@@ -1,0 +1,62 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup)
+
+@(trnForm: Form[RadioConfirm], trn: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@mainTemplate(title = errorPrefix(trnForm) + Messages("removeTrn.title")) {
+
+
+    <a href="@routes.TaxRegController.showYourTaxRegNumbersForm" class="link-back">@Messages("button.back")</a>
+
+    @if(trnForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"),trnForm, Seq.empty, Some("trn"))
+    }
+
+    @form(action = routes.TaxRegController.submitRemoveTaxRegNumber(trn), 'class -> "form js-form") {
+
+        <fieldset>
+
+            <legend class="margin-bottom-10">
+                <h1 class="heading-xlarge margin-bottom-20">@Messages("removeTrn.title")</h1>
+            </legend>
+
+            <div class="form-group" id="isRemovingTrn">
+            @inputRadioGroup(
+                trnForm("isRemovingTrn"),
+                Seq(
+                    "true" -> Messages("removeTrn.form.yes"),
+                    "false" -> Messages("removeTrn.form.no")
+                ),
+                '_groupDivClass -> "soft--ends",
+                '_fieldsetAttributes -> Html("""id='removeTrn'""")
+            )
+
+            </div>
+
+            <div class="form-group">
+                <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
+            </div>
+
+        </fieldset>
+    }
+}

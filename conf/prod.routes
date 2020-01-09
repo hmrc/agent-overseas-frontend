@@ -1,6 +1,7 @@
-# Add all the application routes to the app.routes file
-->         /agent-overseas-frontend              app.Routes
-->         /                          health.Routes
-->         /template                  template.Routes
+# Add all the application routes to the application.routes file
+->         /agent-services/apply-from-outside-uk        application.Routes
 
-GET        /admin/metrics             com.kenshoo.play.metrics.MetricsController.metrics
+->         /                                            health.Routes
+->         /template                                    template.Routes
+
+GET        /admin/metrics                               com.kenshoo.play.metrics.MetricsController.metrics

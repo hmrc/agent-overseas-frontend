@@ -1,0 +1,37 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+
+@this(mainTemplate: main_template)
+
+@()(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = Messages("taxRegNo.more_info_required.title")) {
+
+    <a href="@routes.TaxRegController.showTaxRegistrationNumberForm" class="link-back">@Messages("button.back")</a>
+
+    <h2 class="heading-xlarge margin-bottom-20">@Messages("taxRegNo.more_info_required.title")</h2>
+
+    <p>@Messages("taxRegNo.more_info_required.p1")</p>
+
+    <p>@Messages("taxRegNo.more_info_required.p2")</p>
+
+    <a href="@routes.TaxRegController.showTaxRegistrationNumberForm()" draggable="false" role="button" class="button margin-bottom-30">@Messages("button.back")</a>
+
+}

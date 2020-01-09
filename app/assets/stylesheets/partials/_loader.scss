@@ -1,0 +1,37 @@
+
+.govuk-c-loader {
+  text-align: center;
+  position: relative;
+  line-height: 0;
+}
+
+.govuk-c-loader:focus {
+  outline: 3px solid #ffbf47;
+}
+
+.govuk-c-loader__spinner {
+  z-index: 2000000000;
+}
+
+.govuk-c-loader__label {
+  font-family: "ntatabularnumbers", "nta", Arial, sans-serif;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 16px;
+  display: block;
+  line-height: 1em;
+  margin-top: -.5em;
+  padding-bottom: 1.5em;
+}
+
+.loader {
+  display: none;
+}
+
+
+@media (min-width: 641px) {
+  .govuk-c-loader__label {
+    font-size: 19px;
+    line-height: 1.31579;
+  }
+}

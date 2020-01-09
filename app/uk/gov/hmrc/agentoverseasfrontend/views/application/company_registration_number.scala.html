@@ -1,0 +1,64 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models.CompanyRegistrationNumber
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF)
+
+@(companyRegistrationNumberForm: Form[CompanyRegistrationNumber], backButtonLink: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(companyRegistrationNumberForm) + Messages("companyRegistrationNumber.title")) {
+
+    <a href="@backButtonLink" class="link-back">@Messages("button.back")</a>
+
+    @if(companyRegistrationNumberForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), companyRegistrationNumberForm, Seq.empty, Some("enter-tax-registration-numbers"))
+    }
+
+    @form(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
+        <fieldset>
+            <legend class="margin-bottom-10">
+                <h1 class="heading-xlarge margin-bottom-20 @if(companyRegistrationNumberForm.hasErrors) {push--top}">
+                    <span class="pre-heading">@Messages("companyRegistrationNumber.caption")</span>
+                    @Messages("companyRegistrationNumber.title")
+                </h1>
+            </legend>
+
+            <p>@Messages("companyRegistrationNumber.body.text")</p>
+
+            <div class="multiple-choice" data-target="confirmRegistration">
+                <input id="confirmRegistration_true" type="radio" name="confirmRegistration" value="true" @if(companyRegistrationNumberForm.error("registrationNumber").isDefined || companyRegistrationNumberForm.value.map(_.confirmRegistration == Some(true)).getOrElse(false)) {checked}>
+                <label for="confirmRegistration_true">@Messages("companyRegistrationNumber.form.registered.yes")</label>
+            </div>
+            <div class="panel panel-border-narrow js-hidden @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-group-error}" id="confirmRegistration">
+                <label class="form-label" for="registrationNumber">@Messages("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn")</label>
+                @companyRegistrationNumberForm.errors("registrationNumber").map { formError => <span class="error-message">@Messages(formError.message)</span> }
+                <input data-uppercase="false" class="form-control @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-control-error}" name="registrationNumber" type="text" id="registrationNumber" value="@companyRegistrationNumberForm.value.map(_.registrationNumber.map(_.value) .getOrElse(""))">
+            </div>
+
+            <div class="multiple-choice margin-bottom-30">
+                <input id="confirmRegistration_false" type="radio" name="confirmRegistration" value="false" @if(companyRegistrationNumberForm.value.flatMap(_.confirmRegistration).exists(_ == false)) { checked = "checked" }>
+                <label for="confirmRegistration_false">@Messages("companyRegistrationNumber.form.registered.no")</label>
+            </div>
+        </fieldset>
+
+        <button class="button-block button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+    }
+}

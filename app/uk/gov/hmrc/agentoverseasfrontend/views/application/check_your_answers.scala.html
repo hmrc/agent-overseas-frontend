@@ -1,0 +1,74 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.config.view.{AnswerBlock, CheckYourAnswers, CheckYourAnswersConfirmation}
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.check_answers_div
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@this(mainTemplate: main_template, checkAnswersDiv: check_answers_div, errorPrefix: error_prefix, errorSummary: ErrorSummary, formHelper: FormWithCSRF, singleCheckbox: SingleCheckbox)
+
+@(cyaForm: Form[CheckYourAnswersConfirmation], checkYourAnswers: CheckYourAnswers)(implicit request: Request[_],
+        messages: Messages, appConfig: AppConfig)
+
+@renderAnswerBlock(answerBlock: AnswerBlock) = {
+
+    <h2 class="heading-medium margin-bottom-10">@answerBlock.heading</h2>
+
+    @for(group <- answerBlock.answerGroups) {
+        <div class="app-check-your-answers--group margin-bottom-30">
+            <dl class="app-check-your-answers app-check-your-answers--long">
+            @for(row <- group.answerRows) { @checkAnswersDiv(row) }
+            </dl>
+        </div>
+    }
+}
+
+@mainTemplate(title = errorPrefix(cyaForm) + Messages("checkAnswers.title"), bodyClasses = None) {
+
+    <a href="@checkYourAnswers.backLink" class="link-back">@Messages("button.back")</a>
+
+    <h1 class="heading-xlarge margin-bottom-30">@Messages("checkAnswers.title")</h1>
+
+    @if(cyaForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), cyaForm)
+    }
+
+    @renderAnswerBlock(checkYourAnswers.amlsDetails)
+    @renderAnswerBlock(checkYourAnswers.contactDetails)
+    @renderAnswerBlock(checkYourAnswers.businessDetails)
+    @renderAnswerBlock(checkYourAnswers.otherBusinessDetails)
+
+    <p class="margin-top-30">@Messages("checkAnswers.confirm.p1")</p>
+
+    @formHelper(
+        action = routes.ApplicationController.submitCheckYourAnswers(),
+        'class -> "form js-form",
+        'id -> "checkAnswers") {
+
+        @singleCheckbox(
+            cyaForm("confirmed"),
+            '_label  -> Messages("checkAnswers.confirm.label")
+        )
+
+        <div class="form-group">
+            <button type="submit" id="continue" >@Messages("checkAnswers.confirm.button")</button>
+        </div>
+    }
+
+}

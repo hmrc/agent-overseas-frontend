@@ -1,0 +1,94 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix)
+
+@(upscan: UpscanInitiate, fileType: String, backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = "" + Messages(s"fileUpload.title.$fileType")) {
+
+    <a href="@backLink" class="link-back">@Messages("button.back")</a>
+
+
+    <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data">
+
+        <div class="flash error-summary"
+        id="error-summary-display"
+        role="alert"
+        aria-labelledby="error-summary-heading"
+        tabindex="-1">
+            <h2 id="error-summary-heading" class="h3-heading">@Messages("error.summary.heading")</h2>
+            <ul class="js-error-summary-messages">
+                <li>
+                    <a href="#file-upload" id="#" data-focuses="#file-upload"></a>
+                </li>
+            </ul>
+        </div>
+
+
+        <fieldset>
+            <legend class="margin-bottom-10">
+                <h1 class="heading-xlarge margin-bottom-20">
+                    <span class="pre-heading">@Messages("fileUpload.caption")</span>
+                    @Messages(s"fileUpload.title.$fileType")
+                </h1>
+            </legend>
+            <div class="govuk-box loader" id="file-upload-loading" aria-busy="true"></div>
+            <div class="hide-when-uploading">
+                <p>@Messages(s"fileUpload.p1.$fileType")</p>
+                <p>@Messages("fileUpload.p2")</p>
+                <ul class="list-bullet">
+                    <li>@Messages(s"fileUpload.li.1.$fileType")</li>
+                    <li>@Messages("fileUpload.li.2")</li>
+                    <li>@Messages("fileUpload.li.3")</li>
+                </ul>
+                <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
+                    <label class="" for="file-upload">@Messages("fileUpload.upload")</label>
+                    <span id="file-upload-error" class="error-notification" role="tooltip"></span>
+                    @for((key, value) <- upscan.uploadRequest.fields){
+                        <input type="hidden" name="@key" value="@value">
+                    }
+                    <input class="" id="file-upload" name="file" type="file" accept="application/pdf, image/jpeg">
+
+                </div>
+                <div class="panel panel-border-wide margin-bottom-30">
+                @Messages("fileUpload.inset")
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="form-group hide-when-uploading">
+            <input type="submit" class="button file-upload"
+            data-reference="@upscan.reference"
+            data-filetype="@fileType"
+            data-nofile="@Messages("error.fileUpload.no-file")"
+            data-empty-file="@Messages("error.fileUpload.empty-file")"
+            data-pswd-protected="@Messages("error.fileUpload.password-protected")"
+            data-no-upload="@Messages("error.fileUpload.no-upload")"
+            data-virus="@Messages("error.fileUpload.virus")"
+            data-invalid="@Messages("error.fileUpload.invalid")"
+            data-too-large="@Messages("error.fileUpload.too-large")"
+            value="@Messages("fileUpload.button")">
+        </div>
+
+    </form>
+
+}
+
