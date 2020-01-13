@@ -1,0 +1,66 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers._
+@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup, checkBoxWithConditionalText: checkbox_with_conditional_text)
+
+@(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(agentCodesForm) + Messages("agentCodes.title")) {
+
+    <a href="@backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm)" class="link-back">@Messages("button.back")</a>
+
+    @if(agentCodesForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"),agentCodesForm, Seq.empty, Some("agent-codes"))
+    }
+
+    @form(
+        action = routes.ApplicationController.submitAgentCodes,
+        'class -> "form js-form"
+    ) {
+        <fieldset>
+            <legend>
+                <h1 class="heading-xlarge margin-bottom-20">
+                    <span class="pre-heading">@Messages("agentCodes.caption")</span>
+                    @Messages("agentCodes.title")
+                </h1>
+            </legend>
+
+            <p>@Messages("agentCodes.p1")</p>
+
+            <p id="agent-codes" class="faded-text margin-bottom-20">@Messages("agentCodes.form.hint")</p>
+
+            <div aria-describedby="agent-codes" class="panels-conditionals form-group margin-bottom-30">
+                @checkBoxWithConditionalText(agentCodesForm("self-assessment"),
+                    '_labelCheckbox -> Messages("agentCodes.form.self-assessment.label"),
+                    '_labelInset -> Messages("agentCodes.form.self-assessment.inset"))
+
+                @checkBoxWithConditionalText(agentCodesForm("corporation-tax"),
+                    '_labelCheckbox -> Messages("agentCodes.form.corporation-tax.label"),
+                    '_labelInset -> Messages("agentCodes.form.corporation-tax.inset"))
+            </div>
+
+        </fieldset>
+
+        <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+    }
+}

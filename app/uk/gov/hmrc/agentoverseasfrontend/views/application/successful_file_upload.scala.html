@@ -1,0 +1,61 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup)
+
+@(uploadSuccessForm: Form[SuccessfulFileUploadConfirmation], fileName: Option[String], fileType: String, backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(uploadSuccessForm) + Messages("fileUpload.success.title")) {
+
+    <a href="@backLink" class="link-back">@Messages("button.back")</a>
+
+    @if(uploadSuccessForm.hasErrors) {
+         @errorSummary(Messages("error.summary.heading"),uploadSuccessForm, Seq.empty, Some("successful-file-upload"))
+    }
+
+
+    @form(action = routes.FileUploadController.submitSuccessfulFileUploadedForm, 'class -> "form js-form" ){
+
+            <h1 class="heading-xlarge margin-bottom-30">
+                <span class="pre-heading">@Messages("fileUpload.success.caption")</span>
+                @Messages("fileUpload.success.title")
+            </h1>
+
+            <div class="form-group">
+                <input type="hidden" name="fileType" value="@fileType">
+                @inputRadioGroup(
+                uploadSuccessForm("choice.correctFile"),
+                Seq(
+                "true" -> Messages("fileUpload.success.form.correctFile.yes"),
+                "false" -> Messages("fileUpload.success.form.correctFile.no")
+                ),
+                '_legend -> Html("""<h2 class="margin-top-10">""" + Messages(s"fileUpload.success.correctFile.confirmation", fileName.getOrElse("")) + """</h2>"""),
+                '_groupDivClass -> "soft--ends",
+                '_fieldsetAttributes -> Html("""id='choice.correctFile'""")
+                )
+            </div>
+
+            <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+
+    }
+}

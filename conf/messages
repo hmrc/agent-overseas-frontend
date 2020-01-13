@@ -1,0 +1,453 @@
+# Error messages for digital services
+global.error.400.title=Bad request - 400
+global.error.400.heading=Bad request
+global.error.400.message=Please check that you have entered the correct web address.
+global.error.404.title=Page not found - 404
+global.error.404.heading=This page can’t be found
+global.error.404.message=Please check that you have entered the correct web address.
+global.error.500.title=Sorry, there is a problem with the service - 500
+global.error.500.heading=Sorry, there is a problem with the service
+global.error.500.message=Try again later.
+global.error.500.p2=We may not have saved your answers. When the service is available, you may have to start again.
+global.error.500.vat_helpline.link=Call the VAT online services helpline
+global.error.500.vat_helpline=if you need help with Making Tax Digital for VAT.
+global.error.500.sa_helpline.link=Call the HMRC Self Assessment online services helpline
+global.error.500.sa_helpline=if you need help with Making Tax Digital for Income Tax.
+
+#session time out
+timeout-dialog.title=You are about to be signed out
+timeout-dialog.seconds=seconds
+timeout-dialog.minutes=minutes
+timeout-dialog.minute=minute
+timeout-dialog.button=Stay signed in
+timeout-dialog.p1=For security reasons, you will be signed out in
+
+#timed out
+timed-out.header=You have been signed out
+timed-out.p1=You have not done anything for {0}, so we have signed you out to keep your account secure.
+timed-out.p2.link=Sign in again
+timed-out.p2=to use this service.
+
+# Validation errors
+error.prefix=Error:
+error.boolean=Please select one of the options
+error.summary.heading=There is a problem
+error.postcode.invalid=You can only enter these characters: A-Z 0-9
+error.string.invalid=You can only enter these characters: a-z A-Z 0-9 ,.() - ! @ space
+error.maxLength=You can only enter up to {0} characters
+error.no-radio-selected=You must choose an option
+error.amls.required.empty=Select yes if your country requires you to register with a money laundering supervisory body
+
+error.jobTitle.blank=Enter your job title
+error.jobTitle.invalid=Job title must only include letters a to z, apostrophes, hyphens and spaces
+error.jobTitle.length=Job title must be between 2 and 50 characters
+
+error.moneyLaunderingCompliance.amlsbody.blank=Enter the name of the supervisory body
+error.moneyLaunderingCompliance.amlsbody.invalid=Name of supervisory body must only include letters a to z, numbers, apostrophes, commas, ampersands (&), round brackets, forward slashes, full stops, hyphens and spaces
+error.moneyLaunderingCompliance.amlsbody.maxlength=Name of supervisory body must be 100 characters or less
+
+error.firstName.blank=Enter your first name
+error.firstName.invalid=First name must only include letters a to z, apostrophes, hyphens and spaces
+error.firstName.maxlength=First name must be 35 characters or less
+
+error.lastName.blank=Enter your last name
+error.lastName.invalid=Last name must only include letters a to z, apostrophes, hyphens and spaces
+error.lastName.maxlength=Last name must be 35 characters or less
+
+error.membershipNumber.invalid=Membership number must only include letters a to z, numbers, hyphens, forward slashes and spaces
+error.membershipNumber.maxlength=Membership number must be 24 characters or less
+
+error.telephone.blank=Enter your business telephone number
+error.telephone.invalid=Enter a business telephone number in the correct format, like 0048 605 555 555
+error.telephone.maxlength=Business telephone number must be 24 characters or less
+
+error.email.blank=Enter your business email address
+error.email.invalid=Enter an email address in the correct format, like name@example.com
+error.email=Enter an email address in the correct format, like name@example.com
+error.email.maxlength=Business email address must be 132 characters or less
+
+error.tradingName.blank=Enter the trading name of your business
+error.tradingName.invalid=Trading name must only include letters a to z, numbers, hyphens, forward slashes and spaces
+error.tradingName.maxlength=Trading name must be 40 characters or less
+
+error.addressline.1.blank=Enter Address line 1
+error.addressline.1.invalid=Address line 1 must only include letters a to z, numbers, exclamation marks, forward slashes, quotation marks, round brackets and spaces
+error.addressline.1.maxlength=Address line 1 must be 35 characters or less
+
+error.addressline.2.blank=Enter Address line 2
+error.addressline.2.invalid=Address line 2 must only include letters a to z, numbers, exclamation marks, forward slashes, quotation marks, round brackets and spaces
+error.addressline.2.maxlength=Address line 2 must be 35 characters or less
+
+error.addressline.3.invalid=Address line 3 must only include letters a to z, numbers, exclamation marks, forward slashes, quotation marks, round brackets and spaces
+error.addressline.3.maxlength=Address line 3 must be 35 characters or less
+
+error.addressline.4.invalid=Address line 4 must only include letters a to z, numbers, exclamation marks, forward slashes, quotation marks, round brackets and spaces
+error.addressline.4.maxlength=Address line 4 must be 35 characters or less
+
+error.saAgentCode.blank=Enter a Self Assessment agent code
+error.saAgentCode.invalid=Self Assessment agent code must be only include letters a to z and numbers
+error.saAgentCode.maxlength=Self Assessment agent code must be 6 characters, like SA1234
+
+error.ctAgentCode.blank=Enter a Corporation Tax agent code
+error.ctAgentCode.invalid=Corporation Tax agent code must be only include letters a to z and numbers
+error.ctAgentCode.maxlength=Corporation Tax agent code must be 6 characters, like 12345A or A1234A
+
+error.nino.blank=Enter your National Insurance number
+error.nino.invalid=Enter a National Insurance number in the correct format
+
+error.sautr.blank=Enter your Self Assessment Unique Taxpayer Reference (UTR)
+error.sautr.invalid=Self Assessment Unique Taxpayer Reference (UTR) must be 10 numbers
+error.sautr.maxlength=Self Assessment Unique Taxpayer Reference (UTR) must be 10 numbers
+
+error.crn.blank=Enter your company registration number or equivalent
+error.crn.invalid=Company registration number must only include letters a to z, numbers, forward slashes, full stops, hyphens and spaces
+error.crn.maxlength=Company registration number must be 40 characters or less
+
+error.trn.blank=Enter your tax registration number
+error.trn.invalid=Tax registration number must only include letters a to z, numbers and spaces
+error.trn.maxlength=Tax registration number must be 24 characters or less
+
+error.registeredWithHmrc.no-radio.selected=Select yes if you are registered as an agent with HMRC
+error.registeredForUkTaxForm.no-radio.selected=Select yes if you are registered to pay UK tax or National Insurance
+error.personalDetails.no-radio.selected=Select if you want to enter a National Insurance number, or if you want to enter a Self Assessment Unique Taxpayer Reference (UTR), or if you do not have these details
+error.removeTrn.no-radio.selected=Select yes if you want to remove this tax registration number
+
+error.fileUpload.no-file=Select a file
+error.fileUpload.empty-file=The selected file is empty
+error.fileUpload.too-large=The selected file must be smaller than 5MB
+error.fileUpload.password-protected=The selected file is password protected
+error.fileUpload.no-upload=The selected file could not be uploaded - try again
+error.fileUpload.virus=The selected file contains a virus
+error.fileUpload.invalid=The selected file must be a PDF or JPG
+
+
+# Service specific messages
+app.name=Apply for an agent services account if you are not in the UK
+servicename.titleSuffix=Apply for an agent services account if you are not in the UK - GOV.UK
+
+# Common
+button.continue=Continue
+button.back=Back
+button.register=Create a Government Gateway account
+
+error.country.empty=Enter your country
+error.country.invalid=Select a country from the list
+
+# Application under review
+
+application_not_ready.title=Application received
+application_not_ready.p1=We received your application for approval to create an agent services account for {0} on {1}.
+application_not_ready.h2=What happens next
+application_not_ready.p2=We may get in touch with you to discuss your application.
+application_not_ready.p3=We will tell you within {0} calendar days if your application has been approved. We will also tell you how to set up your account.
+application_not_ready.p4=If your application is rejected we will tell you why.
+application_not_ready.h3=If you need help
+application_not_ready.p5=If you need help using this service, use the ''get help with this page'' link at the bottom of this page.
+
+# AMLS required
+amls.required.title=Does your country require you to register with a money laundering supervisory body?
+amls.required.yes=Yes
+amls.required.no=No
+
+# AMLS
+amls.title=Money laundering compliance details
+amls.inset.p1=You must be registered with a money laundering supervisory body before you can apply for an agent services account.
+amls.form.supervisory_body=Name of supervisory body
+amls.form.membership_number=Membership number (optional)
+amls.hint.expandable=I am not registered with a money laundering supervisory body
+amls.hint.expandable.p1=You cannot apply for an agent services account if you are not registered.
+amls.hint.expandable.p2=For details about who can apply, <a href="{0}" target="_blank" id="guidance">check the guidance (opens in a new window or tab)</a>.
+amls.hint.expandable.sign_out=<a href="{0}" id="signOut">Finish and sign out</a>
+
+# Contact Details
+contactDetails.caption=Your details
+contactDetails.title=Your contact details
+contactDetails.inset.p1=You need to be a director, owner or senior company officer of the business you are applying for.
+contactDetails.body.text=We need this information to contact you about your application.
+contactDetails.form.firstName=First name
+contactDetails.form.lastName=Last name
+contactDetails.form.jobTitle=Job title
+contactDetails.form.businessTelephone=Business telephone number
+contactDetails.form.businessTelephone.hint=For international numbers include the country code
+contactDetails.form.businessEmail=Business email address
+
+mainBusinessAddress.caption=Your business details
+mainBusinessAddress.title=Your main trading address
+mainBusinessAddress.body.text=This address cannot be a PO Box or third party address.
+mainBusinessAddress.form.addressLine1=Address line 1
+mainBusinessAddress.form.addressLine2=Address line 2
+mainBusinessAddress.form.addressLine3=Address line 3 (optional)
+mainBusinessAddress.form.addressLine4=Address line 4 (optional)
+mainBusinessAddress.form.country=Country
+
+# File Upload
+fileUpload.title.trading-address=Upload proof of your trading address
+fileUpload.p1.trading-address=You need to upload a document that shows your trading address, like a bank statement or utility bill.
+fileUpload.li.1.trading-address=dated in the last 3 months
+fileUpload.title.amls=Upload proof of anti-money laundering registration
+fileUpload.p1.amls=You need to upload a document that shows your business is registered with a money laundering supervisory body, such as a letter from your supervisory body.
+fileUpload.li.1.amls=dated in the last 12 months
+fileUpload.title.trn=Upload proof of tax registration
+fileUpload.p1.trn=You need to upload a document that shows your business is registered for tax, such as a letter from a tax authority.
+fileUpload.li.1.trn=dated in the last 12 months
+
+fileUpload.caption=Your business details
+fileUpload.p2=Your document needs to be:
+fileUpload.li.2=in PDF or JPG format
+fileUpload.li.3=no more than 5MB
+fileUpload.upload=Upload a file
+fileUpload.inset=It may take a few moments to upload your file. Do not close this window while your file is uploading.
+fileUpload.button=Upload your file
+
+fileUploadTradingAddress.no_js_page.caption=Your business details
+fileUploadTradingAddress.no_js_page.title=We are checking your file
+fileUploadTradingAddress.no_js_page.p1=It may take a few moments to check your file.
+fileUploadTradingAddress.no_js_page.p2=Do not close this window.
+
+fileUpload.correctFile.no-radio.selected=Select yes if the file you uploaded is correct
+fileUpload.success.caption=Your business details
+fileUpload.success.title=Your file was uploaded successfully
+fileUpload.success.form.correctFile.yes=Yes
+fileUpload.success.form.correctFile.no=No
+fileUpload.success.correctFile.confirmation=Is {0} the correct file?
+
+fileUpload.failed.caption=Your business details
+fileUpload.failed.title=There is a problem
+fileUpload.failed.p1=The file you uploaded did not pass our security checks.
+fileUpload.failed.try-again.label=Try again
+
+#Non agent
+nonAgent.title=You have not signed in with an agent user ID
+nonAgent.p1=<a href="{0}">Sign in with an agent Government Gateway user ID</a> to continue.
+nonAgent.p2=If you do not have one, you need to <a href="{0}">create a new user ID</a>, selecting the ''Agent'' option.
+
+# Trading name
+tradingName.title=What is the trading name of your business?
+tradingName.p1=Your business details
+
+# Registered With HMRC
+registeredWithHmrc.title=Are you registered as an agent with HMRC?
+registeredWithHmrc.caption=Other business details
+registeredWithHmrc.form.title=We need to know if you are registered, so we can confirm who you are.
+registeredWithHmrc.form.registered.yes=Yes
+registeredWithHmrc.form.registered.no=No
+
+# Registered for UK Tax
+ukTaxRegistration.title=Are you registered to pay UK tax or National Insurance?
+ukTaxRegistration.caption=Your details
+ukTaxRegistration.form.title=We need to know if you are registered, so we can confirm who you are.
+ukTaxRegistration.form.registered.yes=Yes
+ukTaxRegistration.form.registered.no=No
+
+# Agent codes
+agentCodes.title=Tell us about any HMRC agent codes you have for these services
+agentCodes.caption=Other business details
+agentCodes.p1=This will help us match your details against information we hold.
+agentCodes.form.hint=Select all that apply or leave blank if you are not sure.
+agentCodes.form.self-assessment.label=Self Assessment
+agentCodes.form.self-assessment.inset=Self Assessment agent code
+agentCodes.form.corporation-tax.label=Corporation Tax
+agentCodes.form.corporation-tax.inset=Corporation Tax agent code
+
+# Personal details
+personalDetails.title=Your UK tax or National Insurance details
+personalDetails.p1=You need to enter your UK National Insurance number or Self Assessment Unique Taxpayer Reference (UTR). This will help us match your details against information we hold.
+personalDetails.p2=Select one option.
+personalDetails.form.nino=National Insurance number
+personalDetails.form.input.label.nino=National Insurance number
+personalDetails.form.helper.nino=For example, QQ 12 34 56 C
+personalDetails.form.sautr=Self Assessment UTR
+personalDetails.form.input.label.sautr=Self Assessment UTR
+personalDetails.form.helper.sautr=For example, 12345 67890
+
+# Has Tax Registration Number Radio Button
+taxRegNo.title=Do you have any tax registration numbers in your country?
+taxRegNo.caption=Other business details
+taxRegNo.p1=This information will help us to confirm who you are.
+taxRegNo.form.yes=Yes
+taxRegNo.form.yes.prompt=Enter your tax registration number
+taxRegNo.form.no=No
+taxRegNo.form.no-radio.selected=Select yes if you have any tax registration numbers in your country
+taxRegNo.more_info_required.title=You need to enter your tax registration details
+taxRegNo.more_info_required.p1=You cannot submit your application if you do not have this information.
+taxRegNo.more_info_required.p2=Go back and enter your tax registration details.
+
+# Company Registration Number
+companyRegistrationNumber.title=Does your business have a company registration number or equivalent in your country?
+companyRegistrationNumber.caption=Other business details
+companyRegistrationNumber.body.text=This information will help us to confirm your business details.
+companyRegistrationNumber.form.registered.yes=Yes
+companyRegistrationNumber.form.registered.no=No
+companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn=Enter the company registration number
+companyRegistrationNumber.error.no-radio.selected=Select yes if your business has a company registration number or equivalent in your country
+
+# Add tax registration number
+addTrn.title=What is your tax registration number?
+
+# Remove tax registration number
+removeTrn.title=Are you sure you want to remove this tax registration number?
+removeTrn.form.yes=Yes
+removeTrn.form.no=No
+
+# Update tax registration number
+updateTrn.title=Update your tax registration number
+
+
+# Your tax registration numbers
+yourTaxRegistrationNumbers.caption=Other business details
+yourTaxRegistrationNumbers.title=Your tax registration numbers
+yourTaxRegistrationNumbers.body.text=You have added {0} tax registration numbers.
+yourTaxRegistrationNumbers.remove.button=Remove
+yourTaxRegistrationNumbers.update.button=Edit
+yourTaxRegistrationNumbers.want.to.add.another=Do you want to add another tax registration number?
+yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.yes=Yes
+yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.no=No
+doYouWantToAddAnotherTrn.error.no-radio.selected=Select yes if you want to add another tax registration number
+
+# Check Answers
+checkAnswers.title=Check your details before sending your application
+checkAnswers.change.button=Change
+checkAnswers.amlsDetails.title=Money laundering compliance details
+checkAnswers.amlsDetails.amlsRequired=Required to register with a money laundering supervisory body
+checkAnswers.amlsDetails.amlsRequired.true=Yes
+checkAnswers.amlsDetails.amlsRequired.false=No
+checkAnswers.amlsDetails.supervisoryBody=Name of supervisory body
+checkAnswers.amlsDetails.membershipNumber=Membership number
+checkAnswers.amlsFile.title=Proof of anti-money laundering registration
+
+checkAnswers.contactDetails.title=Your contact details
+checkAnswers.contactDetails.name=Name
+checkAnswers.contactDetails.visuallyHiddenText=contact details
+checkAnswers.contactDetails.jobTitle=Job title
+checkAnswers.contactDetails.businessTelephone=Business telephone number
+checkAnswers.contactDetails.businessEmail=Business email address
+
+checkAnswers.BusinessDetails.title=Your business details
+checkAnswers.tradingName.title=Main trading name
+checkAnswers.mainBusinessAddress.title=Main trading address
+checkAnswers.tradingAddressFile.title=Proof of trading address
+
+checkAnswers.registeredWithHmrc.title=Registered as agent with HMRC?
+checkAnswers.agentCode.title=Agent Codes
+checkAnswers.agentCode.empty=No codes given
+checkAnswers.agentCode.selfAssessment=Self Assessment agent code
+checkAnswers.agentCode.corporationTax=Corporation Tax agent code
+
+checkAnswers.registeredForUKTax.title=Registered to pay UK tax or National Insurance?
+
+checkAnswers.personalDetails.nino.title=National Insurance number
+checkAnswers.personalDetails.saUtr.title=Self Assessment UTR
+
+checkAnswers.companyRegistrationNumber.title=Company registration number
+checkAnswers.companyRegistrationNumber.empty=None
+checkAnswers.taxRegistrationNumbers.title=Tax registration numbers
+checkAnswers.taxRegistrationNumbers.empty=None
+checkAnswers.taxRegistrationNumbersFile.title=Proof of tax registration
+
+checkAnswers.OtherBusinessDetails.title=Other business or personal details
+
+checkAnswers.confirm.p1=By submitting this application you are confirming that, to the best of your knowledge, the details you providing are correct.
+checkAnswers.confirm.button=Confirm answers and send application
+
+checkAnswers.confirm.label=I confirm that my agent business complies with the anti-money laundering regulations in my country.
+checkAnswers.confirm.error=You must confirm that you comply with anti-money laundering rules in your country
+
+# Application Complete
+applicationComplete.title=Application complete
+applicationComplete.panel.body=We received your application for
+applicationComplete.whatHappensNext.heading=What happens next
+applicationComplete.whatHappensNext.para1=We will send a confirmation email to {0}.
+applicationComplete.whatHappensNext.para2=We may get in touch with you to discuss your application.
+applicationComplete.whatHappensNext.para3=We will tell you within 28 calendar days if your application has been approved. We will also tell you how to set up your account.
+applicationComplete.whatHappensNext.para4=If your application is rejected we will tell you why.
+applicationComplete.whatYouCanDoNext.heading=What you can do next
+applicationComplete.whatYouCanDoNext.link=Check the guidance on GOV.UK
+applicationComplete.whatYouCanDoNext.text=to find out how to track the progress of your application.
+applicationComplete.help.heading=If you need help
+applicationComplete.help.text=If you need help using this service, use the ''get help with this page'' link at the bottom of the page.
+applicationComplete.print=Print this page
+applicationComplete.feedback.link=What did you think of this service?
+applicationComplete.feedback.text=(takes 30 seconds)
+
+# Status rejected
+statusRejected.title=Application rejected
+statusRejected.para1=We have rejected your application for an agent services account for {0}.
+statusRejected.para2=We have sent an email to {0} to confirm our decision.
+statusRejected.heading=If you want to apply again
+statusRejected.para3=Before you apply again, you should read the decision to find out why your application was rejected.
+statusRejected.link=If you want to apply again, you will need to {0}
+statusRejected.link.text=start a new application
+
+# Accessibility Statement
+accessibility.statement.title=Accessibility statement for apply for an agent services account if you are not in the UK
+accessibility.statement.h1=Accessibility statement for apply for an agent services account if you are not in the UK
+accessibility.statement.intro.p1=This accessibility statement explains how accessible this service is, what to do if you have difficulty using it, and how to report accessibility problems with the service.
+accessibility.statement.intro.p2=This service is part of the wider GOV.UK website. There is a separate <a href="https://www.gov.uk/help/accessibility">accessibility statement</a> for the main GOV.UK website.
+accessibility.statement.intro.p3=This page only contains information about the apply for an agent services account if you are not in the UK service, available at <a href="https://www.tax.service.gov.uk/agent-services/apply-from-outside-uk">www.tax.service.gov.uk/agent-services/apply-from-outside-uk</a>.
+
+accessibility.statement.using.heading=Using this service
+accessibility.statement.using.p1=This service allows you to apply to HMRC for approval to create an agent services account, if your agent business is based outside the UK.
+accessibility.statement.using.p2=This service is run by HM Revenue and Customs (HMRC). We want as many people as possible to be able to use this service. This means you should be able to:
+accessibility.statement.using.l1=change colours, contrast levels and fonts
+accessibility.statement.using.l2=zoom in up to 300% without the text spilling off the screen
+accessibility.statement.using.l3=get from the start of the service to the end using just a keyboard
+accessibility.statement.using.l4=get from the start of the service to the end using speech recognition software
+accessibility.statement.using.l5=listen to the service using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)
+accessibility.statement.using.p3=We have also made the text in the service as simple as possible to understand.
+accessibility.statement.using.p4=<a class="govuk-link" href="https://mcmw.abilitynet.org.uk/">AbilityNet</a> has advice on making your device easier to use if you have a disability.
+
+accessibility.statement.accessible.heading=How accessible this service is
+accessibility.statement.accessible.p1=This service is partially compliant with the <a class="govuk-link" href="https://www.w3.org/TR/WCAG21/">Web Content Accessibility Guidelines version 2.1 AA standard</a>.
+accessibility.statement.accessible.p2=Some people may find parts of this service difficult to use:
+accessibility.statement.accessible.p3=some of the pages in the service have a redundant fieldset, which could prevent users browsing out of context from understanding what is being selected
+accessibility.statement.accessible.p4=the input field on the ’Do you have any tax registration numbers in your country?’ page is unlabelled, which may prevent some users from understanding what they need to enter into the field
+accessibility.statement.accessible.p5=the ’Have you applied for money laundering supervision with HMRC?’ page does not have a fieldset and legend attribute, so the purpose of the radio buttons may be unclear for some users
+accessibility.statement.accessible.p6=the ’Remove’ button on the ’Your tax registration numbers’ page does not have a descriptive link
+accessibility.statement.accessible.p7=the ’Your tax registration numbers’ page does not have a legend attribute, so the purpose of the radio buttons may be unclear for some users
+
+accessibility.statement.whattodo.heading=What to do if you have difficulty using this service
+accessibility.statement.whattodo.p1=If you have difficulty using this service, use the ‘Get help with this page’ link on the page in the online service.
+
+accessibility.statement.reporting.heading=Reporting accessibility problems with this service
+accessibility.statement.reporting.p1=We are always looking to improve the accessibility of this service. If you find any problems that are not listed on this page or think we are not meeting accessibility requirements, report the <a href="{0}" target="_blank">accessibility problem (opens in a new window or tab)</a>.
+
+accessibility.statement.enforcement.heading=What to do if you are not happy with how we respond to your complaint
+accessibility.statement.enforcement.p1=The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’). If you are not happy with how we respond to your complaint, <a href="https://www.equalityadvisoryservice.com/">contact the Equality Advisory and Support Service</a> (EASS), or the <a href="https://www.equalityni.org/Home">Equality Commission for Northern Ireland</a> (ECNI) if you live in Northern Ireland.
+
+accessibility.statement.contacting.heading=Contacting us by phone or getting a visit from us in person
+accessibility.statement.contacting.p1=We provide a text relay service if you are deaf, hearing impaired or have a speech impediment.
+accessibility.statement.contacting.p2=We can provide a British Sign Language (BSL) interpreter, or you can arrange a visit from an HMRC advisor to help you complete the service.
+accessibility.statement.contacting.p3=Find out how to <a href="https://www.gov.uk/dealing-hmrc-additional-needs">contact us</a>.
+
+accessibility.statement.technical.heading=Technical information about this service’s accessibility
+accessibility.statement.technical.p1=HMRC is committed to making this service accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
+accessibility.statement.technical.p2=This service is partially compliant with the <a href="https://www.w3.org/TR/WCAG21/">Web Content Accessibility Guidelines version 2.1 AA standard</a> due to the compliances listed below.
+accessibility.statement.technical.p3=Non-accessible content
+accessibility.statement.technical.p4=The content listed below is non-accessible for the following reasons.
+accessibility.statement.technical.p5=Non-compliance with the accessibility regulations
+accessibility.statement.technical.p6=Some of the pages in the service have a redundant fieldset, which could prevent users browsing out of context from understanding what is being selected. This doesn’t meet WCAG success criterion 1.3.1 (Info and Relationships) and 4.1.1 (Parsing).
+accessibility.statement.technical.p7=The input field on the ’Do you have any tax registration numbers in your country?’ page is unlabelled, which may prevent some users from understanding what they need to enter into the field. This doesn’t meet WCAG success criterion 1.3.1 (Info and Relationships) and 3.3.2 (Labels or Instructions).
+accessibility.statement.technical.p8=The ’Have you applied for money laundering supervision with HMRC?’ page does not have a fieldset and legend attribute, so the purpose of the radio buttons may be unclear for some users. This doesn’t meet WCAG success criterion 1.3.1 (Info and Relationships).
+accessibility.statement.technical.p9=The ’Remove’ button on the ’Your tax registration numbers’ page does not have a descriptive link. This doesn’t meet WCAG 2.1 success criterion 2.4.4 (Link Purpose in context).
+accessibility.statement.technical.p10=The ’Your tax registration numbers’ page does not have a legend attribute, so the purpose of the radio buttons may be unclear for some users. This doesn’t meet WCAG success criterion 4.1.1 (Parsing).
+accessibility.statement.technical.p11=The current visible focus indicator on some pages in this service does not meet the required ratio of 3:1. This doesn’t meet WCAG success criterion 1.4.11 (Non-text Contrast).
+accessibility.statement.technical.p12=The ’Edit’ button on the ’Your tax registration numbers’ page does not have a descriptive label to give the button more context. This doesn’t meet WCAG success criterion 2.4.6 (Headings and Labels).
+accessibility.statement.technical.p13=The ’Your contact details’ page does not use an autocomplete feature to allow users to fill this information in automatically. This doesn’t meet WCAG success criterion 1.3.5 (Identify Input Purpose).
+accessibility.statement.technical.p14=We have carried out an in-house expert review of the service and fixed these accessibility issues.
+accessibility.statement.technical.p15=We will arrange a further formal external audit of the full service as soon as possible, as part of our roadmap for making sure the service is fully compliant.
+accessibility.statement.technical.p16=We have carried out an in-house expert review of the service and fixed all known accessibility issues.
+accessibility.statement.technical.p17=We will arrange a formal external audit of the full service as soon as possible, as part of our roadmap for making sure the service is fully compliant.
+
+accessibility.statement.nonaccessible.heading=Non accessible content
+accessibility.statement.nonaccessible.p1=The content listed below is non-accessible for the following reasons.
+
+accessibility.statement.noncompliance.heading=Non compliance with the accessibility regulations
+
+accessibility.statement.howtested.heading=How we tested this service
+accessibility.statement.howtested.p1=The service was last tested on 23 October 2019 and was checked for compliance with WCAG 2.1 AA.
+accessibility.statement.howtested.p2=The full service was tested by HMRC and included disabled users.
+accessibility.statement.howtested.p3=This page was prepared on 23 September 2019. It was last updated on 23 September 2019.
+
+# Accessibility link
+footer.links.accessibility.text=Accessibility
+footer.links.accessibility.url=/agent-services/apply-from-outside-uk/accessibility-statement

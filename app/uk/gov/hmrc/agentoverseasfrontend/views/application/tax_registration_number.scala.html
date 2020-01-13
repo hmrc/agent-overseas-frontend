@@ -1,0 +1,67 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models.TaxRegistrationNumber
+@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup)
+
+@(taxRegistrationNumberForm: Form[TaxRegistrationNumber], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(taxRegistrationNumberForm) + Messages("taxRegNo.title")) {
+
+    <a href="@backLink.getOrElse(routes.ApplicationController.showCompanyRegistrationNumberForm())" class="link-back">@Messages("button.back")</a>
+
+    @if(taxRegistrationNumberForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), taxRegistrationNumberForm, Seq.empty, Some("enter-tax-registration-numbers"))
+    }
+
+    @form(action = routes.TaxRegController.submitTaxRegistrationNumber(), 'class -> "form js-form") {
+        <div class="form-group @if(taxRegistrationNumberForm.error("value").isDefined) {form-group-error}" id="radioResponse">
+            <fieldset>
+                <legend>
+                    <h1 class="heading-xlarge margin-bottom-20 @if(taxRegistrationNumberForm.hasErrors) {push--top}">
+                        <span class="pre-heading">@Messages("taxRegNo.caption")</span>
+                        @Messages("taxRegNo.title")
+                    </h1>
+                </legend>
+
+                <p>@Messages("taxRegNo.p1")</p>
+
+                <div class="multiple-choice" data-target="taxRegNoFormTarget">
+                    <input id="canProvideTaxRegNo_true" type="radio" name="canProvideTaxRegNo" value="true" @if(taxRegistrationNumberForm.error("value").isDefined || taxRegistrationNumberForm.value.map(_.canProvideTaxRegNo == Some(true)).getOrElse(false)) {checked}>
+                    <label for="canProvideTaxRegNo_true">@Messages("taxRegNo.form.yes")</label>
+                </div>
+                <div class="panel panel-border-narrow js-hidden @if(taxRegistrationNumberForm.error("value").isDefined) {form-group-error}" id="taxRegNoFormTarget">
+                    <label class="form-label" for="value">@Messages("taxRegNo.form.yes.prompt")</label>
+                    @taxRegistrationNumberForm.errors("value").map { formError => <span class="error-message">@Messages(formError.message)</span> }
+                    <input class="form-control @if(taxRegistrationNumberForm.error("value").isDefined) {form-control-error}" name="value" type="text" id="value" value="@taxRegistrationNumberForm.value.map(_.value.map(_.value).getOrElse(""))">
+                </div>
+
+                <div class="multiple-choice">
+                    <input id="canProvideTaxRegNo_false" type="radio" name="canProvideTaxRegNo" value="false" @if(taxRegistrationNumberForm.value.map(_.canProvideTaxRegNo == Some(false)).getOrElse(false)) {checked}>
+                    <label for="canProvideTaxRegNo_false">@Messages("taxRegNo.form.no")</label>
+                </div>
+            </fieldset>
+        </div>
+
+        <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+    }
+}

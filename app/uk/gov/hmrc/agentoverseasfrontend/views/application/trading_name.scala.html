@@ -1,0 +1,51 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF)
+
+@(tradingNameForm: Form[String], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(tradingNameForm) + Messages("tradingName.title")) {
+
+    <a href="@backLink.getOrElse(routes.ApplicationController.showContactDetailsForm)" class="link-back">@Messages("button.back")</a>
+
+    @if(tradingNameForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"),tradingNameForm, Seq.empty, Some("trading-name"))
+    }
+
+    @form(action = routes.ApplicationController.submitTradingName, 'class -> "form js-form") {
+        <label for="tradingName" class="margin-bottom-10">
+            <h1 class="heading-xlarge margin-bottom-20">
+                <span class="pre-heading">@Messages("tradingName.p1")</span>
+                @Messages("tradingName.title")
+            </h1>
+        </label>
+
+        <div class="form-group @if(tradingNameForm.error("tradingName").isDefined){form-group-error form-field--error}">
+            @tradingNameForm.error("tradingName").map{formError => <span class="error-message"> @Messages(formError.message)</span>}
+            <input type="text" class="form-control--block" name="tradingName" id="tradingName" value="@tradingNameForm.value.getOrElse("")">
+        </div>
+
+        <div class="form-group">
+            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
+        </div>
+    }
+}

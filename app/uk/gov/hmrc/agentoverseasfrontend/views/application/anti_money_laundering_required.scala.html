@@ -1,0 +1,63 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, uiInput: Input, inputRadioGroup: InputRadioGroup, uiFormHelper: FormWithCSRF, errorSummary: ErrorSummary)
+
+@(amlsRequiredForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@headerTitle = {
+    <h1 class="heading-xlarge  margin-bottom-20 @if(amlsRequiredForm.hasErrors){push--top}">
+    @Messages("amls.required.title")
+    </h1>
+}
+
+@mainTemplate(title = errorPrefix(amlsRequiredForm) + Messages("amls.required.title")) {
+
+    @if(backLink.isDefined) {
+        <a href="@backLink" class="link-back">@Messages("button.back")</a>
+    }
+
+    @if(amlsRequiredForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), amlsRequiredForm, Seq.empty, Some("amls-required-form"))
+    }
+
+    @uiFormHelper(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired, 'class -> "form js-form", 'id -> "amlsRequiredForm") {
+
+          <div class="form-group">
+              @inputRadioGroup(
+                  amlsRequiredForm("amlsRequired"),
+                  Seq(
+                      "true" -> Messages("amls.required.yes"),
+                      "false" -> Messages("amls.required.no")
+                  ),
+                  '_legend -> headerTitle,
+                  '_fieldsetAttributes -> Html("""id='amlsRequired'""")
+              )
+          </div>
+
+        <div class="form-group">
+            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
+        </div>
+
+
+    }
+}

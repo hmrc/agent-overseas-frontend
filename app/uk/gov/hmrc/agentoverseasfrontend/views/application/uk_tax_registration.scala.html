@@ -1,0 +1,62 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, inputRadioGroup: InputRadioGroup, form: FormWithCSRF)
+
+@(registeredForUkTaxForm: Form[RadioConfirm], backLinkRoute: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@headerTitle = {
+    <p>@Messages("ukTaxRegistration.form.title")</p>
+}
+
+@mainTemplate(title = errorPrefix(registeredForUkTaxForm) + Messages("ukTaxRegistration.title")) {
+
+    <a href="@backLinkRoute" class="link-back">@Messages("button.back")</a>
+
+    @if(registeredForUkTaxForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"),registeredForUkTaxForm, Seq.empty, Some("registered-uk-tax-form"))
+    }
+
+    @form(action = routes.ApplicationController.submitUkTaxRegistration, 'class -> "form js-form") {
+
+      <h1 class="heading-xlarge margin-bottom-20">
+          <span class="pre-heading">@Messages("ukTaxRegistration.caption")</span>
+          @Messages("ukTaxRegistration.title")
+      </h1>
+
+    <div class="form-group">
+        @inputRadioGroup(
+            registeredForUkTaxForm("registeredForUkTax"),
+            Seq(
+                "true" -> Messages("ukTaxRegistration.form.registered.yes"),
+                "false" -> Messages("ukTaxRegistration.form.registered.no")
+            ),
+            '_legend -> headerTitle,
+            '_groupDivClass -> "soft--ends",
+            '_fieldsetAttributes -> Html("""id='registeredForUkTax'""")
+        )
+    </div>
+
+    <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+
+    }
+}

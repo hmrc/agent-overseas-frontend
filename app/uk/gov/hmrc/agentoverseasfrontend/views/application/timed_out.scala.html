@@ -1,0 +1,36 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+
+@this(mainTemplate: main_template)
+
+@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@timeString=@{
+    val timeout = appConfig.timeout
+    if(timeout < 60) s"$timeout seconds" else s"${timeout/60} minutes"
+}
+
+@mainTemplate(title = Messages("timed-out.header"), hasTimeout = false) {
+
+    <h1 class="heading-xlarge margin-bottom-30">@Messages("timed-out.header")</h1>
+    <p>@Messages("timed-out.p1", timeString)</p>
+
+    <p><a href='@routes.SignOutController.signOutToStart()'>@Messages("timed-out.p2.link")&nbsp;</a>@Html(Messages("timed-out.p2"))</p>
+}

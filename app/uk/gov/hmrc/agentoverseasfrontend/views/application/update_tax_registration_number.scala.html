@@ -1,0 +1,56 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models.UpdateTrn
+@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, input: Input, form: FormWithCSRF)
+
+@(updateTrnForm: Form[UpdateTrn])(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(updateTrnForm) + Messages("updateTrn.title")) {
+
+    <a href="@routes.TaxRegController.showYourTaxRegNumbersForm" class="link-back">@Messages("button.back")</a>
+
+    <h1 class="heading-xlarge">@Messages("updateTrn.title")</h1>
+
+    @if(updateTrnForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), updateTrnForm, Seq.empty, Some("update-trn"))
+    }
+
+    @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'class -> "form js-form", 'id -> "updateTrn") {
+
+        <div class="form-group">
+            @input(
+            updateTrnForm("updated"),
+            '_inputClass -> "form-control--block",
+            '_labelClass -> "soft--ends",
+            '_labelTextClass -> "form-label"
+            )
+        </div>
+
+        <div class="form-group">
+            <input data-uppercase="false" class="hidden" name="original" type="text" id="actual-trn" value="@updateTrnForm.value.map(_.original)"/>
+        </div>
+
+        <div class="form-group">
+            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
+        </div>
+    }
+}

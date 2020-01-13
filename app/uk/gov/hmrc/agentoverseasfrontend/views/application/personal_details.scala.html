@@ -1,0 +1,76 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF)
+
+@(personalDetailsForm: Form[PersonalDetailsChoice], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(personalDetailsForm) + Messages("personalDetails.title")) {
+    <a href="@backLink.getOrElse(routes.ApplicationController.showUkTaxRegistrationForm())" class="link-back">@Messages("button.back")</a>
+
+    @if(personalDetailsForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"),personalDetailsForm, Seq.empty, Some("personal-details"))
+    }
+
+    @form(action = routes.ApplicationController.submitPersonalDetails, 'class -> "form js-form") {
+
+        <div class="form-group @if(personalDetailsForm.error("personalDetailsChoice").isDefined){form-group-error}" id="personalDetailsChoice">
+        <fieldset>
+            <legend class="margin-bottom-10">
+                <h1 class="heading-xlarge margin-bottom-20 @if(personalDetailsForm.hasErrors){push--top}">@Messages("personalDetails.title")</h1>
+            </legend>
+            <p class="margin-bottom-10">@Messages("personalDetails.p1")</p>
+            <p class="faded-text">@Messages("personalDetails.p2")</p>
+            @if(personalDetailsForm.error("variant").isDefined){
+                <span class="error-message">@Messages("personalDetails.error.no-radio.selected")</span>
+            }
+            <div class="multiple-choice" data-target="ninoRadioInput">
+                <input id="variant_nino" type="radio" name="personalDetailsChoice" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true) || personalDetailsForm.error("nino").isDefined){checked} value="nino" >
+                <label for="variant_nino">@Messages("personalDetails.form.nino")</label>
+            </div>
+            <div class="panel panel-border-narrow js-hidden @if(personalDetailsForm.error("nino").isDefined){form-group-error}" id="ninoRadioInput">
+                <label class="form-label" for="nino">@Messages("personalDetails.form.nino")
+                    <span class="form-hint" id="nino-hint">@Messages("personalDetails.form.helper.nino")</span>
+                </label>
+                @personalDetailsForm.error("nino").map{formError => <span class="error-message"> @Messages(formError.message)</span>}
+                <input aria-describedby="nino-hint" data-uppercase="true" class="form-control" name="nino" type="text" id="nino"  @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true)){ value="@personalDetailsForm.value.flatMap(_.nino.map(_.nino)).getOrElse("")" } >
+            </div>
+            <div class="multiple-choice" data-target="utrRadioInput">
+                <input id="variant_utr" type="radio" name="personalDetailsChoice" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true) || personalDetailsForm.error("saUtr").isDefined){checked} value="saUtr">
+                <label for="variant_utr">@Messages("personalDetails.form.sautr")</label>
+            </div>
+            <div class="panel panel-border-narrow js-hidden @if(personalDetailsForm.error("saUtr").isDefined){form-group-error}" id="utrRadioInput">
+                <label class="form-label" for="saUtr">@Messages("personalDetails.form.sautr")
+                    <span class="form-hint" id="sa-utr">@Messages("personalDetails.form.helper.sautr")</span>
+                </label>
+                @personalDetailsForm.error("saUtr").map{formError => <span class="error-message"> @Messages(formError.message)</span>}
+                <input aria-describedby="sa-utr" class="form-control" name="saUtr" type="text" id="saUtr" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true)) { value="@personalDetailsForm.value.flatMap(_.saUtr.map(_.utr)).getOrElse("")" }>
+            </div>
+
+        </fieldset>
+        </div>
+        <div class="form-group">
+            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
+        </div>
+ }
+
+}

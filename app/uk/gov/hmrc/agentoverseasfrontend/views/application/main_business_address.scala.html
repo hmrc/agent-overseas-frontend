@@ -1,0 +1,109 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers._
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, input: Input)
+
+@(mainBusinessAddressForm: Form[OverseasAddress], countries: Map[String, String], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
+@mainTemplate(title = errorPrefix(mainBusinessAddressForm) + Messages("mainBusinessAddress.title")) {
+
+    <a href="@backLink.getOrElse(routes.ApplicationController.showTradingNameForm)" class="link-back">@Messages("button.back")</a>
+
+    @if(mainBusinessAddressForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), mainBusinessAddressForm, Seq.empty, Some("main-business-address"))
+    }
+
+    @form(action = routes.TradingAddressController.submitMainBusinessAddress, 'class -> "form js-form") {
+
+      <fieldset>
+
+        <legend class="margin-bottom-10">
+            <h1 class="heading-xlarge margin-bottom-20">
+                <span class="pre-heading">@Messages("mainBusinessAddress.caption")</span>
+                @Messages("mainBusinessAddress.title")
+            </h1>
+        </legend>
+
+        <p class="body-text">@Messages("mainBusinessAddress.body.text")</p>
+
+        <div class="form-group">
+        @input(
+            mainBusinessAddressForm("addressLine1"),
+            '_label -> Messages(s"mainBusinessAddress.form.addressLine1"),
+            '_inputClass -> "form-control--block",
+            '_labelClass -> "soft--ends",
+            '_labelTextClass -> "form-label"
+        )
+        </div>
+
+        <div class="form-group">
+        @input(
+            mainBusinessAddressForm("addressLine2"),
+            '_label -> Messages("mainBusinessAddress.form.addressLine2"),
+            '_inputClass -> "form-control--block",
+            '_labelClass -> "soft--ends",
+            '_labelTextClass -> "form-label"
+        )
+        </div>
+
+
+        <div class="form-group">
+            @input(
+            mainBusinessAddressForm("addressLine3"),
+            '_label -> Messages("mainBusinessAddress.form.addressLine3"),
+            '_inputClass -> "form-control--block",
+            '_labelClass -> "soft--ends",
+            '_labelTextClass -> "form-label"
+            )
+        </div>
+
+        <div class="form-group">
+            @input(
+            mainBusinessAddressForm("addressLine4"),
+            '_label -> Messages("mainBusinessAddress.form.addressLine4"),
+            '_inputClass -> "form-control--block",
+            '_labelClass -> "soft--ends",
+            '_labelTextClass -> "form-label"
+            )
+        </div>
+
+        <div class="form-group" id="countryCode">
+            @country_dropdown(
+                mainBusinessAddressForm("countryCode"),
+                countries.toSeq,
+                true,
+                '_errorsAboveInput -> true,
+                '_label -> Messages("mainBusinessAddress.form.country"),
+                '_inputClass -> "form-control input--cleared",
+                '_labelClass -> "soft--ends",
+                '_selectWrapper -> Html("""class="autocomplete-wrapper"""")
+            )
+        </div>
+
+      </fieldset>
+
+      <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+
+
+    }
+}

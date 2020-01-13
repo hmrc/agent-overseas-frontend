@@ -1,0 +1,106 @@
+.margin-top-30 {
+    margin-top: 30px !important;
+}
+
+.margin-top-20 {
+    margin-top: 20px !important;
+}
+
+.margin-top-10 {
+    margin-top: 10px !important;
+}
+
+.margin-top-0 {
+    margin-top: 0px !important;
+}
+
+.margin-bottom-30 {
+    margin-bottom: 30px !important;
+}
+
+.margin-bottom-20 {
+    margin-bottom: 20px !important;
+}
+
+.margin-bottom-10 {
+    margin-bottom: 10px !important;
+}
+
+.margin-bottom-0 {
+    margin-bottom: 0px !important;
+}
+
+.button-block {
+    display: block;
+    clear: both;
+}
+
+.js-enabled #amlsForm{
+ visibility: hidden;
+}
+
+.report-error .report-error__toggle {
+    color: #005ea5;
+}
+
+.report-error {
+    margin: 0;
+}
+
+.panels-conditionals .panel {
+    margin-left: 15px;
+    border-left-width: 10px;
+    padding-left: 32px;
+    padding-top: 3px;
+}
+
+.report-error .report-error__toggle {
+    color: #005ea5;
+}
+
+.report-error {
+    margin: 0;
+}
+
+.panels-conditionals .panel {
+    margin-left: 15px;
+    border-left-width: 10px;
+    padding-left: 32px;
+    padding-top: 0;
+}
+
+/* arrow element not needed from polyfill in IE */
+.no-details details summary .arrow-closed {
+    display: none;
+}
+
+@media (min-width: 641px) {
+    .content__body {
+        float: left;
+        width: 66.666667%;
+    }
+}
+
+
+details .panel[aria-hidden=true] a {
+    display: none; /* Accessibility requirement - Aria hidden elements do not contain focusable elements */
+}
+
+#file-upload-container {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#file-upload-container.form-field--error input[type=file] {
+    border: 4px solid #d4351c;
+}
+
+@import 'partials/_forms';
+@import 'partials/_loader';
+@import 'partials/_checkAnswers';
+@import 'partials/_accessibleAutocomplete';
+@import 'partials/_accessibilityStatement';
+@import 'partials/_focus';
+@import 'partials/_palette';
+
+

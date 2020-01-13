@@ -1,0 +1,40 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.api.i18n._
+@import views.html.helper._
+@import play.mvc.Call
+
+@import uk.gov.hmrc.agentoverseasfrontend.config.view.AnswerRow
+
+@this()
+
+@(answerRow: AnswerRow)(implicit messages: Messages)
+<div class="app-check-your-answers__contents">
+    <dt class="app-check-your-answers__question">
+      @answerRow.question
+    </dt>
+    <dd class="app-check-your-answers__answer" id="@answerRow.id">
+      @for(line <- answerRow.answerLines) { <div>@line</div> }
+    </dd>
+    @answerRow.changeLink.map { changeLink =>
+        <dd class="app-check-your-answers__change">
+            <a href="@changeLink" data-include-hidden="@Messages("checkAnswers.change.button")
+            @answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)">
+        @Messages("checkAnswers.change.button") <span class="visuallyhidden"> @answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)</span></a>
+        </dd>
+    }
+</div>
