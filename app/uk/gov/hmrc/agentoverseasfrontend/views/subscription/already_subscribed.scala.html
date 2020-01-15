@@ -1,0 +1,31 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.api.Configuration
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+
+@this(mainTemplate: main_template)
+
+@()(implicit request: Request[_], messages: Messages, config: Configuration, appConfig: AppConfig)
+@mainTemplate(title = Messages("already.subscribed.title"), bodyClasses = None) {
+
+<h1 class="heading-xlarge margin-bottom-10">@Messages("already.subscribed.title")</h1>
+<p class="margin-bottom-20">@Messages("already.subscribed.p1")</p>
+<p class="margin-bottom-30"><a href="@routes.SubscriptionSignOutController.signOut().url" class="button" role="button">@Messages("already.subscribed.button")</a></p>
+
+}

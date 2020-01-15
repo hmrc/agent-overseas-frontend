@@ -1,11 +1,12 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
+
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.LOCATION
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangingAnswersControllerISpec extends BaseISpec {

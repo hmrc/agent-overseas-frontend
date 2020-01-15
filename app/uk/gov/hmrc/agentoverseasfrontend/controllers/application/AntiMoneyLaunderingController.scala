@@ -18,11 +18,11 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import javax.inject.{Inject, Singleton}
 import play.api.Environment
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.AmlsDetailsForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.amlsRequiredForm
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
@@ -39,7 +39,7 @@ class AntiMoneyLaunderingController @Inject()(
   sessionStoreService: SessionStoreService,
   applicationService: ApplicationService,
   val upscanConnector: UpscanConnector,
-  authAction: AuthAction,
+  authAction: ApplicationAuth,
   cc: MessagesControllerComponents,
   amlsView: anti_money_laundering,
   amlsRequiredView: anti_money_laundering_required)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
@@ -118,7 +118,7 @@ class AntiMoneyLaunderingController @Inject()(
         } else
           applicationService.getCurrentApplication.map {
             case Some(application) if application.status == Rejected =>
-              Some(routes.StartController.applicationStatus().url)
+              Some(routes.ApplicationRootController.applicationStatus().url)
             case _ =>
               Some(
                 routes.AntiMoneyLaunderingController

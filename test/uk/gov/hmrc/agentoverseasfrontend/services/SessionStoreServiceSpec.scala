@@ -53,18 +53,31 @@ class SessionStoreServiceSpec extends UnitSpec {
     taxRegistrationNumbers = Some(SortedSet(Trn("123"), Trn("456")))
   )
 
+  private val agencyDetails = AgencyDetails(
+    agencyName = "test agency name",
+    agencyEmail = "test-agency-email@domain.com",
+    agencyAddress = OverseasAddress(
+      addressLine1 = "agencyAddressLine1",
+      addressLine2 = "agencyAddressLine2",
+      addressLine3 = Some("agencyAddressLine3"),
+      addressLine4 = Some("agencyAddressLine4"),
+      countryCode = "BE"
+    )
+  )
+
   "SessionStoreService AgentSession" should {
 
-    "store agent details" in {
+    trait Setup {
       val store = new SessionStoreService(new TestSessionCache())
+    }
 
+    "store agent details" in new Setup {
       await(store.cacheAgentSession(agentSession))
 
       await(store.fetchAgentSession) shouldBe Some(agentSession)
     }
 
-    "always sanitise data when stored" in {
-      val store = new SessionStoreService(new TestSessionCache())
+    "always sanitise data when stored" in new Setup {
 
       await(
         store.cacheAgentSession(agentSession
@@ -74,10 +87,27 @@ class SessionStoreServiceSpec extends UnitSpec {
       await(store.fetchAgentSession).get.personalDetails shouldBe None
     }
 
-    "return None when no application details have been stored" in {
-      val store = new SessionStoreService(new TestSessionCache())
+    "return None when no application details have been stored" in new Setup {
 
       await(store.fetchAgentSession) shouldBe None
+    }
+
+    "storing and retrieving agency details" in new Setup {
+      await(store.cacheAgencyDetails(agencyDetails))
+
+      await(store.fetchAgencyDetails) shouldBe Some(agencyDetails)
+    }
+
+    "return None if fetching agency details when they have not been stored" in new Setup {
+      await(store.fetchAgencyDetails) shouldBe None
+    }
+
+    "remove the underlying storage for the current session when remove is called" in new Setup {
+      await(store.cacheAgencyDetails(agencyDetails))
+
+      await(store.remove())
+
+      await(store.fetchAgencyDetails) shouldBe None
     }
   }
 }

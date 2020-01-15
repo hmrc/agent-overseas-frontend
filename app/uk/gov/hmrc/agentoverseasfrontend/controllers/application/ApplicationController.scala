@@ -22,7 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.view.CheckYourAnswers
 import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.{registeredForUkTaxForm, registeredWithHmrcForm}
 import uk.gov.hmrc.agentoverseasfrontend.forms._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.{IsRegisteredForUkTax, IsRegisteredWithHmrc}
@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ApplicationController @Inject()(
   val env: Environment,
-  authAction: AuthAction,
+  authAction: ApplicationAuth,
   sessionStoreService: SessionStoreService,
   applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
@@ -53,7 +53,7 @@ class ApplicationController @Inject()(
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
-  import authAction._
+  import authAction.{withBasicAuthAndAgentAffinity, withEnrollingAgent}
 
   private val countries = countryNamesLoader.load
 
@@ -390,7 +390,7 @@ class ApplicationController @Inject()(
   }
 
   def showApplicationComplete: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { cRequest =>
+    withBasicAuthAndAgentAffinity { cRequest =>
       val tradingName = request.flash.get("tradingName")
       val contactDetail = request.flash.get("contactDetail")
 

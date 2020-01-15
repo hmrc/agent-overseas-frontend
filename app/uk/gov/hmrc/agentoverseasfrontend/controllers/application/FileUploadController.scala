@@ -22,9 +22,9 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.forms.SuccessfulFileUploadConfirmationForm
-import uk.gov.hmrc.agentoverseasfrontend.models.{CredentialRequest, Yes, YesNo}
+import uk.gov.hmrc.agentoverseasfrontend.models.{ApplicationRequest, Yes, YesNo}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FileUploadController @Inject()(
   sessionStoreService: SessionStoreService,
-  authAction: AuthAction,
+  authAction: ApplicationAuth,
   applicationService: ApplicationService,
   upscanConnector: UpscanConnector,
   cc: MessagesControllerComponents,
@@ -45,7 +45,7 @@ class FileUploadController @Inject()(
   fileUploadFailedView: file_upload_failed)(implicit ex: ExecutionContext, appConfig: AppConfig)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour {
 
-  import authAction._
+  import authAction.withEnrollingAgent
 
   def showAmlsUploadForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { implicit cRequest =>
@@ -66,7 +66,7 @@ class FileUploadController @Inject()(
   }
 
   private def showUploadForm(
-    fileType: String)(implicit cRequest: CredentialRequest, hc: HeaderCarrier, request: Request[_]) =
+    fileType: String)(implicit cRequest: ApplicationRequest, hc: HeaderCarrier, request: Request[_]) =
     upscanConnector
       .initiate()
       .flatMap(
@@ -205,7 +205,7 @@ class FileUploadController @Inject()(
       case None => throw new RuntimeException("no agent session")
     }
 
-  private def getBackLink(fileType: String)(implicit cRequest: CredentialRequest, hc: HeaderCarrier): Option[String] =
+  private def getBackLink(fileType: String)(implicit cRequest: ApplicationRequest, hc: HeaderCarrier): Option[String] =
     if (cRequest.agentSession.changingAnswers && (fileType match {
           case "trading-address" =>
             cRequest.agentSession.tradingAddressUploadStatus.nonEmpty
@@ -234,7 +234,7 @@ class FileUploadController @Inject()(
       }
     }
 
-  private def nextPage(fileType: String)(implicit cRequest: CredentialRequest, hc: HeaderCarrier): Future[String] =
+  private def nextPage(fileType: String)(implicit cRequest: ApplicationRequest, hc: HeaderCarrier): Future[String] =
     if (cRequest.agentSession.changingAnswers) {
       sessionStoreService
         .cacheAgentSession(cRequest.agentSession.copy(changingAnswers = false))

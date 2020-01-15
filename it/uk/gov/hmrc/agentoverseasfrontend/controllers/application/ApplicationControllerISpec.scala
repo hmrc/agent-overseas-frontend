@@ -1,4 +1,4 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import org.jsoup.Jsoup
 import org.scalatest.Assertion
@@ -6,7 +6,6 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{LOCATION, flash, redirectLocation}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption.SaUtrChoice
 import uk.gov.hmrc.agentoverseasfrontend.models._
@@ -14,9 +13,9 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.domain.{Nino, SaUtr}
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.collection.immutable.SortedSet
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -1448,7 +1447,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         "We will send a confirmation email to",
         email,
         tradingName,
-        routes.SignOutController.startFeedbackSurvey().url)
+        routes.ApplicationSignOutController.startFeedbackSurvey().url)
     }
 
     "303 to JOURNEY START when no required fields in flash, authAction should deal with routing circumstances" in {

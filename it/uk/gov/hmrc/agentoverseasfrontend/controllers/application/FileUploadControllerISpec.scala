@@ -1,14 +1,14 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import org.jsoup.Jsoup
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.redirectLocation
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application._
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, FailureDetails, FileUploadStatus}
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, UpscanStubs}
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationStubs with UpscanStubs {

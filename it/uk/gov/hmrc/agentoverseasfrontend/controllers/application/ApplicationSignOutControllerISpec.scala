@@ -1,17 +1,16 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import java.net.URLEncoder
 
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{LOCATION, redirectLocation}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
 import scala.language.postfixOps
 
-class SignOutControllerISpec extends BaseISpec{
+class ApplicationSignOutControllerISpec extends BaseISpec{
 
-  private val controller: SignOutController = app.injector.instanceOf[SignOutController]
+  private val controller: ApplicationSignOutController = app.injector.instanceOf[ApplicationSignOutController]
 
   "signOut" should {
     "303 lose existing session and redirect to gg sign-in" in {
@@ -33,7 +32,7 @@ class SignOutControllerISpec extends BaseISpec{
       val result = await(controller.signOutWithContinueUrl(request))
 
       result.session.get(someExistingKey) shouldBe None
-      val continueUrl = "http://localhost:9404/agent-services/apply-from-outside-uk"
+      val continueUrl = "http://localhost:9414/agent-services/apply-from-outside-uk"
       redirectLocation(result).get shouldBe s"http://localhost:8571/government-gateway-registration-frontend?accountType=agent&origin=unknown&continue=${URLEncoder.encode(continueUrl, "utf-8")}"
     }
   }

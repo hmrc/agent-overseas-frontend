@@ -1,0 +1,75 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.api.Configuration
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+
+@this(mainTemplate: main_template)
+
+@(accessibilityUrl: String)(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+
+@mainTemplate(title = Messages("subscription.accessibility.statement.title")) {
+
+    <h1 class="heading-xlarge">@Messages("subscription.accessibility.statement.h1")</h1>
+    <p class="govuk-body-l">@Messages("subscription.accessibility.statement.intro.p1")</p>
+    <p>@Html(Messages("subscription.accessibility.statement.intro.p2"))</p>
+    <p>@Html(Messages("subscription.accessibility.statement.intro.p3"))</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.using.heading")</h2>
+    <p>@Messages("subscription.accessibility.statement.using.p1")</p>
+    <p>@Messages("subscription.accessibility.statement.using.p2")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("subscription.accessibility.statement.using.l1")</li>
+        <li>@Messages("subscription.accessibility.statement.using.l2")</li>
+        <li>@Messages("subscription.accessibility.statement.using.l3")</li>
+        <li>@Messages("subscription.accessibility.statement.using.l4")</li>
+        <li>@Messages("subscription.accessibility.statement.using.l5")</li>
+    </ul>
+
+    <p>@Messages("subscription.accessibility.statement.using.p3")</p>
+    <p>@Html(Messages("subscription.accessibility.statement.using.p4"))</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.accessible.heading")</h2>
+    <p>@Html(Messages("subscription.accessibility.statement.accessible.p1"))</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.whattodo.heading")</h2>
+    <p>@Html(Messages("subscription.accessibility.statement.whattodo.p1"))</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.reporting.heading")</h2>
+    <p>@Html(Messages("subscription.accessibility.statement.reporting.p1", accessibilityUrl))</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.enforcement.heading")</h2>
+    <p>@Html(Messages("subscription.accessibility.statement.enforcement.p1"))</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.contacting.heading")</h2>
+    <p>@Messages("subscription.accessibility.statement.contacting.p1")</p>
+    <p>@Messages("subscription.accessibility.statement.contacting.p2")</p>
+    <p>@Html(Messages("subscription.accessibility.statement.contacting.p3"))</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.technical.heading")</h2>
+    <p>@Messages("subscription.accessibility.statement.technical.p1")</p>
+    <p>@Html(Messages("subscription.accessibility.statement.technical.p2"))</p>
+    <p>@Messages("subscription.accessibility.statement.technical.p3")</p>
+    <p>@Messages("subscription.accessibility.statement.technical.p4")</p>
+
+    <h2 class="govuk-heading-l">@Messages("subscription.accessibility.statement.howtested.heading")</h2>
+    <p>@Messages("subscription.accessibility.statement.howtested.p1")</p>
+    <p>@Html(Messages("subscription.accessibility.statement.howtested.p2"))<p>
+    <p>@Messages("subscription.accessibility.statement.howtested.p3")</p>
+
+}

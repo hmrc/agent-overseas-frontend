@@ -2,8 +2,9 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 import uk.gov.hmrc.http.SessionKeys
 
 trait AuthStubs {
@@ -12,6 +13,11 @@ trait AuthStubs {
   case class Enrolment(serviceName: String, identifierName: String, identifierValue: String)
 
   def authorisedAsValidAgent[A](request: FakeRequest[A], arn: String) = authenticated(request, Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn), isAgent = true)
+
+  protected def authenticatedAs(user: SampleUser): FakeRequest[AnyContentAsEmpty.type] = {
+    val sessionKeys = userIsAuthenticated(user)
+    FakeRequest().withSession(sessionKeys: _*)
+  }
 
   def authenticated[A](request: FakeRequest[A], enrolment: Enrolment, isAgent: Boolean): FakeRequest[A] = {
     givenAuthorisedFor(
@@ -171,4 +177,20 @@ trait AuthStubs {
           """.stripMargin)
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
+
+  def userIsAuthenticated(user: SampleUser): Seq[(String, String)] = {
+    val response =
+      s"""{${user.allEnrolments},${user.affinityGroup},"optionalCredentials": {"providerId": "${user.userId}", "providerType": "GovernmentGateway"}}"""
+    stubFor(
+      post(urlEqualTo("/auth/authorise"))
+        .willReturn(
+          aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(response)))
+    sessionKeysForMockAuth(user)
+  }
+
+  private def sessionKeysForMockAuth(user: SampleUser): Seq[(String, String)] =
+    Seq(SessionKeys.userId -> user.userId, "token" -> "fakeToken")
 }

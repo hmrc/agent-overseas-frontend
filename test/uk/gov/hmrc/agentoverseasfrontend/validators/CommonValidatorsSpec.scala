@@ -143,11 +143,11 @@ class CommonValidatorsSpec extends UnitSpec with EitherValues {
       }
 
       "input is empty" in {
-        bind("").left.value should contain(FormError("testKey", "error.addressline.1.blank"))
+        bind("").left.value should contain(FormError("testKey", "error.addressline.1.empty"))
       }
 
       "input is only whitespace" in {
-        bind("    ").left.value should contain(FormError("testKey", "error.addressline.1.blank"))
+        bind("    ").left.value should contain(FormError("testKey", "error.addressline.1.empty"))
       }
     }
   }
@@ -169,61 +169,13 @@ class CommonValidatorsSpec extends UnitSpec with EitherValues {
 
     "reject the line" when {
       "input is only whitespace" in {
-        bind("    ").left.value should contain only FormError("testKey", "error.addressline.3.blank")
+        bind("    ").left.value should contain only FormError("testKey", "error.addressline.3.empty")
       }
     }
 
     "accept the line" when {
       "field is empty" in {
         shouldAcceptFieldValue("")
-      }
-    }
-  }
-
-  private def anAddressLineValidatingMapping(unprefixedAddressLineMapping: Mapping[String], lineNumber: Int): Unit = {
-
-    val addressLine1Mapping = unprefixedAddressLineMapping.withPrefix("testKey")
-
-    def bind(fieldValue: String) = addressLine1Mapping.bind(Map("testKey" -> fieldValue))
-
-    def shouldRejectFieldValueAsInvalid(fieldValue: String): Assertion =
-      bind(fieldValue) should matchPattern {
-        case Left(List(FormError("testKey", List(emptyError), _))) =>
-      }
-
-    def shouldRejectFieldValueAsTooLong(fieldValue: String): Assertion =
-      bind(fieldValue) shouldBe Left(List(FormError("testKey", List(s"error.addressline.$lineNumber.maxlength"))))
-
-    def shouldAcceptFieldValue(fieldValue: String): Assertion =
-      if (fieldValue.isEmpty) bind(fieldValue) shouldBe Right(None)
-      else bind(fieldValue) shouldBe Right(fieldValue)
-
-    s"reject the address line $lineNumber" when {
-      "there is an character that is not allowed by the DES regex" in {
-        shouldRejectFieldValueAsInvalid("My Agency street<script> City~City")
-      }
-
-      "the line is too long for DES" in {
-        shouldRejectFieldValueAsTooLong("123456789012345678901234567890123456")
-      }
-    }
-
-    s"accept the address line $lineNumber" when {
-      "there is text and numbers" in {
-        shouldAcceptFieldValue("99 My Agency address")
-      }
-
-      "there are valid symbols in the input" in {
-        shouldAcceptFieldValue("My - Ageny, address Street.")
-        shouldAcceptFieldValue("Tester's Agency & address Street")
-      }
-
-      "there is a valid address" in {
-        shouldAcceptFieldValue("My Agency address")
-      }
-
-      "it is the maximum allowable length" in {
-        shouldAcceptFieldValue("12345678901234567890123456789012345")
       }
     }
   }
@@ -681,6 +633,190 @@ class CommonValidatorsSpec extends UnitSpec with EitherValues {
           case Left(List(FormError("testKey", List("error.telephone.invalid"), _))) =>
         }
       }
+    }
+  }
+
+  "addressLine12 bind" should {
+    def unprefixedAddressLine12Mapping(lineNumber: Int) = addressLine12(lineNumber)
+
+    behave like anAddressLineValidatingMapping(unprefixedAddressLine12Mapping(1), 1)
+    behave like anAddressLineValidatingMapping(unprefixedAddressLine12Mapping(2), 2)
+
+    val addressLine12Mapping = unprefixedAddressLine12Mapping(1).withPrefix("testKey")
+
+    def bind(fieldValue: String) = addressLine12Mapping.bind(Map("testKey" -> fieldValue))
+
+    "reject the line" when {
+      "field is not present" in {
+        addressLine12Mapping.bind(Map.empty).left.value should contain only FormError("testKey", "error.required")
+      }
+
+      "input is empty" in {
+        bind("").left.value should contain(FormError("testKey", "error.addressline.1.empty"))
+      }
+
+      "input is only whitespace" in {
+        bind("    ").left.value should contain(FormError("testKey", "error.addressline.1.empty"))
+      }
+    }
+  }
+
+  "businessName bind" should {
+
+    val businessNameMapping = businessName.withPrefix("testKey")
+
+    def bind(fieldValue: String) = businessNameMapping.bind(Map("testKey" -> fieldValue))
+
+    def shouldRejectFieldValueAsInvalid(fieldValue: String) =
+      bind(fieldValue) should matchPattern {
+        case Left(List(FormError("testKey", List("error.business-name.invalid"), _))) =>
+      }
+
+    def shouldRejectFieldValueAsTooLong(fieldValue: String) =
+      bind(fieldValue) should matchPattern {
+        case Left(List(FormError("testKey", List("error.business-name.maxlength"), _))) =>
+      }
+
+    def shouldAcceptFieldValue(fieldValue: String) =
+      bind(fieldValue) shouldBe Right(fieldValue)
+
+    "reject business name" when {
+
+      "there is an ampersand character" in {
+        shouldRejectFieldValueAsInvalid("My Agency & Co")
+      }
+
+      "there is an apostrophe character" in {
+        shouldRejectFieldValueAsInvalid("My Agency's Co")
+      }
+
+      "there is an invalid character" in {
+        shouldRejectFieldValueAsInvalid("a#a")
+        shouldRejectFieldValueAsInvalid("a~a")
+        shouldRejectFieldValueAsInvalid(s"a$$a")
+        shouldRejectFieldValueAsInvalid("a@a")
+        shouldRejectFieldValueAsInvalid("a=a")
+        shouldRejectFieldValueAsInvalid("a+a")
+        shouldRejectFieldValueAsInvalid("a£a")
+        shouldRejectFieldValueAsInvalid("a`a")
+      }
+
+      "there are more than 40 characters" in {
+        val tooLong = "12345678901234567890123456789012345678901"
+        tooLong.length shouldBe 41
+        shouldRejectFieldValueAsTooLong(tooLong)
+      }
+
+      "input is empty" in {
+        bind("").left.value should contain(FormError("testKey", "error.business-name.empty"))
+      }
+
+      "input is only whitespace" in {
+        bind("    ").left.value should contain only FormError("testKey", "error.business-name.empty")
+      }
+
+      "field is not present" in {
+        businessNameMapping.bind(Map.empty).left.value should contain only FormError("testKey", "error.required")
+      }
+    }
+
+    "accept business name" when {
+      "there are valid characters" in {
+        shouldAcceptFieldValue("My Agency")
+        shouldAcceptFieldValue("My/Agency")
+        shouldAcceptFieldValue("My--Agency")
+        shouldAcceptFieldValue("My,Agency")
+        shouldAcceptFieldValue("My.Agency")
+      }
+
+      "there are numbers and letters" in {
+        shouldAcceptFieldValue("The 100 Agency")
+      }
+    }
+  }
+
+  private def anAddressLineValidatingMapping(unprefixedAddressLineMapping: Mapping[String], lineNumber: Int): Unit = {
+
+    val addressLine1Mapping = unprefixedAddressLineMapping.withPrefix("testKey")
+    val invalidError = s"error.addressline.$lineNumber.invalid"
+
+    def bind(fieldValue: String) = addressLine1Mapping.bind(Map("testKey" -> fieldValue))
+
+    def shouldRejectFieldValueAsInvalid(fieldValue: String) =
+      bind(fieldValue) should matchPattern {
+        case Left(List(FormError("testKey", List(`invalidError`), _))) =>
+      }
+
+    def shouldRejectFieldValueAsTooLong(fieldValue: String) =
+      bind(fieldValue) shouldBe Left(
+        List(FormError("testKey", List(s"error.addressline.$lineNumber.maxlength"), List(35))))
+
+    def shouldAcceptFieldValue(fieldValue: String) =
+      if (fieldValue.isEmpty) bind(fieldValue) shouldBe Right(None)
+      else bind(fieldValue) shouldBe Right(fieldValue)
+
+    s"reject the address line $lineNumber" when {
+      "there is an character that is not allowed by the agency address regex" in {
+        shouldRejectFieldValueAsInvalid("My Agency street<script> City")
+        shouldRejectFieldValueAsInvalid("My Agency street City~City")
+        shouldRejectFieldValueAsInvalid("My Agency street City/City")
+      }
+
+      "the line is too long for DES" in {
+        val tooLong = "123456789012345678901234567890123456"
+        tooLong.length shouldBe 36
+        shouldRejectFieldValueAsTooLong(tooLong)
+      }
+    }
+
+    s"accept the address line $lineNumber" when {
+      "there is text and numbers" in {
+        shouldAcceptFieldValue("99 My Agency address")
+      }
+
+      "there are valid symbols in the input" in {
+        shouldAcceptFieldValue("a-a")
+        shouldAcceptFieldValue("a,a")
+        shouldAcceptFieldValue("a.a")
+        shouldAcceptFieldValue("a&a")
+        shouldAcceptFieldValue("a'a")
+      }
+
+      "there is a valid address" in {
+        shouldAcceptFieldValue("My Agency address")
+      }
+
+      "it is the maximum allowable length" in {
+        val atMax = "12345678901234567890123456789012345"
+        atMax.length shouldBe 35
+        shouldAcceptFieldValue(atMax)
+      }
+    }
+
+    s"accumulate errors if there are multiple validation problems for addressline $lineNumber" in {
+      val tooLongAndNonMatchingLine = "123456789012345678901234567890123456<"
+      bind(tooLongAndNonMatchingLine) shouldBe Left(
+        List(
+          FormError("testKey", s"error.addressline.$lineNumber.maxlength", Seq(35)),
+          FormError("testKey", s"error.addressline.$lineNumber.invalid", Seq())))
+    }
+  }
+
+  "countryCode bind" should {
+    val countryCode = CommonValidators.countryCode(Set("GB", "IE", "IN")).withPrefix("testKey")
+
+    def bind(fieldValue: String) = countryCode.bind(Map("testKey" -> fieldValue))
+
+    "return error if no country code is present" in {
+      bind("").left.value should contain(FormError("testKey", "error.country.empty"))
+    }
+
+    "return error if invalid country code is present" in {
+      bind("INVALID").left.value should contain(FormError("testKey", "error.country.invalid"))
+    }
+
+    "return country code if the value is present" in {
+      bind("IE").right.value shouldBe "IE"
     }
   }
 

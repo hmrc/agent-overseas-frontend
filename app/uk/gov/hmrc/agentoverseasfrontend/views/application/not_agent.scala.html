@@ -25,7 +25,7 @@
 @mainTemplate(title = Messages("nonAgent.title")) {
     <h1 class="heading-xlarge">@Messages("nonAgent.title")</h1>
 
-    <p>@Html(Messages("nonAgent.p1",routes.SignOutController.signOut()))</p>
-    <p>@Html(Messages("nonAgent.p2",routes.SignOutController.signOutWithContinueUrl()))</p>
+    <p>@Html(Messages("nonAgent.p1",routes.ApplicationSignOutController.signOut()))</p>
+    <p>@Html(Messages("nonAgent.p2",routes.ApplicationSignOutController.signOutWithContinueUrl()))</p>
 
 }

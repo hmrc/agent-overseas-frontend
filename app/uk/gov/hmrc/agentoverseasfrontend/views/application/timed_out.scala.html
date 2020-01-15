@@ -32,5 +32,5 @@
     <h1 class="heading-xlarge margin-bottom-30">@Messages("timed-out.header")</h1>
     <p>@Messages("timed-out.p1", timeString)</p>
 
-    <p><a href='@routes.SignOutController.signOutToStart()'>@Messages("timed-out.p2.link")&nbsp;</a>@Html(Messages("timed-out.p2"))</p>
+    <p><a href='@routes.ApplicationSignOutController.signOutToStart()'>@Messages("timed-out.p2.link")&nbsp;</a>@Html(Messages("timed-out.p2"))</p>
 }

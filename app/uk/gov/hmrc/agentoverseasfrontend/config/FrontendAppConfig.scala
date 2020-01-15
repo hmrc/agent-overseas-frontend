@@ -30,13 +30,11 @@ trait AppConfig {
   val maintainerApplicationReviewDays: Int
   val sessionCacheDomain: String
   val companyAuthSignInUrl: String
-  val agentOverseasSubscriptionFrontendRootPath: String
   val ggRegistrationFrontendSosRedirectPath: String
-  val agentServicesAccountPath: String
   val guidancePageApplicationUrl: String
   val authBaseUrl: String
   val sessionCacheBaseUrl: String
-  val agentoverseasfrontendExternalUrl: String
+  val agentOverseasFrontendUrl: String
   val agentOverseasApplicationBaseUrl: String
   val upscanBaseUrl: String
   val googleAnalyticsToken: String
@@ -45,6 +43,9 @@ trait AppConfig {
   val reportAProblemNonJSUrl: String
   val timeout: Int
   val timeoutCountdown: Int
+  val agentGuidancePageFullUrl: String
+  val asaFrontendUrl: String
+  val agentSubscriptionBaseUrl: String
 }
 
 @Singleton
@@ -62,12 +63,8 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
     servicesConfig.getString("microservice.services.cachable.session-cache.domain")
   override val companyAuthSignInUrl: String =
     servicesConfig.getString("microservice.services.companyAuthSignInUrl")
-  override val agentOverseasSubscriptionFrontendRootPath: String =
-    servicesConfig.getString("microservice.services.agent-overseas-subscription-frontend.root-path")
   override val ggRegistrationFrontendSosRedirectPath: String =
     servicesConfig.getString("microservice.services.government-gateway-registration-frontend.sosRedirect-path")
-  override val agentServicesAccountPath: String =
-    servicesConfig.getString("microservice.services.agent-services-account.root-path")
   override val guidancePageApplicationUrl: String =
     servicesConfig.getString("microservice.services.guidancePageApplicationUrl")
   override val authBaseUrl: String = servicesConfig.baseUrl("auth")
@@ -75,8 +72,8 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
     servicesConfig.baseUrl("cachable.session-cache")
   override val agentOverseasApplicationBaseUrl: String =
     servicesConfig.baseUrl("agent-overseas-application")
-  override val agentoverseasfrontendExternalUrl: String =
-    servicesConfig.getString("microservice.services.agent-overseas-frontend.root-path")
+  override val agentOverseasFrontendUrl: String =
+    servicesConfig.getString("microservice.services.agent-overseas-frontend.url")
   override val upscanBaseUrl: String = servicesConfig.baseUrl("upscan")
   override val googleAnalyticsToken: String =
     servicesConfig.getString("google-analytics.token")
@@ -90,4 +87,8 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
     servicesConfig.getInt("timeoutDialog.timeout-seconds")
   override val timeoutCountdown: Int =
     servicesConfig.getInt("timeoutDialog.timeout-countdown-seconds")
+  override val agentGuidancePageFullUrl: String = servicesConfig.getString("agent-guidance-page.full-url")
+  override val asaFrontendUrl: String =
+    servicesConfig.getString("microservice.services.agent-services-account-frontend.url") + "/agent-services-account"
+  override val agentSubscriptionBaseUrl: String = servicesConfig.baseUrl("agent-subscription")
 }

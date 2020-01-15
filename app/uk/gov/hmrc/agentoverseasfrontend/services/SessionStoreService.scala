@@ -17,9 +17,10 @@
 package uk.gov.hmrc.agentoverseasfrontend.services
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, AgentSession}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.SessionCache
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -32,5 +33,14 @@ class SessionStoreService @Inject()(val sessionCache: SessionCache) {
     sessionCache.cache("agentSession", agentSession.sanitize).map(_ => ())
 
   def removeAgentSession(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    sessionCache.remove().map(_ => ())
+
+  def fetchAgencyDetails(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[AgencyDetails]] =
+    sessionCache.fetchAndGetEntry[AgencyDetails]("agencyDetails")
+
+  def cacheAgencyDetails(agencyDetails: AgencyDetails)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    sessionCache.cache("agencyDetails", agencyDetails).map(_ => ())
+
+  def remove()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     sessionCache.remove().map(_ => ())
 }

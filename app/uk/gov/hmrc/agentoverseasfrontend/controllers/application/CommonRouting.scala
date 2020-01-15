@@ -66,7 +66,7 @@ trait CommonRouting {
       applicationService.getCurrentApplication.map {
         case Some(application) if application.status == Rejected || application.status == Pending => {
           val initialiseSession = application.status == Rejected
-          StatusRouting(routes.StartController.applicationStatus(), initialiseSession)
+          StatusRouting(routes.ApplicationRootController.applicationStatus(), initialiseSession)
         }
         case Some(application)
             if Set(Accepted, AttemptingRegistration, Registered, Complete)

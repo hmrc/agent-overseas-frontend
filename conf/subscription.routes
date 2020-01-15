@@ -1,0 +1,32 @@
+# microservice specific routes
+
+GET        /                                              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.root
+
+GET        /next-step                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.nextStep
+GET        /subscribe                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscribe
+GET        /complete                                      @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscriptionComplete
+GET        /already-subscribed                      @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.alreadySubscribed
+GET        /accessibility-statement              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.showAccessibilityStatement
+
+GET        /sign-out                                      @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionSignOutController.signOutWithContinueUrl
+GET        /finish-sign-out                            @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionSignOutController.signOut
+GET        /signed-out                                  @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionSignOutController.signedOut
+GET        /start-survey                               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionSignOutController.startFeedbackSurvey
+GET        /keep-alive                                  @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionSignOutController.keepAlive
+GET        /timed-out                                   @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionSignOutController.timedOut
+
+GET        /check-answers                             @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckAnswers
+GET        /return-from-gg-registration        @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.returnFromGGRegistration(sessionId: String)
+
+GET        /update-business-address            @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessAddressForm
+POST       /update-business-address            @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessAddressForm
+
+GET        /update-business-email               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessEmailForm
+POST       /update-business-email              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessEmailForm
+
+GET        /update-business-name                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessNameForm
+POST       /update-business-name               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessNameForm
+
+GET        /cannot-check-status                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.showApplicationIssue
+
+GET        /assets/*file                             controllers.Assets.at(path="/public", file)

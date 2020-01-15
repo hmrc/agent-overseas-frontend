@@ -41,7 +41,7 @@
         serviceInfoContent: Html = HtmlFormat.empty,
         scriptElem: Option[Html] = None,
         gaCode: Seq[String] = Seq.empty,
-        hasTimeout: Boolean = true)(implicit messages: Messages, appConfig: AppConfig)
+        hasTimeout: Boolean = true)(implicit messages: Messages, appConfig: AppConfig, request: Request[_])
 
     @headScripts = {
         <link href="@controllers.routes.Assets.at("stylesheets/styles.css")" media="screen" rel="stylesheet" type="text/css">
@@ -55,7 +55,7 @@
         <script src="@controllers.routes.Assets.at("javascripts/loader.js")" type="text/javascript"></script>
         <script src="@controllers.routes.Assets.at("javascripts/accessible-autocomplete.min.js")" type="text/javascript"></script>
         <script src="@controllers.routes.Assets.at("javascripts/session-timeout.js")" type="text/javascript"></script>
-        <script src="@controllers.routes.Assets.at("javascripts/aoa-fe.js")" type="text/javascript"></script>
+        <script src="@controllers.routes.Assets.at("javascripts/ao-fe.js")" type="text/javascript"></script>
     }
 
 
@@ -73,10 +73,10 @@
             window.jsConfig.timeoutEnabled = true;
             window.jsConfig.timeout = @{appConfig.timeout};
             window.jsConfig.countdown = @{appConfig.timeoutCountdown};
-            window.jsConfig.keep_alive_url = "@{routes.SignOutController.keepAlive().url}";
+            window.jsConfig.keep_alive_url = "@{routes.ApplicationSignOutController.keepAlive().url}";
             window.jsConfig.message = "@{Messages("timeout-dialog.p1")}"
-            window.jsConfig.timed_out_url = "@{routes.SignOutController.timedOut().url}";
-            window.jsConfig.logout_url = "@{routes.SignOutController.signOutToStart().url}";
+            window.jsConfig.timed_out_url = "@{routes.ApplicationSignOutController.timedOut().url}";
+            window.jsConfig.logout_url = "@{routes.ApplicationSignOutController.signOutToStart().url}";
     </script>
     }
 @uiHead(
@@ -112,10 +112,15 @@
     analyticsAdditionalJs = Some(gaJS))
 }
 
+@accessibilityUrl = @{
+  if(request.uri.contains("/create-account"))  Messages("footer.links.accessibility.url.subscription")
+  else Messages("footer.links.accessibility.url.application")
+}
+
 @footerTop = {}
 @footerLinks = {
     <li>
-        <a href='@Messages("footer.links.accessibility.url")'
+        <a href= @accessibilityUrl
            data-sso="false"
            data-journey-click="footer:Click:Accessibility">
             @Messages("footer.links.accessibility.text")

@@ -19,7 +19,7 @@
 
 @this(govUkWrapper: govuk_wrapper, uiMainContent: uk.gov.hmrc.play.views.html.layouts.MainContent)
 
-@(pageTitle: String, heading: String, message: String)(implicit messages: Messages, appConfig: AppConfig)
+@(pageTitle: String, heading: String, message: String)(implicit messages: Messages, appConfig: AppConfig, request: Request[_])
 
 @import akka.http.scaladsl.model.headers.LinkParams.title
 @contentHeader = {
