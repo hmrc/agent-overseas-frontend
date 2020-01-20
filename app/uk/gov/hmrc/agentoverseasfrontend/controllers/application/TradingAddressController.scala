@@ -49,36 +49,36 @@ class TradingAddressController @Inject()(
   private val validCountryCodes = countries.keys.toSet
 
   def showMainBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       val form =
         MainBusinessAddressForm.mainBusinessAddressForm(validCountryCodes)
-      if (cRequest.agentSession.changingAnswers) {
+      if (agentSession.changingAnswers) {
         Ok(
           mainBusinessAddressView(
-            cRequest.agentSession.overseasAddress.fold(form)(form.fill),
+            agentSession.overseasAddress.fold(form)(form.fill),
             countries,
             Some(showCheckYourAnswersUrl)))
       } else {
-        Ok(mainBusinessAddressView(cRequest.agentSession.overseasAddress.fold(form)(form.fill), countries))
+        Ok(mainBusinessAddressView(agentSession.overseasAddress.fold(form)(form.fill), countries))
       }
     }
   }
 
   def submitMainBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       MainBusinessAddressForm
         .mainBusinessAddressForm(validCountryCodes)
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            if (cRequest.agentSession.changingAnswers) {
+            if (agentSession.changingAnswers) {
               Ok(mainBusinessAddressView(formWithErrors, countries, Some(showCheckYourAnswersUrl)))
             } else {
               Ok(mainBusinessAddressView(formWithErrors, countries))
             }
           },
           validForm =>
-            updateSession(cRequest.agentSession.copy(overseasAddress = Some(validForm)))(
+            updateSession(agentSession.copy(overseasAddress = Some(validForm)))(
               routes.FileUploadController.showTradingAddressUploadForm().url)
         )
     }

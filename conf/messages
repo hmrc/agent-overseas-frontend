@@ -132,8 +132,11 @@ error.fileUpload.invalid=The selected file must be a PDF or JPG
 
 
 # Service specific messages
-app.name=Apply for an agent services account if you are not in the UK
-servicename.titleSuffix=Apply for an agent services account if you are not in the UK - GOV.UK
+application.app.name=Apply for an agent services account if you are not in the UK
+application.servicename.titleSuffix=Apply for an agent services account if you are not in the UK - GOV.UK
+
+subscription.app.name=Finish setting up your agent services account
+subscription.servicename.titleSuffix=Finish setting up your agent services account - GOV.UK
 
 # Common
 button.continue=Continue

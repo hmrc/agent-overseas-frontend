@@ -49,20 +49,20 @@ class AntiMoneyLaunderingController @Inject()(
   import authAction.withEnrollingAgent
 
   def showMoneyLaunderingRequired: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       val backUrl =
-        if (cRequest.agentSession.changingAnswers) Some(showCheckYourAnswersUrl)
+        if (agentSession.changingAnswers) Some(showCheckYourAnswersUrl)
         else None
       Ok(
         amlsRequiredView(
-          cRequest.agentSession.amlsRequired.fold(amlsRequiredForm)(amlsRequired =>
+          agentSession.amlsRequired.fold(amlsRequiredForm)(amlsRequired =>
             amlsRequiredForm.fill(RadioConfirm(amlsRequired))),
           backUrl))
     }
   }
 
   def submitMoneyLaunderingRequired: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       amlsRequiredForm
         .bindFromRequest()
         .fold(
@@ -71,7 +71,7 @@ class AntiMoneyLaunderingController @Inject()(
           },
           isRequired =>
             for {
-              session <- cRequest.agentSession
+              session <- agentSession
               isChanging = session.changingAnswers
               updatedSession = updateAmlsSessionBasedOnChanging(isChanging, isRequired.value, session)
               redirectUrl = amlsRedirectUrlBasedOnChanging(isChanging, isRequired.value)
@@ -102,12 +102,12 @@ class AntiMoneyLaunderingController @Inject()(
     }
 
   def showAntiMoneyLaunderingForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       val form = AmlsDetailsForm.form
 
       val backUrl: Future[Option[String]] = {
-        if (cRequest.agentSession.changingAnswers) {
-          cRequest.agentSession.amlsDetails match {
+        if (agentSession.changingAnswers) {
+          agentSession.amlsDetails match {
             case Some(_) => Some(showCheckYourAnswersUrl)
             case None =>
               Some(
@@ -128,9 +128,9 @@ class AntiMoneyLaunderingController @Inject()(
       }
 
       backUrl.map(url =>
-        cRequest.agentSession.amlsRequired match {
+        agentSession.amlsRequired match {
           case Some(true) =>
-            Ok(amlsView(cRequest.agentSession.amlsDetails.fold(form)(form.fill), url)) // happy path
+            Ok(amlsView(agentSession.amlsDetails.fold(form)(form.fill), url)) // happy path
           case Some(false) =>
             Redirect(
               routes.ApplicationController
@@ -146,7 +146,7 @@ class AntiMoneyLaunderingController @Inject()(
   }
 
   def submitAntiMoneyLaundering: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       AmlsDetailsForm.form
         .bindFromRequest()
         .fold(
@@ -164,7 +164,7 @@ class AntiMoneyLaunderingController @Inject()(
             }
           },
           validForm => {
-            cRequest.agentSession
+            agentSession
               .map(_.copy(amlsDetails = Some(validForm)))
               .flatMap(updateSessionAndRedirect(_)(routes.FileUploadController.showAmlsUploadForm().url))
           }

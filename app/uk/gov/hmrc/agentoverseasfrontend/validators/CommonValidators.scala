@@ -21,6 +21,8 @@ import play.api.data.Mapping
 import play.api.data.validation._
 import uk.gov.hmrc.domain.Nino
 
+import scala.util.Try
+
 object CommonValidators {
 
   private val TelephoneNumberRegex = "^[A-Z0-9 )\\/(\\-*#]*"
@@ -243,7 +245,9 @@ object CommonValidators {
           Invalid(ValidationError("error.email.maxlength"))
         } else if (fieldValue.contains('@')) {
           val email = fieldValue.split('@')
-          if (!email(0).matches(EmailLocalPartRegex) || !email(1).matches(EmailDomainRegex)) {
+          val localPart = email(0)
+          val domainPart = Try(email(1)).getOrElse("")
+          if (!localPart.matches(EmailLocalPartRegex) || !domainPart.matches(EmailDomainRegex)) {
             Invalid(ValidationError("error.email.invalid"))
           } else Constraints.emailAddress(fieldValue)
         } else

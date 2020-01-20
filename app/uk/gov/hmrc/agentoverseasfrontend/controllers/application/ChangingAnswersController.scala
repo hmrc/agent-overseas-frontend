@@ -42,101 +42,101 @@ class ChangingAnswersController @Inject()(
   import authAction.{withEnrollingAgent}
 
   def changeAmlsRequired: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
       )
     }
   }
 
   def changeAmlsDetails: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm().url)
     }
   }
 
   def changeAmlsFile: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.FileUploadController.showAmlsUploadForm().url)
     }
   }
 
   def changeContactDetails: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showContactDetailsForm().url)
     }
   }
 
   def changeTradingName: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showTradingNameForm().url)
     }
   }
 
   def changeTradingAddress: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.TradingAddressController.showMainBusinessAddressForm().url)
     }
   }
 
   def changeTradingAddressFile: Action[AnyContent] =
     Action.async { implicit request =>
-      withEnrollingAgent { cRequest =>
-        updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+      withEnrollingAgent { agentSession =>
+        updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
           routes.FileUploadController.showTradingAddressUploadForm().url)
       }
     }
 
   def changeRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showRegisteredWithHmrcForm().url)
     }
   }
 
   def changeAgentCodes: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showAgentCodesForm().url)
     }
   }
 
   def changeRegisteredForUKTax: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showUkTaxRegistrationForm().url)
     }
   }
 
   def changePersonalDetails: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showPersonalDetailsForm().url)
     }
   }
 
   def changeCompanyRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showCompanyRegistrationNumberForm().url)
     }
   }
 
   def changeYourTaxRegistrationNumbers: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.TaxRegController.showYourTaxRegNumbersForm().url)
     }
   }
 
   def changeYourTaxRegistrationNumbersFile: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      updateSessionAndRedirect(cRequest.agentSession.copy(changingAnswers = true))(
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.FileUploadController.showTrnUploadForm().url)
     }
   }

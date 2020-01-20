@@ -22,7 +22,7 @@ import play.api.mvc.{Request, Result}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationRequest
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService, SubscriptionService}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
@@ -41,7 +41,7 @@ class ApplicationAuth @Inject()(
     extends AuthBase with CommonRouting {
 
   def withEnrollingAgent(
-    body: ApplicationRequest => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    body: AgentSession => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(credentials and allEnrolments) {
         case Some(credentials) ~ enrolments =>
@@ -50,7 +50,7 @@ class ApplicationAuth @Inject()(
           else
             sessionStoreService.fetchAgentSession.flatMap {
               case Some(agentSession) =>
-                body(ApplicationRequest(credentials.providerId, agentSession, enrolments.enrolments))
+                body(agentSession)
               case None =>
                 routesIfExistingApplication(s"${appConfig.agentOverseasFrontendUrl}/create-account")
                   .map(Redirect)
