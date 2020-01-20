@@ -1,18 +1,16 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import java.time.{Clock, LocalDateTime}
 
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application._
 import uk.gov.hmrc.agentoverseasfrontend.stubs._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
-class StartControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
+class ApplicationRootControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
 
-  private lazy val controller = app.injector.instanceOf[StartController]
-
+  private lazy val controller = app.injector.instanceOf[ApplicationRootController]
 
   "GET /not-agent" should {
     "display the non-agent  page when the current user is logged in" in {
@@ -20,7 +18,7 @@ class StartControllerISpec extends BaseISpec with AgentOverseasApplicationStubs 
 
       status(result) shouldBe 200
       result should containMessages("nonAgent.title")
-      result should containSubstrings(htmlMessage("nonAgent.p1", routes.SignOutController.signOut().url),htmlMessage("nonAgent.p2", routes.SignOutController.signOutWithContinueUrl()))
+      result should containSubstrings(htmlMessage("nonAgent.p1", routes.ApplicationSignOutController.signOut().url),htmlMessage("nonAgent.p2", routes.ApplicationSignOutController.signOutWithContinueUrl()))
     }
   }
 
@@ -64,7 +62,7 @@ class StartControllerISpec extends BaseISpec with AgentOverseasApplicationStubs 
 
       val result = await(controller.applicationStatus(basicRequest(FakeRequest())))
 
-      redirectLocation(result).get shouldBe routes.StartController.root().url
+      redirectLocation(result).get shouldBe routes.ApplicationRootController.root().url
     }
   }
 
@@ -103,7 +101,7 @@ class StartControllerISpec extends BaseISpec with AgentOverseasApplicationStubs 
   def redirectToSubscriptionFrontend(status: String, action: Action[AnyContent]): Unit = {
     "303 when application status neither Rejected nor Pending" in {
       given200OverseasRedirectStatusApplication(status)
-      redirectLocation(await(action(basicRequest(FakeRequest())))).get shouldBe "http://localhost:9403/agent-services/apply-from-outside-uk/create-account"
+      redirectLocation(await(action(basicRequest(FakeRequest())))).get shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk/create-account"
     }
   }
 }

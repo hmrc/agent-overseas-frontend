@@ -21,7 +21,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.{Environment, Logger}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.removeTrnForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.{AddTrnForm, DoYouWantToAddAnotherTrnForm, TaxRegistrationNumberForm, UpdateTrnForm}
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, TaxRegistrationNumber, Trn}
@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class TaxRegController @Inject()(
   val env: Environment,
-  authAction: AuthAction,
+  authAction: ApplicationAuth,
   sessionStoreService: SessionStoreService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
@@ -50,7 +50,7 @@ class TaxRegController @Inject()(
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
-  import authAction._
+  import authAction.{withEnrollingAgent}
 
   def showTaxRegistrationNumberForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { cRequest =>

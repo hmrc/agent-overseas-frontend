@@ -24,16 +24,20 @@ lazy val compileDeps = Seq(
   "uk.gov.hmrc" %% "agent-mtd-identifiers" % "0.17.0-play-26",
   "uk.gov.hmrc" %% "http-caching-client" % "9.0.0-play-26",
   "uk.gov.hmrc" %% "play-conditional-form-mapping" % "1.2.0-play-26",
-  "uk.gov.hmrc" %% "domain" % "5.6.0-play-26"
+  "uk.gov.hmrc" %% "domain" % "5.6.0-play-26",
+  "org.typelevel" %% "cats-core" % "1.5.0",
+  "com.github.tototoshi" %% "scala-csv" % "1.3.5",
+  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.22.0-play-26"
 )
 
 def testDeps(scope: String) = Seq(
   "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-26" % scope,
-  "org.scalatest" %% "scalatest" % "3.0.7" % scope,
+  "org.scalatest" %% "scalatest" % "3.0.8" % scope,
   "org.mockito" % "mockito-core" % "3.2.4" % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % scope,
   "com.github.tomakehurst" % "wiremock-jre8" % "2.23.2" % scope,
-  "org.jsoup" % "jsoup" % "1.12.1" % scope
+  "org.jsoup" % "jsoup" % "1.12.1" % scope,
+  "uk.gov.hmrc" %% "reactivemongo-test" % "4.16.0-play-25" % scope
 )
 
 def tmpMacWorkaround(): Seq[ModuleID] =

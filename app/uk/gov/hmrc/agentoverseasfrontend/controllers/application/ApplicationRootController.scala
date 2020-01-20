@@ -25,16 +25,16 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Pending, Rejected}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.{application_not_ready, not_agent, status_rejected}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StartController @Inject()(
+class ApplicationRootController @Inject()(
   val env: Environment,
-  authAction: AuthAction,
+  authAction: ApplicationAuth,
   sessionStoreService: SessionStoreService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
@@ -43,7 +43,7 @@ class StartController @Inject()(
   statusRejectedView: status_rejected)(implicit appConfig: AppConfig, ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with I18nSupport {
 
-  import authAction._
+  import authAction.withBasicAuth
 
   def root: Action[AnyContent] = Action.async { implicit request =>
     withBasicAuth { _ =>
@@ -69,8 +69,8 @@ class StartController @Inject()(
         case Some(application) if application.status == Rejected =>
           Ok(statusRejectedView(application))
         case Some(_) =>
-          SeeOther(appConfig.agentOverseasSubscriptionFrontendRootPath)
-        case None => Redirect(routes.StartController.root())
+          SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+        case None => Redirect(routes.ApplicationRootController.root())
       }
     }
   }

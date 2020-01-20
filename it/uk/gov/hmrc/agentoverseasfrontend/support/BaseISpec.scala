@@ -13,12 +13,14 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test.{DefaultAwaitTimeout, FakeRequest}
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.test.UnitSpec
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 class BaseISpec extends UnitSpec with OneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport with DefaultAwaitTimeout {
@@ -30,16 +32,17 @@ class BaseISpec extends UnitSpec with OneAppPerSuite with WireMockSupport with A
   protected def appBuilder: GuiceApplicationBuilder = {
     new GuiceApplicationBuilder()
       .configure(
-        "appName" -> "agent-overseas-application-frontend",
+        "appName" -> "agent-overseas-frontend",
         "microservice.services.auth.port" -> wireMockPort,
         "microservice.services.upscan.port" -> wireMockPort,
         "microservice.services.companyAuthSignInUrl" -> "/baseISpec/gg/sign-in",
         "microservice.services.guidancePageApplicationUrl" -> "guidancePageUrl",
         "government-gateway-registration-frontend.sosRedirect-path" -> "http://localhost:8571/government-gateway-registration-frontend?accountType=agent&origin=unknown",
-        "agent-overseas-subscription-frontend" -> "http://localhost:9403/agent-services/apply-from-outside-uk/create-account",
         "agent-services-account.root-path" -> "http://localhost:9401/agent-services-account",
         "microservice.services.agent-overseas-application.host" -> wireMockHost,
         "microservice.services.agent-overseas-application.port" -> wireMockPort,
+        "microservice.services.agent-subscription.host" -> wireMockHost,
+        "microservice.services.agent-subscription.port" -> wireMockPort,
         "cachable.session-cache.port" -> wireMockPort,
         "cachable.session-cache.domain" -> "keystore",
         "maintainer-application-review-days" -> 28,
@@ -57,6 +60,8 @@ class BaseISpec extends UnitSpec with OneAppPerSuite with WireMockSupport with A
     ()
   }
 
+  protected lazy val sessionDetailsRepo = app.injector.instanceOf[SessionDetailsRepository]
+
   protected lazy val sessionStoreService = new TestSessionStoreService
 
   private class TestGuiceModule extends AbstractModule {
@@ -68,6 +73,7 @@ class BaseISpec extends UnitSpec with OneAppPerSuite with WireMockSupport with A
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     sessionStoreService.clear()
+    val x  = sessionDetailsRepo.drop(global)
   }
 
   protected implicit val materializer = app.materializer

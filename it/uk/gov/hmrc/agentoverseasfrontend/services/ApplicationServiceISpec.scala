@@ -2,11 +2,12 @@ package uk.gov.hmrc.agentoverseasfrontend.services
 
 import java.time.LocalDateTime
 
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Accepted, Pending}
 import uk.gov.hmrc.agentoverseasfrontend.models.{ApplicationEntityDetails, ApplicationStatus}
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Pending
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStubs {
@@ -27,10 +28,10 @@ class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStu
       given200GetOverseasApplications(allRejected = false)
       val app = await(service.getCurrentApplication)
       app shouldBe Some(ApplicationEntityDetails( LocalDateTime.parse("2019-02-20T15:11:51.729"),
-        Pending,
+        Accepted,
         "Testing Agency",
         "test@test.com",
-        None))
+        Some(LocalDateTime.parse("2019-02-20T10:35:21.65"))))
     }
 
     "return empty results for an auth provider id" in {

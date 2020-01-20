@@ -23,7 +23,7 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.timed_out
@@ -31,27 +31,27 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.application.timed_out
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SignOutController @Inject()(
-  authAction: AuthAction,
+class ApplicationSignOutController @Inject()(
+  authAction: ApplicationAuth,
   sessionStoreService: SessionStoreService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
   timedOutView: timed_out)(implicit ec: ExecutionContext, appConfig: AppConfig, val env: Environment)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with I18nSupport {
 
-  import authAction._
+  import authAction.{withBasicAuth}
 
   def signOut: Action[AnyContent] = Action { implicit request =>
     SeeOther(appConfig.companyAuthSignInUrl).withNewSession
   }
 
   def signOutWithContinueUrl: Action[AnyContent] = Action { implicit request =>
-    val continueUrl = appConfig.agentoverseasfrontendExternalUrl
+    val continueUrl = s"${appConfig.agentOverseasFrontendUrl}"
     SeeOther(CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(continueUrl))).withNewSession
   }
 
   def signOutToStart: Action[AnyContent] = Action { implicit request =>
-    Redirect(routes.StartController.root()).withNewSession
+    Redirect(routes.ApplicationRootController.root()).withNewSession
   }
 
   def startFeedbackSurvey: Action[AnyContent] = Action.async { implicit request =>

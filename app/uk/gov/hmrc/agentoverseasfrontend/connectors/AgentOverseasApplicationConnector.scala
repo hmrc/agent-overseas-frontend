@@ -21,9 +21,10 @@ import java.time.{LocalDateTime, ZoneOffset}
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
 import javax.inject.{Inject, Singleton}
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.models.{ApplicationEntityDetails, ApplicationStatus, CreateOverseasApplicationRequest, FileUploadStatus}
+import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, _}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
@@ -79,6 +80,54 @@ class AgentOverseasApplicationConnector @Inject()(
     monitor("ConsumedAPI-Agent-overseas-Application-upscan-poll-status-GET") {
       http
         .GET[FileUploadStatus](url.toString)
+    }
+  }
+
+  def allApplications(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[List[OverseasApplication]] = {
+
+    val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
+
+    monitor(s"ConsumedAPI-agent-overseas-application-application-GET") {
+      http
+        .GET[HttpResponse](url)
+        .map {
+          case response if response.status == 200 => response.json.as[List[OverseasApplication]]
+        }
+        .recover {
+          case _: NotFoundException => List.empty[OverseasApplication]
+        }
+    }
+  }
+
+  def updateApplicationWithAgencyDetails(
+    agencyDetails: AgencyDetails)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+    val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
+
+    monitor(s"ConsumedAPI-agent-overseas-application-application-PUT") {
+
+      import AgencyDetails.formats
+      http
+        .doPut[AgencyDetails](url, agencyDetails)
+        .map { response: HttpResponse =>
+          if (response.status == 204) ()
+          else {
+            val msg = s"agent-overseas-application returned status ${response.status}"
+            if (response.status >= 400 && response.status < 500)
+              throw new Upstream4xxResponse(msg, upstreamResponseCode = response.status, reportAs = 400)
+            else if (response.status >= 500)
+              throw new Upstream5xxResponse(msg, upstreamResponseCode = response.status, reportAs = 500)
+            else
+              throw new RuntimeException(msg)
+          }
+        }
+    }
+  }
+
+  def updateAuthId(oldAuthId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+    val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application/auth-provider-id"
+
+    monitor(s"ConsumedAPI-agent-overseas-application-auth-provider-id-PUT") {
+      http.PUT[JsValue, HttpResponse](url.toString, Json.obj("authId" -> oldAuthId)).map(_ => ())
     }
   }
 }

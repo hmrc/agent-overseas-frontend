@@ -1,14 +1,14 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{LOCATION, redirectLocation}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
@@ -19,8 +19,6 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
   private val overseasAddress = OverseasAddress("line 1", "line 2", None, None, countryCode = "IE")
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
   private val personalDetails = PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
-
-  private val fileUploadStatus: Option[FileUploadStatus] = Some(FileUploadStatus(reference = "ref", fileStatus = "status", fileName = Some("fileName")))
 
   private val agentSession = AgentSession(
     amlsDetails = Some(amlsDetails),
@@ -109,7 +107,7 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
 
         status(result) shouldBe 200
 
-        result should containMessages("error.addressline.1.blank")
+        result should containMessages("error.addressline.1.empty")
       }
       "country code is GB" in {
         sessionStoreService.currentSession.agentSession =

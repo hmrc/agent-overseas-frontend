@@ -1,14 +1,13 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{LOCATION, redirectLocation}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AntiMoneyLaunderingController
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, AmlsDetails}
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
@@ -177,7 +176,7 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
         "amls.hint.expandable.p1"
       )
 
-      result should containSubstrings(routes.SignOutController.signOut().url)
+      result should containSubstrings(routes.ApplicationSignOutController.signOut().url)
     }
 
     "display the money-laundering form with correct back button link when user is CHANGING ANSWERS" in {
@@ -225,7 +224,7 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
 
       status(result) shouldBe 200
 
-      result should containLink("button.back", routes.StartController.applicationStatus().url)
+      result should containLink("button.back", routes.ApplicationRootController.applicationStatus().url)
     }
 
   }

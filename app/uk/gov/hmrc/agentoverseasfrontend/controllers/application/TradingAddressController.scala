@@ -22,7 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.forms.MainBusinessAddressForm
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
@@ -37,13 +37,13 @@ class TradingAddressController @Inject()(
   applicationService: ApplicationService,
   val upscanConnector: UpscanConnector,
   countryNamesLoader: CountryNamesLoader,
-  authAction: AuthAction,
+  authAction: ApplicationAuth,
   cc: MessagesControllerComponents,
   mainBusinessAddressView: main_business_address)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
-  import authAction._
+  import authAction.{withEnrollingAgent}
 
   private val countries = countryNamesLoader.load
   private val validCountryCodes = countries.keys.toSet

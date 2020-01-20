@@ -31,7 +31,7 @@ trait UpscanStubs {
                       |             "key": "xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
                       |            "acl": "private",
                       |             "x-amz-signature": "xxxx",
-                      |            "x-amz-meta-consuming-service": "agent-overseas-application-frontend",
+                      |            "x-amz-meta-consuming-service": "agent-overseas-frontend",
                       |            "policy": "xxxxxxxx=="
                       |        }
                       |    }

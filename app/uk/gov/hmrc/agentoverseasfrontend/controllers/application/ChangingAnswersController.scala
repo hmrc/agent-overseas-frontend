@@ -21,23 +21,25 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.AuthAction
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class ChangingAnswersController @Inject()(
-  val env: Environment,
-  authAction: AuthAction,
+  authAction: ApplicationAuth,
   override val sessionStoreService: SessionStoreService,
   override val applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
-  cc: MessagesControllerComponents)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
+  cc: MessagesControllerComponents)(
+  implicit appConfig: AppConfig,
+  val env: Environment,
+  override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
-  import authAction._
+  import authAction.{withEnrollingAgent}
 
   def changeAmlsRequired: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { cRequest =>

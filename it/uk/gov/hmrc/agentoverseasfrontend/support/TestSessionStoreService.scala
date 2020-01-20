@@ -1,6 +1,6 @@
 package uk.gov.hmrc.agentoverseasfrontend.support
 
-import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, AgentSession}
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionStoreService
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -8,7 +8,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TestSessionStoreService extends SessionStoreService(null) {
 
-  class Session(var agentSession: Option[AgentSession] = None)
+  class Session(var agentSession: Option[AgentSession] = None, var agencyDetails: Option[AgencyDetails] = None)
 
   private val sessions = collection.mutable.Map[String, Session]()
 
@@ -34,5 +34,19 @@ class TestSessionStoreService extends SessionStoreService(null) {
 
   override def removeAgentSession(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
     Future.successful(sessions.remove(sessionKey).fold(())(_ => ()))
+  }
+
+  override def fetchAgencyDetails(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[AgencyDetails]] =
+    Future successful currentSession.agencyDetails
+
+  override def cacheAgencyDetails(agencyDetails: AgencyDetails)
+                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    Future.successful(currentSession.agencyDetails = Some(agencyDetails))
+
+  override def remove()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+    Future.successful{
+      sessions.remove(sessionKey)
+      ()
+    }
   }
 }

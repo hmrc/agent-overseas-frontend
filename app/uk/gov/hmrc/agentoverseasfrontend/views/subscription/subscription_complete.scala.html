@@ -1,0 +1,55 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.api.Configuration
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+
+@this(mainTemplate: main_template)
+
+@(agentGuidancePageUrl: String, continueUrl: String, arn: String, agencyName: String, agencyEmail: String)(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+
+@mainTemplate(title = Messages("subscriptionComplete.title")) {
+
+    <div class="transaction-banner--complete margin-top-10">
+        <h1 class="transaction-banner__heading">@Messages("subscriptionComplete.title")</h1>
+        <div class="govuk-panel__body">
+            <p class="margin-bottom-0">@Messages("subscriptionComplete.accountName")
+                <br>
+                <strong class="bold">@agencyName</strong>
+            </p>
+        </div>
+    </div>
+
+    <p>@Html(Messages("subscriptionComplete.p1", s"$arn"))</p>
+
+    <p>@Html(Messages("subscriptionComplete.p2", s"$agencyEmail"))</p>
+
+    <h2 class="heading-medium">@Messages("subscriptionComplete.h2")</h2>
+
+    <p>@Html(Messages("subscriptionComplete.p3", s"$agentGuidancePageUrl"))</p>
+
+
+    <ul class="list list-bullet">
+        <li>@Messages("subscriptionComplete.bullet-list.1")</li>
+        <li>@Messages("subscriptionComplete.bullet-list.2")</li>
+    </ul>
+
+    <p>
+        <a href="@continueUrl" class="button" id="continue" role="button">@Messages(s"subscriptionComplete.button")</a>
+    </p>
+
+}

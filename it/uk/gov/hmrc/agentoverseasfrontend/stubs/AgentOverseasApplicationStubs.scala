@@ -3,7 +3,7 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentoverseasfrontend.models.{ApplicationStatus, CreateOverseasApplicationRequest}
+import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, ApplicationStatus, CreateOverseasApplicationRequest}
 
 trait AgentOverseasApplicationStubs {
 
@@ -119,5 +119,118 @@ trait AgentOverseasApplicationStubs {
   def given500UpscanPollStatus():  StubMapping = {
     stubFor(get(urlEqualTo("/agent-overseas-application/upscan-poll-status/reference"))
       .willReturn(aResponse().withStatus(500)))
+  }
+
+  def givenAcceptedApplicationResponse(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus())
+        .withStatus(200)
+    ))
+
+  def givenPendingApplicationResponse(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.pendingApplication)
+        .withStatus(200)
+    ))
+
+  def givenRegisteredApplicationResponse(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus("registered"))
+        .withStatus(200)
+    ))
+
+  def givenAttemptingRegistrationApplicationResponse(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus("attempting_registration"))
+        .withStatus(200)
+    ))
+
+  def givenRejectedApplicationResponse(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.rejectedApplication)
+        .withStatus(200)
+    ))
+
+  def givenCompleteApplicationResponse(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus("complete"))
+        .withStatus(200)
+    ))
+
+  def givenApplicationMultiple(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.notAllRejected)
+        .withStatus(200)
+    ))
+
+  def givenApplicationEmptyResponse(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(404)
+    ))
+
+  def givenApplicationUnavailable(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application"))
+      .willReturn(aResponse()
+        .withStatus(503))
+    )
+
+  def givenApplicationServerError(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application"))
+      .willReturn(aResponse()
+        .withStatus(500))
+    )
+
+  def givenApplicationUpdateSuccessResponse(): StubMapping =
+    stubFor(put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(204)
+    ))
+
+  def givenApplicationUpdateNotFoundResponse(): StubMapping =
+    stubFor(put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(404)
+    ))
+
+  def givenApplicationUpdateServerError(): StubMapping =
+    stubFor(put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(500)
+    ))
+
+  def givenUpdateAuthIdSuccessResponse(oldAuthId: String): StubMapping =
+    stubFor(put(urlEqualTo("/agent-overseas-application/application/auth-provider-id"))
+      .withRequestBody(equalToJson(s"""{"authId": "$oldAuthId"}"""))
+      .willReturn(aResponse()
+        .withStatus(204)
+      ))
+
+  def givenUpdateAuthIdNotFoundResponse(): StubMapping =
+    stubFor(put(urlEqualTo("/agent-overseas-application/application/auth-provider-id")).willReturn(
+      aResponse()
+        .withStatus(404)
+    ))
+
+  def givenUpdateAuthIdServerError(): StubMapping =
+    stubFor(put(urlEqualTo("/agent-overseas-application/application/auth-provider-id")).willReturn(
+      aResponse()
+        .withStatus(500)
+    ))
+
+
+  def verifyApplicationUpdate(requestBody: AgencyDetails): Unit = {
+    import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails.formats
+    val expectedRequestBody: String = Json.toJson(requestBody).toString
+
+    verify(
+      putRequestedFor(
+        urlEqualTo("/agent-overseas-application/application"))
+        .withRequestBody(
+          equalToJson(expectedRequestBody)))
+  }
+
+  def verifyUpdateAuthIdRequest(count: Int): Unit = {
+    verify(count, putRequestedFor(urlEqualTo("/agent-overseas-application/application/auth-provider-id")))
   }
 }

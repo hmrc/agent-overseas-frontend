@@ -16,6 +16,18 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.mvc.Request
+import play.api.libs.json.{Format, Json}
 
-case class CredentialRequest(authProviderId: String, request: Request[_], agentSession: AgentSession)
+case class AgencyDetails(agencyName: String, agencyEmail: String, agencyAddress: OverseasAddress)
+
+object AgencyDetails {
+  implicit val formats: Format[AgencyDetails] =
+    Json.format[AgencyDetails]
+
+  def apply(overseasApplication: OverseasApplication): AgencyDetails =
+    AgencyDetails(
+      agencyName = overseasApplication.tradingDetails.tradingName,
+      agencyEmail = overseasApplication.contactDetails.businessEmail,
+      agencyAddress = overseasApplication.tradingDetails.tradingAddress
+    )
+}

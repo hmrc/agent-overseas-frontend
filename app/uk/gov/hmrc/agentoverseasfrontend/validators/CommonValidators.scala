@@ -53,6 +53,10 @@ object CommonValidators {
   private val TrnMaxLength = 24
   private val AmlsBodyMaxLength = 100
 
+  private val AgencyAddressRegex = "^[A-Za-z0-9 \\-,.&']*"
+  private val AgencyNameRegex = "^[A-Za-z0-9 \\-,.\\/]*"
+  private val BusinessNameMaxLength = 40
+
   private type UtrErrors = (String, String)
   private val DefaultUtrErrors = ("error.utr.blank", "error.utr.invalid")
 
@@ -90,12 +94,6 @@ object CommonValidators {
 
   def tradingName: Mapping[String] =
     text verifying commonFormConstraint("tradingName", OverseasTradingNameRegex, TradingNameMaxLength)
-
-  def addressLine12(lineNumber: Int): Mapping[String] =
-    text verifying commonFormConstraint(s"addressline.$lineNumber", OverseasAddressRegex, AddresslineMaxLength)
-
-  def addressLine34(lineNumber: Int): Mapping[Option[String]] =
-    optional(addressLine12(lineNumber))
 
   def companyRegistrationNumber: Mapping[String] =
     text verifying commonFormConstraint("crn", CrnRegex, CrnMaxLength)
@@ -256,4 +254,66 @@ object CommonValidators {
 
   private def validateAMLSBodies(amlsBody: String, bodies: Set[String]): Boolean =
     bodies.contains(amlsBody)
+
+  def addressLine12(lineNumber: Int): Mapping[String] =
+    text
+      .verifying(maxLength(AddresslineMaxLength, s"error.addressline.$lineNumber.maxlength"))
+      .verifying(
+        desText(
+          regex = AgencyAddressRegex,
+          msgKeyRequired = s"error.addressline.$lineNumber.empty",
+          msgKeyInvalid = s"error.addressline.$lineNumber.invalid"))
+
+  def addressLine34(lineNumber: Int): Mapping[Option[String]] =
+    optional(
+      text
+        .verifying(maxLength(AddresslineMaxLength, s"error.addressline.$lineNumber.maxlength"))
+        .verifying(
+          desText(
+            regex = AgencyAddressRegex,
+            msgKeyRequired = s"error.addressline.$lineNumber.empty",
+            msgKeyInvalid = s"error.addressline.$lineNumber.invalid")))
+
+  def emailAddress: Mapping[String] =
+    text
+      .verifying(validEmailAddress)
+
+  def businessName: Mapping[String] =
+    text
+      .verifying(maxLength(BusinessNameMaxLength, "error.business-name.maxlength"))
+      .verifying(
+        checkOneAtATime(
+          noAmpersand("error.business-name.invalid"),
+          checkOneAtATime(
+            noApostrophe("error.business-name.invalid"),
+            desText(
+              AgencyNameRegex,
+              msgKeyRequired = "error.business-name.empty",
+              msgKeyInvalid = "error.business-name.invalid")
+          )
+        ))
+
+  private[validators] def desText(regex: String, msgKeyRequired: String, msgKeyInvalid: String): Constraint[String] =
+    Constraint[String] { fieldValue: String =>
+      nonEmptyWithMessage(msgKeyRequired)(fieldValue) match {
+        case i: Invalid => i
+        case Valid =>
+          fieldValue match {
+            case value if !value.matches(regex) => Invalid(ValidationError(msgKeyInvalid))
+            case _                              => Valid
+          }
+      }
+    }
+
+  private def noAmpersand(errorMsgKey: String) = Constraints.pattern("[^&]*".r, error = errorMsgKey)
+
+  private def noApostrophe(errorMsgKey: String) = Constraints.pattern("[^']*".r, error = errorMsgKey)
+
+  private def checkOneAtATime[T](firstConstraint: Constraint[T], secondConstraint: Constraint[T]) = Constraint[T] {
+    fieldValue: T =>
+      firstConstraint(fieldValue) match {
+        case i @ Invalid(_) => i
+        case Valid          => secondConstraint(fieldValue)
+      }
+  }
 }

@@ -16,30 +16,25 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
-import javax.inject.{Inject, Singleton}
 import play.api.mvc.Results.{Forbidden, Redirect}
 import play.api.mvc.{Request, Result}
 import play.api.{Configuration, Environment, Logger, Mode}
+import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
-import uk.gov.hmrc.agentoverseasfrontend.models.CredentialRequest
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials}
-import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class AuthAction @Inject()(
-  val authConnector: AuthConnector,
-  val sessionStoreService: SessionStoreService,
-  val applicationService: ApplicationService
-)(implicit val env: Environment, val config: Configuration, appConfig: AppConfig, ec: ExecutionContext)
-    extends AuthRedirects with AuthorisedFunctions with CommonRouting {
+trait AuthBase extends AuthRedirects with AuthorisedFunctions {
+  val authConnector: AuthConnector
+  val env: Environment
+  val config: Configuration
+  val appConfig: AppConfig
+  implicit val ec: ExecutionContext
 
   lazy val isDevEnv: Boolean =
     if (env.mode.equals(Mode.Test)) false
@@ -51,34 +46,22 @@ class AuthAction @Inject()(
       block(request)
     }.recover(handleFailure(request))
 
-  def withBasicAgentAuth(
+  def withBasicAuthAndAgentAffinity(
     block: Request[_] => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
       block(request)
     }.recover(handleFailure(request))
 
-  def withEnrollingAgent(
-    block: CredentialRequest => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
-    authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
-      .retrieve(credentials and allEnrolments) {
-        case credentialsOpt ~ enrolments =>
-          if (isEnrolledForHmrcAsAgent(enrolments))
-            Future.successful(Redirect(appConfig.agentServicesAccountPath))
-          else
-            sessionStoreService.fetchAgentSession.flatMap {
-              case Some(agentSession) =>
-                credentialsOpt.fold(throw UnsupportedCredentialRole("User has no credentials"))(credentials =>
-                  block(CredentialRequest(credentials.providerId, request, agentSession)))
-              case None =>
-                routesIfExistingApplication(appConfig.agentOverseasSubscriptionFrontendRootPath).map(Redirect)
-            }
-      }
-      .recover(handleFailure(request))
-
-  private def isEnrolledForHmrcAsAgent(enrolments: Enrolments): Boolean =
+  protected def hasAgentEnrolment(enrolments: Enrolments): Boolean =
     enrolments.enrolments
       .find(_.key equals "HMRC-AS-AGENT")
       .exists(_.isActivated)
+
+  protected def getArn(enrolments: Enrolments): Option[Arn] =
+    for {
+      enrolment  <- enrolments.getEnrolment("HMRC-AS-AGENT")
+      identifier <- enrolment.getIdentifier("AgentReferenceNumber")
+    } yield Arn(identifier.value)
 
   protected def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Result] = {
     case _: NoActiveSession ⇒
@@ -96,7 +79,7 @@ class AuthAction @Inject()(
 
     case _: UnsupportedAffinityGroup =>
       Logger.warn(s"user logged in with unsupported affinity group")
-      Redirect(routes.StartController.showNotAgent())
+      Redirect(application.routes.ApplicationRootController.showNotAgent())
   }
 
 }

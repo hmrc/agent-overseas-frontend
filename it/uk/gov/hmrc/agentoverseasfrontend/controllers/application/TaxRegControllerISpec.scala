@@ -1,18 +1,17 @@
-package uk.gov.hmrc.agentoverseasfrontend.controllers
+package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import org.jsoup.Jsoup
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{LOCATION, redirectLocation}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.collection.immutable.SortedSet
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
   implicit val hc: HeaderCarrier = HeaderCarrier()
