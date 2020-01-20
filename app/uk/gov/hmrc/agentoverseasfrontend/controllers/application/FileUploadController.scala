@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
 import uk.gov.hmrc.agentoverseasfrontend.forms.SuccessfulFileUploadConfirmationForm
-import uk.gov.hmrc.agentoverseasfrontend.models.{ApplicationRequest, Yes, YesNo}
+import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, Yes, YesNo}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
@@ -48,42 +48,42 @@ class FileUploadController @Inject()(
   import authAction.withEnrollingAgent
 
   def showAmlsUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       showUploadForm("amls")
     }
   }
 
   def showTradingAddressUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       showUploadForm("trading-address")
     }
   }
 
   def showTrnUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       showUploadForm("trn")
     }
   }
 
   private def showUploadForm(
-    fileType: String)(implicit cRequest: ApplicationRequest, hc: HeaderCarrier, request: Request[_]) =
+    fileType: String)(implicit agentSession: AgentSession, hc: HeaderCarrier, request: Request[_]) =
     upscanConnector
       .initiate()
       .flatMap(
         upscan =>
           sessionStoreService
-            .cacheAgentSession(cRequest.agentSession.copy(fileType = Some(fileType)))
+            .cacheAgentSession(agentSession.copy(fileType = Some(fileType)))
             .map(_ => Ok(fileUploadView(upscan, fileType, getBackLink(fileType)))))
 
   def showTradingAddressNoJsCheckPage: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       Ok(tradingAddressNoJsView())
     }
   }
 
   //these pollStatus functions are called via ajax in the assets/javascripts/script.js
   def pollStatus(fileType: String, reference: String): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           applicationService
@@ -116,7 +116,7 @@ class FileUploadController @Inject()(
   }
 
   def showSuccessfulUploadedForm(): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           agentSession.fileType match {
@@ -149,7 +149,7 @@ class FileUploadController @Inject()(
     }
 
   def submitSuccessfulFileUploadedForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       SuccessfulFileUploadConfirmationForm.form
         .bindFromRequest()
         .fold(
@@ -174,7 +174,7 @@ class FileUploadController @Inject()(
   }
 
   def showUploadFailedPage(): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit cRequest =>
+    withEnrollingAgent { implicit agentSession =>
       sessionStoreService.fetchAgentSession.map {
         case Some(agentSession) =>
           agentSession.fileType match {
@@ -205,12 +205,12 @@ class FileUploadController @Inject()(
       case None => throw new RuntimeException("no agent session")
     }
 
-  private def getBackLink(fileType: String)(implicit cRequest: ApplicationRequest, hc: HeaderCarrier): Option[String] =
-    if (cRequest.agentSession.changingAnswers && (fileType match {
+  private def getBackLink(fileType: String)(implicit agentSession: AgentSession, hc: HeaderCarrier): Option[String] =
+    if (agentSession.changingAnswers && (fileType match {
           case "trading-address" =>
-            cRequest.agentSession.tradingAddressUploadStatus.nonEmpty
-          case "amls" => cRequest.agentSession.amlsUploadStatus.nonEmpty
-          case "trn"  => cRequest.agentSession.trnUploadStatus.nonEmpty
+            agentSession.tradingAddressUploadStatus.nonEmpty
+          case "amls" => agentSession.amlsUploadStatus.nonEmpty
+          case "trn"  => agentSession.trnUploadStatus.nonEmpty
           case _ =>
             Logger.info("routing error for back link- unrecognized document proof file key!")
             false
@@ -234,10 +234,10 @@ class FileUploadController @Inject()(
       }
     }
 
-  private def nextPage(fileType: String)(implicit cRequest: ApplicationRequest, hc: HeaderCarrier): Future[String] =
-    if (cRequest.agentSession.changingAnswers) {
+  private def nextPage(fileType: String)(implicit agentSession: AgentSession, hc: HeaderCarrier): Future[String] =
+    if (agentSession.changingAnswers) {
       sessionStoreService
-        .cacheAgentSession(cRequest.agentSession.copy(changingAnswers = false))
+        .cacheAgentSession(agentSession.copy(changingAnswers = false))
         .map(_ => showCheckYourAnswersUrl)
     } else {
       fileType match {

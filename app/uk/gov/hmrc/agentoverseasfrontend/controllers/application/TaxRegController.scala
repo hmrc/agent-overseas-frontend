@@ -53,8 +53,8 @@ class TaxRegController @Inject()(
   import authAction.{withEnrollingAgent}
 
   def showTaxRegistrationNumberForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      val storedTrns = cRequest.agentSession.taxRegistrationNumbers
+    withEnrollingAgent { agentSession =>
+      val storedTrns = agentSession.taxRegistrationNumbers
         .getOrElse(SortedSet.empty[Trn])
 
       val whichTrnToPopulate = if (storedTrns.size == 1) {
@@ -64,13 +64,13 @@ class TaxRegController @Inject()(
       }
 
       val prePopulate =
-        TaxRegistrationNumber(cRequest.agentSession.hasTaxRegNumbers, whichTrnToPopulate)
+        TaxRegistrationNumber(agentSession.hasTaxRegNumbers, whichTrnToPopulate)
       Ok(trnView(TaxRegistrationNumberForm.form.fill(prePopulate)))
     }
   }
 
   def submitTaxRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       TaxRegistrationNumberForm.form
         .bindFromRequest()
         .fold(
@@ -80,7 +80,7 @@ class TaxRegController @Inject()(
             val (updatedSession, redirectLink) =
               if (validForm.canProvideTaxRegNo.contains(true)) {
                 (
-                  cRequest.agentSession.copy(
+                  agentSession.copy(
                     hasTaxRegNumbers = validForm.canProvideTaxRegNo,
                     taxRegistrationNumbers = validForm.value.flatMap(taxId => Some(SortedSet(taxId))),
                     hasTrnsChanged = validForm.value.isDefined
@@ -88,7 +88,7 @@ class TaxRegController @Inject()(
                   routes.TaxRegController.showYourTaxRegNumbersForm().url)
               } else {
                 (
-                  cRequest.agentSession.copy(
+                  agentSession.copy(
                     hasTaxRegNumbers = None,
                     taxRegistrationNumbers = None,
                     trnUploadStatus = None,
@@ -104,30 +104,30 @@ class TaxRegController @Inject()(
   }
 
   def showMoreInformationNeeded: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       Ok(taxMoreInfoNeededView())
     }
   }
 
   def showAddTaxRegNoForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       Ok(addTrnView(AddTrnForm.form))
     }
   }
 
   def submitAddTaxRegNo: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       AddTrnForm.form
         .bindFromRequest()
         .fold(
           formWithErrors => Ok(addTrnView(formWithErrors)),
           validForm => {
-            val trns = cRequest.agentSession.taxRegistrationNumbers match {
+            val trns = agentSession.taxRegistrationNumbers match {
               case Some(numbers) => numbers + Trn(validForm)
               case None          => SortedSet(validForm).map(Trn.apply)
             }
             updateSession(
-              cRequest.agentSession
+              agentSession
                 .copy(
                   taxRegistrationNumbers = Some(trns),
                   hasTaxRegNumbers = Some(true),
@@ -139,10 +139,10 @@ class TaxRegController @Inject()(
   }
 
   def showYourTaxRegNumbersForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      val trns = cRequest.agentSession.taxRegistrationNumbers
+    withEnrollingAgent { agentSession =>
+      val trns = agentSession.taxRegistrationNumbers
         .getOrElse(SortedSet.empty[Trn])
-      if (cRequest.agentSession.changingAnswers) {
+      if (agentSession.changingAnswers) {
         Ok(yourTrnsView(DoYouWantToAddAnotherTrnForm.form, trns.map(_.value), Some(showCheckYourAnswersUrl)))
       } else {
         Ok(yourTrnsView(DoYouWantToAddAnotherTrnForm.form, trns.map(_.value)))
@@ -151,14 +151,14 @@ class TaxRegController @Inject()(
   }
 
   def submitYourTaxRegNumbers: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       DoYouWantToAddAnotherTrnForm.form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            val trns = cRequest.agentSession.taxRegistrationNumbers
+            val trns = agentSession.taxRegistrationNumbers
               .getOrElse(SortedSet.empty[Trn])
-            if (cRequest.agentSession.changingAnswers) {
+            if (agentSession.changingAnswers) {
               Ok(yourTrnsView(formWithErrors, trns.map(_.value), Some(showCheckYourAnswersUrl)))
             } else {
               Ok(yourTrnsView(formWithErrors, trns.map(_.value)))
@@ -169,11 +169,11 @@ class TaxRegController @Inject()(
               case Some(true) =>
                 Redirect(routes.TaxRegController.showAddTaxRegNoForm().url)
               case _ =>
-                if (cRequest.agentSession.hasTrnsChanged) {
-                  updateSession(cRequest.agentSession.copy(trnUploadStatus = None, hasTrnsChanged = false))(
+                if (agentSession.hasTrnsChanged) {
+                  updateSession(agentSession.copy(trnUploadStatus = None, hasTrnsChanged = false))(
                     routes.FileUploadController.showTrnUploadForm().url)
                 } else {
-                  updateSession(cRequest.agentSession.copy(hasTrnsChanged = false))(
+                  updateSession(agentSession.copy(hasTrnsChanged = false))(
                     routes.ApplicationController.showCheckYourAnswers().url)
                 }
             }
@@ -183,7 +183,7 @@ class TaxRegController @Inject()(
   }
 
   def submitUpdateTaxRegNumber: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       UpdateTrnForm.form
         .bindFromRequest()
         .fold(
@@ -195,10 +195,10 @@ class TaxRegController @Inject()(
           validForm =>
             validForm.updated match {
               case Some(updatedTrn) =>
-                val updatedSet = cRequest.agentSession.taxRegistrationNumbers
+                val updatedSet = agentSession.taxRegistrationNumbers
                   .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(validForm.original) + Trn(updatedTrn))
 
-                updateSession(cRequest.agentSession
+                updateSession(agentSession
                   .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true))(
                   routes.TaxRegController.showYourTaxRegNumbersForm().url)
 
@@ -210,8 +210,8 @@ class TaxRegController @Inject()(
   }
 
   def showRemoveTaxRegNumber(trn: String): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
-      if (cRequest.agentSession.taxRegistrationNumbers.exists(_.contains(Trn(trn))))
+    withEnrollingAgent { agentSession =>
+      if (agentSession.taxRegistrationNumbers.exists(_.contains(Trn(trn))))
         Ok(removeTrnView(removeTrnForm, trn))
       else
         Ok(errorTemplateView("global.error.404.title", "global.error.404.heading", "global.error.404.message"))
@@ -219,18 +219,18 @@ class TaxRegController @Inject()(
   }
 
   def submitRemoveTaxRegNumber(trn: String): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { cRequest =>
+    withEnrollingAgent { agentSession =>
       removeTrnForm
         .bindFromRequest()
         .fold(
           formWithErrors => Ok(removeTrnView(formWithErrors, trn)),
           validForm => {
             if (validForm.value) {
-              val updatedSet = cRequest.agentSession.taxRegistrationNumbers
+              val updatedSet = agentSession.taxRegistrationNumbers
                 .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(trn))
               val toUpdate: AgentSession =
                 if (updatedSet.isEmpty)
-                  cRequest.agentSession
+                  agentSession
                     .copy(
                       hasTaxRegNumbers = None,
                       taxRegistrationNumbers = None,
@@ -238,7 +238,7 @@ class TaxRegController @Inject()(
                       changingAnswers = false,
                       hasTrnsChanged = true)
                 else
-                  cRequest.agentSession
+                  agentSession
                     .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true)
 
               val redirectUrl =

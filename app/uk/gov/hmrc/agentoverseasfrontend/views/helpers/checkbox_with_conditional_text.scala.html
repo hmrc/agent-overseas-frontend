@@ -36,7 +36,7 @@
 
 <div class="panel panel-border-narrow js-hidden" id="@conditionalDivId">
     @input(field, args ++ Seq(
-      '_label -> Html(s"<span>$labelInset</span>"),
+      '_label -> Html(labelInset.toString),
       '_labelTextClass -> "form-label",
       '_inputClass -> "form-control"
     ): _*)

@@ -29,4 +29,3 @@ POST       /update-business-name               @uk.gov.hmrc.agentoverseasfronten
 
 GET        /cannot-check-status                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.showApplicationIssue
 
-GET        /assets/*file                             controllers.Assets.at(path="/public", file)

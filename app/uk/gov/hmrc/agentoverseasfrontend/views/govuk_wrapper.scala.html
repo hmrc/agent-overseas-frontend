@@ -85,13 +85,13 @@
     <meta name="format-detection" content="telephone=no"/>
 }
 
-@titleWithSuffix = @{ title + " - " + Messages("servicename.titleSuffix") }
+@titleWithSuffix = @{ title + " - " + {if(request.uri.contains("create-account")) Messages("subscription.servicename.titleSuffix") else  Messages("application.servicename.titleSuffix")}}
 
 @headerNavLinks = {}
 
 @insideHeader = {
 @uiHeaderNav(
-    navTitle = Some(Messages("app.name")),
+    navTitle = if(request.uri.contains("create-account")) Some(Messages("subscription.app.name")) else  Some(Messages("application.app.name")),
     navTitleLink = None,
     showBetaLink = false,
     navLinks = Some(headerNavLinks))

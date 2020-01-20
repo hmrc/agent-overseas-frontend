@@ -89,6 +89,6 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
     servicesConfig.getInt("timeoutDialog.timeout-countdown-seconds")
   override val agentGuidancePageFullUrl: String = servicesConfig.getString("agent-guidance-page.full-url")
   override val asaFrontendUrl: String =
-    servicesConfig.getString("microservice.services.agent-services-account-frontend.url") + "/agent-services-account"
+    servicesConfig.getString("microservice.services.agent-services-account-frontend.url")
   override val agentSubscriptionBaseUrl: String = servicesConfig.baseUrl("agent-subscription")
 }
