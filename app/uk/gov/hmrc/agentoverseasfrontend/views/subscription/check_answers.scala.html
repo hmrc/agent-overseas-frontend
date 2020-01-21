@@ -20,10 +20,11 @@
 @import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers._
 
-@this(mainTemplate: main_template, form: FormWithCSRF)
+@this(mainTemplate: main_template, form: FormWithCSRF, checkAnswersDiv: check_answers_div)
 
-@(agencyDetails: AgencyDetails, addressCountryName: String)(implicit messages: Messages, request : Request[_], configuration: Configuration, appConfig: AppConfig)
+@(agencyDetails: AgencyDetails, addressCountryName: String)(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = Messages("subscription.checkAnswers.title")) {
 
@@ -31,53 +32,63 @@
     <p>@Messages("subscription.checkAnswers.description.p1")</p>
     <p>@Messages("subscription.checkAnswers.description.p2")</p>
 
+    <br/>
 
-    <dl class="app-check-your-answers app-check-your-answers--long margin-top-30">
-        <div class="app-check-your-answers__contents">
-            <dt class="app-check-your-answers__question">
+    <div class="app-check-your-answers--group margin-bottom-30">
+        <dl class="app-check-your-answers app-check-your-answers--long">
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
                 @Messages("subscription.checkAnswers.businessName.label")
-            </dt>
-            <dd class="app-check-your-answers__answer" id="registration-name">
+                </dt>
+                <dd class="app-check-your-answers__answer" id="agencyName">
                 @agencyDetails.agencyName
-            </dd>
-            <dd class="app-check-your-answers__change">
-                <a href="@routes.BusinessIdentificationController.showUpdateBusinessNameForm()">@Messages("subscription.checkAnswers.change.button")<span
-                        class="visuallyhidden"> @Messages("subscription.checkAnswers.businessName.label")</span></a>
-            </dd>
-        </div>
-        <div class="app-check-your-answers__contents">
-            <dt class="app-check-your-answers__question">
+                </dd>
+                <dd class="app-check-your-answers__change">
+                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessNameForm()">@Messages("subscription.checkAnswers.change.button") <span
+                    class="visuallyhidden"> @Messages("subscription.checkAnswers.businessName.label")</span></a>
+                </dd>
+            </div>
+        </dl>
+    </div>
+    <div class="app-check-your-answers--group margin-bottom-30">
+        <dl class="app-check-your-answers app-check-your-answers--long">
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
                 @Messages("subscription.checkAnswers.businessAddress.label")
-            </dt>
-            <dd class="app-check-your-answers__answer" id="postcode">
-                <p>
-                    @defining(agencyDetails.agencyAddress) { agencyAddress =>
-                        @agencyAddress.addressLine1<br/>
-                        @agencyAddress.addressLine2<br/>
-                        @agencyAddress.addressLine3.map(address => Html(s"$address <br/>")).getOrElse("")
-                        @agencyAddress.addressLine4.map(address => Html(s"$address <br/>")).getOrElse("")
-                    }
-                    @addressCountryName<br/>
-                </p>
-            </dd>
-            <dd class="app-check-your-answers__change">
-                <a href="@routes.BusinessIdentificationController.showUpdateBusinessAddressForm()">@Messages("subscription.checkAnswers.change.button")<span
-                        class="visuallyhidden"> @Messages("subscription.checkAnswers.businessAddress.label")</span></a>
-            </dd>
-        </div>
-        <div class="app-check-your-answers__contents">
-            <dt class="app-check-your-answers__question">
+                </dt>
+                <dd class="app-check-your-answers__answer" id="postcode">
+                    <p>
+                        @defining(agencyDetails.agencyAddress) { agencyAddress =>
+                            @agencyAddress.addressLine1 <br/>
+                            @agencyAddress.addressLine2 <br/>
+                            @agencyAddress.addressLine3.map(address => Html(s"$address <br/>")).getOrElse("")
+                            @agencyAddress.addressLine4.map(address => Html(s"$address <br/>")).getOrElse("")
+                        }
+                        @addressCountryName <br/>
+                    </p>
+                </dd>
+                <dd class="app-check-your-answers__change">
+                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessAddressForm()">@Messages("subscription.checkAnswers.change.button") <span
+                    class="visuallyhidden"> @Messages("subscription.checkAnswers.businessAddress.label")</span></a>
+                </dd>
+            </div></dl>
+    </div>
+    <div class="app-check-your-answers--group margin-bottom-30">
+        <dl class="app-check-your-answers app-check-your-answers--long">
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
                 @Messages("subscription.checkAnswers.businessEmailAddress.label")
-            </dt>
-            <dd class="app-check-your-answers__answer" id="utr">
+                </dt>
+                <dd class="app-check-your-answers__answer" id="utr">
                 @agencyDetails.agencyEmail
-            </dd>
-            <dd class="app-check-your-answers__change">
-                <a href="@routes.BusinessIdentificationController.showUpdateBusinessEmailForm()">@Messages("subscription.checkAnswers.change.button")<span
-                        class="visuallyhidden"> @Messages("subscription.checkAnswers.businessEmailAddress.label")</span></a>
-            </dd>
-        </div>
-    </dl>
+                </dd>
+                <dd class="app-check-your-answers__change">
+                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessEmailForm()">@Messages("subscription.checkAnswers.change.button") <span
+                    class="visuallyhidden"> @Messages("subscription.checkAnswers.businessEmailAddress.label")</span></a>
+                </dd>
+            </div>
+        </dl>
+    </div>
 
     <br/>
 
