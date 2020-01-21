@@ -23,37 +23,33 @@
 
 @this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, input: Input)
 
-@(businessEmailForm: Form[BusinessEmailForm])(implicit messages: Messages, request : Request[_], configuration: Configuration, appConfig: AppConfig)
+@(businessEmailForm: Form[BusinessEmailForm])(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
-@formLabel = @{
-"""<h1 class="heading-xlarge margin-bottom-10">""" + Messages("updateBusinessEmail.title") + """</h1>"""+
-"""<p class="panel panel-border-wide margin-bottom-40">""" + Messages("updateBusinessEmail.description") + """</p>"""
-}
+@mainTemplate(title = errorPrefix(businessEmailForm) + Messages("updateBusinessEmail.title"), bodyClasses = None) {
 
-@mainTemplate(title =  errorPrefix(businessEmailForm) +  Messages("updateBusinessEmail.title"), bodyClasses = None) {
+    <a href="@routes.BusinessIdentificationController.showCheckAnswers()" class="link-back">@Messages("button.back")</a>
 
-<a href="@routes.BusinessIdentificationController.showCheckAnswers()" class="link-back">@Messages("button.back")</a>
+    @if(businessEmailForm.hasErrors) {
+        @errorSummary(Messages("error.summary.heading"), businessEmailForm, Seq.empty, Some("business-email"))
+    }
 
-@if(businessEmailForm.hasErrors) {
-@errorSummary(Messages("error.summary.heading"), businessEmailForm, Seq.empty, Some("business-email"))
-}
+    @form(
+        action = routes.BusinessIdentificationController.submitUpdateBusinessEmailForm(),
+        'class -> "form js-form") {
 
-@form(
-action = routes.BusinessIdentificationController.submitUpdateBusinessEmailForm(),
-'class -> "form js-form") {
+        <div class="form-group margin-bottom-20">
+        @input(
+            businessEmailForm("email"),
+            '_inputClass -> "form-control input--cleared",
+            '_label -> Messages("updateBusinessEmail.title"),
+            '_labelTextClass -> "heading-xlarge margin-bottom-40",
+            '_inputHint -> Html("""<p class="panel panel-border-wide margin-bottom-40">""" + Messages("updateBusinessEmail.description") + "</p>"),
+            '_errorPrefix -> Messages("error.prefix")
+        )
+        </div>
 
-<div class="form-group margin-bottom-20">
-    @input(
-    businessEmailForm("email"),
-    '_inputClass -> "form-control input--cleared",
-    '_labelClass -> "heading-small soft--ends",
-    '_label -> Html(formLabel),
-'_errorPrefix -> Messages("error.prefix")
-    )
-</div>
-
-<div class="form-field margin-top-10">
-    <button class="button" type="submit" id="submit-email">@Messages("updateBusinessEmail.continue")</button>
-</div>
-}
+        <div class="form-field margin-top-10">
+            <button class="button" type="submit" id="submit-email">@Messages("updateBusinessEmail.continue")</button>
+        </div>
+    }
 }
