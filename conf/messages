@@ -227,7 +227,6 @@ fileUpload.failed.caption=Your business details
 fileUpload.failed.title=The selected file could not be uploaded
 fileUpload.failed.p1=The file you uploaded did not pass our security checks.
 fileUpload.failed.try-again.label=Try again
-fileUpload.failed.title.amls=The selected file could not be uploaded
 
 
 #Non agent
