@@ -179,7 +179,7 @@ class FileUploadController @Inject()(
         case Some(agentSession) =>
           agentSession.fileType match {
             case Some(fileType) =>
-              Ok(fileUploadFailedView(fileType, backToFileUploadPage(fileType)))
+              Ok(fileUploadFailedView(backToFileUploadPage(fileType)))
             case None =>
               Logger.info("expecting a fileType in session for failed upload but none found")
               Redirect(routes.FileUploadController.showAmlsUploadForm())

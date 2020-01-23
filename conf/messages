@@ -130,7 +130,6 @@ error.fileUpload.no-upload=The selected file could not be uploaded - try again
 error.fileUpload.virus=The selected file contains a virus
 error.fileUpload.invalid=The selected file must be a PDF or JPG
 
-
 # Service specific messages
 application.app.name=Apply for an agent services account if you are not in the UK
 application.servicename.titleSuffix=Apply for an agent services account if you are not in the UK - GOV.UK
@@ -228,6 +227,7 @@ fileUpload.failed.caption=Your business details
 fileUpload.failed.title=The selected file could not be uploaded
 fileUpload.failed.p1=The file you uploaded did not pass our security checks.
 fileUpload.failed.try-again.label=Try again
+
 
 #Non agent
 nonAgent.title=You have not signed in with an agent user ID
