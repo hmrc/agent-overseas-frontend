@@ -155,7 +155,7 @@ application_not_ready.p2=We may get in touch with you to discuss your applicatio
 application_not_ready.p3=We will tell you within {0} calendar days if your application has been approved. We will also tell you how to set up your account.
 application_not_ready.p4=If your application is rejected we will tell you why.
 application_not_ready.h3=If you need help
-application_not_ready.p5=If you need help using this service, use the ''get help with this page'' link at the bottom of this page.
+application_not_ready.p5=If you need help using this service, use the ‘get help with this page’ link at the bottom of this page.
 
 # AMLS required
 amls.required.title=Does your country require you to register with a money laundering supervisory body?
@@ -225,14 +225,14 @@ fileUpload.success.form.correctFile.no=No
 fileUpload.success.correctFile.confirmation=Is {0} the correct file?
 
 fileUpload.failed.caption=Your business details
-fileUpload.failed.title=There is a problem
+fileUpload.failed.title=The selected file could not be uploaded
 fileUpload.failed.p1=The file you uploaded did not pass our security checks.
 fileUpload.failed.try-again.label=Try again
 
 #Non agent
 nonAgent.title=You have not signed in with an agent user ID
-nonAgent.p1=<a href="{0}">Sign in with an agent Government Gateway user ID</a> to continue.
-nonAgent.p2=If you do not have one, you need to <a href="{0}">create a new user ID</a>, selecting the ''Agent'' option.
+nonAgent.p1=To continue, <a href="{0}">sign in with an agent user ID</a>.
+nonAgent.p2=If you do not have one, <a href="{0}"> create a new Government Gateway user ID</a>, selecting the ‘Agent’ option.
 
 # Trading name
 tradingName.title=What is the trading name of your business?
@@ -377,7 +377,7 @@ applicationComplete.whatYouCanDoNext.heading=What you can do next
 applicationComplete.whatYouCanDoNext.link=Check the guidance on GOV.UK
 applicationComplete.whatYouCanDoNext.text=to find out how to track the progress of your application.
 applicationComplete.help.heading=If you need help
-applicationComplete.help.text=If you need help using this service, use the ''get help with this page'' link at the bottom of the page.
+applicationComplete.help.text=If you need help using this service, use the ‘get help with this page’ link at the bottom of the page.
 applicationComplete.print=Print this page
 applicationComplete.feedback.link=What did you think of this service?
 applicationComplete.feedback.text=(takes 30 seconds)
@@ -521,9 +521,8 @@ updateBusinessName.continue=Continue
 # cannot_check_status /cannot-check-status
 
 cannot_check_status.title=Sorry, there is a problem with the service
-cannot_check_status.p1=Something has gone wrong with the service. It was not your fault.
-cannot_check_status.p2=Please contact us to check the status of your application.
-cannot_check_status.p3=Use the ''get help with this page'' link at the bottom of this page, and we will get back to you.
+cannot_check_status.p1=Please contact us to check the status of your application.
+cannot_check_status.p2=Use the ‘get help with this page’ link at the bottom of this page, and we will get back to you.
 
 # Already subscribed
 already.subscribed.title=Your business already has an agent services account

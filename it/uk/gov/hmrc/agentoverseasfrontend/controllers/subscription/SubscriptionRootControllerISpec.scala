@@ -52,7 +52,6 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
       result should containMessages("cannot_check_status.title",
       "cannot_check_status.p1",
       "cannot_check_status.p2",
-      "cannot_check_status.p3"
       )
     }
   }
