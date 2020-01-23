@@ -522,7 +522,7 @@ updateBusinessName.continue=Continue
 
 cannot_check_status.title=Sorry, there is a problem with the service
 cannot_check_status.p1=Please contact us to check the status of your application.
-cannot_check_status.p2=Use the ‘get help with this page’ link at the bottom of this page, and we will get back to you.
+cannot_check_status.p2=Use the ‘Get help with this page’ link at the bottom of this page, and we will get back to you.
 
 # Already subscribed
 already.subscribed.title=Your business already has an agent services account
