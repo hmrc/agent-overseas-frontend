@@ -40,7 +40,7 @@
         </label>
 
         <div class="form-group @if(tradingNameForm.error("tradingName").isDefined){form-group-error form-field--error}">
-            @tradingNameForm.error("tradingName").map{formError => <span class="error-message"> @Messages(formError.message)</span>}
+            @tradingNameForm.error("tradingName").map{formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span>}
             <input type="text" class="form-control--block" name="tradingName" id="tradingName" value="@tradingNameForm.value.getOrElse("")">
         </div>
 

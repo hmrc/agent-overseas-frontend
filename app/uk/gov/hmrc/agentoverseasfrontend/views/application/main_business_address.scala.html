@@ -52,7 +52,8 @@
             '_label -> Messages(s"mainBusinessAddress.form.addressLine1"),
             '_inputClass -> "form-control--block",
             '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label"
+            '_labelTextClass -> "form-label",
+            '_errorPrefix -> Messages("error.prefix")
         )
         </div>
 
@@ -62,7 +63,9 @@
             '_label -> Messages("mainBusinessAddress.form.addressLine2"),
             '_inputClass -> "form-control--block",
             '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label"
+            '_labelTextClass -> "form-label",
+            '_errorPrefix -> Messages("error.prefix")
+
         )
         </div>
 
@@ -97,6 +100,7 @@
                 '_inputClass -> "form-control input--cleared",
                 '_labelClass -> "soft--ends",
                 '_selectWrapper -> Html("""class="autocomplete-wrapper"""")
+
             )
         </div>
 

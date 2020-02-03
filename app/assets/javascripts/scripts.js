@@ -316,7 +316,7 @@ $(document).ready(function () {
         $('title').html("Error: " + title);
         $('.js-error-summary-messages a').html(errorMsg);
         $('#file-upload-container').addClass('form-field--error');
-        $('#file-upload-error').html(errorMsg);
+      $('#file-upload-error').html('<span class="visuallyhidden">Error:</span>' + errorMsg);
     }
 
     function clearErrors() {
