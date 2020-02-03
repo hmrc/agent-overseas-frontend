@@ -36,7 +36,7 @@ args: (Symbol,Any)*
 
     @if(elements.args.contains('_additionalTitleText)){<p>@elements.args.get('_additionalTitleText)</p>}
     @if(elements.args.contains('_errorsAboveInput)){
-    @elements.errors.map { error => <span style="display: block" class="error-notification">@Messages(error)</span>}
+        @elements.errors.map { error => <span style="display: block" class="error-notification"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(error)</span>}
     }
     <div @elements.args.get(
     '_selectWrapper) >
@@ -54,5 +54,5 @@ args: (Symbol,Any)*
     </div>
 </label>
 @if(!elements.args.contains('_errorsAboveInput)){
-@elements.errors.map { error => <span style="display: block" class="error-notification">@Messages(error)</span>}
+    @elements.errors.map { error => <span style="display: block" class="error-notification"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(error)</span>}
 }

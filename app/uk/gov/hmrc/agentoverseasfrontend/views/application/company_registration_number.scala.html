@@ -49,7 +49,7 @@
             </div>
             <div class="panel panel-border-narrow js-hidden @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-group-error}" id="confirmRegistration">
                 <label class="form-label" for="registrationNumber">@Messages("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn")</label>
-                @companyRegistrationNumberForm.errors("registrationNumber").map { formError => <span class="error-message">@Messages(formError.message)</span> }
+                @companyRegistrationNumberForm.errors("registrationNumber").map { formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(formError.message)</span> }
                 <input data-uppercase="false" class="form-control @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-control-error}" name="registrationNumber" type="text" id="registrationNumber" value="@companyRegistrationNumberForm.value.map(_.registrationNumber.map(_.value) .getOrElse(""))">
             </div>
 

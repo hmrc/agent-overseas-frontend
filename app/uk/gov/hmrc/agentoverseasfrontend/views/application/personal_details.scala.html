@@ -51,7 +51,7 @@
                 <label class="form-label" for="nino">@Messages("personalDetails.form.nino")
                     <span class="form-hint" id="nino-hint">@Messages("personalDetails.form.helper.nino")</span>
                 </label>
-                @personalDetailsForm.error("nino").map{formError => <span class="error-message"> @Messages(formError.message)</span>}
+                @personalDetailsForm.error("nino").map{formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span>}
                 <input aria-describedby="nino-hint" data-uppercase="true" class="form-control" name="nino" type="text" id="nino"  @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true)){ value="@personalDetailsForm.value.flatMap(_.nino.map(_.nino)).getOrElse("")" } >
             </div>
             <div class="multiple-choice" data-target="utrRadioInput">
@@ -62,7 +62,7 @@
                 <label class="form-label" for="saUtr">@Messages("personalDetails.form.sautr")
                     <span class="form-hint" id="sa-utr">@Messages("personalDetails.form.helper.sautr")</span>
                 </label>
-                @personalDetailsForm.error("saUtr").map{formError => <span class="error-message"> @Messages(formError.message)</span>}
+                @personalDetailsForm.error("saUtr").map{formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span>}
                 <input aria-describedby="sa-utr" class="form-control" name="saUtr" type="text" id="saUtr" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true)) { value="@personalDetailsForm.value.flatMap(_.saUtr.map(_.utr)).getOrElse("")" }>
             </div>
 

@@ -38,6 +38,7 @@
     @input(field, args ++ Seq(
       '_label -> Html(labelInset.toString),
       '_labelTextClass -> "form-label",
-      '_inputClass -> "form-control"
+      '_inputClass -> "form-control",
+        '_errorPrefix -> Messages("error.prefix")
     ): _*)
 </div>
