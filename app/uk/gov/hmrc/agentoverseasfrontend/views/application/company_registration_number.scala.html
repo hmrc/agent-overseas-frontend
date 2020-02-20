@@ -33,6 +33,7 @@
     }
 
     @form(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
+
         <fieldset>
             <legend class="margin-bottom-10">
                 <h1 class="heading-xlarge margin-bottom-20 @if(companyRegistrationNumberForm.hasErrors) {push--top}">
@@ -42,12 +43,17 @@
             </legend>
 
             <p>@Messages("companyRegistrationNumber.body.text")</p>
+            <div class="form-group @if(companyRegistrationNumberForm.error("confirmRegistration").isDefined){form-group-error}" id="confirmRegistration">
 
-            <div class="multiple-choice" data-target="confirmRegistration">
+            @if(companyRegistrationNumberForm.error("confirmRegistration").isDefined){
+                <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages("companyRegistrationNumber.error.no-radio.selected")</span>
+            }
+
+            <div class="multiple-choice" data-target="companyReg">
                 <input id="confirmRegistration_true" type="radio" name="confirmRegistration" value="true" @if(companyRegistrationNumberForm.error("registrationNumber").isDefined || companyRegistrationNumberForm.value.map(_.confirmRegistration == Some(true)).getOrElse(false)) {checked}>
                 <label for="confirmRegistration_true">@Messages("companyRegistrationNumber.form.registered.yes")</label>
             </div>
-            <div class="panel panel-border-narrow js-hidden @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-group-error}" id="confirmRegistration">
+            <div class="panel panel-border-narrow js-hidden @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-group-error}" id="companyReg">
                 <label class="form-label" for="registrationNumber">@Messages("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn")</label>
                 @companyRegistrationNumberForm.errors("registrationNumber").map { formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(formError.message)</span> }
                 <input data-uppercase="false" class="form-control @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-control-error}" name="registrationNumber" type="text" id="registrationNumber" value="@companyRegistrationNumberForm.value.map(_.registrationNumber.map(_.value) .getOrElse(""))">
@@ -57,8 +63,12 @@
                 <input id="confirmRegistration_false" type="radio" name="confirmRegistration" value="false" @if(companyRegistrationNumberForm.value.flatMap(_.confirmRegistration).exists(_ == false)) { checked = "checked" }>
                 <label for="confirmRegistration_false">@Messages("companyRegistrationNumber.form.registered.no")</label>
             </div>
+            </div>
         </fieldset>
 
+
+        <div class="form-group">
         <button class="button-block button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+        </div>
     }
 }

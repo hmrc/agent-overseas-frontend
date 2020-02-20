@@ -101,6 +101,7 @@ details .panel[aria-hidden=true] a {
 
 #file-upload-container.form-field--error input[type=file] {
     border: 4px solid #d4351c;
+    width: 100%;
 }
 
 @import 'partials/_forms';
@@ -130,6 +131,10 @@ details .panel[aria-hidden=true] a {
     font-weight: bold;
     font-size: 19px;
     line-height: 1.31579;
+}
+
+#confirmed--error {
+    padding-left: .8rem;
 }
 .error,
 .form-field--error {

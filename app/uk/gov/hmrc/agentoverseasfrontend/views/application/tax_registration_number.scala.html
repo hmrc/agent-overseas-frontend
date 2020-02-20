@@ -34,7 +34,7 @@
     }
 
     @form(action = routes.TaxRegController.submitTaxRegistrationNumber(), 'class -> "form js-form") {
-        <div class="form-group @if(taxRegistrationNumberForm.error("value").isDefined) {form-group-error}" id="radioResponse">
+
             <fieldset>
                 <legend>
                     <h1 class="heading-xlarge margin-bottom-20 @if(taxRegistrationNumberForm.hasErrors) {push--top}">
@@ -44,6 +44,11 @@
                 </legend>
 
                 <p>@Messages("taxRegNo.p1")</p>
+                <div class="form-group @if(taxRegistrationNumberForm.error("canProvideTaxRegNo").isDefined) {form-group-error}" id="canProvideTaxRegNo">
+
+                @if(taxRegistrationNumberForm.error("canProvideTaxRegNo").isDefined){
+                    <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages("taxRegNo.form.no-radio.selected")</span>
+                }
 
                 <div class="multiple-choice" data-target="taxRegNoFormTarget">
                     <input id="canProvideTaxRegNo_true" type="radio" name="canProvideTaxRegNo" value="true" @if(taxRegistrationNumberForm.error("value").isDefined || taxRegistrationNumberForm.value.map(_.canProvideTaxRegNo == Some(true)).getOrElse(false)) {checked}>
@@ -55,13 +60,16 @@
                     <input class="form-control @if(taxRegistrationNumberForm.error("value").isDefined) {form-control-error}" name="value" type="text" id="value" value="@taxRegistrationNumberForm.value.map(_.value.map(_.value).getOrElse(""))">
                 </div>
 
+
                 <div class="multiple-choice">
                     <input id="canProvideTaxRegNo_false" type="radio" name="canProvideTaxRegNo" value="false" @if(taxRegistrationNumberForm.value.map(_.canProvideTaxRegNo == Some(false)).getOrElse(false)) {checked}>
                     <label for="canProvideTaxRegNo_false">@Messages("taxRegNo.form.no")</label>
                 </div>
+                </div>
             </fieldset>
-        </div>
 
+        <div class="form-group">
         <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+        </div>
     }
 }
