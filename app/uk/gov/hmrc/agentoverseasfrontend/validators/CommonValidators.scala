@@ -119,7 +119,7 @@ object CommonValidators {
     nonEmptyWithMessage("error.country.empty")(code) match {
       case i: Invalid => i
       case Valid =>
-        if (codes.contains(code) && code != "GB" && code.size == 2)
+        if (codes.contains(code) && code.size == 2)
           Valid
         else
           Invalid(ValidationError("error.country.invalid"))

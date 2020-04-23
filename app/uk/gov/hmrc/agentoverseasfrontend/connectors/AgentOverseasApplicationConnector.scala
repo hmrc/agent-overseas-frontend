@@ -91,7 +91,8 @@ class AgentOverseasApplicationConnector @Inject()(
       http
         .GET[HttpResponse](url)
         .map {
-          case response if response.status == 200 => response.json.as[List[OverseasApplication]]
+          case response if response.status == 200 =>
+            response.json.as[List[OverseasApplication]]
         }
         .recover {
           case _: NotFoundException => List.empty[OverseasApplication]
