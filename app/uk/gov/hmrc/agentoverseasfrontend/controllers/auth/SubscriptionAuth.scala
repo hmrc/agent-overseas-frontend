@@ -79,16 +79,13 @@ class SubscriptionAuth @Inject()(
           Future.successful(Redirect(appConfig.asaFrontendUrl))
         } else {
           val hasCleanCreds = enrolments.enrolments.isEmpty
-          println(s"attempting to retrieve most recent application.....")
 
           subscriptionService.mostRecentApplication.flatMap {
             case Some(application) if application.status == Pending || application.status == Rejected =>
               Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}/application-status"))
             case Some(application) if application.status == Accepted =>
-              if (hasCleanCreds) {
-                println(s"HERE IS AM and application is $application")
-                block(application)
-              } else Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep()))
+              if (hasCleanCreds) block(application)
+               else Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep()))
             case Some(application) if application.status == Registered || application.status == Complete =>
               Future.successful(Redirect(subscription.routes.SubscriptionController.subscribe()))
             case Some(application) if application.status == AttemptingRegistration =>
