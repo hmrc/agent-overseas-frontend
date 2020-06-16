@@ -85,7 +85,7 @@ class SubscriptionAuth @Inject()(
               Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}/application-status"))
             case Some(application) if application.status == Accepted =>
               if (hasCleanCreds) block(application)
-               else Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep()))
+              else Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep()))
             case Some(application) if application.status == Registered || application.status == Complete =>
               Future.successful(Redirect(subscription.routes.SubscriptionController.subscribe()))
             case Some(application) if application.status == AttemptingRegistration =>
