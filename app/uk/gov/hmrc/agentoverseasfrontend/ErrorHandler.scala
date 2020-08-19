@@ -20,14 +20,14 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.MessagesApi
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
-import play.api.{Configuration, Environment, Mode}
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.http.{JsValidationException, NotFoundException}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.bootstrap.config.{AuthRedirects, HttpAuditEvent}
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
-import uk.gov.hmrc.agentoverseasfrontend.views.html._
+import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,10 +44,6 @@ class ErrorHandler @Inject()(
     extends FrontendErrorHandler with AuthRedirects with ErrorAuditing {
 
   val appName: String = appConfig.appName
-
-  private val isDevEnv =
-    if (env.mode.equals(Mode.Test)) false
-    else config.getOptional[String]("run.mode").forall(Mode.Dev.toString.equals)
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     auditClientError(request, statusCode, message)

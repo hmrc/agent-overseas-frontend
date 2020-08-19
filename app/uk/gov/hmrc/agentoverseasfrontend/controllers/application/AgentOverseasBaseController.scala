@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.ExecutionContext
 
@@ -28,5 +28,5 @@ import scala.concurrent.ExecutionContext
 class AgentOverseasBaseController @Inject()(
   val sessionStoreService: SessionStoreService,
   val applicationService: ApplicationService,
-  val controllerComponents: MessagesControllerComponents)(implicit val ec: ExecutionContext)
-    extends FrontendBaseController with SessionBehaviour with I18nSupport {}
+  override val controllerComponents: MessagesControllerComponents)(implicit val ec: ExecutionContext)
+    extends FrontendController(controllerComponents) with SessionBehaviour with I18nSupport {}
