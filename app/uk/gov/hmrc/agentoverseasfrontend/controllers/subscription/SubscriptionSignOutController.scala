@@ -24,7 +24,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{AuthBase, SubscriptionAuth}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService, SubscriptionService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._

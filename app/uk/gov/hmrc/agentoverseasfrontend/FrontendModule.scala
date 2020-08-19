@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 class FrontendModule(environment: Environment, configuration: Configuration) extends AbstractModule {
 
-  def configure(): Unit = {
+  override def configure(): Unit = {
 
     val appName: String = "agent-overseas-frontend"
 

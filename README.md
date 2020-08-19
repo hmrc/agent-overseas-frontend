@@ -15,7 +15,7 @@ This frontend allows overseas agents to submit an application to HMRC for regist
 
 ## Running the app locally
 
-    sm --start AGENT_OVERSEAS -r
+    sm --start AGENT_ONBOARDING -r
     sm --stop AGENT_OVERSEAS_FRONTEND
     sbt run
 
