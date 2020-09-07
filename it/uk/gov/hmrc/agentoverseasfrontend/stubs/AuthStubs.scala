@@ -15,8 +15,8 @@ trait AuthStubs {
   def authorisedAsValidAgent[A](request: FakeRequest[A], arn: String) = authenticated(request, Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn), isAgent = true)
 
   protected def authenticatedAs(user: SampleUser): FakeRequest[AnyContentAsEmpty.type] = {
-    val sessionKeys = userIsAuthenticated(user)
-    FakeRequest().withSession(sessionKeys: _*)
+    userIsAuthenticated(user)
+    FakeRequest()
   }
 
   def authenticated[A](request: FakeRequest[A], enrolment: Enrolment, isAgent: Boolean): FakeRequest[A] = {
@@ -178,7 +178,7 @@ trait AuthStubs {
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
 
-  def userIsAuthenticated(user: SampleUser): Seq[(String, String)] = {
+  def userIsAuthenticated(user: SampleUser) = {
     val response =
       s"""{${user.allEnrolments},${user.affinityGroup},"optionalCredentials": {"providerId": "${user.userId}", "providerType": "GovernmentGateway"}}"""
     stubFor(
@@ -188,9 +188,5 @@ trait AuthStubs {
             .withStatus(200)
             .withHeader("Content-Type", "application/json")
             .withBody(response)))
-    sessionKeysForMockAuth(user)
   }
-
-  private def sessionKeysForMockAuth(user: SampleUser): Seq[(String, String)] =
-    Seq(SessionKeys.userId -> user.userId, "token" -> "fakeToken")
 }
