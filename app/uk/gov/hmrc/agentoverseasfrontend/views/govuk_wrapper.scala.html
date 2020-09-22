@@ -112,20 +112,11 @@
     analyticsAdditionalJs = Some(gaJS))
 }
 
-@accessibilityUrl = @{
-  if(request.uri.contains("/create-account"))  Messages("footer.links.accessibility.url.subscription")
-  else Messages("footer.links.accessibility.url.application")
-}
+
 
 @footerTop = {}
 @footerLinks = {
-    <li>
-        <a href= @accessibilityUrl
-           data-sso="false"
-           data-journey-click="footer:Click:Accessibility">
-            @Messages("footer.links.accessibility.text")
-        </a>
-    </li>
+
 }
 
 @serviceInfo = {
@@ -155,4 +146,4 @@
     sidebar = sidebar)
 }
 
-@govUkTemplate(Some(titleWithSuffix), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiFooterLinks(additionalLinks = Some(footerLinks))), nav = true)(content)
+@govUkTemplate(Some(titleWithSuffix), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiFooterLinks()), nav = true)(content)
