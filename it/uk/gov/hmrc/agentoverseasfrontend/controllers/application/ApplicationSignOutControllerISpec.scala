@@ -6,8 +6,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{LOCATION, redirectLocation}
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
-import scala.language.postfixOps
-
 class ApplicationSignOutControllerISpec extends BaseISpec{
 
   private val controller: ApplicationSignOutController = app.injector.instanceOf[ApplicationSignOutController]

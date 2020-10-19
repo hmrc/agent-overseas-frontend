@@ -38,7 +38,6 @@ object CommonValidators {
   private val CrnRegex = "^[A-Za-z0-9 \\-.\\/]*$"
   private val TrnRegex = """^[a-zA-Z0-9 ]*$"""
   private val OverseasTradingNameRegex = "^[A-Za-z0-9 \\-\\/]*"
-  private val OverseasAddressRegex = "^[A-Za-z0-9 \\-,.&']*"
   private val AmlsBodyRegex = "^[A-Za-z0-9 \\-,.'&()\\/]*$"
 
   private val AgentCodeMaxLength = 6
@@ -60,7 +59,6 @@ object CommonValidators {
   private val BusinessNameMaxLength = 40
 
   private type UtrErrors = (String, String)
-  private val DefaultUtrErrors = ("error.utr.blank", "error.utr.invalid")
 
   def saAgentCode = text verifying agentCodeConstraint("saAgentCode")
 
@@ -143,7 +141,7 @@ object CommonValidators {
         Valid
     }
 
-  private def utrConstraint(errorMessages: UtrErrors = DefaultUtrErrors): Constraint[String] =
+  private def utrConstraint(errorMessages: UtrErrors): Constraint[String] =
     Constraint[String] { fieldValue: String =>
       val formattedField = fieldValue.replace(" ", "")
       val (blank, invalid) = errorMessages
@@ -169,17 +167,6 @@ object CommonValidators {
       case _ => Valid
     }
   }
-
-  private def amlsBodyConstraint(bodies: Set[String]): Constraint[String] =
-    Constraint[String] { fieldValue: String =>
-      Constraints.nonEmpty.apply(fieldValue) match {
-        case _: Invalid =>
-          Invalid(ValidationError("error.moneyLaunderingCompliance.amlsbody.empty"))
-        case _ if !validateAMLSBodies(fieldValue, bodies) =>
-          Invalid(ValidationError("error.moneyLaunderingCompliance.amlsbody.invalid"))
-        case _ => Valid
-      }
-    }
 
   private val jobTitleConstraint: Constraint[String] = Constraint[String] { fieldValue: String =>
     Constraints.nonEmpty.apply(fieldValue) match {
@@ -218,7 +205,7 @@ object CommonValidators {
     }
 
   // Same as play.api.data.validation.Constraints.maxLength but with a chance to use a custom message instead of error.maxLength
-  private def maxLength(length: Int, messageKey: String = "error.maxLength"): Constraint[String] =
+  private def maxLength(length: Int, messageKey: String): Constraint[String] =
     Constraint[String]("constraint.maxLength", length) { o =>
       require(length >= 0, "string maxLength must not be negative")
       if (o == null) Invalid(ValidationError(messageKey, length))
@@ -255,9 +242,6 @@ object CommonValidators {
       }
     }
   }
-
-  private def validateAMLSBodies(amlsBody: String, bodies: Set[String]): Boolean =
-    bodies.contains(amlsBody)
 
   def addressLine12(lineNumber: Int): Mapping[String] =
     text

@@ -1,6 +1,6 @@
 package uk.gov.hmrc.agentoverseasfrontend.repository
 
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
@@ -9,9 +9,8 @@ import uk.gov.hmrc.agentoverseasfrontend.support.MongoApp
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.postfixOps
 
-class SessionDetailsRepositoryISpec extends UnitSpec with OneAppPerSuite with MongoApp {
+class SessionDetailsRepositoryISpec extends UnitSpec with GuiceOneAppPerSuite with MongoApp {
 
   protected def builder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()

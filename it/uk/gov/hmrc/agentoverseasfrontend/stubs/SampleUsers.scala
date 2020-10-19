@@ -1,6 +1,5 @@
 package uk.gov.hmrc.agentoverseasfrontend.stubs
 
-import uk.gov.hmrc.agentoverseasfrontend.support.WireMockBaseUrl
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier}
 
 case class SampleUser(userId: String, enrolments: Seq[Enrolment], affinity: AffinityGroup) {
@@ -19,13 +18,13 @@ case class SampleUser(userId: String, enrolments: Seq[Enrolment], affinity: Affi
 
 object SampleUser {
 
-  def subscribingAgentEnrolledForHMRCASAGENT(implicit wireMockBaseUrl: WireMockBaseUrl) =
+  def subscribingAgentEnrolledForHMRCASAGENT() =
     SampleUser(
       "12345-credId",
       Seq(Enrolment("HMRC-AS-AGENT", Seq(EnrolmentIdentifier("AgentReferenceNumber", "TARN0000001")), "Activated")),
       AffinityGroup.Agent)
 
-  def subscribingAgentEnrolledForNonMTD(implicit wireMockBaseUrl: WireMockBaseUrl) =
+  def subscribingAgentEnrolledForNonMTD() =
     SampleUser(
       "12345-credId",
       Seq(
@@ -35,13 +34,13 @@ object SampleUser {
       AffinityGroup.Agent
     )
 
-  def subscribingCleanAgentWithoutEnrolments(implicit wireMockBaseUrl: WireMockBaseUrl) =
+  def subscribingCleanAgentWithoutEnrolments() =
     SampleUser("12345-credId", Seq(), AffinityGroup.Agent)
 
-  def subscribing2ndCleanAgentWithoutEnrolments(implicit wireMockBaseUrl: WireMockBaseUrl) =
+  def subscribing2ndCleanAgentWithoutEnrolments() =
     SampleUser("54321-credId", Seq(), AffinityGroup.Agent)
 
-  def individual(implicit wireMockBaseUrl: WireMockBaseUrl) =
+  def individual() =
     SampleUser(
       "individual",
       Seq(Enrolment("FOO", Seq(EnrolmentIdentifier("foo", "AAAAA")), "Activated")),

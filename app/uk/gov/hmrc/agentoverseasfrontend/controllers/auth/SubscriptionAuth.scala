@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.Results.{Forbidden, Redirect, SeeOther}
 import play.api.mvc.{Request, Result}
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Environment, Logging}
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
@@ -42,7 +42,7 @@ class SubscriptionAuth @Inject()(
   val applicationService: ApplicationService,
   val subscriptionService: SubscriptionService
 )(implicit val env: Environment, val config: Configuration, val appConfig: AppConfig, val ec: ExecutionContext)
-    extends AuthBase with CommonRouting {
+    extends AuthBase with CommonRouting with Logging {
 
   def withBasicAgentAuth(
     block: SubscriptionRequest => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
@@ -52,7 +52,7 @@ class SubscriptionAuth @Inject()(
           creds match {
             case Some(c) => block(SubscriptionRequest(c.providerId, enrolments.enrolments))
             case None =>
-              Logger.warn("credentials expected but not found for the logged in user")
+              logger.warn("credentials expected but not found for the logged in user")
               Future.successful(Forbidden)
           }
       }
@@ -65,7 +65,7 @@ class SubscriptionAuth @Inject()(
         getArn(enrolments) match {
           case Some(arn) => block(arn)
           case None =>
-            Logger.warn("could not find the ARN from the logger in user to continue")
+            logger.warn("could not find the ARN from the logger in user to continue")
             Future.successful(Forbidden)
         }
       }

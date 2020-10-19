@@ -9,7 +9,6 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.postfixOps
 
 class SubscriptionSignOutControllerISpec extends BaseISpec {
   lazy val controller = app.injector.instanceOf[SubscriptionSignOutController]

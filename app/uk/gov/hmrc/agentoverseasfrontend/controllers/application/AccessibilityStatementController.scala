@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
@@ -30,10 +30,7 @@ import scala.concurrent.ExecutionContext
   sessionStoreService: SessionStoreService,
   applicationService: ApplicationService,
   controllerComponents: MessagesControllerComponents,
-  accessibilityStatementView: accessibility_statement)(
-  implicit messagesApi: MessagesApi,
-  appConfig: AppConfig,
-  override val ec: ExecutionContext)
+  accessibilityStatementView: accessibility_statement)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, controllerComponents)
     with SessionBehaviour with I18nSupport {
 

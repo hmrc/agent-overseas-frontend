@@ -5,7 +5,7 @@ import com.google.inject.AbstractModule
 import org.jsoup.Jsoup
 import org.scalatest.Assertion
 import org.scalatest.matchers.{MatchResult, Matcher}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-class BaseISpec extends UnitSpec with OneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport with DefaultAwaitTimeout {
+class BaseISpec extends UnitSpec with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport with DefaultAwaitTimeout {
 
   implicit val timeout =  Timeout(5.seconds)
 
@@ -73,7 +73,8 @@ class BaseISpec extends UnitSpec with OneAppPerSuite with WireMockSupport with A
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     sessionStoreService.clear()
-    val x  = sessionDetailsRepo.drop(global)
+    sessionDetailsRepo.drop(global)
+    ()
   }
 
   protected implicit val materializer = app.materializer

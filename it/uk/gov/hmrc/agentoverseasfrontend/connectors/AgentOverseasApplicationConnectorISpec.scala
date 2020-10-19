@@ -8,8 +8,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, FileUploadStatus
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.agentoverseasfrontend.support.{BaseISpec, MetricsTestSupport, MongoApp, WireMockSupport}
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -119,13 +118,13 @@ class AgentOverseasApplicationConnectorISpec
     "return exception if the upstream returns 404" in {
       givenApplicationUpdateNotFoundResponse()
 
-      an[Upstream4xxResponse] shouldBe thrownBy(await(connector.updateApplicationWithAgencyDetails(agencyDetails)))
+      an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.updateApplicationWithAgencyDetails(agencyDetails)))
     }
 
     "return exception if the upstream responds with 500 internal server error" in {
       givenApplicationUpdateServerError()
 
-      an[Upstream5xxResponse] shouldBe thrownBy(await(connector.updateApplicationWithAgencyDetails(agencyDetails)))
+      an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.updateApplicationWithAgencyDetails(agencyDetails)))
     }
   }
 
@@ -146,7 +145,7 @@ class AgentOverseasApplicationConnectorISpec
     "return exception if the upstream responds with 500 internal server error" in {
       givenUpdateAuthIdServerError()
 
-      an[Upstream5xxResponse] shouldBe thrownBy(await(connector.updateAuthId(oldAuthId)))
+      an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.updateAuthId(oldAuthId)))
     }
   }
 }

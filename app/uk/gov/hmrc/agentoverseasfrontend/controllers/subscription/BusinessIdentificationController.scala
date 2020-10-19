@@ -22,7 +22,7 @@ import play.api.data.Forms.mapping
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{AuthBase, SubscriptionAuth}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController._
 import uk.gov.hmrc.agentoverseasfrontend.forms.{BusinessAddressForm, BusinessEmailForm, BusinessNameForm}
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress

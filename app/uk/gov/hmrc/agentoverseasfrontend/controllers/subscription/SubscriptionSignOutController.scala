@@ -63,18 +63,18 @@ class SubscriptionSignOutController @Inject()(
   }
 
   def startFeedbackSurvey: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { implicit subRequest =>
+    withBasicAgentAuth { subRequest =>
       Future.successful(SeeOther(new URL(appConfig.feedbackSurveyUrl).toString).withNewSession)
     }
   }
 
   def signOut: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { implicit subRequest =>
+    withBasicAgentAuth { subRequest =>
       Future.successful(SeeOther(routes.SubscriptionRootController.root().url).withNewSession)
     }
   }
 
-  def keepAlive = Action.async { implicit request =>
+  def keepAlive = Action.async {
     Future successful Ok("OK")
   }
 

@@ -21,14 +21,17 @@ import java.time.{LocalDateTime, ZoneOffset}
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
 import javax.inject.{Inject, Singleton}
+import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, _}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
+import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpErrorFunctions._
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HttpErrorFunctions._
 
 @Singleton
 class AgentOverseasApplicationConnector @Inject()(
@@ -51,32 +54,37 @@ class AgentOverseasApplicationConnector @Inject()(
 
   def getUserApplications(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[List[ApplicationEntityDetails]] =
     monitor("ConsumedAPI-Agent-Overseas-Application-application-GET") {
-      http
-        .GET[List[ApplicationEntityDetails]](urlGetAllApplications.toString)
-        .recover {
-          case _: NotFoundException => List.empty
-          case e =>
-            throw new RuntimeException(s"Could not retrieve overseas agent application status: ${e.getMessage}")
+
+      http.GET[HttpResponse](urlGetAllApplications).map { response =>
+        response.status match {
+          case OK        => response.json.as[List[ApplicationEntityDetails]]
+          case NOT_FOUND => List.empty
+          case s =>
+            throw new RuntimeException(
+              s"Could not retrieve overseas agent application status $urlGetAllApplications, status: $s")
         }
+      }
     }
 
-  def createOverseasApplication(request: CreateOverseasApplicationRequest)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Unit] = {
-    val url =
-      s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
+  def createOverseasApplication(
+    request: CreateOverseasApplicationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+    val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
     monitor("ConsumedAPI-Agent-Overseas-Application-application-POST") {
       http
         .POST[CreateOverseasApplicationRequest, HttpResponse](url.toString, request)
-        .map(_ => ())
+        .map { response =>
+          response.status match {
+            case status if is4xx(status) || is5xx(status) =>
+              throw new Exception(s"createOverseasApplication Error for $request, Http Status: ${response.status}")
+            case _ => ()
+          }
+        }
     }
   }
 
   def upscanPollStatus(
     reference: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FileUploadStatus] = {
-    val url =
-      s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-poll-status/$reference"
+    val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-poll-status/$reference"
     monitor("ConsumedAPI-Agent-overseas-Application-upscan-poll-status-GET") {
       http
         .GET[FileUploadStatus](url.toString)
@@ -84,18 +92,16 @@ class AgentOverseasApplicationConnector @Inject()(
   }
 
   def allApplications(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[List[OverseasApplication]] = {
-
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
-
     monitor(s"ConsumedAPI-agent-overseas-application-application-GET") {
       http
         .GET[HttpResponse](url)
-        .map {
-          case response if response.status == 200 =>
-            response.json.as[List[OverseasApplication]]
-        }
-        .recover {
-          case _: NotFoundException => List.empty[OverseasApplication]
+        .map { response =>
+          response.status match {
+            case OK        => response.json.as[List[OverseasApplication]]
+            case NOT_FOUND => List.empty[OverseasApplication]
+            case _         => throw UpstreamErrorResponse(s"allApplications error: ${response.body}", response.status)
+          }
         }
     }
   }
@@ -113,10 +119,10 @@ class AgentOverseasApplicationConnector @Inject()(
           if (response.status == 204) ()
           else {
             val msg = s"agent-overseas-application returned status ${response.status}"
-            if (response.status >= 400 && response.status < 500)
-              throw new Upstream4xxResponse(msg, upstreamResponseCode = response.status, reportAs = 400)
-            else if (response.status >= 500)
-              throw new Upstream5xxResponse(msg, upstreamResponseCode = response.status, reportAs = 500)
+            if (is4xx(response.status))
+              throw UpstreamErrorResponse(msg, response.status, 400)
+            else if (is5xx(response.status))
+              throw UpstreamErrorResponse(msg, response.status, 500)
             else
               throw new RuntimeException(msg)
           }
@@ -128,7 +134,18 @@ class AgentOverseasApplicationConnector @Inject()(
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application/auth-provider-id"
 
     monitor(s"ConsumedAPI-agent-overseas-application-auth-provider-id-PUT") {
-      http.PUT[JsValue, HttpResponse](url.toString, Json.obj("authId" -> oldAuthId)).map(_ => ())
+      http
+        .PUT[JsValue, HttpResponse](url.toString, Json.obj("authId" -> oldAuthId))
+        .map { response =>
+          response.status match {
+            case NOT_FOUND =>
+              throw new NotFoundException(
+                s"createOverseasApplication not found for authId: $oldAuthId, Http Status: ${response.status}")
+            case status if is4xx(status) || is5xx(status) =>
+              throw UpstreamErrorResponse(s"createOverseasApplication Error for authId: $oldAuthId", response.status)
+            case _ => ()
+          }
+        }
     }
   }
 }

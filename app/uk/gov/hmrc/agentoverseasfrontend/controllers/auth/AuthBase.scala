@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
 import play.api.mvc.Results.{Forbidden, Redirect}
 import play.api.mvc.{Request, Result}
-import play.api.{Configuration, Environment, Logger, Mode}
+import play.api.{Configuration, Environment, Logging, Mode}
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
@@ -29,7 +29,7 @@ import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthBase extends AuthRedirects with AuthorisedFunctions {
+trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
   val authConnector: AuthConnector
   val env: Environment
   val config: Configuration
@@ -70,15 +70,15 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions {
         else s"${request.uri}")
 
     case _: InsufficientEnrolments ⇒
-      Logger.warn(s"Logged in user does not have required enrolments")
+      logger.warn(s"Logged in user does not have required enrolments")
       Forbidden
 
     case _: UnsupportedAuthProvider ⇒
-      Logger.warn(s"user logged in with unsupported auth provider")
+      logger.warn(s"user logged in with unsupported auth provider")
       Forbidden
 
     case _: UnsupportedAffinityGroup =>
-      Logger.warn(s"user logged in with unsupported affinity group")
+      logger.warn(s"user logged in with unsupported affinity group")
       Redirect(application.routes.ApplicationRootController.showNotAgent())
   }
 

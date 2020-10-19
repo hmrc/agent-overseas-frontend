@@ -307,7 +307,6 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
       val result = await(controller.showRegisteredWithHmrcForm(authenticatedRequest))
-      val doc = Jsoup.parse(bodyOf(result))
 
       result should containLink(
         expectedMessageKey = "button.back",

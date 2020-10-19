@@ -192,9 +192,6 @@ class CommonValidatorsSpec extends UnitSpec with EitherValues {
 
     def bind(fieldValue: String) = mapping.bind(Map("testKey" -> fieldValue))
 
-    val invalidErrorMessage = s"error.$nameType.invalid"
-    val maxLengthErrorMessage = s"error.$nameType.maxlength"
-
     def shouldRejectFieldValueAsInvalid(fieldValue: String): Assertion =
       bind(fieldValue) should matchPattern {
         case Left(List(FormError("testKey", List(invalidErrorMessage), _))) =>
@@ -394,9 +391,6 @@ class CommonValidatorsSpec extends UnitSpec with EitherValues {
 
   def testAgentCode(codeType: String)(mapping: => Mapping[String]) = {
     def bind(fieldValue: String) = mapping.bind(Map("testKey" -> fieldValue))
-
-    val invalidMessage = s"error.$codeType.invalid"
-    val maxLengthMessage = s"error.$codeType.maxlength"
 
     s"accept valid $codeType" in {
       bind("SA1234") shouldBe Right("SA1234")

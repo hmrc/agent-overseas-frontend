@@ -51,7 +51,7 @@ lazy val root = Project("agent-overseas-frontend", file("."))
     organization := "uk.gov.hmrc",
     scalaVersion := "2.12.10",
     scalacOptions ++= Seq(
-      //"-Xfatal-warnings",
+      "-Xfatal-warnings",
       "-Xlint:-missing-interpolator,_",
       "-Yno-adapted-args",
       "-Ywarn-value-discard",
@@ -59,7 +59,8 @@ lazy val root = Project("agent-overseas-frontend", file("."))
       "-deprecation",
       "-feature",
       "-unchecked",
-      "-language:implicitConversions"),
+      "-language:implicitConversions",
+      "-P:silencer:pathFilters=views;routes"),
     PlayKeys.playDefaultPort := 9414,
     resolvers := Seq(
       Resolver.bintrayRepo("hmrc", "releases"),
@@ -68,6 +69,10 @@ lazy val root = Project("agent-overseas-frontend", file("."))
       Resolver.jcenterRepo
     ),
     libraryDependencies ++= tmpMacWorkaround() ++ compileDeps ++ testDeps("test") ++ testDeps("it"),
+    libraryDependencies ++= Seq(
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full
+    ),
     publishingSettings,
     scoverageSettings,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
