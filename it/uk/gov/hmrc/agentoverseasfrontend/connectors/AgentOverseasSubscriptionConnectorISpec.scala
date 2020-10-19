@@ -22,22 +22,22 @@ class AgentOverseasSubscriptionConnectorISpec extends BaseISpec with AgentSubscr
     "return appropriate exception" when {
       "receiving a 401 Unauthorized response (bearer token expired/invalid)" in {
         givenSubscriptionFailedUnauthorized
-        an[Upstream4xxResponse] shouldBe thrownBy(await(connector.overseasSubscription))
+        an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.overseasSubscription))
       }
 
       "receiving a 403 Forbidden response (user is not Agent or application not in 'accepted' status)" in {
         givenSubscriptionFailedForbidden
-        an[Upstream4xxResponse] shouldBe thrownBy(await(connector.overseasSubscription))
+        an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.overseasSubscription))
       }
 
       "receiving a 503 response (service is unavailable)" in {
         givenSubscriptionFailedUnavailable
-        an[Upstream5xxResponse] shouldBe thrownBy(await(connector.overseasSubscription))
+        an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.overseasSubscription))
       }
 
       "receiving a 500 response (internal server error)" in {
         givenSubscriptionFailedServerError
-        an[Upstream5xxResponse] shouldBe thrownBy(await(connector.overseasSubscription))
+        an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.overseasSubscription))
       }
     }
   }

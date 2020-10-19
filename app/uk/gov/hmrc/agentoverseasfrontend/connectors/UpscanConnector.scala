@@ -24,8 +24,8 @@ import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-
+import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -51,8 +51,7 @@ class UpscanConnector @Inject()(appConfig: AppConfig, httpClient: HttpClient, me
     monitor("ConsumedAPI-upscan-initiate-POST") {
       httpClient
         .POST[JsValue, JsValue](upscanUrl.toString, payload, Seq("content-Type" -> "application/json"))
-        .map { response =>
-          response.as[UpscanInitiate]
-        }
+        .map(_.as[UpscanInitiate])
+
     }
 }

@@ -45,18 +45,18 @@ class SubscriptionRootController @Inject()(
 
   import authAction.withBasicAgentAuth
 
-  def root: Action[AnyContent] = Action { implicit request =>
+  def root: Action[AnyContent] = Action {
     Redirect(routes.BusinessIdentificationController.showCheckAnswers())
   }
 
   def nextStep: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { implicit subRequest =>
+    withBasicAgentAuth { subRequest =>
       Future.successful(Ok(createNewAccountView()))
     }
   }
 
   def showApplicationIssue: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { implicit subRequest =>
+    withBasicAgentAuth { subRequest =>
       Future.successful(Ok(cannotCheckStatusView()))
     }
   }

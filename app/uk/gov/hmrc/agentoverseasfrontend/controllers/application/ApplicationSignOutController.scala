@@ -23,7 +23,7 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.timed_out
@@ -39,18 +39,18 @@ class ApplicationSignOutController @Inject()(
   timedOutView: timed_out)(implicit ec: ExecutionContext, appConfig: AppConfig, val env: Environment)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with I18nSupport {
 
-  import authAction.{withBasicAuth}
+  import authAction.withBasicAuth
 
-  def signOut: Action[AnyContent] = Action { implicit request =>
+  def signOut: Action[AnyContent] = Action {
     SeeOther(appConfig.companyAuthSignInUrl).withNewSession
   }
 
-  def signOutWithContinueUrl: Action[AnyContent] = Action { implicit request =>
+  def signOutWithContinueUrl: Action[AnyContent] = Action {
     val continueUrl = s"${appConfig.agentOverseasFrontendUrl}"
     SeeOther(CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(continueUrl))).withNewSession
   }
 
-  def signOutToStart: Action[AnyContent] = Action { implicit request =>
+  def signOutToStart: Action[AnyContent] = Action {
     Redirect(routes.ApplicationRootController.root()).withNewSession
   }
 
@@ -60,7 +60,7 @@ class ApplicationSignOutController @Inject()(
     }
   }
 
-  def keepAlive: Action[AnyContent] = Action.async { implicit request =>
+  def keepAlive: Action[AnyContent] = Action.async {
     Future successful Ok("Ok")
   }
 

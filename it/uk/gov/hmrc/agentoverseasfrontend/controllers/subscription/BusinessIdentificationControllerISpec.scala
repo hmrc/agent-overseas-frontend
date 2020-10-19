@@ -9,7 +9,6 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.postfixOps
 
 class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
 

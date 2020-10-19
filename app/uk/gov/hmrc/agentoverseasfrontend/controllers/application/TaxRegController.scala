@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.{Environment, Logger}
+import play.api.{Environment, Logging}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.removeTrnForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.{AddTrnForm, DoYouWantToAddAnotherTrnForm, TaxRegistrationNumberForm, UpdateTrnForm}
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, TaxRegistrationNumber, Trn}
@@ -48,9 +48,9 @@ class TaxRegController @Inject()(
   removeTrnView: remove_tax_reg_number,
   errorTemplateView: error_template)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
-    with I18nSupport {
+    with I18nSupport with Logging {
 
-  import authAction.{withEnrollingAgent}
+  import authAction.withEnrollingAgent
 
   def showTaxRegistrationNumberForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
@@ -188,7 +188,7 @@ class TaxRegController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            Logger.warn(
+            logger.warn(
               s"error during updating tax registration number ${formWithErrors.errors.map(_.message).mkString(",")}")
             Ok(updateTrnView(formWithErrors))
           },

@@ -21,7 +21,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 import cats.data.OptionT
 import cats.implicits._
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.connectors.{AgentOverseasApplicationConnector, AgentSubscriptionConnector}
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus._
@@ -38,7 +38,8 @@ class SubscriptionService @Inject()(
   applicationConnector: AgentOverseasApplicationConnector,
   subscriptionConnector: AgentSubscriptionConnector,
   repository: SessionDetailsRepository,
-  sessionStoreService: SessionStoreService) {
+  sessionStoreService: SessionStoreService)
+    extends Logging {
 
   implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
@@ -62,7 +63,7 @@ class SubscriptionService @Inject()(
       .map(arn => Right(arn))
       .recover {
         case ex: Upstream4xxResponse if ex.upstreamResponseCode == 409 =>
-          Logger.info("The user is already subscribed", ex)
+          logger.info("The user is already subscribed", ex)
           Left(AlreadySubscribed)
       }
 
@@ -82,12 +83,10 @@ class SubscriptionService @Inject()(
       apps.sortBy(_.createdDate).lastOption
     }
 
-  def authProviderId(
-    detailsId: SessionDetailsId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] =
+  def authProviderId(detailsId: SessionDetailsId)(implicit ec: ExecutionContext): Future[Option[String]] =
     repository.findAuthProviderId(detailsId)
 
-  def storeSessionDetails(
-    authProviderId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[SessionDetailsId] =
+  def storeSessionDetails(authProviderId: String)(implicit ec: ExecutionContext): Future[SessionDetailsId] =
     repository.create(authProviderId)
 
   def updateAuthProviderId(

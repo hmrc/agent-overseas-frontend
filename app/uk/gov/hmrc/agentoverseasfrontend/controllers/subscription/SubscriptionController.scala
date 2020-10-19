@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
-import javax.inject.{Inject, Named}
+import javax.inject.Inject
+import play.api.Logging
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.{Configuration, Logger}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{AuthBase, SubscriptionAuth}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.{AlreadySubscribed, NoAgencyInSession, NoApplications, WrongApplicationStatus}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService, SubscriptionService}
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
@@ -40,7 +40,8 @@ class SubscriptionController @Inject()(
   subscriptionCompleteView: subscription_complete,
   alreadySubscribedView: already_subscribed,
   accessibilityStatementView: accessibility_statement)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler {
+    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler
+    with Logging {
 
   import authAction.{config, withBasicAgentAuth, withHmrcAsAgentAction}
 
@@ -51,10 +52,10 @@ class SubscriptionController @Inject()(
           case Right(_) =>
             Redirect(routes.SubscriptionController.subscriptionComplete())
           case Left(NoApplications) =>
-            Logger.info("User has no known applications, redirecting to application frontend")
+            logger.info("User has no known applications, redirecting to application frontend")
             Redirect(s"${appConfig.agentOverseasFrontendUrl}/create-account")
           case Left(NoAgencyInSession) =>
-            Logger.info("No agency details in session, redirecting to /check-answers")
+            logger.info("No agency details in session, redirecting to /check-answers")
             Redirect(routes.BusinessIdentificationController.showCheckAnswers())
           case Left(AlreadySubscribed) =>
             Redirect(routes.SubscriptionController.alreadySubscribed())
@@ -63,7 +64,7 @@ class SubscriptionController @Inject()(
               "Can not proceed with application - can not subscribe with an application in this status")
         }
       } else {
-        Logger.info("User has other enrolments, redirecting to /next-step")
+        logger.info("User has other enrolments, redirecting to /next-step")
         Future.successful(Redirect(routes.SubscriptionRootController.nextStep()))
       }
     }
@@ -81,14 +82,14 @@ class SubscriptionController @Inject()(
               agencyDetails.agencyName,
               agencyDetails.agencyEmail))
         case None =>
-          Logger.warn("no agent session found on subscription complete page")
+          logger.warn("no agent session found on subscription complete page")
           SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")
       }
     }
   }
 
   def alreadySubscribed: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { implicit subRequest =>
+    withBasicAgentAuth { subRequest =>
       Future.successful(Ok(alreadySubscribedView()))
     }
   }

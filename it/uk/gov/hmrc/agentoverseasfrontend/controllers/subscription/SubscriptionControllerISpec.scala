@@ -9,8 +9,6 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AgentSubscriptionStubs}
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
-import scala.language.postfixOps
-
 class SubscriptionControllerISpec
   extends BaseISpec
   with AgentOverseasApplicationStubs

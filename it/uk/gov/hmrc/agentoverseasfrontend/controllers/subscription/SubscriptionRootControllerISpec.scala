@@ -8,8 +8,6 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
-import scala.language.postfixOps
-
 class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
   val arn = Arn("TARN0000001")
 

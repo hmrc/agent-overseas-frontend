@@ -7,10 +7,9 @@ import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AgentSubscriptionStubs}
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.postfixOps
 
 class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationStubs with AgentSubscriptionStubs {
 
@@ -103,14 +102,14 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
         sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
         givenApplicationServerError()
         givenApplicationUpdateServerError()
-        an[Upstream5xxResponse] shouldBe thrownBy(await(service.subscribe))
+        an[UpstreamErrorResponse] shouldBe thrownBy(await(service.subscribe))
       }
 
       "upstream agent-overseas-application retrieve application succeeds but update fails with 500" in {
         sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
         givenAcceptedApplicationResponse()
         givenApplicationUpdateServerError()
-        an[Upstream5xxResponse] shouldBe thrownBy(await(service.subscribe))
+        an[UpstreamErrorResponse] shouldBe thrownBy(await(service.subscribe))
       }
 
       "upstream agent-subscription is unavailable" in {
@@ -118,7 +117,7 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
         givenAcceptedApplicationResponse()
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionFailedUnavailable()
-        an[Upstream5xxResponse] shouldBe thrownBy(await(service.subscribe))
+        an[UpstreamErrorResponse] shouldBe thrownBy(await(service.subscribe))
       }
     }
   }

@@ -20,8 +20,8 @@ import javax.inject.{Inject, Singleton}
 import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
-import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.{ApplicationAuth, AuthBase}
+import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
+import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
 
 import scala.concurrent.ExecutionContext
@@ -32,14 +32,11 @@ class ChangingAnswersController @Inject()(
   override val sessionStoreService: SessionStoreService,
   override val applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
-  cc: MessagesControllerComponents)(
-  implicit appConfig: AppConfig,
-  val env: Environment,
-  override val ec: ExecutionContext)
+  cc: MessagesControllerComponents)(implicit val env: Environment, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
-  import authAction.{withEnrollingAgent}
+  import authAction.withEnrollingAgent
 
   def changeAmlsRequired: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>

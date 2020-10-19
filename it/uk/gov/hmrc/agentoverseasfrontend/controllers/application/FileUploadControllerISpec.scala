@@ -4,7 +4,7 @@ import org.jsoup.Jsoup
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.redirectLocation
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, FailureDetails, FileUploadStatus}
+import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, FileUploadStatus}
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, UpscanStubs}
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
@@ -186,8 +186,6 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
   "GET /file-upload-failed" should {
 
-    val failureDetails = FailureDetails("QUARANTINE","a virus was found!")
-    val fileUploadStatus = FileUploadStatus("reference","READY",Some("filename"),Some(failureDetails))
     val tradingAddressAddressUploadStatus = FileUploadStatus("reference","READY",Some("filename"))
 
     "display page as expected" in {
