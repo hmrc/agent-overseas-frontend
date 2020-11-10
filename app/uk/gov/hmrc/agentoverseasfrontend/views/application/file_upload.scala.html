@@ -27,7 +27,7 @@
     <a href="@backLink" class="link-back">@Messages("button.back")</a>
 
 
-    <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data">
+    <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data" class="form js-form">
 
         <div class="flash error-summary"
         id="error-summary-display"
@@ -61,7 +61,7 @@
                 </ul>
                 <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
                     <label class="" for="file-upload">@Messages("fileUpload.upload")</label>
-                    <span id="file-upload-error" class="error-notification" role="tooltip"></span>
+                    <span id="file-upload-error" class="error-notification"></span>
                     @for((key, value) <- upscan.uploadRequest.fields){
                         <input type="hidden" name="@key" value="@value">
                     }

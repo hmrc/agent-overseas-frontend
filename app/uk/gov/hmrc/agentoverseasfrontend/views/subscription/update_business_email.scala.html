@@ -37,18 +37,30 @@
         action = routes.BusinessIdentificationController.submitUpdateBusinessEmailForm(),
         'class -> "form js-form") {
 
-        <div class="form-group margin-bottom-20">
-        @input(
-            businessEmailForm("email"),
-            '_inputClass -> "form-control input--cleared",
-            '_label -> Messages("updateBusinessEmail.title"),
-            '_labelTextClass -> "heading-xlarge margin-bottom-40",
-            '_inputHint -> Html("""<p class="panel panel-border-wide margin-bottom-40">""" + Messages("updateBusinessEmail.description") + "</p>"),
-            '_errorPrefix -> Messages("error.prefix")
-        )
+        <div class="form-group margin-bottom-20 @if(businessEmailForm.hasErrors){form-field--error soft--ends}">
+            <h1>
+                <label for="email" class="heading-xlarge margin-bottom-40">@Messages("updateBusinessEmail.title")</label>
+            </h1>
+            <p class="panel panel-border-wide margin-bottom-40" id="email-hint">@Messages("updateBusinessEmail.description")</p>
+            @businessEmailForm.error("email").map { formError => <span class="error-notification" id="email-error">
+                <span class="visuallyhidden">@Messages("error.prefix")</span>
+                @Messages(formError.message)
+            </span>
+            }
+
+            <input
+            type="email"
+            name="email"
+            id="email"
+            class="form-control input--cleared"
+            spellcheck="false"
+            @businessEmailForm.data.get("email").map { v => value="@v"}
+            aria-describedby="email-hint @if(businessEmailForm.hasErrors){email-error}"
+            >
+
         </div>
 
-        <div class="form-field margin-top-10">
+        <div class="form-field">
             <button class="button" type="submit" id="submit-email">@Messages("updateBusinessEmail.continue")</button>
         </div>
     }

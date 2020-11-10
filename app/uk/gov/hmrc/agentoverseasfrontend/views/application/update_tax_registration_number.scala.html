@@ -28,26 +28,34 @@
 
     <a href="@routes.TaxRegController.showYourTaxRegNumbersForm" class="link-back">@Messages("button.back")</a>
 
-    <h1 class="heading-xlarge">@Messages("updateTrn.title")</h1>
-
     @if(updateTrnForm.hasErrors) {
         @errorSummary(Messages("error.summary.heading"), updateTrnForm, Seq.empty, Some("update-trn"))
     }
 
     @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'class -> "form js-form", 'id -> "updateTrn") {
 
-        <div class="form-group">
-            @input(
-            updateTrnForm("updated"),
-            '_inputClass -> "form-control--block",
-            '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label",
-                '_errorPrefix -> Messages("error.prefix")
-            )
+        <div class="form-group @if(updateTrnForm.hasErrors){form-field--error soft--ends}">
+            <h1>
+                <label class="heading-xlarge margin-bottom-20" for="updated">@Messages("updateTrn.title")</label>
+            </h1>
+            @updateTrnForm.error("updated").map { formError => <span class="error-notification" id="updated-error">
+                <span class="visuallyhidden">@Messages("error.prefix")</span>
+                @Messages(formError.message)
+            </span>
+            }
+            <input
+            type="text"
+            name="updated"
+            id="updated"
+            spellcheck="false"
+            class="form-control--block"
+            @updateTrnForm.data.get("updated").map { v => value="@v"}
+            @if(updateTrnForm.hasErrors){aria-describedby="updated-error"}
+            >
         </div>
 
         <div class="form-group">
-            <input data-uppercase="false" class="hidden" name="original" type="text" id="actual-trn" value="@updateTrnForm.value.map(_.original)"/>
+            <input data-uppercase="false" class="hidden" name="original" type="text" id="actual-trn" value="@updateTrnForm.data.getOrElse("original", "")"/>
         </div>
 
         <div class="form-group">

@@ -1,7 +1,3 @@
-#error-summary-display:focus {
-  outline: none;
-}
-
 /* form overrides */
 
 .flash.error-summary {
@@ -23,6 +19,7 @@
   font-weight: bold;
   font-size: 19px;
   line-height: 1.31579;
+  color: #d4351c;
 }
 
 .error,
@@ -32,9 +29,8 @@
   margin-right: 15px;
 }
 
-.form-field--error input[type="text"] {
+.form-field--error input[type="text"]{
   border: 4px solid #d4351c;
-
 }
 
 .form-field--error .form-date .form-field--error {
@@ -51,10 +47,9 @@
   padding-bottom: 0;
 }
 
-.form-field--error input[type="text"] {
+.form-field--error input[type="text"]{
   border: 4px solid #d4351c;
   height: 40px;
-  width: 100%;
 }
 
 .form-field--error{
@@ -85,7 +80,7 @@
 }
 
 .no-js .nojs-date-fields-error .form-group.soft--ends {
-  border-left: 3px solid #df3034;
+  border-left: 3px solid #d4351c;
   padding: 0.75em 1em;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;

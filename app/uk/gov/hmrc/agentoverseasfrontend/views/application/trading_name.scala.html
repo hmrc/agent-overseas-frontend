@@ -32,16 +32,29 @@
     }
 
     @form(action = routes.ApplicationController.submitTradingName, 'class -> "form js-form") {
-        <label for="tradingName" class="margin-bottom-10">
-            <h1 class="heading-xlarge margin-bottom-20">
-                <span class="pre-heading">@Messages("tradingName.p1")</span>
-                @Messages("tradingName.title")
-            </h1>
-        </label>
 
-        <div class="form-group @if(tradingNameForm.error("tradingName").isDefined){form-group-error form-field--error}">
-            @tradingNameForm.error("tradingName").map{formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span>}
-            <input type="text" class="form-control--block" name="tradingName" id="tradingName" value="@tradingNameForm.value.getOrElse("")">
+        <div class="form-group @if(tradingNameForm.hasErrors){form-field--error soft--ends}">
+           <h1>
+               <label for="tradingName" class="heading-xlarge margin-bottom-20">
+                   <span class="pre-heading">@Messages("tradingName.p1")</span>
+                   @Messages("tradingName.title")
+               </label>
+           </h1>
+            @tradingNameForm.error("tradingName").map { formError => <span class="error-notification" id="tradingName-error">
+                <span class="visuallyhidden">@Messages("error.prefix")</span>
+                @Messages(formError.message)
+            }
+            </span>
+            <input
+                type="text"
+                class="form-control--block"
+                name="tradingName"
+                id="tradingName"
+                spellcheck="false"
+                @tradingNameForm.data.get("tradingName").map { v => value="@v"}
+                @if(tradingNameForm.hasErrors){aria-describedby="tradingName-error" }
+            >
+
         </div>
 
         <div class="form-group">

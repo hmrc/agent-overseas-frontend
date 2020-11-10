@@ -42,15 +42,22 @@
 
         <div class="panel panel-border-wide margin-bottom-30">@Messages("amls.inset.p1")</div>
 
-        <div class="form-group">
-            @uiInput(
-                amlsForm("amlsBody"),
-                '_label -> Messages("amls.form.supervisory_body"),
-                '_inputClass -> "form-control--block",
-                '_labelClass -> "soft--ends",
-                '_labelTextClass -> "form-label",
-                '_errorPrefix -> Messages("error.prefix")
-            )
+        <div class="form-group @if(amlsForm("amlsBody").hasErrors){form-field--error soft--ends}">
+            <label for="amlsBody">@Messages("amls.form.supervisory_body")</label>
+            @amlsForm.error("amlsBody").map { formError => <span class="error-notification" id="amls-body-error">
+                <span class="visuallyhidden">@Messages("error.prefix")</span>
+                @Messages(formError.message)
+            </span>
+            }
+            <input
+            type="text"
+            class="form-control--block"
+            id="amlsBody"
+            name="amlsBody"
+            spellcheck="false"
+            @amlsForm.data.get("amlsBody").map { v => value="@v"}
+            @amlsForm.error("amlsBody").map { e => aria-describedby="amls-body-error"}
+            >
         </div>
 
         <div class="form-group">
@@ -59,8 +66,7 @@
             '_label -> Messages("amls.form.membership_number"),
             '_inputClass -> "form-control--block",
             '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label",
-            '_errorPrefix -> Messages("error.prefix")
+            '_labelTextClass -> "form-label"
         )
         </div>
 

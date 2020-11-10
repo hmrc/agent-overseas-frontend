@@ -26,50 +26,129 @@
 
 @(addressForm: Form[BusinessAddressForm], countries: Map[String, String])(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
+@value = @{ addressForm("countryCode").value.getOrElse("")}
+
 @mainTemplate(title = errorPrefix(addressForm) + Messages("updateBusinessAddress.title"), bodyClasses = None) {
+
+    <a href="@routes.BusinessIdentificationController.showCheckAnswers()" class="link-back">@Messages("button.back")</a>
+
     @if(addressForm.hasErrors) {
         @errorSummary(Messages("error.summary.heading"), addressForm, Seq.empty, Some("update-business-address"))
     }
 
-    <a href="@routes.BusinessIdentificationController.showCheckAnswers()" class="link-back">@Messages("button.back")</a>
-    <h1 class="heading-xlarge margin-bottom-10">@Messages("updateBusinessAddress.title")</h1>
-
-    <p>@Messages("updateBusinessAddress.p1")</p>
-
-    <p class="panel panel-border-wide">@Messages("updateBusinessAddress.p2")</p>
-
     @form(action = routes.BusinessIdentificationController.submitUpdateBusinessAddressForm, 'class -> "form js-form") {
 
         <fieldset>
+            <legend>
+                <h1 class="heading-xlarge margin-bottom-20">
+                    @Messages("updateBusinessAddress.title")
+                </h1>
+            </legend>
 
-            @for(index <- 1 to 4) {
-                <div class="form-group">
-                @input(
-                    addressForm(s"addressLine$index"),
-                    '_label -> Messages(s"updateBusinessAddress.address_line_$index.title"),
-                    '_inputClass -> "form-control input--cleared",
-                    '_labelClass -> "heading-small soft--ends",
-                '_errorPrefix -> Messages("error.prefix")
-                )
-                </div>
-            }
+            <p class="body-text">@Messages("updateBusinessAddress.p1")</p>
 
-            <div class="form-group" id="countryCode">
-                @country_dropdown(
-                    addressForm("countryCode"),
-                    countries.toSeq,
-                    true,
-                    '_errorsAboveInput -> true,
-                    '_label -> Messages("updateBusinessAddress.country.title"),
-                    '_inputClass -> "form-control input--cleared",
-                    '_labelClass -> "heading-small soft--ends",
-                    '_selectWrapper -> Html("""class="autocomplete-wrapper"""")
-                )
+            <p class="panel panel-border-wide">@Messages("updateBusinessAddress.p2")</p>
+
+            <div class="form-group @if(addressForm.error("addressLine1").isDefined){form-field--error soft--ends}">
+                <label class="heading-small soft--ends" for="addressLine1">@Messages("updateBusinessAddress.address_line_1.title")</label>
+                @addressForm.error("addressLine1").map { formError => <span class="error-notification" id="addressLine1-error">
+                    <span class="visuallyhidden">@Messages("error.prefix")</span>
+                    @Messages(formError.message)
+                </span>
+                }
+                <input
+                type="text"
+                id="addressLine1"
+                class="form-control--block"
+                name="addressLine1"
+                spellcheck="false"
+                autocomplete="address-line1"
+                    @addressForm.data.get("addressLine1").map { v => value="@v"}
+                    @if(addressForm.error("addressLine1").isDefined){aria-describedby="addressLine1-error"}
+                >
 
             </div>
 
-        </fieldset>
+            <div class="form-group @if(addressForm.error("addressLine2").isDefined){form-field--error soft--ends}">
+                <label class="heading-small soft--ends" for="addressLine2">@Messages("updateBusinessAddress.address_line_2.title")</label>
+                @addressForm.error("addressLine2").map { formError => <span class="error-notification" id="addressLine2-error">
+                    <span class="visuallyhidden">@Messages("error.prefix")</span>
+                    @Messages(formError.message)
+                </span>
+                }
+                <input
+                type="text"
+                id="addressLine2"
+                class="form-control--block"
+                name="addressLine2"
+                spellcheck="false"
+                autocomplete="address-line2"
+                    @addressForm.data.get("addressLine2").map { v => value="@v"}
+                    @if(addressForm.error("addressLine2").isDefined){aria-describedby="addressLine2-error"}
+                >
 
+            </div>
+
+            <div class="form-group @if(addressForm.error("addressLine3").isDefined){form-field--error soft--ends}">
+                <label class="heading-small soft--ends" for="addressLine3">@Messages("updateBusinessAddress.address_line_3.title")</label>
+                @addressForm.error("addressLine3").map { formError => <span class="error-notification" id="addressLine3-error">
+                    <span class="visuallyhidden">@Messages("error.prefix")</span>
+                    @Messages(formError.message)
+                </span>
+                }
+                <input
+                type="text"
+                id="addressLine3"
+                class="form-control--block"
+                name="addressLine3"
+                spellcheck="false"
+                autocomplete="address-line3"
+                    @addressForm.data.get("addressLine3").map { v => value="@v"}
+                    @if(addressForm.error("addressLine3").isDefined){aria-describedby="addressLine3-error"}
+                >
+
+            </div>
+
+            <div class="form-group @if(addressForm.error("addressLine4").isDefined){form-field--error soft--ends}">
+                <label class="heading-small soft--ends" for="addressLine4">@Messages("updateBusinessAddress.address_line_4.title")</label>
+                @addressForm.error("addressLine4").map { formError => <span class="error-notification" id="addressLine4-error">
+                    <span class="visuallyhidden">@Messages("error.prefix")</span>
+                    @Messages(formError.message)
+                </span>
+                }
+                <input
+                type="text"
+                id="addressLine4"
+                class="form-control--block"
+                name="addressLine4"
+                spellcheck="false"
+                autocomplete="address-line4"
+                    @addressForm.data.get("addressLine4").map { v => value="@v"}
+                    @if(addressForm.error("addressLine4").isDefined){aria-describedby="addressLine4-error"}
+                >
+
+            </div>
+
+            <div class="form-group @if(addressForm.error("countryCode").isDefined){form-field--error soft--ends}">
+                <label class="heading-small soft--ends" for="countryCode-auto-complete">@Messages("updateBusinessAddress.country.title")</label>
+                @addressForm.error("countryCode").map { formError => <span class="error-notification" id="countryCode-error">
+                    <span class="visuallyhidden">@Messages("error.prefix")</span>
+                    @Messages(formError.message)
+                </span>
+                }
+                <div class="autocomplete-wrapper" id="countryCode">
+                    <select id="countryCode-auto-complete" name="countryCode">
+                        <option value=""></option>
+                        @for(option <- countries.toSeq) {
+                            <option
+                            id="countryCode-@option._1"
+                            value="@option._1"
+                                @if(value==option._1){selected="selected"}>@option._2</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </fieldset>
         <div class="form-group">
             <button class="button" type="submit" id="continue">@Messages("updateBusinessAddress.continue")</button>
         </div>

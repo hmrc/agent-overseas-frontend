@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, input: Input)
+@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF)
 @(businessNameForm: Form[BusinessNameForm])(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(businessNameForm) + Messages("updateBusinessName.title"), bodyClasses = None) {
@@ -35,15 +35,25 @@
     @form(action = routes.BusinessIdentificationController.submitUpdateBusinessNameForm(),
         'class -> "form js-form") {
 
-        <div class="form-group">
-        @input(
-            businessNameForm("name"),
-            '_inputClass -> "form-control input--cleared",
-            '_label -> Messages("updateBusinessName.title"),
-            '_labelTextClass -> "heading-xlarge margin-bottom-40",
-            '_inputHint -> Html("""<p class="panel panel-border-wide margin-bottom-40">""" + Messages("updateBusinessName.description") + "</p>"),
-            '_errorPrefix -> Messages("error.prefix")
-        )
+        <div class="form-group @if(businessNameForm.hasErrors){form-field--error soft--ends}">
+            <h1>
+                <label class="heading-xlarge margin-bottom-20" for="name">@Messages("updateBusinessName.title")</label>
+            </h1>
+            <p class="panel panel-border-wide margin-bottom-40" id="name-hint">@Messages("updateBusinessName.description")</p>
+            @businessNameForm.error("name").map { formError => <span class="error-notification" id="name-error">
+                <span class="visuallyhidden">@Messages("error.prefix")</span>
+                @Messages(formError.message)
+            </span>
+            }
+            <input
+            type="text"
+            class="form-control input--cleared"
+            id="name"
+            name="name"
+            spellcheck="false"
+            aria-describedby="name-hint @if(businessNameForm.hasErrors){name-error}"
+            @businessNameForm.data.get("name").map { v => value="@v"}
+            >
         </div>
 
         <div class="form-field">

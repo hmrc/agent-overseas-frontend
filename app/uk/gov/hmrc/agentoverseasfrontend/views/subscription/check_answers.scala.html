@@ -28,7 +28,7 @@
 
 @mainTemplate(title = Messages("subscription.checkAnswers.title")) {
 
-    <h1 class="heading-xlarge margin-bottom-10">@Messages("subscription.checkAnswers.title")</h1>
+    <h1 class="heading-xlarge margin-bottom-20">@Messages("subscription.checkAnswers.title")</h1>
     <p>@Messages("subscription.checkAnswers.description.p1")</p>
     <p>@Messages("subscription.checkAnswers.description.p2")</p>
 
@@ -44,8 +44,8 @@
                 @agencyDetails.agencyName
                 </dd>
                 <dd class="app-check-your-answers__change">
-                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessNameForm()">@Messages("subscription.checkAnswers.change.button") <span
-                    class="visuallyhidden"> @Messages("subscription.checkAnswers.businessName.label")</span></a>
+                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessNameForm()">@Messages("subscription.checkAnswers.change.button")
+                        <span class="visuallyhidden"> @Messages("subscription.checkAnswers.businessName.label")</span></a>
                 </dd>
             </div>
         </dl>

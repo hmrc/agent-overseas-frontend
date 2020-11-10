@@ -33,13 +33,12 @@
 
     @form(action = routes.ApplicationController.submitPersonalDetails, 'class -> "form js-form") {
 
-
         <fieldset>
             <legend class="margin-bottom-10">
                 <h1 class="heading-xlarge margin-bottom-20 @if(personalDetailsForm.hasErrors) {push--top}">@Messages("personalDetails.title")</h1>
             </legend>
             <p class="margin-bottom-10">@Messages("personalDetails.p1")</p>
-            <p class="faded-text">@Messages("personalDetails.p2")</p>
+            <p class="hint-text">@Messages("personalDetails.p2")</p>
             <div class="form-group @if(personalDetailsForm.error("personalDetailsChoice").isDefined) {form-group-error}" id="personalDetailsChoice">
                 @if(personalDetailsForm.error("personalDetailsChoice").isDefined) {
                     <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages("error.personalDetails.no-radio.selected")</span>
@@ -52,9 +51,18 @@
                     <label class="form-label" for="nino">@Messages("personalDetails.form.nino")
                         <span class="form-hint" id="nino-hint">@Messages("personalDetails.form.helper.nino")</span>
                     </label>
-                    @personalDetailsForm.error("nino").map { formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span> }
-                    <input aria-describedby="nino-hint" data-uppercase="true" class="form-control" name="nino" type="text" id="nino" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true)) {
-                        value="@personalDetailsForm.value.flatMap(_.nino.map(_.nino)).getOrElse("")" } >
+                    @personalDetailsForm.error("nino").map { formError => <span class="error-message" id="nino-error" ><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span> }
+                    <input
+                    aria-describedby="nino-hint @if(personalDetailsForm.error("nino").isDefined){nino-error}"
+                    spellcheck="false"
+                    data-uppercase="true"
+                    class="form-control"
+                    name="nino"
+                    type="text"
+                    id="nino"
+                        @if(personalDetailsForm.data.getOrElse("personalDetailsChoice", "") == "nino") {
+                        @personalDetailsForm.data.get("nino").map { v => value="@v"}}
+                    >
                 </div>
                 <div class="multiple-choice" data-target="utrRadioInput">
                     <input id="variant_utr" type="radio" name="personalDetailsChoice" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true) || personalDetailsForm.error("saUtr").isDefined) {checked} value="saUtr">
@@ -64,16 +72,26 @@
                     <label class="form-label" for="saUtr">@Messages("personalDetails.form.sautr")
                         <span class="form-hint" id="sa-utr">@Messages("personalDetails.form.helper.sautr")</span>
                     </label>
-                    @personalDetailsForm.error("saUtr").map { formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span> }
-                    <input aria-describedby="sa-utr" class="form-control" name="saUtr" type="text" id="saUtr" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true)) {
-                        value="@personalDetailsForm.value.flatMap(_.saUtr.map(_.utr)).getOrElse("")" }>
+                    @personalDetailsForm.error("saUtr").map { formError => <span class="error-message" id="sa-utr-error"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span> }
+                    <input
+                    aria-describedby="sa-utr @if(personalDetailsForm.error("saUtr").isDefined){sa-utr-error}"
+                    class="form-control"
+                    name="saUtr"
+                    spellcheck="false"
+                    type="text"
+                    id="saUtr"
+                        @if(personalDetailsForm.data.getOrElse("personalDetailsChoice", "") == "saUtr") {
+                        @personalDetailsForm.data.get("saUtr").map { v => value="@v"}}
+                    >
                 </div>
             </div>
         </fieldset>
 
-        <div class="form-group">
-            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-        </div>
+            <div class="form-group">
+                <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
+            </div>
+
+
  }
 
 }
