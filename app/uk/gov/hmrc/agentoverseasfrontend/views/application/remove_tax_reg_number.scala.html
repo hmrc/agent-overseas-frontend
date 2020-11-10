@@ -20,9 +20,16 @@
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        errorSummary: ErrorSummary,
+        form: FormWithCSRF,
+        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom
+)
 
 @(trnForm: Form[RadioConfirm], trn: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+
 @mainTemplate(title = errorPrefix(trnForm) + Messages("removeTrn.title")) {
 
 
@@ -34,30 +41,20 @@
 
     @form(action = routes.TaxRegController.submitRemoveTaxRegNumber(trn), 'class -> "form js-form") {
 
-        <fieldset>
-
-            <legend class="margin-bottom-10">
-                <h1 class="heading-xlarge margin-bottom-20">@Messages("removeTrn.title")</h1>
-            </legend>
-
-            <div class="form-group" id="isRemovingTrn">
-            @inputRadioGroup(
+            @inputRadioGroupCustom(
                 trnForm("isRemovingTrn"),
                 Seq(
                     "true" -> Messages("removeTrn.form.yes"),
                     "false" -> Messages("removeTrn.form.no")
                 ),
-                '_groupDivClass -> "soft--ends",
-                '_fieldsetAttributes -> Html("""id='removeTrn'"""),
-                '_errorPrefix -> Messages("error.prefix")
+                '_legend -> Html("""<h1 class="heading-xlarge margin-bottom-20">""" + Messages("removeTrn.title") + """</h1>"""),
+                '_groupDivClass -> "form-group",
+                '_fieldsetAttributes -> Html("""id='isRemovingTrn'""")
             )
-
-            </div>
 
             <div class="form-group">
                 <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
             </div>
 
-        </fieldset>
     }
 }

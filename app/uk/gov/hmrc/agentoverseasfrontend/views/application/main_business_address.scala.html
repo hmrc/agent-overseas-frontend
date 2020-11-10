@@ -25,6 +25,8 @@
 
 @(mainBusinessAddressForm: Form[OverseasAddress], countries: Map[String, String], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
+@value = @{ mainBusinessAddressForm("countryCode").value.getOrElse("")}
+
 @mainTemplate(title = errorPrefix(mainBusinessAddressForm) + Messages("mainBusinessAddress.title")) {
 
     <a href="@backLink.getOrElse(routes.ApplicationController.showTradingNameForm)" class="link-back">@Messages("button.back")</a>
@@ -46,68 +48,110 @@
 
         <p class="body-text">@Messages("mainBusinessAddress.body.text")</p>
 
-        <div class="form-group">
-        @input(
-            mainBusinessAddressForm("addressLine1"),
-            '_label -> Messages(s"mainBusinessAddress.form.addressLine1"),
-            '_inputClass -> "form-control--block",
-            '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label",
-            '_errorPrefix -> Messages("error.prefix")
-        )
-        </div>
+          <div class="form-group @if(mainBusinessAddressForm.error("addressLine1").isDefined){form-field--error soft--ends}">
+              <label for="addressLine1">@Messages("mainBusinessAddress.form.addressLine1")</label>
+              @mainBusinessAddressForm.error("addressLine1").map { formError => <span class="error-notification" id="addressLine1-error">
+                  <span class="visuallyhidden">@Messages("error.prefix")</span>
+                  @Messages(formError.message)
+              </span>
+              }
+              <input
+              type="text"
+              id="addressLine1"
+              class="form-control--block"
+              name="addressLine1"
+              spellcheck="false"
+              autocomplete="address-line1"
+                  @mainBusinessAddressForm.data.get("addressLine1").map { v => value="@v"}
+                  @if(mainBusinessAddressForm.error("addressLine1").isDefined){aria-describedby="addressLine1-error"}
+              >
 
-        <div class="form-group">
-        @input(
-            mainBusinessAddressForm("addressLine2"),
-            '_label -> Messages("mainBusinessAddress.form.addressLine2"),
-            '_inputClass -> "form-control--block",
-            '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label",
-            '_errorPrefix -> Messages("error.prefix")
+          </div>
 
-        )
-        </div>
+          <div class="form-group @if(mainBusinessAddressForm.error("addressLine2").isDefined){form-field--error soft--ends}">
+              <label for="addressLine2">@Messages("mainBusinessAddress.form.addressLine2")</label>
+              @mainBusinessAddressForm.error("addressLine2").map { formError => <span class="error-notification" id="addressLine2-error">
+                  <span class="visuallyhidden">@Messages("error.prefix")</span>
+                  @Messages(formError.message)
+              </span>
+              }
+              <input
+              type="text"
+              id="addressLine2"
+              class="form-control--block"
+              name="addressLine2"
+              spellcheck="false"
+              autocomplete="address-line2"
+                  @mainBusinessAddressForm.data.get("addressLine2").map { v => value="@v"}
+                  @if(mainBusinessAddressForm.error("addressLine2").isDefined){aria-describedby="addressLine2-error"}
+              >
+
+          </div>
 
 
-        <div class="form-group">
-            @input(
-            mainBusinessAddressForm("addressLine3"),
-            '_label -> Messages("mainBusinessAddress.form.addressLine3"),
-            '_inputClass -> "form-control--block",
-            '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label"
-            )
-        </div>
+          <div class="form-group">
+              <label for="addressLine3">@Messages("mainBusinessAddress.form.addressLine3")</label>
+              @mainBusinessAddressForm.error("addressLine3").map { formError => <span class="error-notification" id="addressLine3-error">
+                  <span class="visuallyhidden">@Messages("error.prefix")</span>
+                  @Messages(formError.message)
+              </span>
+              }
 
-        <div class="form-group">
-            @input(
-            mainBusinessAddressForm("addressLine4"),
-            '_label -> Messages("mainBusinessAddress.form.addressLine4"),
-            '_inputClass -> "form-control--block",
-            '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label"
-            )
-        </div>
+              <input
+              type="text"
+              id="addressLine3"
+              class="form-control--block"
+              name="addressLine3"
+              spellcheck="false"
+              autocomplete="address-level2"
+                  @mainBusinessAddressForm.data.get("addressLine3").map { v => value="@v"}
+                  @if(mainBusinessAddressForm.error("addressLine3").isDefined){aria-describedby="addressLine3-error"}
+              >
 
-        <div class="form-group" id="countryCode">
-            @country_dropdown(
-                mainBusinessAddressForm("countryCode"),
-                countries.toSeq,
-                true,
-                '_errorsAboveInput -> true,
-                '_label -> Messages("mainBusinessAddress.form.country"),
-                '_inputClass -> "form-control input--cleared",
-                '_labelClass -> "soft--ends",
-                '_selectWrapper -> Html("""class="autocomplete-wrapper"""")
+          </div>
 
-            )
-        </div>
+          <div class="form-group">
+              <label for="addressLine4">@Messages("mainBusinessAddress.form.addressLine4")</label>
+              @mainBusinessAddressForm.error("addressLine4").map { formError => <span class="error-notification" id="addressLine4-error">
+                  <span class="visuallyhidden">@Messages("error.prefix")</span>
+                  @Messages(formError.message)
+              </span>
+              }
 
+              <input
+              type="text"
+              id="addressLine4"
+              class="form-control--block"
+              name="addressLine4"
+              spellcheck="false"
+              autocomplete="postal-code"
+                  @mainBusinessAddressForm.data.get("addressLine4").map { v => value="@v"}
+                  @if(mainBusinessAddressForm.error("addressLine4").isDefined){aria-describedby="addressLine4-error"}
+              >
+
+          </div>
+
+          <div class="form-group @if(mainBusinessAddressForm.error("countryCode").isDefined){form-field--error soft--ends}">
+              <label for="countryCode-auto-complete">@Messages("mainBusinessAddress.form.country")</label>
+              @mainBusinessAddressForm.error("countryCode").map { formError => <span class="error-notification" id="countryCode-error">
+                  <span class="visuallyhidden">@Messages("error.prefix")</span>
+                  @Messages(formError.message)
+              </span>
+              }
+              <div class="autocomplete-wrapper" id="countryCode">
+                  <select id="countryCode-auto-complete" name="countryCode">
+                      <option value=""></option>
+                      @for(option <- countries.toSeq) {
+                          <option
+                          id="countryCode-@option._1"
+                          value="@option._1"
+                              @if(value==option._1){selected="selected"}>@option._2</option>
+                      }
+                  </select>
+              </div>
+          </div>
       </fieldset>
 
       <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
-
-
     }
 }

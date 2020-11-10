@@ -24,7 +24,7 @@
 @()(implicit request: Request[_], messages: Messages, config: Configuration, appConfig: AppConfig)
 @mainTemplate(title = Messages("already.subscribed.title"), bodyClasses = None) {
 
-<h1 class="heading-xlarge margin-bottom-10">@Messages("already.subscribed.title")</h1>
+<h1 class="heading-xlarge margin-bottom-20">@Messages("already.subscribed.title")</h1>
 <p class="margin-bottom-20">@Messages("already.subscribed.p1")</p>
 <p class="margin-bottom-30"><a href="@routes.SubscriptionSignOutController.signOut().url" class="button" role="button">@Messages("already.subscribed.button")</a></p>
 

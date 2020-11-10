@@ -20,15 +20,17 @@
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, uiInput: Input, inputRadioGroup: InputRadioGroup, uiFormHelper: FormWithCSRF, errorSummary: ErrorSummary)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        uiInput: Input,
+        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom,
+        uiFormHelper: FormWithCSRF,
+        errorSummary: ErrorSummary
+)
 
 @(amlsRequiredForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@headerTitle = {
-    <h1 class="heading-xlarge  margin-bottom-20 @if(amlsRequiredForm.hasErrors){push--top}">
-    @Messages("amls.required.title")
-    </h1>
-}
 
 @mainTemplate(title = errorPrefix(amlsRequiredForm) + Messages("amls.required.title")) {
 
@@ -43,15 +45,15 @@
     @uiFormHelper(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired, 'class -> "form js-form", 'id -> "amlsRequiredForm") {
 
           <div class="form-group">
-              @inputRadioGroup(
+              @inputRadioGroupCustom(
                   amlsRequiredForm("amlsRequired"),
                   Seq(
                       "true" -> Messages("amls.required.yes"),
                       "false" -> Messages("amls.required.no")
                   ),
-                  '_legend -> headerTitle,
-                  '_fieldsetAttributes -> Html("""id='amlsRequired'"""),
-                  '_errorPrefix -> Messages("error.prefix")
+                  '_legend -> Html("""<h1 class="heading-xlarge">""" + Messages("amls.required.title") + """</h1>"""),
+                  '_groupDivClass -> "form-group",
+                  '_fieldsetAttributes -> Html("""id='amlsRequired'""")
               )
           </div>
 

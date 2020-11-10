@@ -55,11 +55,20 @@
             </div>
             <div class="panel panel-border-narrow js-hidden @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-group-error}" id="companyReg">
                 <label class="form-label" for="registrationNumber">@Messages("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn")</label>
-                @companyRegistrationNumberForm.errors("registrationNumber").map { formError => <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(formError.message)</span> }
-                <input data-uppercase="false" class="form-control @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-control-error}" name="registrationNumber" type="text" id="registrationNumber" value="@companyRegistrationNumberForm.value.map(_.registrationNumber.map(_.value) .getOrElse(""))">
+                @companyRegistrationNumberForm.errors("registrationNumber").map { formError => <span class="error-message" id="companyReg-error"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(formError.message)</span> }
+                <input
+                data-uppercase="false"
+                class="form-control @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-control-error}"
+                name="registrationNumber"
+                type="text"
+                spellcheck="false"
+                id="registrationNumber"
+                @companyRegistrationNumberForm.data.get("registrationNumber").map { v => value="@v"}
+                @if(companyRegistrationNumberForm.error("registrationNumber").isDefined){aria-describedby="companyReg-error"}
+                >
             </div>
 
-            <div class="multiple-choice margin-bottom-30">
+            <div class="multiple-choice">
                 <input id="confirmRegistration_false" type="radio" name="confirmRegistration" value="false" @if(companyRegistrationNumberForm.value.flatMap(_.confirmRegistration).exists(_ == false)) { checked = "checked" }>
                 <label for="confirmRegistration_false">@Messages("companyRegistrationNumber.form.registered.no")</label>
             </div>
@@ -68,7 +77,7 @@
 
 
         <div class="form-group">
-        <button class="button-block button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+        <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
         </div>
     }
 }

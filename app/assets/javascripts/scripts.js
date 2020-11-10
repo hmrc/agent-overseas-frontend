@@ -8,14 +8,6 @@ $(function () {
         errorSummary.focus()
     }
 
-    $input.each(function () {
-        if ($(this).closest('label').hasClass('form-field--error')) {
-            $(this).attr('aria-invalid', true)
-        } else {
-            $(this).attr('aria-invalid', false)
-        }
-    });
-
     //Trim inputs and Capitalize postode
     $('[type="submit"]').click(function () {
         $input.each(function () {
@@ -42,46 +34,38 @@ $(function () {
 
     });
 
-    $('body').on('change', '#country-auto-complete', function () {
-        if (!$(this).val()) {
-            $('#country select option').removeAttr('selected')
-        }
-
-    });
-
-    var selectCountryEl = document.querySelector('#country-auto-complete')
-    if (selectCountryEl) {
+    var selectEl = document.querySelector('#countryCode-auto-complete');
+    if(selectEl){
         accessibleAutocomplete.enhanceSelectElement({
             autoselect: true,
-            defaultValue: selectCountryEl.options[selectCountryEl.options.selectedIndex].innerHTML,
+            defaultValue: selectEl.options[selectEl.options.selectedIndex].innerHTML,
             minLength: 2,
-            selectElement: selectCountryEl
+            selectElement: selectEl
         })
     }
 
     function findCountry(country) {
-        return country == $("#country-auto-complete").val();
+        return  country == $("#countryCode-auto-complete").val();
     }
 
-    //custom handle for not found countries
-    $('#country-auto-complete').change(function () {
-        var changedValue = $(this).val()
+    //custom handler for AMLS auto-complete dropdown
+    $('#countryCode-auto-complete').change(function(){
+        var changedValue = $(this).val();
         var array = [];
 
-        $('.autocomplete__menu li').each(function () {
+        $('.autocomplete__menu li').each(function(){
             array.push($(this).text())
-        })
+        });
 
-        if (array == "No results found") {
-            $('#country-auto-complete-select').append('<option id="notFound" value="NOTFOUND">No results found</option>')
-            $('#country-auto-complete-select').val('NOTFOUND').attr("selected", "selected");
+        if(array == "No results found"){
+            $('#countryCode-auto-complete-select').append('<option id="notFound" value="NOTFOUND">No results found</option>');
+            $('#countryCode-auto-complete-select').val('NOTFOUND').attr("selected", "selected");
 
-        } else if (array == "") {
-            $('#country-auto-complete-select').val('').attr("selected", "selected");
+        }else if(array == ""){
+            $('#countryCode-auto-complete-select').val('').attr("selected", "selected");
         }
 
     });
-
 
     var selectAmlsEl = document.querySelector('#amls-auto-complete')
 
@@ -342,4 +326,14 @@ $(document).ready(function () {
         error(errorMessageNoUpload);
         fileUploadClass.removeAttr('disabled');
     }
+
+    // ------------------------------------
+    // Introduce direct skip link control, to work around voiceover failing of hash links
+    // https://bugs.webkit.org/show_bug.cgi?id=179011
+    // https://axesslab.com/skip-links/
+    // ------------------------------------
+    $('.skiplink').click(function(e) {
+        e.preventDefault();
+        $(':header:first').attr('tabindex', '-1').focus();
+    });
 });

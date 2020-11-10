@@ -21,13 +21,14 @@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        errorSummary: ErrorSummary,
+        form: FormWithCSRF,
+        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom)
 
 @(registeredWithHmrcForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
-
-@headerTitle = {
-    <p>@Messages("registeredWithHmrc.form.title")</p>
-}
 
 @mainTemplate(title = errorPrefix(registeredWithHmrcForm) + Messages("registeredWithHmrc.title")) {
 
@@ -39,25 +40,19 @@
 
     @form(action = routes.ApplicationController.submitRegisteredWithHmrc, 'class -> "form js-form") {
 
-        <h1 class="heading-xlarge margin-bottom-20">
-            <span class="pre-heading">@Messages("registeredWithHmrc.caption")</span>
-            @Messages("registeredWithHmrc.title")
-        </h1>
-
-        <div class="form-group">
-        @inputRadioGroup(
+        @inputRadioGroupCustom(
             registeredWithHmrcForm("registeredWithHmrc"),
             Seq(
                 "true" -> Messages("registeredWithHmrc.form.registered.yes"),
                 "false" -> Messages("registeredWithHmrc.form.registered.no")
             ),
-            '_legend -> headerTitle,
-            '_groupDivClass -> "soft--ends",
-            '_fieldsetAttributes -> Html("""id='registeredWithHmrc'"""),
-            '_errorPrefix -> Messages("error.prefix")
+            '_legend -> Html("""<h1 class="heading-xlarge margin-bottom-20"><span class="pre-heading">""" + Messages("registeredWithHmrc.caption") + """</span>""" + Messages("registeredWithHmrc.title") + """</h1>"""),
+            '_groupDivClass -> "form-group",
+            '_inputHint -> Messages("registeredWithHmrc.form.title"),
+            '_inputHintClass -> "hint-text",
+            '_fieldsetAttributes -> Html("""id='registeredWithHmrc'""")
         )
 
-        </div>
         <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
 
     }

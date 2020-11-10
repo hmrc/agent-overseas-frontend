@@ -21,7 +21,12 @@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        errorSummary: ErrorSummary,
+        form: FormWithCSRF,
+        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom)
 
 @(uploadSuccessForm: Form[SuccessfulFileUploadConfirmation], fileName: Option[String], fileType: String, backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -41,20 +46,19 @@
                 @Messages("fileUpload.success.title")
             </h1>
 
-            <div class="form-group">
+
                 <input type="hidden" name="fileType" value="@fileType">
-                @inputRadioGroup(
+
+                @inputRadioGroupCustom(
                 uploadSuccessForm("choice.correctFile"),
                 Seq(
                 "true" -> Messages("fileUpload.success.form.correctFile.yes"),
                 "false" -> Messages("fileUpload.success.form.correctFile.no")
                 ),
                 '_legend -> Html("""<h2 class="margin-top-10">""" + Messages(s"fileUpload.success.correctFile.confirmation", fileName.getOrElse("")) + """</h2>"""),
-                '_groupDivClass -> "soft--ends",
-                '_fieldsetAttributes -> Html("""id='choice.correctFile'"""),
-                    '_errorPrefix -> Messages("error.prefix")
+                '_groupDivClass -> "form-group",
+                '_fieldsetAttributes -> Html("""id='choice.correctFile'""")
                 )
-            </div>
 
             <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
 

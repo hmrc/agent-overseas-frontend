@@ -119,7 +119,7 @@ error.trn.maxlength=Tax registration number must be 24 characters or less
 
 error.registeredWithHmrc.no-radio.selected=Select yes if you are registered as an agent with HMRC
 error.registeredForUkTaxForm.no-radio.selected=Select yes if you are registered to pay UK tax or National Insurance
-error.personalDetails.no-radio.selected=Select if you want to enter a National Insurance number, or if you want to enter a Self Assessment Unique Taxpayer Reference (UTR), or if you do not have these details
+error.personalDetails.no-radio.selected=Select if you want to enter a National Insurance number or a Self Assessment Unique Taxpayer Reference (UTR)
 error.removeTrn.no-radio.selected=Select yes if you want to remove this tax registration number
 
 error.fileUpload.no-file=Select a file
