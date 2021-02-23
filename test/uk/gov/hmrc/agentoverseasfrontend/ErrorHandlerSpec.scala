@@ -39,7 +39,8 @@ class ErrorHandlerSpec
   val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   implicit val lang: Lang = Lang("en")
 
-  protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder().configure("auditing.enabled" -> false)
+  protected def appBuilder: GuiceApplicationBuilder =
+    new GuiceApplicationBuilder().configure("auditing.enabled" -> false)
 
   "ErrorHandler should show the error page with log" when {
     "a server error occurs of type BadGateway" in {
