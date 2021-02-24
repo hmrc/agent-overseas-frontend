@@ -37,7 +37,7 @@ import scala.concurrent.Future
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
 
 class CommonRoutingSpec extends UnitSpec {
-  implicit val hc = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
+  implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
 
   private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))

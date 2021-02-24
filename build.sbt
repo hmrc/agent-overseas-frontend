@@ -14,20 +14,18 @@ lazy val scoverageSettings = {
 }
 
 lazy val compileDeps = Seq(
-  ws,
-  "uk.gov.hmrc" %% "bootstrap-frontend-play-27" % "2.24.0",
-  "uk.gov.hmrc" %% "govuk-template" % "5.58.0-play-27",
-  "uk.gov.hmrc" %% "play-ui" % "8.18.0-play-27",
-  "uk.gov.hmrc" %% "auth-client" % "3.0.0-play-27",
-  "uk.gov.hmrc" %% "play-partials" % "6.11.0-play-27",
-  "uk.gov.hmrc" %% "agent-kenshoo-monitoring" % "4.4.0",
-  "uk.gov.hmrc" %% "agent-mtd-identifiers" % "0.19.0-play-27",
-  "uk.gov.hmrc" %% "http-caching-client" % "9.1.0-play-27",
-  "uk.gov.hmrc" %% "play-conditional-form-mapping" % "1.3.0-play-26",
-  "uk.gov.hmrc" %% "domain" % "5.9.0-play-27",
-  "org.typelevel" %% "cats-core" % "2.1.1",
-  "com.github.tototoshi" %% "scala-csv" % "1.3.5",
-  "uk.gov.hmrc" %% "simple-reactivemongo" % "7.30.0-play-27"
+  "uk.gov.hmrc"           %% "bootstrap-frontend-play-27"    % "3.4.0",
+  "uk.gov.hmrc"           %% "govuk-template"                % "5.61.0-play-27",
+  "uk.gov.hmrc"           %% "play-ui"                       % "8.21.0-play-27",
+  "uk.gov.hmrc"           %% "play-partials"                 % "7.1.0-play-27",
+  "uk.gov.hmrc"           %% "agent-kenshoo-monitoring"      % "4.4.0",
+  "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "0.22.0-play-27",
+  "uk.gov.hmrc"           %% "http-caching-client"           % "9.1.0-play-27",
+  "uk.gov.hmrc"           %% "play-conditional-form-mapping" % "1.6.0-play-27",
+  "uk.gov.hmrc"           %% "simple-reactivemongo"          % "7.31.0-play-27",
+  "uk.gov.hmrc"           %% "domain"                        % "5.10.0-play-27",
+  "org.typelevel"         %% "cats-core"                     % "2.1.1",
+  "com.github.tototoshi"  %% "scala-csv"                     % "1.3.5"
 )
 
 def testDeps(scope: String) = Seq(
@@ -40,21 +38,15 @@ def testDeps(scope: String) = Seq(
   "uk.gov.hmrc" %% "reactivemongo-test" % "4.21.0-play-27" % scope
 )
 
-def tmpMacWorkaround(): Seq[ModuleID] =
-  if (sys.props.get("os.name").fold(false)(_.toLowerCase.contains("mac")))
-    Seq("org.reactivemongo" % "reactivemongo-shaded-native" % "0.16.1-osx-x86-64" % "runtime,test,it")
-  else Seq()
-
 lazy val root = Project("agent-overseas-frontend", file("."))
   .settings(
     name := "agent-overseas-frontend",
     organization := "uk.gov.hmrc",
-    scalaVersion := "2.12.10",
+    scalaVersion := "2.12.12",
     scalacOptions ++= Seq(
       "-Xfatal-warnings",
       "-Xlint:-missing-interpolator,_",
       "-Yno-adapted-args",
-      "-Ywarn-value-discard",
       "-Ywarn-dead-code",
       "-deprecation",
       "-feature",
@@ -68,10 +60,10 @@ lazy val root = Project("agent-overseas-frontend", file("."))
       Resolver.typesafeRepo("releases"),
       Resolver.jcenterRepo
     ),
-    libraryDependencies ++= tmpMacWorkaround() ++ compileDeps ++ testDeps("test") ++ testDeps("it"),
+    libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
     libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % "1.7.0" % Provided cross CrossVersion.full
     ),
     publishingSettings,
     scoverageSettings,
@@ -88,4 +80,4 @@ lazy val root = Project("agent-overseas-frontend", file("."))
     parallelExecution in IntegrationTest := false,
     scalafmtOnCompile in IntegrationTest := true
   )
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
