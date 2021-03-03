@@ -104,8 +104,8 @@
 }
 
 @bodyEnd = {
-@uiFooter(analyticsToken = Some(appConfig.googleAnalyticsToken),
-    analyticsHost = appConfig.googleAnalyticsHost,
+@uiFooter(analyticsToken = None,
+    analyticsHost = "N/A",
     ssoUrl = None,
     scriptElem = Some(scriptElement),
     gaCalls = None,

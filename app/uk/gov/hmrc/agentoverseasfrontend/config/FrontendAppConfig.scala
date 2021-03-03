@@ -37,8 +37,6 @@ trait AppConfig {
   val agentOverseasFrontendUrl: String
   val agentOverseasApplicationBaseUrl: String
   val upscanBaseUrl: String
-  val googleAnalyticsToken: String
-  val googleAnalyticsHost: String
   val reportAProblemPartialUrl: String
   val reportAProblemNonJSUrl: String
   val timeout: Int
@@ -75,10 +73,6 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
   override val agentOverseasFrontendUrl: String =
     servicesConfig.getString("microservice.services.agent-overseas-frontend.url")
   override val upscanBaseUrl: String = servicesConfig.baseUrl("upscan")
-  override val googleAnalyticsToken: String =
-    servicesConfig.getString("google-analytics.token")
-  override val googleAnalyticsHost: String =
-    servicesConfig.getString("google-analytics.host")
   override val reportAProblemPartialUrl: String =
     servicesConfig.getString("reportAProblemPartialUrl")
   override val reportAProblemNonJSUrl: String =
