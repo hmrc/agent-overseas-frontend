@@ -310,11 +310,15 @@ class CommonRoutingSpec extends UnitSpec {
   "routesForApplicationStatuses" should {
     "return applicationStatus page" when {
       "the application status is pending" in {
-        testRoutesForApplicationStatuses(List(applicationEntityDetails), "/application-status")
+        testRoutesForApplicationStatuses(
+          List(applicationEntityDetails),
+          "/agent-services/apply-from-outside-uk/application-status")
       }
 
       "the application status is rejected" in {
-        testRoutesForApplicationStatuses(List(applicationEntityDetails.copy(status = Rejected)), "/application-status")
+        testRoutesForApplicationStatuses(
+          List(applicationEntityDetails.copy(status = Rejected)),
+          "/agent-services/apply-from-outside-uk/application-status")
       }
     }
 
@@ -327,7 +331,9 @@ class CommonRoutingSpec extends UnitSpec {
     }
 
     "return /money-laundering-registration page" in {
-      testRoutesForApplicationStatuses(List.empty, "/money-laundering-registration")
+      testRoutesForApplicationStatuses(
+        List.empty,
+        "/agent-services/apply-from-outside-uk/money-laundering-registration")
     }
   }
 
