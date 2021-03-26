@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController._
 import uk.gov.hmrc.agentoverseasfrontend.forms.{BusinessAddressForm, BusinessEmailForm, BusinessNameForm}
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
@@ -39,7 +39,7 @@ class BusinessIdentificationController @Inject()(
   subscriptionService: SubscriptionService,
   mcc: MessagesControllerComponents,
   applicationService: ApplicationService,
-  override val sessionStoreService: SessionStoreService,
+  override val sessionStoreService: MongoDBSessionStoreService,
   checkAnswersView: check_answers,
   updateBusinessAddressView: update_business_address,
   updateBusinessNameView: update_business_name,

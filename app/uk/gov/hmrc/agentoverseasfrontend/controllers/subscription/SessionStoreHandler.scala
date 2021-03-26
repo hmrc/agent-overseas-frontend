@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import play.api.Logger
 import play.api.mvc.{Result, Results}
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, OverseasApplication}
-import uk.gov.hmrc.agentoverseasfrontend.services.SessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait SessionStoreHandler {
   this: Results =>
 
-  val sessionStoreService: SessionStoreService
+  val sessionStoreService: MongoDBSessionStoreService
 
   def withAgencyDetailsOrWithNewDefaults(defaultsFromThisApplication: OverseasApplication)(
     implicit hc: HeaderCarrier,

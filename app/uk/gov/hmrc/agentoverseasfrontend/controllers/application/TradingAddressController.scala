@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.MainBusinessAddressForm
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.main_business_address
 
@@ -33,7 +33,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class TradingAddressController @Inject()(
   val env: Environment,
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   val upscanConnector: UpscanConnector,
   countryNamesLoader: CountryNamesLoader,

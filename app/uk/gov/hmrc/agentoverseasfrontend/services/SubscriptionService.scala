@@ -38,7 +38,7 @@ class SubscriptionService @Inject()(
   applicationConnector: AgentOverseasApplicationConnector,
   subscriptionConnector: AgentSubscriptionConnector,
   repository: SessionDetailsRepository,
-  sessionStoreService: SessionStoreService)
+  sessionStoreService: MongoDBSessionStoreService)
     extends Logging {
 
   implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))

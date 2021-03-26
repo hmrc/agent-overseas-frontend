@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.SuccessfulFileUploadConfirmationForm
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, Yes, YesNo}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileUploadController @Inject()(
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   authAction: ApplicationAuth,
   applicationService: ApplicationService,
   upscanConnector: UpscanConnector,

@@ -28,12 +28,10 @@ trait AppConfig {
   val feedbackSurveyUrl: String
   val accessibilityUrl: String
   val maintainerApplicationReviewDays: Int
-  val sessionCacheDomain: String
   val companyAuthSignInUrl: String
   val ggRegistrationFrontendSosRedirectPath: String
   val guidancePageApplicationUrl: String
   val authBaseUrl: String
-  val sessionCacheBaseUrl: String
   val agentOverseasFrontendUrl: String
   val agentOverseasApplicationBaseUrl: String
   val upscanBaseUrl: String
@@ -44,6 +42,7 @@ trait AppConfig {
   val agentGuidancePageFullUrl: String
   val asaFrontendUrl: String
   val agentSubscriptionBaseUrl: String
+  val mongoDbExpireAfterSeconds: Int
 }
 
 @Singleton
@@ -57,8 +56,6 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
     servicesConfig.getString("accessibilityUrl")
   override val maintainerApplicationReviewDays: Int =
     servicesConfig.getInt("maintainer-application-review-days")
-  override val sessionCacheDomain: String =
-    servicesConfig.getString("microservice.services.cachable.session-cache.domain")
   override val companyAuthSignInUrl: String =
     servicesConfig.getString("microservice.services.companyAuthSignInUrl")
   override val ggRegistrationFrontendSosRedirectPath: String =
@@ -66,8 +63,6 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
   override val guidancePageApplicationUrl: String =
     servicesConfig.getString("microservice.services.guidancePageApplicationUrl")
   override val authBaseUrl: String = servicesConfig.baseUrl("auth")
-  override val sessionCacheBaseUrl: String =
-    servicesConfig.baseUrl("cachable.session-cache")
   override val agentOverseasApplicationBaseUrl: String =
     servicesConfig.baseUrl("agent-overseas-application")
   override val agentOverseasFrontendUrl: String =
@@ -85,4 +80,5 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
   override val asaFrontendUrl: String =
     servicesConfig.getString("microservice.services.agent-services-account-frontend.url")
   override val agentSubscriptionBaseUrl: String = servicesConfig.baseUrl("agent-subscription")
+  override val mongoDbExpireAfterSeconds: Int = servicesConfig.getInt("mongodb.session.expireAfterSeconds")
 }

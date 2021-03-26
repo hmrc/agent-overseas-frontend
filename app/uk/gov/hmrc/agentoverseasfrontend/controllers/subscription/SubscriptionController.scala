@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.{AlreadySubscribed, NoAgencyInSession, NoApplications, WrongApplicationStatus}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ class SubscriptionController @Inject()(
   subscriptionService: SubscriptionService,
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
-  override val sessionStoreService: SessionStoreService,
+  override val sessionStoreService: MongoDBSessionStoreService,
   subscriptionCompleteView: subscription_complete,
   alreadySubscribedView: already_subscribed,
   accessibilityStatementView: accessibility_statement)(implicit override val ec: ExecutionContext, appConfig: AppConfig)

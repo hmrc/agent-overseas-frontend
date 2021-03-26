@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus._
 import uk.gov.hmrc.agentoverseasfrontend.models.{OverseasApplication, SubscriptionRequest}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, authorisedEnrolments, credentials}
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -38,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubscriptionAuth @Inject()(
   val authConnector: AuthConnector,
-  val sessionStoreService: SessionStoreService,
+  val sessionStoreService: MongoDBSessionStoreService,
   val applicationService: ApplicationService,
   val subscriptionService: SubscriptionService
 )(implicit val env: Environment, val config: Configuration, val appConfig: AppConfig, val ec: ExecutionContext)

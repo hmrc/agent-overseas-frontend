@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentoverseasfrontend.forms.AmlsDetailsForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.amlsRequiredForm
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, RadioConfirm}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AntiMoneyLaunderingController @Inject()(
   val env: Environment,
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   val upscanConnector: UpscanConnector,
   authAction: ApplicationAuth,

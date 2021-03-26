@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.removeTrnForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.{AddTrnForm, DoYouWantToAddAnotherTrnForm, TaxRegistrationNumberForm, UpdateTrnForm}
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, TaxRegistrationNumber, Trn}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContext
 class TaxRegController @Inject()(
   val env: Environment,
   authAction: ApplicationAuth,
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
   trnView: tax_registration_number,

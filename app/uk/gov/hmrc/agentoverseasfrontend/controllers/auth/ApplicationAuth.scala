@@ -23,7 +23,7 @@ import play.api.{Configuration, Environment}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials}
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ApplicationAuth @Inject()(
   val authConnector: AuthConnector,
-  val sessionStoreService: SessionStoreService,
+  val sessionStoreService: MongoDBSessionStoreService,
   val applicationService: ApplicationService
 )(implicit val env: Environment, val config: Configuration, val appConfig: AppConfig, val ec: ExecutionContext)
     extends AuthBase with CommonRouting {

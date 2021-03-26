@@ -24,7 +24,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.timed_out
 
@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ApplicationSignOutController @Inject()(
   authAction: ApplicationAuth,
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
   timedOutView: timed_out)(implicit ec: ExecutionContext, appConfig: AppConfig, val env: Environment)
