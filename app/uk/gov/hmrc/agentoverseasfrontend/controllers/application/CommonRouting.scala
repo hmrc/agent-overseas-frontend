@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession._
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus._
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, No, Yes}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait CommonRouting {
   case class StatusRouting(proceedTo: Call, initialiseAgentSession: Boolean)
 
-  val sessionStoreService: SessionStoreService
+  val sessionStoreService: MongoDBSessionStoreService
 
   val applicationService: ApplicationService
 

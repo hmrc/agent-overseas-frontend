@@ -16,17 +16,19 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers
 
-import java.time.LocalDateTime
+import org.mockito.ArgumentMatchers.any
 
+import java.time.LocalDateTime
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.libs.json.JsValue
 import play.api.mvc.Results
+import reactivemongo.api.commands.{LastError, WriteResult}
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Accepted, AttemptingRegistration, Complete, Registered, Rejected}
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
-import uk.gov.hmrc.agentoverseasfrontend.support.TestSessionCache
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.SessionId
@@ -35,6 +37,9 @@ import uk.gov.hmrc.play.test.UnitSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
+import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
+import uk.gov.hmrc.cache.model.{Cache, Id}
+import uk.gov.hmrc.mongo.DatabaseUpdate
 
 class CommonRoutingSpec extends UnitSpec {
   implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
@@ -347,7 +352,17 @@ class CommonRoutingSpec extends UnitSpec {
 
 object FakeRouting extends CommonRouting with Results with MockitoSugar {
   val connector = mock[AgentOverseasApplicationConnector]
+  protected val mockSessionCacheRepository: SessionCacheRepository = mock[SessionCacheRepository]
+  protected val mockDatabaseUpdate: DatabaseUpdate[Cache] = mock[DatabaseUpdate[Cache]]
+  protected val mockLastError: LastError = mock[LastError]
+  protected val mockWriteResult: WriteResult = mock[WriteResult]
 
-  override val sessionStoreService = new SessionStoreService(new TestSessionCache())
+  when(mockSessionCacheRepository.createOrUpdate(any[Id], any[String], any[JsValue]))
+    .thenReturn(Future.successful(mockDatabaseUpdate))
+  when(mockDatabaseUpdate.writeResult).thenReturn(mockLastError)
+  when(mockLastError.inError).thenReturn(false)
+  when(mockWriteResult.writeErrors).thenReturn(Seq.empty)
+
+  override val sessionStoreService = new MongoDBSessionStoreService(mockSessionCacheRepository)
   override val applicationService = new ApplicationService(connector)
 }

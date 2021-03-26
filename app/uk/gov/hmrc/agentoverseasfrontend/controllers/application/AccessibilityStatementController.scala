@@ -21,13 +21,13 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
 import scala.concurrent.ExecutionContext
 
 @Singleton class AccessibilityStatementController @Inject()(
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   controllerComponents: MessagesControllerComponents,
   accessibilityStatementView: accessibility_statement)(implicit appConfig: AppConfig, override val ec: ExecutionContext)

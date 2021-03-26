@@ -18,13 +18,13 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.mvc.{Result, Results}
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
-import uk.gov.hmrc.agentoverseasfrontend.services.SessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SessionBehaviour extends CommonRouting with Results {
-  val sessionStoreService: SessionStoreService
+  val sessionStoreService: MongoDBSessionStoreService
   implicit val ec: ExecutionContext
 
   val showCheckYourAnswersUrl: String =

@@ -23,7 +23,7 @@ import play.api.mvc._
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +33,7 @@ class SubscriptionRootController @Inject()(
   override val messagesApi: MessagesApi,
   service: SubscriptionService,
   authAction: SubscriptionAuth,
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   createNewAccountView: create_new_account,

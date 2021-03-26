@@ -16,18 +16,27 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.libs.json.JsValue
+import reactivemongo.api.ReadPreference
+import reactivemongo.api.commands.{LastError, WriteResult}
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
-import uk.gov.hmrc.agentoverseasfrontend.support.TestSessionCache
+import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
+import uk.gov.hmrc.cache.model.{Cache, Id}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.SessionId
+import uk.gov.hmrc.mongo.DatabaseUpdate
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
-class SessionStoreServiceSpec extends UnitSpec {
+class MongoDBSessionStoreServiceSpec extends UnitSpec {
 
   implicit val hc = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
 
@@ -67,14 +76,10 @@ class SessionStoreServiceSpec extends UnitSpec {
 
   "SessionStoreService AgentSession" should {
 
-    trait Setup {
-      val store = new SessionStoreService(new TestSessionCache())
-    }
-
     "store agent details" in new Setup {
       await(store.cacheAgentSession(agentSession))
 
-      await(store.fetchAgentSession) shouldBe Some(agentSession)
+      verify(mockSessionCacheRepository).createOrUpdate(any[Id], any[String], any[JsValue])
     }
 
     "always sanitise data when stored" in new Setup {
@@ -83,22 +88,24 @@ class SessionStoreServiceSpec extends UnitSpec {
         store.cacheAgentSession(agentSession
           .copy(registeredWithHmrc = Some(No), agentCodes = Some(agentCodes), personalDetails = Some(personalDetails))))
 
-      await(store.fetchAgentSession).get.agentCodes shouldBe None
-      await(store.fetchAgentSession).get.personalDetails shouldBe None
+      verify(mockSessionCacheRepository).createOrUpdate(any[Id], any[String], any[JsValue])
     }
 
     "return None when no application details have been stored" in new Setup {
-
+      when(mockSessionCacheRepository.findById(any[Id], any[ReadPreference])(any[ExecutionContext]))
+        .thenReturn(Future.successful(None))
       await(store.fetchAgentSession) shouldBe None
     }
 
     "storing and retrieving agency details" in new Setup {
       await(store.cacheAgencyDetails(agencyDetails))
 
-      await(store.fetchAgencyDetails) shouldBe Some(agencyDetails)
+      verify(mockSessionCacheRepository).createOrUpdate(any[Id], any[String], any[JsValue])
     }
 
     "return None if fetching agency details when they have not been stored" in new Setup {
+      when(mockSessionCacheRepository.findById(any[Id], any[ReadPreference])(any[ExecutionContext]))
+        .thenReturn(Future.successful(None))
       await(store.fetchAgencyDetails) shouldBe None
     }
 
@@ -107,7 +114,23 @@ class SessionStoreServiceSpec extends UnitSpec {
 
       await(store.remove())
 
-      await(store.fetchAgencyDetails) shouldBe None
+      verify(mockSessionCacheRepository).removeAll(any())(any[ExecutionContext])
     }
+  }
+
+  trait Setup {
+    protected val mockSessionCacheRepository: SessionCacheRepository = mock[SessionCacheRepository]
+    protected val mockDatabaseUpdate: DatabaseUpdate[Cache] = mock[DatabaseUpdate[Cache]]
+    protected val mockLastError: LastError = mock[LastError]
+    protected val mockWriteResult: WriteResult = mock[WriteResult]
+
+    when(mockSessionCacheRepository.createOrUpdate(any[Id], any[String], any[JsValue]))
+      .thenReturn(Future.successful(mockDatabaseUpdate))
+    when(mockDatabaseUpdate.writeResult).thenReturn(mockLastError)
+    when(mockLastError.inError).thenReturn(false)
+    when(mockWriteResult.writeErrors).thenReturn(Seq.empty)
+    when(mockSessionCacheRepository.removeAll(any())(any())).thenReturn(mockWriteResult)
+
+    val store = new MongoDBSessionStoreService(mockSessionCacheRepository)
   }
 }

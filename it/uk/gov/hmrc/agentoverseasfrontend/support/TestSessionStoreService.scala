@@ -1,12 +1,12 @@
 package uk.gov.hmrc.agentoverseasfrontend.support
 
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, AgentSession}
-import uk.gov.hmrc.agentoverseasfrontend.services.SessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TestSessionStoreService extends SessionStoreService(null) {
+class TestSessionStoreService extends MongoDBSessionStoreService(null) {
 
   class Session(var agentSession: Option[AgentSession] = None, var agencyDetails: Option[AgencyDetails] = None)
 
@@ -32,8 +32,8 @@ class TestSessionStoreService extends SessionStoreService(null) {
   override def cacheAgentSession(agentSession: AgentSession)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     Future.successful(currentSession.agentSession = Some(agentSession))
 
-  override def removeAgentSession(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
-    Future.successful(sessions.remove(sessionKey).fold(())(_ => ()))
+  override def removeAgentSession(implicit ec: ExecutionContext) = {
+    Future.successful(sessions.clear())
   }
 
   override def fetchAgencyDetails(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[AgencyDetails]] =
@@ -43,9 +43,9 @@ class TestSessionStoreService extends SessionStoreService(null) {
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     Future.successful(currentSession.agencyDetails = Some(agencyDetails))
 
-  override def remove()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  override def remove()(implicit ec: ExecutionContext): Future[Unit] = {
     Future.successful{
-      sessions.remove(sessionKey)
+      sessions.clear()
       ()
     }
   }

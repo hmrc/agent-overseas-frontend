@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.{registered
 import uk.gov.hmrc.agentoverseasfrontend.forms._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.{IsRegisteredForUkTax, IsRegisteredWithHmrc}
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, No, Yes, _}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, SessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContext
 class ApplicationController @Inject()(
   val env: Environment,
   authAction: ApplicationAuth,
-  sessionStoreService: SessionStoreService,
+  sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents,
