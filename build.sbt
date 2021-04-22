@@ -16,10 +16,10 @@ lazy val scoverageSettings = {
 lazy val compileDeps = Seq(
   "uk.gov.hmrc"           %% "bootstrap-frontend-play-27"    % "3.4.0",
   "uk.gov.hmrc"           %% "govuk-template"                % "5.61.0-play-27",
-  "uk.gov.hmrc"           %% "play-ui"                       % "8.21.0-play-27",
+  "uk.gov.hmrc"           %% "play-ui"                       % "9.1.0-play-27",
   "uk.gov.hmrc"           %% "play-partials"                 % "7.1.0-play-27",
   "uk.gov.hmrc"           %% "agent-kenshoo-monitoring"      % "4.4.0",
-  "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "0.22.0-play-27",
+  "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "0.23.0-play-27",
   "uk.gov.hmrc"           %% "mongo-caching"                 % "6.16.0-play-27",
   "uk.gov.hmrc"           %% "play-conditional-form-mapping" % "1.6.0-play-27",
   "uk.gov.hmrc"           %% "simple-reactivemongo"          % "7.31.0-play-27",
@@ -53,11 +53,8 @@ lazy val root = Project("agent-overseas-frontend", file("."))
       "-language:implicitConversions",
       "-P:silencer:pathFilters=views;routes"),
     PlayKeys.playDefaultPort := 9414,
-    resolvers := Seq(
-      Resolver.bintrayRepo("hmrc", "releases"),
-      Resolver.bintrayRepo("hmrc", "release-candidates"),
+    resolvers ++= Seq(
       Resolver.typesafeRepo("releases"),
-      Resolver.jcenterRepo
     ),
     libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
     libraryDependencies ++= Seq(
