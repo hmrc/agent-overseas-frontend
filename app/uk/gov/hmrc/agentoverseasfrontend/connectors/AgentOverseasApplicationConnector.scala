@@ -106,8 +106,7 @@ class AgentOverseasApplicationConnector @Inject()(
     }
   }
 
-  def updateApplicationWithAgencyDetails(
-    agencyDetails: AgencyDetails)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def updateApplicationWithAgencyDetails(agencyDetails: AgencyDetails)(implicit ec: ExecutionContext): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
 
     monitor(s"ConsumedAPI-agent-overseas-application-application-PUT") {

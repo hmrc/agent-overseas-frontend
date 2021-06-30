@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
 import uk.gov.hmrc.cache.model.{Cache, Id}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.SessionId
+import uk.gov.hmrc.http.SessionId
 import uk.gov.hmrc.mongo.DatabaseUpdate
 import uk.gov.hmrc.play.test.UnitSpec
 
