@@ -17,7 +17,7 @@ import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
 import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -93,7 +93,7 @@ class BaseISpec extends UnitSpec with GuiceOneAppPerSuite with WireMockSupport w
   protected def htmlEscapedMessage(key: String, args: Any*): String = HtmlFormat.escape(Messages(key, args: _*)).toString
   protected def htmlMessage(key: String, args: Any*): String = Messages(key, args: _*).toString
 
-  implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+  implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
   protected def checkMessageIsDefined(messageKey: String) =
     withClue(s"Message key ($messageKey) should be defined: ") {

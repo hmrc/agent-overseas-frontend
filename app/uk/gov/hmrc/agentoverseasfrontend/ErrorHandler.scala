@@ -25,7 +25,7 @@ import play.api.{Configuration, Environment}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.http.{JsValidationException, NotFoundException}
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.bootstrap.config.{AuthRedirects, HttpAuditEvent}
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
@@ -98,7 +98,8 @@ trait ErrorAuditing extends HttpAuditEvent {
     }
     auditConnector.sendEvent(
       dataEvent(eventType, transactionName, request, Map(TransactionFailureReason -> ex.getMessage))(
-        HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))))
+        HeaderCarrierConverter
+          .fromRequestAndSession(request, request.session)))
   }
 
   def auditClientError(request: RequestHeader, statusCode: Int, message: String)(
@@ -109,17 +110,17 @@ trait ErrorAuditing extends HttpAuditEvent {
         auditConnector.sendEvent(
           dataEvent(ResourceNotFound, notFoundError, request, Map(TransactionFailureReason -> message))(
             HeaderCarrierConverter
-              .fromHeadersAndSession(request.headers, Some(request.session))))
+              .fromRequestAndSession(request, request.session)))
       case BAD_REQUEST =>
         auditConnector.sendEvent(
           dataEvent(ServerValidationError, badRequestError, request, Map(TransactionFailureReason -> message))(
             HeaderCarrierConverter
-              .fromHeadersAndSession(request.headers, Some(request.session))))
+              .fromRequestAndSession(request, request.session)))
       case _ =>
         auditConnector.sendEvent(
           dataEvent(UnknownError, unexpectedError, request, Map(TransactionFailureReason -> message))(
             HeaderCarrierConverter
-              .fromHeadersAndSession(request.headers, Some(request.session))))
+              .fromRequestAndSession(request, request.session)))
     }
   }
 }
