@@ -3,7 +3,7 @@
 GET        /                                              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.root
 
 GET        /next-step                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.nextStep
-GET        /subscribe                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscribe
+POST        /subscribe                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscribe
 GET        /complete                                      @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscriptionComplete
 GET        /already-subscribed                      @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.alreadySubscribed
 GET        /accessibility-statement              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.showAccessibilityStatement
