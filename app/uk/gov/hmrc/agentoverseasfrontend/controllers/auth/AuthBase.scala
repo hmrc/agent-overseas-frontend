@@ -38,7 +38,7 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
 
   lazy val isDevEnv: Boolean =
     if (env.mode.equals(Mode.Test)) false
-    else config.getOptional[String]("run.mode").forall(Mode.Dev.toString.equals)
+    else (env.mode.equals(Mode.Dev))
 
   def withBasicAuth(
     block: Request[_] => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =

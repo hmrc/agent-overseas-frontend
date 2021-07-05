@@ -106,14 +106,15 @@ class AgentOverseasApplicationConnector @Inject()(
     }
   }
 
-  def updateApplicationWithAgencyDetails(agencyDetails: AgencyDetails)(implicit ec: ExecutionContext): Future[Unit] = {
+  def updateApplicationWithAgencyDetails(
+    agencyDetails: AgencyDetails)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
 
     monitor(s"ConsumedAPI-agent-overseas-application-application-PUT") {
 
       import AgencyDetails.formats
       http
-        .doPut[AgencyDetails](url, agencyDetails)
+        .PUT[AgencyDetails, HttpResponse](url, agencyDetails)
         .map { response: HttpResponse =>
           if (response.status == 204) ()
           else {
