@@ -22,6 +22,7 @@ import play.api.{Configuration, Environment, Logging, Mode}
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
+import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,7 +39,7 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
 
   lazy val isDevEnv: Boolean =
     if (env.mode.equals(Mode.Test)) false
-    else (env.mode.equals(Mode.Dev))
+    else config.getOptional[String]("run.mode").contains(Mode.Dev.toString)
 
   def withBasicAuth(
     block: Request[_] => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
