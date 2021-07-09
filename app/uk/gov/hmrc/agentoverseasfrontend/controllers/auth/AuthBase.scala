@@ -61,7 +61,7 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
 
   protected def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Result] = {
     case _: NoActiveSession ⇒
-      Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}")
+      Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}&origin=$appName")
 
     case _: InsufficientEnrolments ⇒
       logger.warn(s"Logged in user does not have required enrolments")
@@ -80,5 +80,6 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
 
   private val signInUrl = getString("bas-gateway.url")
   private val continueUrl = getString("login.continue")
+  private val appName = getString("appName")
 
 }
