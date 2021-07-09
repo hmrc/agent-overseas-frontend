@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
 import play.api.mvc.Results.{Forbidden, Redirect}
 import play.api.mvc.{Request, Result}
-import play.api.{Configuration, Environment, Logging, Mode}
+import play.api.{Configuration, Environment, Logging}
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
@@ -35,10 +35,6 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
   val config: Configuration
   val appConfig: AppConfig
   implicit val ec: ExecutionContext
-
-  lazy val isDevEnv: Boolean =
-    if (env.mode.equals(Mode.Test)) false
-    else (env.mode.equals(Mode.Dev))
 
   def withBasicAuth(
     block: Request[_] => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
@@ -65,9 +61,7 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
 
   protected def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Result] = {
     case _: NoActiveSession ⇒
-      toGGLogin(
-        if (isDevEnv) s"http://${request.host}${request.uri}"
-        else s"${request.uri}")
+      Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}")
 
     case _: InsufficientEnrolments ⇒
       logger.warn(s"Logged in user does not have required enrolments")
@@ -81,5 +75,10 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
       logger.warn(s"user logged in with unsupported affinity group")
       Redirect(application.routes.ApplicationRootController.showNotAgent())
   }
+
+  private def getString(key: String): String = config.underlying.getString(key)
+
+  private val signInUrl = getString("bas-gateway.url")
+  private val continueUrl = getString("login.continue")
 
 }
