@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import views.html.helper.CSRF
 
 @this(mainTemplate: main_template, errorPrefix: error_prefix)
 
@@ -28,6 +29,10 @@
 
 
     <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data" class="form js-form">
+
+        @{
+            play.filters.csrf.CSRF.getToken(request).map {token => CSRF.formField(request)}
+        }
 
         <div class="flash error-summary"
         id="error-summary-display"
