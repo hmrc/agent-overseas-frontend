@@ -26,7 +26,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       result should containMessages(
         "subscription.checkAnswers.title",
         "subscription.checkAnswers.description.p1",
-        "subscription.checkAnswers.description.p2",
+        "subscription.checkAnswers.description.p2a",
+        "subscription.checkAnswers.description.p2b",
+        "subscription.checkAnswers.description.p2c",
+        "subscription.checkAnswers.description.p3",
         "subscription.checkAnswers.businessName.label",
         "subscription.checkAnswers.businessAddress.label",
         "subscription.checkAnswers.businessEmailAddress.label",
@@ -54,6 +57,82 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
       result.header.headers(LOCATION) shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk"
     }
+  }
+
+  "GET /check-business-address" should {
+    "display the business address page" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.showCheckBusinessAddress(request))
+      status(result) shouldBe 200
+
+      result should containMessages(
+        "contactTradingAddressCheck.title",
+        "contactTradingAddressCheck.p",
+        "contactTradingAddressCheck.option.yes",
+        "contactTradingAddressCheck.option.no",
+        "contactTradingAddressCheck.continue.button",
+        "button.back"
+      )
+    }
+  }
+
+  "POST /check-business-address" should {
+    "show validation error when the form is submitted blank" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody("useThisAddress" -> "")
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessAddress(request))
+
+      result should containMessages("error.contact-trading-address-check.invalid")
+    }
+
+    "redirect to check-answers page for a Yes answer" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisAddress" -> "true",
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessAddress(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+    }
+
+    "redirect to 'update address' page for a No answer" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisAddress" -> "false",
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessAddress(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showUpdateBusinessAddressForm().url
+    }
+
+    "redirect to check-answers page for a No answer without session data" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisAddress" -> "false"
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = None
+
+      val result = await(controller.submitCheckBusinessAddress(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+    }
+
   }
 
   "GET /update-business-address" should {
@@ -227,6 +306,82 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
   }
 
+  "GET /check-business-email" should {
+    "display the business email page" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.showCheckBusinessEmail(request))
+      status(result) shouldBe 200
+
+      result should containMessages(
+        "contactTradingEmailCheck.title",
+        "contactTradingEmailCheck.p",
+        "contactTradingEmailCheck.option.yes",
+        "contactTradingEmailCheck.option.no",
+        "contactTradingEmailCheck.continue.button",
+        "button.back"
+      )
+    }
+  }
+
+  "POST /check-business-email" should {
+    "show validation error when the form is submitted blank" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody("useThisEmail" -> "")
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessEmail(request))
+
+      result should containMessages("error.contact-trading-email-check.invalid")
+    }
+
+    "redirect to check-answers page for a Yes answer" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisEmail" -> "true",
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessEmail(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+    }
+
+    "redirect to 'update email' page for a No answer" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisEmail" -> "false",
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessEmail(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showUpdateBusinessEmailForm().url
+    }
+
+    "redirect to check-answers page for a No answer without session data" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisEmail" -> "false"
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = None
+
+      val result = await(controller.submitCheckBusinessEmail(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+    }
+
+  }
+
   "GET /update-business-email" should {
     "display the business email page" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
@@ -295,6 +450,82 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
       result should containMessages("updateBusinessEmail.title", "error.business-email.empty")
     }
+  }
+
+  "GET /check-business-name" should {
+    "display the business name page" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.showCheckBusinessName(request))
+      status(result) shouldBe 200
+
+      result should containMessages(
+        "contactTradingNameCheck.title",
+        "contactTradingNameCheck.p",
+        "contactTradingNameCheck.option.yes",
+        "contactTradingNameCheck.option.no",
+        "contactTradingNameCheck.continue.button",
+        "button.back"
+      )
+    }
+  }
+
+  "POST /check-business-name" should {
+    "show validation error when the form is submitted blank" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody("useThisName" -> "")
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessName(request))
+
+      result should containMessages("error.contact-trading-name-check.invalid")
+    }
+
+    "redirect to check-answers page for a Yes answer" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisName" -> "true",
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessName(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+    }
+
+    "redirect to 'update name' page for a No answer" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisName" -> "false",
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = await(controller.submitCheckBusinessName(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showUpdateBusinessNameForm().url
+    }
+
+    "redirect to check-answers page for a No answer without session data" in {
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        "useThisName" -> "false"
+      )
+
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = None
+
+      val result = await(controller.submitCheckBusinessName(request))
+
+      status(result) shouldBe 303
+      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+    }
+
   }
 
   "GET /update-business-name" should {

@@ -45,4 +45,14 @@ object YesNoRadioButtonForms {
 
   val successfulFileUploadForm: Form[RadioConfirm] =
     form("correctFile", "fileUploadTradingAddress.correctFile.no-radio.selected")
+
+  val businessNameCheckForm: Form[RadioConfirm] =
+    form("useThisName", "error.contact-trading-name-check.invalid")
+
+  val businessAddressCheckForm: Form[RadioConfirm] =
+    form("useThisAddress", "error.contact-trading-address-check.invalid")
+
+  val businessEmailCheckForm: Form[RadioConfirm] =
+    form("useThisEmail", "error.contact-trading-email-check.invalid")
+
 }
