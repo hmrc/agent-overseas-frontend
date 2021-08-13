@@ -30,10 +30,37 @@
 
     <h1 class="heading-xlarge margin-bottom-20">@Messages("subscription.checkAnswers.title")</h1>
     <p>@Messages("subscription.checkAnswers.description.p1")</p>
-    <p>@Messages("subscription.checkAnswers.description.p2")</p>
+    <div class="form-group">
+        <details class="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="summary govuk-details__summary-text">@Messages("subscription.checkAnswers.how-we-use")</span>
+            </summary>
+            <div class="panel panel-border-narro govuk-details__text">
+              <p>@Messages("subscription.checkAnswers.description.p2a")</p>
+              <p>@Messages("subscription.checkAnswers.description.p2b")</p>
+              <p>@Messages("subscription.checkAnswers.description.p2c")</p>
+            </div>
+        </details>
+    </div>
 
     <br/>
 
+    <div class="app-check-your-answers--group margin-bottom-30">
+        <dl class="app-check-your-answers app-check-your-answers--long">
+            <div class="app-check-your-answers__contents">
+                <dt class="app-check-your-answers__question">
+                @Messages("subscription.checkAnswers.businessEmailAddress.label")
+                </dt>
+                <dd class="app-check-your-answers__answer" id="agencyEmail">
+                @agencyDetails.agencyEmail
+                </dd>
+                <dd class="app-check-your-answers__change">
+                    <a href="@routes.BusinessIdentificationController.showCheckBusinessEmail()">@Messages("subscription.checkAnswers.change.button") <span
+                    class="visuallyhidden"> @Messages("subscription.checkAnswers.businessEmailAddress.label")</span></a>
+                </dd>
+            </div>
+        </dl>
+    </div>
     <div class="app-check-your-answers--group margin-bottom-30">
         <dl class="app-check-your-answers app-check-your-answers--long">
             <div class="app-check-your-answers__contents">
@@ -44,7 +71,7 @@
                 @agencyDetails.agencyName
                 </dd>
                 <dd class="app-check-your-answers__change">
-                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessNameForm()">@Messages("subscription.checkAnswers.change.button")
+                    <a href="@routes.BusinessIdentificationController.showCheckBusinessName()">@Messages("subscription.checkAnswers.change.button")
                         <span class="visuallyhidden"> @Messages("subscription.checkAnswers.businessName.label")</span></a>
                 </dd>
             </div>
@@ -68,26 +95,10 @@
                     </p>
                 </dd>
                 <dd class="app-check-your-answers__change">
-                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessAddressForm()">@Messages("subscription.checkAnswers.change.button") <span
+                    <a href="@routes.BusinessIdentificationController.showCheckBusinessAddress()">@Messages("subscription.checkAnswers.change.button") <span
                     class="visuallyhidden"> @Messages("subscription.checkAnswers.businessAddress.label")</span></a>
                 </dd>
             </div></dl>
-    </div>
-    <div class="app-check-your-answers--group margin-bottom-30">
-        <dl class="app-check-your-answers app-check-your-answers--long">
-            <div class="app-check-your-answers__contents">
-                <dt class="app-check-your-answers__question">
-                @Messages("subscription.checkAnswers.businessEmailAddress.label")
-                </dt>
-                <dd class="app-check-your-answers__answer" id="agencyEmail">
-                @agencyDetails.agencyEmail
-                </dd>
-                <dd class="app-check-your-answers__change">
-                    <a href="@routes.BusinessIdentificationController.showUpdateBusinessEmailForm()">@Messages("subscription.checkAnswers.change.button") <span
-                    class="visuallyhidden"> @Messages("subscription.checkAnswers.businessEmailAddress.label")</span></a>
-                </dd>
-            </div>
-        </dl>
     </div>
 
     <br/>

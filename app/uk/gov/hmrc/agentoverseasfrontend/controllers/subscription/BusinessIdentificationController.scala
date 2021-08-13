@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBa
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController._
 import uk.gov.hmrc.agentoverseasfrontend.forms.{BusinessAddressForm, BusinessEmailForm, BusinessNameForm}
+import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms._
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
@@ -41,8 +42,11 @@ class BusinessIdentificationController @Inject()(
   applicationService: ApplicationService,
   override val sessionStoreService: MongoDBSessionStoreService,
   checkAnswersView: check_answers,
+  checkBusinessAddressView: check_business_address,
   updateBusinessAddressView: update_business_address,
+  checkBusinessNameView: check_business_name,
   updateBusinessNameView: update_business_name,
+  checkBusinessEmailView: check_business_email,
   updateBusinessEmailView: update_business_email
 )(implicit override val ec: ExecutionContext, appConfig: AppConfig)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler {
@@ -61,6 +65,45 @@ class BusinessIdentificationController @Inject()(
           throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown"))
 
         Ok(checkAnswersView(agencyDetails, countryName))
+      }
+    }
+  }
+
+  def showCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
+    withSubscribingAgent { overseasApplication =>
+      withAgencyDetails { agencyDetails =>
+        val countryCode = agencyDetails.agencyAddress.countryCode
+        val countryName = countries.getOrElse(
+          countryCode,
+          throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
+        )
+        Future.successful(
+          Ok(checkBusinessAddressView(businessAddressCheckForm, agencyDetails.agencyAddress, countryName)))
+      }
+    }
+  }
+
+  def submitCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
+    withSubscribingAgent { agent =>
+      withAgencyDetails { agencyDetails =>
+        businessAddressCheckForm.bindFromRequest
+          .fold(
+            formWithErrors => {
+              val countryCode = agencyDetails.agencyAddress.countryCode
+              val countryName = countries.getOrElse(
+                countryCode,
+                throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
+              )
+              Future.successful(Ok(checkBusinessAddressView(formWithErrors, agencyDetails.agencyAddress, countryName)))
+            },
+            validForm => {
+              val useCurrentAddress = validForm.value
+              if (useCurrentAddress)
+                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+              else
+                Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessAddressForm))
+            }
+          )
       }
     }
   }
@@ -102,6 +145,34 @@ class BusinessIdentificationController @Inject()(
     }
   }
 
+  def showCheckBusinessEmail: Action[AnyContent] = Action.async { implicit request =>
+    withSubscribingAgent { overseasApplication =>
+      withAgencyDetails { agencyDetails =>
+        Future.successful(Ok(checkBusinessEmailView(businessEmailCheckForm, agencyDetails.agencyEmail)))
+      }
+    }
+  }
+
+  def submitCheckBusinessEmail: Action[AnyContent] = Action.async { implicit request =>
+    withSubscribingAgent { agent =>
+      withAgencyDetails { agencyDetails =>
+        businessEmailCheckForm.bindFromRequest
+          .fold(
+            formWithErrors => {
+              Future.successful(Ok(checkBusinessEmailView(formWithErrors, agencyDetails.agencyEmail)))
+            },
+            validForm => {
+              val useCurrentEmail = validForm.value
+              if (useCurrentEmail)
+                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+              else
+                Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessEmailForm))
+            }
+          )
+      }
+    }
+  }
+
   def showUpdateBusinessEmailForm: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
       withAgencyDetails { agencyDetails =>
@@ -123,6 +194,34 @@ class BusinessIdentificationController @Inject()(
 
               updateAgencyDetails(agencyWithUpdatedEmail).map(_ =>
                 Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+            }
+          )
+      }
+    }
+  }
+
+  def showCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
+    withSubscribingAgent { overseasApplication =>
+      withAgencyDetails { agencyDetails =>
+        Future.successful(Ok(checkBusinessNameView(businessNameCheckForm, agencyDetails.agencyName)))
+      }
+    }
+  }
+
+  def submitCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
+    withSubscribingAgent { agent =>
+      withAgencyDetails { agencyDetails =>
+        businessNameCheckForm.bindFromRequest
+          .fold(
+            formWithErrors => {
+              Future.successful(Ok(checkBusinessNameView(formWithErrors, agencyDetails.agencyName)))
+            },
+            validForm => {
+              val useCurrentName = validForm.value
+              if (useCurrentName)
+                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+              else
+                Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessNameForm))
             }
           )
       }

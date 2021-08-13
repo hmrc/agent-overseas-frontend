@@ -134,7 +134,7 @@ error.fileUpload.invalid=The selected file must be a PDF or JPG
 application.app.name=Apply for an agent services account if you are not in the UK
 application.servicename.titleSuffix=Apply for an agent services account if you are not in the UK - GOV.UK
 
-subscription.app.name=Finish setting up your agent services account
+subscription.app.name=Set up your approved agent services account
 subscription.servicename.titleSuffix=Finish setting up your agent services account - GOV.UK
 
 # Common
@@ -482,21 +482,24 @@ createNewAccount.button=Continue
 subscriptionComplete.title=Agent services account created
 subscriptionComplete.accountName=You created an account for
 subscriptionComplete.h2=What you can do next
-subscriptionComplete.p1=Make a note of your account reference number <strong class="bold">{0}</strong>. You will need this to contact HMRC if you cannot access your agent services account.
+subscriptionComplete.p1=Make a note of your account reference number <strong class="bold">{0}</strong>. Make sure you have this with you if you contact us about your agent services account.
 subscriptionComplete.p2=We have sent an email to {0} confirming these details.
 subscriptionComplete.p3=<a href="{0}">Check the guidance</a> to find out how to:
 subscriptionComplete.bullet-list.1=sign in to your agent services account
-subscriptionComplete.bullet-list.2=use new HMRC services on behalf of your clients
-subscriptionComplete.button=Go to your agent services account
+subscriptionComplete.bullet-list.2=use HMRC services on behalf of your clients
+subscriptionComplete.button=View your agent services account
 
 
-subscription.checkAnswers.title=Check your details before creating your account
-subscription.checkAnswers.description.p1=These are the business details we will use for your agent services account.
-subscription.checkAnswers.description.p2=Your business name will be the name shown to clients. We need your business address and email address to contact you about your agent services account.
+subscription.checkAnswers.title=Confirm your contact details before creating your account
+subscription.checkAnswers.how-we-use=How we use your personal information
+subscription.checkAnswers.description.p1=These are the contact details we will use for your agent services account.
+subscription.checkAnswers.description.p2a=We will use your email address to tell you when your agent services account has been created and the status of authorisation requests.
+subscription.checkAnswers.description.p2b=Clients will see the name you give us when they accept or manage your authorisations.
+subscription.checkAnswers.description.p2c=We will use your address to check your identity if you call us and may send some correspondence to this address.
 subscription.checkAnswers.description.p3=By setting up this account, you confirm that, to the best of your knowledge, the details you provided are correct.
-subscription.checkAnswers.businessName.label=Business name
-subscription.checkAnswers.businessAddress.label=Business address
-subscription.checkAnswers.businessEmailAddress.label=Business email address
+subscription.checkAnswers.businessName.label=Name
+subscription.checkAnswers.businessAddress.label=Address
+subscription.checkAnswers.businessEmailAddress.label=Email address
 subscription.checkAnswers.confirm.button=Confirm details and create account
 subscription.checkAnswers.change.button=Change
 
@@ -580,3 +583,27 @@ subscription.accessibility.statement.howtested.heading=How we tested this servic
 subscription.accessibility.statement.howtested.p1=The service was last tested on 22 August 2019 and was checked for compliance with WCAG 2.1 AA.
 subscription.accessibility.statement.howtested.p2=The full service was tested by HMRC and included disabled users.
 subscription.accessibility.statement.howtested.p3=This page was prepared on 23 September 2019. It was last updated on 23 September 2019.
+
+#Contact Trading Name Check
+contactTradingNameCheck.title=Is this the name you want to show to your clients?
+contactTradingNameCheck.p=Clients will see this name when they accept or manage your authorisations.
+contactTradingNameCheck.option.yes=Yes
+contactTradingNameCheck.option.no=No
+contactTradingNameCheck.continue.button=Continue
+error.contact-trading-name-check.invalid=Select Yes to use the name displayed or No if you trade under a different name
+
+#Contact Trading Email Check
+contactTradingEmailCheck.title=Is this the email address you want to use for your agent services account?
+contactTradingEmailCheck.p=We will use it to tell you when your agent services account has been created and to let you know the status of authorisation requests.
+contactTradingEmailCheck.option.yes=Yes
+contactTradingEmailCheck.option.no=No - I want to use a different email address
+contactTradingEmailCheck.continue.button=Continue
+error.contact-trading-email-check.invalid=Select if you want to use the email address displayed or a different email address
+
+#Contact Trading Address Check
+contactTradingAddressCheck.title=Is this the address you want to use for your agent services account?
+contactTradingAddressCheck.p=This is the address we will use to check your identity if you call us. We may send some correspondence to this address.
+contactTradingAddressCheck.option.yes=Yes
+contactTradingAddressCheck.option.no=No - I want to enter a different address
+contactTradingAddressCheck.continue.button=Continue
+error.contact-trading-address-check.invalid=Select Yes if this is the main trading address you want to use for your agent services account correspondence

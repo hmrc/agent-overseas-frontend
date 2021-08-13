@@ -18,12 +18,18 @@ GET        /timed-out                                   @uk.gov.hmrc.agentoverse
 GET        /check-answers                             @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckAnswers
 GET        /return-from-gg-registration        @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.returnFromGGRegistration(sessionId: String)
 
+GET        /check-business-address             @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckBusinessAddress
+POST       /check-business-address             @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitCheckBusinessAddress
 GET        /update-business-address            @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessAddressForm
 POST       /update-business-address            @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessAddressForm
 
-GET        /update-business-email               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessEmailForm
+GET        /check-business-email               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckBusinessEmail
+POST       /check-business-email               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitCheckBusinessEmail
+GET        /update-business-email              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessEmailForm
 POST       /update-business-email              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessEmailForm
 
+GET        /check-business-name                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckBusinessName
+POST       /check-business-name                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitCheckBusinessName
 GET        /update-business-name                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessNameForm
 POST       /update-business-name               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessNameForm
 
