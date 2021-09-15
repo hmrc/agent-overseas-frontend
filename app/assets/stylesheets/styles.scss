@@ -29,6 +29,9 @@
 .margin-bottom-10 {
     margin-bottom: 10px !important;
 }
+.margin-bottom-2 {
+    margin-bottom: 2px !important;
+}
 
 .margin-bottom-0 {
     margin-bottom: 0px !important;
@@ -99,12 +102,6 @@ details .panel[aria-hidden=true] a {
     border: 4px solid #d4351c;
     width: 100%;
 }
-
-@import 'partials/_forms';
-@import 'partials/_loader';
-@import 'partials/_checkAnswers';
-@import 'partials/_accessibleAutocomplete';
-@import 'partials/_accessibilityStatement';
 
 /* form overrides */
 
@@ -395,3 +392,10 @@ input[type="text"].autocomplete__input {
         line-height: 1.25;
     }
 }
+
+@import 'partials/_forms';
+@import 'partials/_loader';
+@import 'partials/_checkAnswers';
+@import 'partials/_accessibleAutocomplete';
+@import 'partials/_accessibilityStatement';
+@import 'partials/govuk_radios';

@@ -58,10 +58,11 @@
 				      |  $businessAddressCountryName <br/>
                                       |</p>""".stripMargin),
       '_groupDivClass      -> "form-group",
-      '_horizontal          -> true,
+      '_horizontal          -> false,
       '_fieldsetAttributes -> Html("""id='useThisAddress'""")
     )
+      <div class="form-group">
       <button class="button" type="submit" id="continue">@Messages("contactTradingAddressCheck.continue.button")</button>
-
+      </div>
   }
 }

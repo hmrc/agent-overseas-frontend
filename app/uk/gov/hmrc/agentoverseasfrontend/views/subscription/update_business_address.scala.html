@@ -40,17 +40,15 @@
 
         <fieldset>
             <legend>
-                <h1 class="heading-xlarge margin-bottom-20">
+                <h1 class="heading-xlarge">
                     @Messages("updateBusinessAddress.title")
                 </h1>
             </legend>
 
             <p class="body-text">@Messages("updateBusinessAddress.p1")</p>
 
-            <p class="panel panel-border-wide">@Messages("updateBusinessAddress.p2")</p>
-
             <div class="form-group @if(addressForm.error("addressLine1").isDefined){form-field--error soft--ends}">
-                <label class="heading-small soft--ends" for="addressLine1">@Messages("updateBusinessAddress.address_line_1.title")</label>
+                <label class="margin-bottom-2" for="addressLine1">@Messages("updateBusinessAddress.address_line_1.title")</label>
                 @addressForm.error("addressLine1").map { formError => <span class="error-notification" id="addressLine1-error">
                     <span class="visuallyhidden">@Messages("error.prefix")</span>
                     @Messages(formError.message)
@@ -70,7 +68,7 @@
             </div>
 
             <div class="form-group @if(addressForm.error("addressLine2").isDefined){form-field--error soft--ends}">
-                <label class="heading-small soft--ends" for="addressLine2">@Messages("updateBusinessAddress.address_line_2.title")</label>
+                <label class="margin-bottom-2" for="addressLine2">@Messages("updateBusinessAddress.address_line_2.title")</label>
                 @addressForm.error("addressLine2").map { formError => <span class="error-notification" id="addressLine2-error">
                     <span class="visuallyhidden">@Messages("error.prefix")</span>
                     @Messages(formError.message)
@@ -90,7 +88,7 @@
             </div>
 
             <div class="form-group @if(addressForm.error("addressLine3").isDefined){form-field--error soft--ends}">
-                <label class="heading-small soft--ends" for="addressLine3">@Messages("updateBusinessAddress.address_line_3.title")</label>
+                <label class="margin-bottom-2" for="addressLine3">@Messages("updateBusinessAddress.address_line_3.title")</label>
                 @addressForm.error("addressLine3").map { formError => <span class="error-notification" id="addressLine3-error">
                     <span class="visuallyhidden">@Messages("error.prefix")</span>
                     @Messages(formError.message)
@@ -110,7 +108,7 @@
             </div>
 
             <div class="form-group @if(addressForm.error("addressLine4").isDefined){form-field--error soft--ends}">
-                <label class="heading-small soft--ends" for="addressLine4">@Messages("updateBusinessAddress.address_line_4.title")</label>
+                <label class="margin-bottom-2" for="addressLine4">@Messages("updateBusinessAddress.address_line_4.title")</label>
                 @addressForm.error("addressLine4").map { formError => <span class="error-notification" id="addressLine4-error">
                     <span class="visuallyhidden">@Messages("error.prefix")</span>
                     @Messages(formError.message)
@@ -130,7 +128,7 @@
             </div>
 
             <div class="form-group @if(addressForm.error("countryCode").isDefined){form-field--error soft--ends}">
-                <label class="heading-small soft--ends" for="countryCode-auto-complete">@Messages("updateBusinessAddress.country.title")</label>
+                <label class="margin-bottom-2" for="countryCode-auto-complete">@Messages("updateBusinessAddress.country.title")</label>
                 @addressForm.error("countryCode").map { formError => <span class="error-notification" id="countryCode-error">
                     <span class="visuallyhidden">@Messages("error.prefix")</span>
                     @Messages(formError.message)

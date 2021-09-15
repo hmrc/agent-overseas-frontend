@@ -503,9 +503,8 @@ subscription.checkAnswers.businessEmailAddress.label=Email address
 subscription.checkAnswers.confirm.button=Confirm details and create account
 subscription.checkAnswers.change.button=Change
 
-updateBusinessAddress.title=Update your business address
-updateBusinessAddress.p1=Make sure your business address only includes letters a to z, numbers, commas, ampersands, single quotation marks, full stops, apostrophes, hyphens, forward slashes, and spaces.
-updateBusinessAddress.p2=Your business address will not be updated in other government services.
+updateBusinessAddress.title=Enter the address you want to use for your agent services account
+updateBusinessAddress.p1=This is the address we will use to check your identity if you call us. We may send some correspondence to this address.
 updateBusinessAddress.address_line_1.title = Address line 1
 updateBusinessAddress.address_line_2.title = Address line 2
 updateBusinessAddress.address_line_3.title = Address line 3 (Optional)
@@ -513,12 +512,12 @@ updateBusinessAddress.address_line_4.title = Address line 4 (Optional)
 updateBusinessAddress.country.title = Country
 updateBusinessAddress.continue = Continue
 
-updateBusinessEmail.title=Update your business email address
-updateBusinessEmail.description=Your business email address will not be updated in other government services.
+updateBusinessEmail.title=What is the email address you want to use for your agent services account?
+updateBusinessEmail.description=We will use it to tell you when your agent services account has been created and to let you know the status of authorisation requests.
 updateBusinessEmail.continue=Continue
 
-updateBusinessName.title=Update your business name
-updateBusinessName.description=Your business name will not be updated in other government services.
+updateBusinessName.title=What is the name you want to show to your clients?
+updateBusinessName.description=Clients will see this name when they accept or manage your authorisations.
 updateBusinessName.continue=Continue
 
 # cannot_check_status /cannot-check-status

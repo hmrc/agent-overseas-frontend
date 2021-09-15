@@ -51,10 +51,11 @@
       '_inputHint          -> Html(s"""<p>${Messages("contactTradingEmailCheck.p")}</p>"""),
       '_fieldsetDiv        -> Html(s"""<p>${Messages(s"$businessEmail")}</p>"""),
       '_groupDivClass      -> "form-group",
-      '_horizontal          -> true,
+      '_horizontal          -> false,
       '_fieldsetAttributes -> Html("""id='useThisEmail'""")
     )
+      <div class="form-group">
       <button class="button" type="submit" id="continue">@Messages("contactTradingEmailCheck.continue.button")</button>
-
+      </div>
   }
 }
