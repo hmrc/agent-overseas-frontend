@@ -28,7 +28,7 @@
 
 @mainTemplate(title = Messages("subscription.checkAnswers.title")) {
 
-    <h1 class="heading-xlarge margin-bottom-20">@Messages("subscription.checkAnswers.title")</h1>
+    <h1 class="heading-xlarge">@Messages("subscription.checkAnswers.title")</h1>
     <p>@Messages("subscription.checkAnswers.description.p1")</p>
     <div class="form-group">
         <details class="govuk-details">
@@ -45,7 +45,7 @@
 
     <br/>
 
-    <div class="app-check-your-answers--group margin-bottom-30">
+    <div class="app-check-your-answers--group margin-bottom-10">
         <dl class="app-check-your-answers app-check-your-answers--long">
             <div class="app-check-your-answers__contents">
                 <dt class="app-check-your-answers__question">
@@ -61,7 +61,7 @@
             </div>
         </dl>
     </div>
-    <div class="app-check-your-answers--group margin-bottom-30">
+    <div class="app-check-your-answers--group margin-bottom-10">
         <dl class="app-check-your-answers app-check-your-answers--long">
             <div class="app-check-your-answers__contents">
                 <dt class="app-check-your-answers__question">
@@ -77,7 +77,7 @@
             </div>
         </dl>
     </div>
-    <div class="app-check-your-answers--group margin-bottom-30">
+    <div class="app-check-your-answers--group margin-bottom-10">
         <dl class="app-check-your-answers app-check-your-answers--long">
             <div class="app-check-your-answers__contents">
                 <dt class="app-check-your-answers__question">
@@ -107,7 +107,7 @@
 
     @form(action = routes.SubscriptionController.subscribe(), 'class -> "form js-form") {
         <div class="form-group">
-            <button class="button margin-top-30" type="submit" id="continue" >@Messages("subscription.checkAnswers.confirm.button")</button>
+            <button class="button" type="submit" id="continue">@Messages("subscription.checkAnswers.confirm.button")</button>
         </div>
     }
 }

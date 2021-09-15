@@ -23,6 +23,7 @@
 @elements = @{new FieldElements(field.id, field, Html(None), args.toMap, messages) }
 @groupDivClass = {@elements.args.get('_groupDivClass) @if(elements.hasErrors){ form-field--error}}
 @labelAfter = @{ elements.args.getOrElse('_labelAfter, false).asInstanceOf[Boolean] }
+@horizontal = @{ elements.args.getOrElse('_horizontal, false).asInstanceOf[Boolean] }
 
 <div class="@groupDivClass @if(elements.hasErrors){error-container soft--ends}">
     <fieldset @elements.args.get('_groupClass).map{ groupClass => class='@groupClass'}
@@ -47,27 +48,32 @@
             </p>
 
         }
+        @if(elements.args.contains('_panelText)){
+            <p class="panel panel-border-wide margin-bottom-30" id="panel-text">
+            @elements.args.get('_panelText)
+            </p>
+        }
         @if(elements.args.contains('_fieldsetDiv)){
             <div @elements.args.get('_fieldsetDivClass).map { fieldsetDivClass => class='@fieldsetDivClass'}>
             @elements.args.get('_fieldsetDiv)
             </div>
         }
         @elements.errors.map{error => <span class="error-notification" id="radio-select-error"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(error.toString)</span>}
-
+        @if(horizontal){ <div class="govuk-radios govuk-radios--inline">}
         @radioOptions.map { case (value, label) =>
             @defining(s"${elements.field.name}-${value.toLowerCase.replace(" ","_")}")  { inputId =>
-                <div class="multiple-choice">
+                <div class="@if(horizontal){ govuk-radios__item } else { multiple-choice }">
                     <input
                     type="radio"
+                    class="govuk-radios__input"
                     id="@inputId"
                     name="@elements.field.name"
                     value="@value"
-                        @elements.args.get('_inputClass).map { inputClass => class="@inputClass"}
                         @elements.args.getOrElse('_dataAttributes, "")
                         @field.value.filter( _ == value).map{_ => checked="checked"}/>
 
                     <label for="@inputId"
-                        @elements.args.get('_labelClass).map { labelClass => class="@labelClass@field.value.filter( _ == value).map{_ => selected}"}>
+                    class="govuk-label govuk-radios__label @elements.args.get('_labelClass).map { labelClass => @labelClass @field.value.filter( _ == value).map{_ => selected}}">
                     @if(!labelAfter) {
                         @if(elements.args.get('_stackedLabel)) {
                             @if(label.toString().split(" ").length < 2) {<br>@label
@@ -82,5 +88,6 @@
                 </div>
             }
         }
+        @if(horizontal){ </div> }
     </fieldset>
 </div>

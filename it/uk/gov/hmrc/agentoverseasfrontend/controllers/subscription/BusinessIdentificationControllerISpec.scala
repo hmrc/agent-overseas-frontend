@@ -148,7 +148,6 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       result should containMessages(
         "updateBusinessAddress.title",
         "updateBusinessAddress.p1",
-        "updateBusinessAddress.p2",
         "updateBusinessAddress.address_line_1.title",
         "updateBusinessAddress.address_line_2.title",
         "updateBusinessAddress.address_line_3.title",
