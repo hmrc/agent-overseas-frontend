@@ -18,6 +18,10 @@ package uk.gov.hmrc.agentoverseasfrontend.services
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
+import org.scalatest.OptionValues
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.libs.json.JsValue
 import reactivemongo.api.ReadPreference
@@ -30,13 +34,12 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionId
 import uk.gov.hmrc.mongo.DatabaseUpdate
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class MongoDBSessionStoreServiceSpec extends UnitSpec {
+class MongoDBSessionStoreServiceSpec extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures {
 
   implicit val hc = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
 
@@ -77,16 +80,17 @@ class MongoDBSessionStoreServiceSpec extends UnitSpec {
   "SessionStoreService AgentSession" should {
 
     "store agent details" in new Setup {
-      await(store.cacheAgentSession(agentSession))
+      store.cacheAgentSession(agentSession).futureValue
 
       verify(mockSessionCacheRepository).createOrUpdate(any[Id], any[String], any[JsValue])
     }
 
     "always sanitise data when stored" in new Setup {
 
-      await(
-        store.cacheAgentSession(agentSession
-          .copy(registeredWithHmrc = Some(No), agentCodes = Some(agentCodes), personalDetails = Some(personalDetails))))
+      store
+        .cacheAgentSession(agentSession
+          .copy(registeredWithHmrc = Some(No), agentCodes = Some(agentCodes), personalDetails = Some(personalDetails)))
+        .futureValue
 
       verify(mockSessionCacheRepository).createOrUpdate(any[Id], any[String], any[JsValue])
     }
@@ -94,11 +98,11 @@ class MongoDBSessionStoreServiceSpec extends UnitSpec {
     "return None when no application details have been stored" in new Setup {
       when(mockSessionCacheRepository.findById(any[Id], any[ReadPreference])(any[ExecutionContext]))
         .thenReturn(Future.successful(None))
-      await(store.fetchAgentSession) shouldBe None
+      store.fetchAgentSession.futureValue shouldBe None
     }
 
     "storing and retrieving agency details" in new Setup {
-      await(store.cacheAgencyDetails(agencyDetails))
+      store.cacheAgencyDetails(agencyDetails).futureValue
 
       verify(mockSessionCacheRepository).createOrUpdate(any[Id], any[String], any[JsValue])
     }
@@ -106,13 +110,13 @@ class MongoDBSessionStoreServiceSpec extends UnitSpec {
     "return None if fetching agency details when they have not been stored" in new Setup {
       when(mockSessionCacheRepository.findById(any[Id], any[ReadPreference])(any[ExecutionContext]))
         .thenReturn(Future.successful(None))
-      await(store.fetchAgencyDetails) shouldBe None
+      store.fetchAgencyDetails.futureValue shouldBe None
     }
 
     "remove the underlying storage for the current session when remove is called" in new Setup {
-      await(store.cacheAgencyDetails(agencyDetails))
+      store.cacheAgencyDetails(agencyDetails).futureValue
 
-      await(store.remove())
+      store.remove().futureValue
 
       verify(mockSessionCacheRepository).removeAll(any())(any[ExecutionContext])
     }
@@ -129,7 +133,7 @@ class MongoDBSessionStoreServiceSpec extends UnitSpec {
     when(mockDatabaseUpdate.writeResult).thenReturn(mockLastError)
     when(mockLastError.inError).thenReturn(false)
     when(mockWriteResult.writeErrors).thenReturn(Seq.empty)
-    when(mockSessionCacheRepository.removeAll(any())(any())).thenReturn(mockWriteResult)
+    when(mockSessionCacheRepository.removeAll(any())(any())).thenReturn(Future.successful(mockWriteResult))
 
     val store = new MongoDBSessionStoreService(mockSessionCacheRepository)
   }

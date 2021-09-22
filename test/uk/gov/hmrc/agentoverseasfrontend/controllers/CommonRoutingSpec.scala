@@ -20,6 +20,10 @@ import org.mockito.ArgumentMatchers.any
 
 import java.time.LocalDateTime
 import org.mockito.Mockito.when
+import org.scalatest.OptionValues
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsValue
 import play.api.mvc.Results
@@ -32,7 +36,6 @@ import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSe
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionId
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,7 +44,7 @@ import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
 import uk.gov.hmrc.cache.model.{Cache, Id}
 import uk.gov.hmrc.mongo.DatabaseUpdate
 
-class CommonRoutingSpec extends UnitSpec {
+class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures {
   implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
 
   private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
@@ -76,69 +79,70 @@ class CommonRoutingSpec extends UnitSpec {
   "lookupNextPage" should {
     "return showAntiMoneyLaunderingRegistration when AmlsRequired is not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(amlsRequired = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.AntiMoneyLaunderingController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.AntiMoneyLaunderingController
         .showMoneyLaunderingRequired()
     }
 
     "return showAntiMoneyLaunderingForm when AmlsDetails are not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(amlsDetails = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.AntiMoneyLaunderingController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.AntiMoneyLaunderingController
         .showAntiMoneyLaunderingForm()
     }
 
     "return showAntiMoneyLaunderingRegistration when session not found" in {
-      await(FakeRouting.lookupNextPage(None)) shouldBe routes.AntiMoneyLaunderingController
+      FakeRouting.lookupNextPage(None) shouldBe routes.AntiMoneyLaunderingController
         .showMoneyLaunderingRequired()
     }
 
     "return showFileUpload(amls) when amlsFileUploadStatus not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(amlsUploadStatus = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.FileUploadController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.FileUploadController
         .showAmlsUploadForm()
     }
 
     "return showContactDetailsForm when ContactDetails are not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(contactDetails = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
         .showContactDetailsForm()
     }
 
     "return showTradingNameForm when Trading Name is not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(tradingName = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController.showTradingNameForm()
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
+        .showTradingNameForm()
     }
 
     "return showMainBusinessAddressForm when Business Address is not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(overseasAddress = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.TradingAddressController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.TradingAddressController
         .showMainBusinessAddressForm()
     }
 
     "return showUploadForm(trading-address) when tradingAddressUploadStatus not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(tradingAddressUploadStatus = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.FileUploadController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.FileUploadController
         .showTradingAddressUploadForm()
     }
 
     "return showRegisteredWithHmrc when RegisteredWithHmrc choice is not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(registeredWithHmrc = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
         .showRegisteredWithHmrcForm()
     }
 
@@ -146,9 +150,9 @@ class CommonRoutingSpec extends UnitSpec {
       "RegisteredWithHmrc choice is Yes" should {
         "return showSelfAssessmentAgentCodeForm when self assessment details are not in session" in {
           val agentSession = detailsUpToRegisteredWithHmrc.copy(registeredWithHmrc = Some(Yes))
-          await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+          FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-          await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+          FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
             .showAgentCodesForm()
         }
       }
@@ -156,9 +160,9 @@ class CommonRoutingSpec extends UnitSpec {
       s"RegisteredWithHmrc choice is No" should {
         "return showUkTaxRegistrationForm when uk tax registration details are not in session" in {
           val agentSession = detailsUpToRegisteredWithHmrc.copy(registeredWithHmrc = Some(No))
-          await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+          FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-          await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+          FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
             .showUkTaxRegistrationForm()
         }
       }
@@ -170,18 +174,18 @@ class CommonRoutingSpec extends UnitSpec {
       "return showPersonalDetailsForm when personal details are not in session" in {
         val agentSession = detailsUpToRegisteredWithHmrc
           .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(Yes), personalDetails = None)
-        await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+        FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-        await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+        FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
           .showPersonalDetailsForm()
       }
 
       "return showCompanyRegistrationNumberForm when personal details are in session" in {
         val agentSession = detailsUpToRegisteredWithHmrc
           .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(Yes), personalDetails = Some(personalDetails))
-        await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+        FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-        await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+        FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
           .showCompanyRegistrationNumberForm()
       }
     }
@@ -190,9 +194,9 @@ class CommonRoutingSpec extends UnitSpec {
       "return showCompanyRegistrationNumberForm when company registration number is not in session" in {
         val agentSession = detailsUpToRegisteredWithHmrc
           .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(No), personalDetails = None)
-        await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+        FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-        await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+        FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
           .showCompanyRegistrationNumberForm()
       }
     }
@@ -206,9 +210,9 @@ class CommonRoutingSpec extends UnitSpec {
         personalDetails = Some(personalDetails),
         companyRegistrationNumber = Some(companyRegistrationNumber)
       )
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.TaxRegController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.TaxRegController
         .showTaxRegistrationNumberForm()
     }
   }
@@ -219,9 +223,9 @@ class CommonRoutingSpec extends UnitSpec {
       registeredForUkTax = Some(No),
       personalDetails = None,
       companyRegistrationNumber = Some(companyRegistrationNumber))
-    await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+    FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-    await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.TaxRegController
+    FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.TaxRegController
       .showTaxRegistrationNumberForm()
   }
 
@@ -233,9 +237,9 @@ class CommonRoutingSpec extends UnitSpec {
       companyRegistrationNumber = Some(companyRegistrationNumber),
       hasTaxRegNumbers = Some(true)
     )
-    await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+    FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-    await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.TaxRegController.showAddTaxRegNoForm()
+    FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.TaxRegController.showAddTaxRegNoForm()
   }
 
   "return showCheckYourAnswers when hasTaxRegNumbers equals Some(false)" in {
@@ -246,33 +250,35 @@ class CommonRoutingSpec extends UnitSpec {
       companyRegistrationNumber = Some(companyRegistrationNumber),
       hasTaxRegNumbers = Some(false)
     )
-    await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+    FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-    await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController.showCheckYourAnswers()
+    FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
+      .showCheckYourAnswers()
   }
 
   "return showAgentCodesForm when registered with HMRC and no answer for agent codes has yet been given" in {
     val agentSession = detailsUpToRegisteredWithHmrc.copy(registeredWithHmrc = Some(Yes), agentCodes = None)
-    await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+    FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-    await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController.showAgentCodesForm()
+    FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
+      .showAgentCodesForm()
   }
 
   "return showUkTaxRegistrationForm when one or more agent codes have been given" in {
     val agentSession = detailsUpToRegisteredWithHmrc
       .copy(registeredWithHmrc = Some(Yes), agentCodes = Some(AgentCodes(Some(SaAgentCode("saCode")), None)))
-    await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+    FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-    await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+    FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
       .showUkTaxRegistrationForm()
   }
 
   "return showUkTaxRegistrationForm when no agent codes have been given" in {
     val agentSession = detailsUpToRegisteredWithHmrc
       .copy(registeredWithHmrc = Some(Yes), agentCodes = Some(AgentCodes(None, None)))
-    await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+    FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-    await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+    FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
       .showUkTaxRegistrationForm()
   }
 
@@ -280,9 +286,9 @@ class CommonRoutingSpec extends UnitSpec {
     "return showUkTaxRegistrationForm when they have not yet made a choice for whether they are registered for UK tax" in {
       val agentSession = detailsUpToRegisteredWithHmrc
         .copy(registeredWithHmrc = Some(Yes), agentCodes = Some(AgentCodes(None, None)), registeredForUkTax = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
         .showUkTaxRegistrationForm()
     }
 
@@ -292,9 +298,9 @@ class CommonRoutingSpec extends UnitSpec {
         agentCodes = Some(AgentCodes(None, None)),
         registeredForUkTax = Some(Yes),
         personalDetails = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
         .showPersonalDetailsForm()
     }
 
@@ -305,9 +311,9 @@ class CommonRoutingSpec extends UnitSpec {
         registeredForUkTax = Some(No),
         personalDetails = None,
         companyRegistrationNumber = None)
-      await(FakeRouting.sessionStoreService.cacheAgentSession(agentSession))
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      await(FakeRouting.lookupNextPage(Some(agentSession))) shouldBe routes.ApplicationController
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
         .showCompanyRegistrationNumberForm()
     }
   }
@@ -345,7 +351,7 @@ class CommonRoutingSpec extends UnitSpec {
   def testRoutesForApplicationStatuses(applications: List[ApplicationEntityDetails], responseRoute: String) = {
     when(FakeRouting.connector.getUserApplications).thenReturn(Future.successful(applications))
 
-    await(FakeRouting.routesIfExistingApplication(subscriptionRootPath)).url shouldBe responseRoute
+    FakeRouting.routesIfExistingApplication(subscriptionRootPath).futureValue.url shouldBe responseRoute
   }
 
 }

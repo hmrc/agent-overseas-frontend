@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.collection.immutable.SortedSet
 
-class AgentSessionSpec extends UnitSpec {
+class AgentSessionSpec extends AnyWordSpecLike with Matchers with OptionValues {
 
   private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))

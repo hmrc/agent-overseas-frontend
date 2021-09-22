@@ -5,7 +5,7 @@ import org.scalatest.Assertion
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{LOCATION, flash, redirectLocation}
+import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption.SaUtrChoice
 import uk.gov.hmrc.agentoverseasfrontend.models._
@@ -40,17 +40,16 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
   "GET /contact-details" should {
     "display the contact details form" in {
 
-      await(
-        sessionStoreService.cacheAgentSession(
-          AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)))
+     sessionStoreService.cacheAgentSession(
+       AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)).futureValue
 
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
-      val result = await(controller.showContactDetailsForm(authenticatedRequest))
+      val result = controller.showContactDetailsForm(authenticatedRequest)
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "contactDetails.title",
         "contactDetails.form.firstName",
         "contactDetails.form.lastName",
@@ -58,13 +57,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         "contactDetails.form.businessTelephone",
         "contactDetails.form.businessEmail"
       )
-      result should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
+      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
     }
 
     "redirect to /money-laundering-registration when session not found" in {
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
-      val result = await(controller.showContactDetailsForm(authenticatedRequest))
+      val result = controller.showContactDetailsForm(authenticatedRequest)
 
       status(result) shouldBe 303
 
@@ -74,9 +73,9 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
   "POST /contact-details" should {
     "submit form and then redirect to trading-name" in {
-      await(
-        sessionStoreService.cacheAgentSession(
-          AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), None)))
+      
+      sessionStoreService.cacheAgentSession(
+        AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), None)).futureValue
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody(
@@ -86,21 +85,21 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           "businessTelephone" -> "12345",
           "businessEmail"     -> "test@email.com")
 
-      val result = await(controller.submitContactDetails(authenticatedRequest))
+      val result = controller.submitContactDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showTradingNameForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showTradingNameForm().url
 
-      val mayBeContactDetails = await(sessionStoreService.fetchAgentSession).get.contactDetails
+      val mayBeContactDetails = sessionStoreService.fetchAgentSession.futureValue.get.contactDetails
 
       mayBeContactDetails shouldBe Some(ContactDetails("test", "last", "senior agent", "12345", "test@email.com"))
     }
 
     "submit form and then redirect to check-your-answers if user is changing answers" in {
       //pre state
-      await(
-        sessionStoreService.cacheAgentSession(
-          AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)))
+      
+      sessionStoreService.cacheAgentSession(
+        AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)).futureValue
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody(
@@ -110,12 +109,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           "businessTelephone" -> "12345",
           "businessEmail"     -> "test@email.com")
 
-      val result = await(controller.submitContactDetails(authenticatedRequest))
+      val result = controller.submitContactDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
 
       session.contactDetails shouldBe Some(ContactDetails("test", "last", "senior agent", "12345", "test@email.com"))
 
@@ -125,9 +124,9 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "show validation errors when form data is incorrect" in {
       //pre state
-      await(
-        sessionStoreService.cacheAgentSession(
-          AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)))
+      
+      sessionStoreService.cacheAgentSession(
+        AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)).futureValue
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody(
@@ -137,11 +136,11 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           "businessTelephone" -> "12345",
           "businessEmail"     -> "test")
 
-      val result = await(controller.submitContactDetails(authenticatedRequest))
+      val result = controller.submitContactDetails(authenticatedRequest)
 
       status(result) shouldBe 200
 
-      result should containMessages("error.firstName.blank", "error.lastName.invalid", "error.email")
+      result.futureValue should containMessages("error.firstName.blank", "error.lastName.invalid", "error.email")
     }
   }
 
@@ -150,23 +149,23 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(tradingName = None, changingAnswers = true))
 
-      val result = await(controller.showTradingNameForm(cleanCredsAgent(FakeRequest())))
+      val result = controller.showTradingNameForm(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "tradingName.title",
         "tradingName.p1"
       )
 
-      result should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
+      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
     }
 
     "redirect to /money-laundering-registration when session not found" in {
 
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
-      val result = await(controller.showTradingNameForm(authenticatedRequest))
+      val result = controller.showTradingNameForm(authenticatedRequest)
 
       status(result) shouldBe 303
 
@@ -176,15 +175,15 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     "pre-fill trading name if previously has used the endpoint POST /trading-name" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingName = Some("tradingName")))
 
-      val result = await(controller.showTradingNameForm(cleanCredsAgent(FakeRequest())))
+      val result = controller.showTradingNameForm(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
-      result should containMessages(
+      result.futureValue should containMessages(
         "tradingName.title",
         "tradingName.p1"
       )
 
-      val doc = Jsoup.parse(bodyOf(result))
+      val doc = Jsoup.parse(contentAsString(result))
 
       doc.getElementById("tradingName").attr("value") shouldBe "tradingName"
     }
@@ -198,12 +197,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("tradingName" -> "test")
 
-      val result = await(controller.submitTradingName(authenticatedRequest))
+      val result = controller.submitTradingName(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.TradingAddressController.showMainBusinessAddressForm().url
+      header(LOCATION, result).get shouldBe routes.TradingAddressController.showMainBusinessAddressForm().url
 
-      val tradingName = await(sessionStoreService.fetchAgentSession).get.tradingName
+      val tradingName = sessionStoreService.fetchAgentSession.futureValue.get.tradingName
 
       tradingName shouldBe Some("test")
     }
@@ -215,12 +214,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("tradingName" -> "test")
 
-      val result = await(controller.submitTradingName(authenticatedRequest))
+      val result = controller.submitTradingName(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
 
       session.tradingName shouldBe Some("test")
 
@@ -235,11 +234,11 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("tradingName" -> "")
 
-      val result = await(controller.submitTradingName(authenticatedRequest))
+      val result = controller.submitTradingName(authenticatedRequest)
 
       status(result) shouldBe 200
 
-      result should containMessages("error.tradingName.blank")
+      result.futureValue should containMessages("error.tradingName.blank")
     }
   }
 
@@ -247,12 +246,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     class RegisteredWithHmrcSetup(agentSession: AgentSession = agentSession.copy(registeredWithHmrc = None)) {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showRegisteredWithHmrcForm(authenticatedRequest))
-      val doc = Jsoup.parse(bodyOf(result))
+      val result = controller.showRegisteredWithHmrcForm(authenticatedRequest)
+      val doc = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new RegisteredWithHmrcSetup {
-      result should containMessages(
+      result.futureValue should containMessages(
         "registeredWithHmrc.title",
         "registeredWithHmrc.caption",
         "registeredWithHmrc.form.title"
@@ -288,14 +287,14 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       }
 
     "contain a continue button" in new RegisteredWithHmrcSetup {
-      result should containSubmitButton(
+      result.futureValue should containSubmitButton(
         expectedMessageKey = "button.continue",
         expectedElementId = "continue"
       )
     }
 
     "contain a back link to /file-uploaded-successfully/trading-address" in new RegisteredWithHmrcSetup {
-      result should containLink(
+      result.futureValue should containLink(
         expectedMessageKey = "button.back",
         expectedHref = "/agent-services/apply-from-outside-uk/file-uploaded-successfully"
       )
@@ -306,9 +305,9 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         Some(agentSession.copy(changingAnswers = true, registeredWithHmrc = None))
 
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showRegisteredWithHmrcForm(authenticatedRequest))
+      val result = controller.showRegisteredWithHmrcForm(authenticatedRequest)
 
-      result should containLink(
+      result.futureValue should containLink(
         expectedMessageKey = "button.back",
         expectedHref = "/agent-services/apply-from-outside-uk/check-your-answers"
       )
@@ -323,10 +322,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "redirect to /money-laundering-registration when session not found" in {
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showRegisteredWithHmrcForm(authenticatedRequest))
+      val result = controller.showRegisteredWithHmrcForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
     }
   }
 
@@ -337,12 +336,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
 
-      val result = await(controller.submitRegisteredWithHmrc(authenticatedRequest))
+      val result = controller.submitRegisteredWithHmrc(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showAgentCodesForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showAgentCodesForm().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
 
       session.registeredWithHmrc shouldBe Some(Yes)
 
@@ -355,12 +354,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
 
-      val result = await(controller.submitRegisteredWithHmrc(authenticatedRequest))
+      val result = controller.submitRegisteredWithHmrc(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
 
       session.registeredWithHmrc shouldBe Some(Yes)
 
@@ -371,10 +370,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None))
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
-      await(controller.submitRegisteredWithHmrc(authenticatedRequest)) should containMessages(
+      controller.submitRegisteredWithHmrc(authenticatedRequest).futureValue should containMessages(
         "error.registeredWithHmrc.no-radio.selected")
 
-      await(sessionStoreService.fetchAgentSession).get.registeredWithHmrc shouldBe None
+      sessionStoreService.fetchAgentSession.futureValue.get.registeredWithHmrc shouldBe None
     }
   }
 
@@ -386,12 +385,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showUkTaxRegistrationForm(authenticatedRequest))
-      val doc = Jsoup.parse(bodyOf(result))
+      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
+      val doc = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new UkTaxRegistrationSetup {
-      result should containMessages(
+      result.futureValue should containMessages(
         "ukTaxRegistration.title",
         "ukTaxRegistration.caption",
         "ukTaxRegistration.form.title"
@@ -426,7 +425,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       }
 
     "contain a continue button" in new UkTaxRegistrationSetup {
-      result should containSubmitButton(
+      result.futureValue should containSubmitButton(
         expectedMessageKey = "button.continue",
         expectedElementId = "continue"
       )
@@ -439,7 +438,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             registeredWithHmrc = Some(Yes),
             agentCodes = Some(AgentCodes(None, None))
           )) {
-          result should containLink(
+          result.futureValue should containLink(
             expectedMessageKey = "button.back",
             expectedHref = "/agent-services/apply-from-outside-uk/self-assessment-agent-code"
           )
@@ -451,7 +450,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             registeredWithHmrc = Some(No),
             agentCodes = None
           )) {
-          result should containLink(
+          result.futureValue should containLink(
             expectedMessageKey = "button.back",
             expectedHref = "/agent-services/apply-from-outside-uk/registered-with-hmrc"
           )
@@ -464,7 +463,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             agentCodes = None,
             changingAnswers = true
           )) {
-          result should containLink(
+          result.futureValue should containLink(
             expectedMessageKey = "button.back",
             expectedHref = "/agent-services/apply-from-outside-uk/check-your-answers"
           )
@@ -480,10 +479,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "redirect to /money-laundering-registration when session not found" in {
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showUkTaxRegistrationForm(authenticatedRequest))
+      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
     }
   }
 
@@ -499,12 +498,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("registeredForUkTax" -> "true")
 
-      val result = await(controller.submitUkTaxRegistration(authenticatedRequest))
+      val result = controller.submitUkTaxRegistration(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showPersonalDetailsForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showPersonalDetailsForm().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.registeredForUkTax shouldBe Some(Yes)
       session.changingAnswers shouldBe false
     }
@@ -520,12 +519,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("registeredForUkTax" -> "false")
 
-      val result = await(controller.submitUkTaxRegistration(authenticatedRequest))
+      val result = controller.submitUkTaxRegistration(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.registeredForUkTax shouldBe Some(No)
       session.changingAnswers shouldBe false
     }
@@ -538,10 +537,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         ))
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
-      await(controller.submitUkTaxRegistration(authenticatedRequest)) should containMessages(
+      controller.submitUkTaxRegistration(authenticatedRequest).futureValue should containMessages(
         "error.registeredForUkTaxForm.no-radio.selected")
 
-      await(sessionStoreService.fetchAgentSession).get.registeredForUkTax shouldBe None
+      sessionStoreService.fetchAgentSession.futureValue.get.registeredForUkTax shouldBe None
     }
   }
 
@@ -553,12 +552,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     class PersonalDetailsSetup(agentSession: AgentSession = defaultAgentSession) {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showPersonalDetailsForm(authenticatedRequest))
-      val doc = Jsoup.parse(bodyOf(result))
+      val result = controller.showPersonalDetailsForm(authenticatedRequest)
+      val doc = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new PersonalDetailsSetup {
-      result should containMessages(
+      result.futureValue should containMessages(
         "personalDetails.title",
         "personalDetails.p1",
         "personalDetails.p2",
@@ -572,14 +571,14 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     }
 
     "contain a back link to previous page - /uk-tax-registration" in new PersonalDetailsSetup {
-      result should containLink(
+      result.futureValue should containLink(
         expectedMessageKey = "button.back",
         expectedHref = "/agent-services/apply-from-outside-uk/uk-tax-registration")
     }
 
     "contain a back link to check-your-answers if user is changing answers" in new PersonalDetailsSetup(
       defaultAgentSession.copy(changingAnswers = true)) {
-      result should containLink(
+      result.futureValue should containLink(
         expectedMessageKey = "button.back",
         expectedHref = "/agent-services/apply-from-outside-uk/check-your-answers")
     }
@@ -593,10 +592,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "redirect to /money-laundering-registration when session not found" in {
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showUkTaxRegistrationForm(authenticatedRequest))
+      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
     }
   }
 
@@ -611,12 +610,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("personalDetailsChoice" -> "nino", "nino" -> "AB123456A", "saUtr" -> "")
 
-      val result = await(controller.submitPersonalDetails(authenticatedRequest))
+      val result = controller.submitPersonalDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm().url
 
-      val savedPersonalDetails = await(sessionStoreService.fetchAgentSession).get.personalDetails.get
+      val savedPersonalDetails = sessionStoreService.fetchAgentSession.futureValue.get.personalDetails.get
       savedPersonalDetails shouldBe PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
     }
 
@@ -632,12 +631,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("personalDetailsChoice" -> "nino", "nino" -> "AB123456A", "saUtr" -> "")
 
-      val result = await(controller.submitPersonalDetails(authenticatedRequest))
+      val result = controller.submitPersonalDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.personalDetails.get shouldBe PersonalDetailsChoice(
         Some(RadioOption.NinoChoice),
         Some(Nino("AB123456A")),
@@ -655,9 +654,9 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("personalDetailsChoice" -> "", "nino" -> "", "saUtr" -> "")
 
-      await(controller.submitPersonalDetails(authenticatedRequest)) should containMessages(
+      controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages(
         "error.personalDetails.no-radio.selected")
-      await(sessionStoreService.fetchAgentSession).get.personalDetails shouldBe None
+      sessionStoreService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
     }
 
     "show validation error if National Insurance number option is selected, but no value has been entered" in {
@@ -670,8 +669,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("personalDetailsChoice" -> "nino", "nino" -> "", "saUtr" -> "")
 
-      await(controller.submitPersonalDetails(authenticatedRequest)) should containMessages("error.nino.blank")
-      await(sessionStoreService.fetchAgentSession).get.personalDetails shouldBe None
+      controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages("error.nino.blank")
+      sessionStoreService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
     }
 
     "show validation error if SA UTR option is selected, but no value has been entered" in {
@@ -684,8 +683,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("personalDetailsChoice" -> "saUtr", "nino" -> "", "saUtr" -> "")
 
-      await(controller.submitPersonalDetails(authenticatedRequest)) should containMessages("error.sautr.blank")
-      await(sessionStoreService.fetchAgentSession).get.personalDetails shouldBe None
+      controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages("error.sautr.blank")
+      sessionStoreService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
     }
   }
 
@@ -694,32 +693,32 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(registeredForUkTax = Some(Yes), companyRegistrationNumber = None))
 
-      val result = await(controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest())))
+      val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
       val backButtonUrl = routes.ApplicationController.showPersonalDetailsForm().url
 
       status(result) shouldBe 200
-      result should containMessages(
+      result.futureValue should containMessages(
         "companyRegistrationNumber.title",
         "companyRegistrationNumber.caption"
       )
 
-      result should containSubstrings(backButtonUrl)
+      result.futureValue should containSubstrings(backButtonUrl)
     }
 
     "display the company-registration-number form with check-your-answers back link if user is changing answers" in {
       sessionStoreService.currentSession.agentSession = Some(
         agentSession.copy(registeredForUkTax = Some(Yes), companyRegistrationNumber = None, changingAnswers = true))
 
-      val result = await(controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest())))
+      val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
       val backButtonUrl = routes.ApplicationController.showCheckYourAnswers().url
 
       status(result) shouldBe 200
-      result should containMessages(
+      result.futureValue should containMessages(
         "companyRegistrationNumber.title",
         "companyRegistrationNumber.caption"
       )
 
-      result should containSubstrings(backButtonUrl)
+      result.futureValue should containSubstrings(backButtonUrl)
     }
 
     "display the company-registration-number form with correct back button link in case user selects No option in the /uk-tax-registration page" in {
@@ -728,18 +727,18 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredForUkTax = Some(No),
           companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(false), None))))
 
-      val result = await(controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest())))
+      val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
       val backButtonUrl = routes.ApplicationController.showUkTaxRegistrationForm().url
 
       status(result) shouldBe 200
-      result should containMessages(
+      result.futureValue should containMessages(
         "companyRegistrationNumber.title",
         "companyRegistrationNumber.caption"
       )
 
-      result should containSubstrings(backButtonUrl)
+      result.futureValue should containSubstrings(backButtonUrl)
 
-      val doc = Jsoup.parse(bodyOf(result))
+      val doc = Jsoup.parse(contentAsString(result))
 
       doc.getElementById("confirmRegistration_false").attr("checked") shouldBe "checked"
     }
@@ -758,11 +757,11 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
 
-      val result = await(controller.submitCompanyRegistrationNumber(authenticatedRequest))
+      val result = controller.submitCompanyRegistrationNumber(authenticatedRequest)
       status(result) shouldBe 303
 
-      result.header.headers(LOCATION) shouldBe routes.TaxRegController.showTaxRegistrationNumberForm().url
-      await(sessionStoreService.fetchAgentSession).get.companyRegistrationNumber shouldBe Some(
+      header(LOCATION, result).get shouldBe routes.TaxRegController.showTaxRegistrationNumberForm().url
+      sessionStoreService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe Some(
         CompanyRegistrationNumber(Some(true), Some(Crn("AB123456"))))
     }
 
@@ -780,12 +779,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
 
-      val result = await(controller.submitCompanyRegistrationNumber(authenticatedRequest))
+      val result = controller.submitCompanyRegistrationNumber(authenticatedRequest)
       status(result) shouldBe 303
 
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
 
       session.companyRegistrationNumber shouldBe Some(CompanyRegistrationNumber(Some(true), Some(Crn("AB123456"))))
       session.changingAnswers shouldBe false
@@ -800,9 +799,9 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
-      await(controller.submitCompanyRegistrationNumber(authenticatedRequest)) should containMessages(
+      controller.submitCompanyRegistrationNumber(authenticatedRequest).futureValue should containMessages(
         "companyRegistrationNumber.error.no-radio.selected")
-      await(sessionStoreService.fetchAgentSession).get.companyRegistrationNumber shouldBe None
+      sessionStoreService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe None
     }
 
     "show validation error if Yes is selected but no input passed for registrationNumber" in {
@@ -815,8 +814,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "")
 
-      await(controller.submitCompanyRegistrationNumber(authenticatedRequest)) should containMessages("error.crn.blank")
-      await(sessionStoreService.fetchAgentSession).get.companyRegistrationNumber shouldBe None
+      controller.submitCompanyRegistrationNumber(authenticatedRequest).futureValue should containMessages("error.crn.blank")
+      sessionStoreService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe None
     }
   }
 
@@ -828,12 +827,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showAgentCodesForm(authenticatedRequest))
-      val doc = Jsoup.parse(bodyOf(result))
+      val result = controller.showAgentCodesForm(authenticatedRequest)
+      val doc = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new UkTaxRegistrationSetup {
-      result should containMessages(
+      result.futureValue should containMessages(
         "agentCodes.title",
         "agentCodes.caption",
         "agentCodes.p1",
@@ -843,12 +842,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "ask for optional self-assessment and corporation-tax" in new UkTaxRegistrationSetup {
       Seq("self-assessment", "corporation-tax").foreach { agentCode =>
-        result should containMessages(
+        result.futureValue should containMessages(
           s"agentCodes.form.$agentCode.label",
           s"agentCodes.form.$agentCode.inset"
         )
 
-        result should containElement(
+        result.futureValue should containElement(
           id = s"$agentCode-checkbox",
           tag = "input",
           attrs = Map(
@@ -858,7 +857,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           )
         )
 
-        result should containElement(
+        result.futureValue should containElement(
           id = agentCode,
           tag = "input",
           attrs = Map(
@@ -874,7 +873,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         defaultAgentSession.copy(
           agentCodes = Some(AgentCodes(Some(SaAgentCode("saTestCode")), None))
         )) {
-        result should containElement(
+        result.futureValue should containElement(
           id = "self-assessment-checkbox",
           tag = "input",
           attrs = Map("checked" -> "checked")
@@ -882,7 +881,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       }
 
     "contain a continue button" in new UkTaxRegistrationSetup {
-      result should containSubmitButton(
+      result.futureValue should containSubmitButton(
         expectedMessageKey = "button.continue",
         expectedElementId = "continue"
       )
@@ -892,7 +891,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       defaultAgentSession.copy(
         registeredWithHmrc = Some(Yes)
       )) {
-      result should containLink(
+      result.futureValue should containLink(
         expectedMessageKey = "button.back",
         expectedHref = "/agent-services/apply-from-outside-uk/registered-with-hmrc"
       )
@@ -903,7 +902,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         registeredWithHmrc = Some(Yes),
         changingAnswers = true
       )) {
-      result should containLink(
+      result.futureValue should containLink(
         expectedMessageKey = "button.back",
         expectedHref = "/agent-services/apply-from-outside-uk/check-your-answers"
       )
@@ -918,10 +917,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "redirect to /money-laundering-registration when session not found" in {
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = await(controller.showUkTaxRegistrationForm(authenticatedRequest))
+      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
     }
   }
 
@@ -941,12 +940,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           "corporation-tax"          -> "123456"
         )
 
-      val result = await(controller.submitAgentCodes(authenticatedRequest))
+      val result = controller.submitAgentCodes(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showUkTaxRegistrationForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
 
       session.agentCodes shouldBe Some(
         AgentCodes(
@@ -969,12 +968,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           "self-assessment" -> "",
           "corporation-tax" -> ""
         )
-      val result = await(controller.submitAgentCodes(authenticatedRequest))
+      val result = controller.submitAgentCodes(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showUkTaxRegistrationForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.agentCodes shouldBe Some(AgentCodes(None, None))
       session.changingAnswers shouldBe false
     }
@@ -995,9 +994,9 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               "corporation-tax"  -> ""
             )
 
-          await(controller.submitAgentCodes(authenticatedRequest)) should containMessages(s"error.$key.blank")
+          controller.submitAgentCodes(authenticatedRequest).futureValue should containMessages(s"error.$key.blank")
 
-          await(sessionStoreService.fetchAgentSession).get.agentCodes shouldBe None
+          sessionStoreService.fetchAgentSession.futureValue.get.agentCodes shouldBe None
         }
     }
   }
@@ -1045,10 +1044,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             trnUploadStatus = Some(fileUploadStatus)
           ))
 
-        val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+        val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
         status(result) shouldBe 200
-        result should containLink("button.back", routes.FileUploadController.showSuccessfulUploadedForm().url)
+        result.futureValue should containLink("button.back", routes.FileUploadController.showSuccessfulUploadedForm().url)
       }
 
       "no agent codes no taxRegNumbers provided, back link to ask if has tax-registration-number" in {
@@ -1070,10 +1069,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             trnUploadStatus = Some(fileUploadStatus)
           ))
 
-        val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+        val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
         status(result) shouldBe 200
-        result should containLink("button.back", routes.TaxRegController.showTaxRegistrationNumberForm().url)
+        result.futureValue should containLink("button.back", routes.TaxRegController.showTaxRegistrationNumberForm().url)
       }
     }
 
@@ -1101,13 +1100,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               amlsUploadStatus = Some(fileUploadStatus)
             ))
 
-          val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
           status(result) shouldBe 200
 
-          testMandatoryContent(result)
+          testMandatoryContent(result.futureValue)
 
-          result should containMessages(
+          result.futureValue should containMessages(
             "checkAnswers.tradingAddressFile.title",
             "checkAnswers.agentCode.title",
             "checkAnswers.agentCode.empty",
@@ -1115,7 +1114,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             "checkAnswers.companyRegistrationNumber.empty"
           )
 
-          testAgentCodes(bodyOf(result), false)
+          testAgentCodes(contentAsString(result), false)
         }
 
         "CompanyRegistrationNumber is non empty" in {
@@ -1140,19 +1139,19 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               amlsUploadStatus = Some(fileUploadStatus)
             ))
 
-          val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
           status(result) shouldBe 200
-          testMandatoryContent(result)
+          testMandatoryContent(result.futureValue)
 
-          result should containMessages(
+          result.futureValue should containMessages(
             "checkAnswers.agentCode.title",
             "checkAnswers.agentCode.empty",
             "checkAnswers.companyRegistrationNumber.title"
           )
 
-          testAgentCodes(bodyOf(result), false)
-          bodyOf(result).contains("999999") shouldBe true
+          testAgentCodes(contentAsString(result), false)
+          contentAsString(result).contains("999999") shouldBe true
         }
 
         "TaxRegistrationNumbers is empty" in {
@@ -1177,12 +1176,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               amlsUploadStatus = Some(fileUploadStatus)
             ))
 
-          val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
           status(result) shouldBe 200
-          testMandatoryContent(result)
+          testMandatoryContent(result.futureValue)
 
-          result should containMessages(
+          result.futureValue should containMessages(
             "checkAnswers.agentCode.title",
             "checkAnswers.agentCode.empty",
             "checkAnswers.companyRegistrationNumber.title",
@@ -1191,7 +1190,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             "checkAnswers.taxRegistrationNumbers.empty"
           )
 
-          testAgentCodes(bodyOf(result), false)
+          testAgentCodes(contentAsString(result), false)
         }
 
         "TaxRegistrationNumbers is non empty" in {
@@ -1218,12 +1217,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               trnUploadStatus = Some(fileUploadStatus)
             ))
 
-          val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
           status(result) shouldBe 200
 
-          testMandatoryContent(result)
-          result should containMessages(
+          testMandatoryContent(result.futureValue)
+          result.futureValue should containMessages(
             "checkAnswers.registeredWithHmrc.title",
             "checkAnswers.agentCode.title",
             "checkAnswers.agentCode.empty",
@@ -1231,9 +1230,9 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             "checkAnswers.taxRegistrationNumbers.title"
           )
 
-          testAgentCodes(bodyOf(result), false)
-          bodyOf(result).contains("TX12345") shouldBe true
-          bodyOf(result).contains("tradingAddressFileName") shouldBe true
+          testAgentCodes(contentAsString(result), false)
+          contentAsString(result).contains("TX12345") shouldBe true
+          contentAsString(result).contains("tradingAddressFileName") shouldBe true
         }
       }
       "UkTaxRegistration is No" in {
@@ -1257,12 +1256,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             amlsUploadStatus = Some(fileUploadStatus)
           ))
 
-        val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+        val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
         status(result) shouldBe 200
 
-        testMandatoryContent(result)
-        result should containMessages(
+        testMandatoryContent(result.futureValue)
+        result.futureValue should containMessages(
           "checkAnswers.title",
           "checkAnswers.change.button",
           "checkAnswers.amlsDetails.title",
@@ -1275,10 +1274,10 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           "checkAnswers.agentCode.empty"
         )
 
-        result shouldNot containMessages("checkAnswers.personalDetails.nino.title")
+        result.futureValue shouldNot containMessages("checkAnswers.personalDetails.nino.title")
 
-        testAgentCodes(bodyOf(result), false)
-        bodyOf(result).contains("tradingAddressFileName") shouldBe true
+        testAgentCodes(contentAsString(result), false)
+        contentAsString(result).contains("tradingAddressFileName") shouldBe true
       }
     }
 
@@ -1303,21 +1302,21 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           trnUploadStatus = Some(fileUploadStatus)
         ))
 
-      val result = await(controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+      val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      testMandatoryContent(result)
-      result should containMessages(
+      testMandatoryContent(result.futureValue)
+      result.futureValue should containMessages(
         "checkAnswers.registeredForUKTax.title",
         "checkAnswers.personalDetails.nino.title",
         "checkAnswers.companyRegistrationNumber.title",
         "checkAnswers.taxRegistrationNumbers.title"
       )
 
-      result shouldNot containMessages("checkAnswers.agentCode.title", "checkAnswers.agentCode.empty")
+      result.futureValue shouldNot containMessages("checkAnswers.agentCode.title", "checkAnswers.agentCode.empty")
 
-      val body = bodyOf(result)
+      val body = contentAsString(result)
 
       body.contains("No") shouldBe true
       body.contains("Yes") shouldBe true
@@ -1325,7 +1324,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       body.contains("crnCode") shouldBe true
       body.contains("trn1") shouldBe true
       body.contains("trn2") shouldBe true
-      bodyOf(result).contains("tradingAddressFileName") shouldBe true
+      contentAsString(result).contains("tradingAddressFileName") shouldBe true
     }
   }
 
@@ -1358,11 +1357,11 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       givenPostOverseasApplication(201, Json.toJson(CreateOverseasApplicationRequest(agentSession)).toString())
 
-      val result = await(controller.submitCheckYourAnswers(cleanCredsAgent(FakeRequest())))
+      val result = controller.submitCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 400
 
-      await(sessionStoreService.fetchAgentSession).isDefined shouldBe true
+      sessionStoreService.fetchAgentSession.futureValue.isDefined shouldBe true
     }
 
     "submit the application and redirect to application-complete" in {
@@ -1370,20 +1369,20 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       givenPostOverseasApplication(201, Json.toJson(CreateOverseasApplicationRequest(agentSession)).toString())
 
-      val result = await(
+      val result = 
         controller.submitCheckYourAnswers(
           cleanCredsAgent(
             FakeRequest().withFormUrlEncodedBody("confirmed" -> "true")
           )
-        ))
+        )
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showApplicationComplete().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showApplicationComplete().url
 
       flash(result).get("tradingName").get shouldBe "tradingName"
       flash(result).get("contactDetail").get shouldBe "test@email.com"
 
-      await(sessionStoreService.fetchAgentSession).isDefined shouldBe false
+      sessionStoreService.fetchAgentSession.futureValue.isDefined shouldBe false
     }
 
     "return exception when agent-overseas-application backend is unavailable" in {
@@ -1393,17 +1392,15 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       givenPostOverseasApplication(503, Json.toJson(CreateOverseasApplicationRequest(agentSession)).toString())
 
-      an[Exception] should be thrownBy (
-        await(
-          controller.submitCheckYourAnswers(
-            cleanCredsAgent(
-              FakeRequest().withFormUrlEncodedBody("confirmed" -> "true")
-            )))
-      )
+      val e = controller.submitCheckYourAnswers(
+        cleanCredsAgent(
+          FakeRequest().withFormUrlEncodedBody("confirmed" -> "true")
+        )).failed.futureValue
+      e shouldBe a[Exception]
     }
 
     "redirect to /money-laundering-registration when session not found" in {
-      val result = await(controller.submitCheckYourAnswers()(cleanCredsAgent(FakeRequest())))
+      val result = controller.submitCheckYourAnswers()(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 303
 
@@ -1416,12 +1413,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val tradingName = "testTradingName"
       val email = "testEmail@test.com"
 
-      val result = await(
+      val result = 
         controller.showApplicationComplete(
-          basicAgentRequest(FakeRequest().withFlash("tradingName" -> tradingName, "contactDetail" -> email))))
+          basicAgentRequest(FakeRequest().withFlash("tradingName" -> tradingName, "contactDetail" -> email)))
 
       status(result) shouldBe 200
-      result should containMessages(
+      result.futureValue should containMessages(
         "applicationComplete.title",
         "applicationComplete.panel.body",
         "applicationComplete.whatHappensNext.heading",
@@ -1438,11 +1435,11 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         "applicationComplete.feedback.text"
       )
 
-      result should containLink("applicationComplete.whatYouCanDoNext.link", "guidancePageUrl")
+      result.futureValue should containLink("applicationComplete.whatYouCanDoNext.link", "guidancePageUrl")
 
-      bodyOf(result).contains(
+      contentAsString(result).contains(
         htmlEscapedMessage("applicationComplete.whatHappensNext.para1", contactDetails.businessEmail))
-      result should containSubstrings(
+      result.futureValue should containSubstrings(
         "We will send a confirmation email to",
         email,
         tradingName,
@@ -1450,7 +1447,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     }
 
     "303 to JOURNEY START when no required fields in flash, authAction should deal with routing circumstances" in {
-      val result = await(controller.showApplicationComplete(basicAgentRequest(FakeRequest())))
+      val result = controller.showApplicationComplete(basicAgentRequest(FakeRequest()))
 
       //as the Agent should have no agentSession at this point, previous last created application would be shown or start of Journey
       status(result) shouldBe 303

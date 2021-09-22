@@ -2,7 +2,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers.redirectLocation
+import play.api.test.Helpers._
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
@@ -15,7 +15,7 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
 
   "root" should {
     "303 to start of journey: showCheckAnswers" in {
-      val result = await(controller.root(authenticatedAs(subscribingCleanAgentWithoutEnrolments)))
+      val result = controller.root(authenticatedAs(subscribingCleanAgentWithoutEnrolments))
       status(result) shouldBe 303
       redirectLocation(result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
@@ -32,10 +32,10 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
 
     def testNextStepPage(request: FakeRequest[AnyContentAsEmpty.type]) = {
       givenAcceptedApplicationResponse
-      val result = await(controller.nextStep(request))
+      val result = controller.nextStep(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "createNewAccount.title",
         "createNewAccount.p1",
         "createNewAccount.button")
@@ -44,10 +44,10 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
 
   "showApplicationIssue /cannot-check-status" should {
     "200 cannot_check_Status page is shown" in {
-      val result = await(controller.showApplicationIssue(authenticatedAs(subscribingCleanAgentWithoutEnrolments)))
+      val result = controller.showApplicationIssue(authenticatedAs(subscribingCleanAgentWithoutEnrolments))
 
       status(result) shouldBe 200
-      result should containMessages("cannot_check_status.title",
+      result.futureValue should containMessages("cannot_check_status.title",
       "cannot_check_status.p1",
       "cannot_check_status.p2"
       )

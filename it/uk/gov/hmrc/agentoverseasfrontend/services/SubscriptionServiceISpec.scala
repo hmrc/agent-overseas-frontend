@@ -19,17 +19,17 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
   "mostRecentApplication" should {
     "return application record for an auth provider id" in {
       givenAcceptedApplicationResponse()
-      await(service.mostRecentApplication) shouldBe Some(application)
+      service.mostRecentApplication.futureValue shouldBe Some(application)
     }
 
     "return active application record that will be the most recently made for the auth provider id" in {
       givenApplicationMultiple()
-      await(service.mostRecentApplication) shouldBe Some(application)
+      service.mostRecentApplication.futureValue shouldBe Some(application)
     }
 
     "return empty results for an auth provider id" in {
       givenApplicationEmptyResponse()
-      await(service.mostRecentApplication) shouldBe None
+      service.mostRecentApplication.futureValue shouldBe None
     }
   }
 
@@ -39,7 +39,7 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionSuccessfulResponse(Arn("123"))
 
-        await(service.subscribe) shouldBe Right(Arn("123"))
+        service.subscribe.futureValue shouldBe Right(Arn("123"))
       }
 
       "most recent application is 'accepted' and the agency details are in the session" in {
@@ -65,27 +65,27 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
       "details are missing from the session store, return Left(NoAgencyInSession)" in {
         givenAcceptedApplicationResponse()
         sessionStoreService.currentSession.agencyDetails = None
-        await(service.subscribe) shouldBe Left(NoAgencyInSession)
+        service.subscribe.futureValue shouldBe Left(NoAgencyInSession)
       }
 
       "the user has no applications, return Left(NoApplications)" in {
         givenApplicationEmptyResponse()
-        await(service.subscribe) shouldBe Left(NoApplications)
+        service.subscribe.futureValue shouldBe Left(NoApplications)
       }
 
       "the user's most recent application is in 'attempting_registration' status, return Left(WrongApplicationStatus)" in {
         givenAttemptingRegistrationApplicationResponse()
-        await(service.subscribe) shouldBe Left(WrongApplicationStatus)
+        service.subscribe.futureValue shouldBe Left(WrongApplicationStatus)
       }
 
       "the user's most recent application is in 'rejected' status, return Left(WrongApplicationStatus)" in {
         givenRejectedApplicationResponse()
-        await(service.subscribe) shouldBe Left(WrongApplicationStatus)
+        service.subscribe.futureValue shouldBe Left(WrongApplicationStatus)
       }
 
       "the user's most recent application is in 'pending' status, return Left(WrongApplicationStatus)" in {
         givenPendingApplicationResponse()
-        await(service.subscribe) shouldBe Left(WrongApplicationStatus)
+        service.subscribe.futureValue shouldBe Left(WrongApplicationStatus)
       }
 
       "upstream agent-subscription returns 409 (i.e. the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group)" in {
@@ -93,7 +93,7 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
         givenCompleteApplicationResponse()
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionFailedConflict()
-        await(service.subscribe) shouldBe Left(AlreadySubscribed)
+        service.subscribe.futureValue shouldBe Left(AlreadySubscribed)
       }
     }
 
@@ -102,14 +102,14 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
         sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
         givenApplicationServerError()
         givenApplicationUpdateServerError()
-        an[UpstreamErrorResponse] shouldBe thrownBy(await(service.subscribe))
+        service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
 
       "upstream agent-overseas-application retrieve application succeeds but update fails with 500" in {
         sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
         givenAcceptedApplicationResponse()
         givenApplicationUpdateServerError()
-        an[UpstreamErrorResponse] shouldBe thrownBy(await(service.subscribe))
+        service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
 
       "upstream agent-subscription is unavailable" in {
@@ -117,15 +117,15 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
         givenAcceptedApplicationResponse()
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionFailedUnavailable()
-        an[UpstreamErrorResponse] shouldBe thrownBy(await(service.subscribe))
+        service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
     }
   }
 
   "detailsStoreAuthProviderId" should {
     "return produced Id as reference to obtaining stored authProviderId" in {
-      val idRef: SessionDetailsId = await(service.storeSessionDetails(authProviderId))
-      val findUsingIdRef = await(service.authProviderId(idRef))
+      val idRef: SessionDetailsId = service.storeSessionDetails(authProviderId).futureValue
+      val findUsingIdRef = service.authProviderId(idRef).futureValue
 
       idRef.toString.size shouldBe 32
       findUsingIdRef shouldBe Some(authProviderId)
@@ -133,7 +133,7 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
 
     "return None when Id not found" in {
       val sampleIdRef = new SessionDetails.SessionDetailsId("d4b872c5819f49f9aebc50f921f5bd2c")
-      val findUsingIdRef = await(service.authProviderId(sampleIdRef))
+      val findUsingIdRef = service.authProviderId(sampleIdRef).futureValue
 
       findUsingIdRef shouldBe None
     }

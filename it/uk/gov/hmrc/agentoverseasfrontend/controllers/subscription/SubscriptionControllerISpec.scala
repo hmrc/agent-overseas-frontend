@@ -1,7 +1,7 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers.LOCATION
+import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
@@ -29,28 +29,28 @@ class SubscriptionControllerISpec
       givenApplicationUpdateSuccessResponse
       givenSubscriptionSuccessfulResponse(arn)
 
-      val result = await(controller.subscribe(request))
+      val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.SubscriptionController.subscriptionComplete().url
+      header(LOCATION, result).get shouldBe routes.SubscriptionController.subscriptionComplete().url
     }
 
     "redirect to /check-answers if there's no agency details in the session" in {
       implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       sessionStoreService.currentSession.agencyDetails = None
       givenAcceptedApplicationResponse
-      val result = await(controller.subscribe(request))
+      val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
     "redirect to /next-steps if user has unclean credentials (they have 1 or more enrolments)" in {
       implicit val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      val result = await(controller.subscribe(request))
+      val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.SubscriptionRootController.nextStep().url
+      header(LOCATION, result).get shouldBe routes.SubscriptionRootController.nextStep().url
     }
 
     "redirect to /already-subscribed if the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group" in {
@@ -58,10 +58,10 @@ class SubscriptionControllerISpec
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
       givenCompleteApplicationResponse()
       givenSubscriptionFailedConflict()
-      val result = await(controller.subscribe(request))
+      val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.SubscriptionController.alreadySubscribed().url
+      header(LOCATION, result).get shouldBe routes.SubscriptionController.alreadySubscribed().url
     }
   }
 
@@ -69,11 +69,11 @@ class SubscriptionControllerISpec
     "showSubscriptionCompletePage when HMRC-AS-AGENT" in {
       implicit val request = authenticated(FakeRequest(), Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn.value), true)
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
-      val result = await(controller.subscriptionComplete(request))
+      val result = controller.subscriptionComplete(request)
 
       status(result) shouldBe 200
 
-      result should containSubstrings(
+      result.futureValue should containSubstrings(
         htmlMessage("subscriptionComplete.p1", "TARN0000001"),
         agentServicesAccountBase + agentServicesAccountPath,
         "test agency name",
@@ -81,7 +81,7 @@ class SubscriptionControllerISpec
         htmlMessage("subscriptionComplete.p3", guidancePageUrl)
       )
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "subscriptionComplete.title",
         "subscriptionComplete.accountName",
         "subscriptionComplete.h2",
@@ -96,11 +96,11 @@ class SubscriptionControllerISpec
     "show the already subscribed page for a user with Agent affinity group" in {
       implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
 
-      val result = await(controller.alreadySubscribed(request))
+      val result = controller.alreadySubscribed(request)
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "already.subscribed.title",
         "already.subscribed.p1",
         "already.subscribed.button"
@@ -110,11 +110,11 @@ class SubscriptionControllerISpec
 
   "GET /accessibility-statement" should {
     "show the accessibility statement content with accessibility link" in {
-      val result = await(controller.showAccessibilityStatement(FakeRequest().withHeaders(HeaderNames.REFERER -> "foo")))
+      val result = controller.showAccessibilityStatement(FakeRequest().withHeaders(HeaderNames.REFERER -> "foo"))
 
       status(result) shouldBe 200
-      result should containMessages("subscription.accessibility.statement.h1")
-      result should containSubstrings("/contact/accessibility?service=AOSS&userAction=foo")
+      result.futureValue should containMessages("subscription.accessibility.statement.h1")
+      result.futureValue should containSubstrings("/contact/accessibility?service=AOSS&userAction=foo")
     }
   }
 }

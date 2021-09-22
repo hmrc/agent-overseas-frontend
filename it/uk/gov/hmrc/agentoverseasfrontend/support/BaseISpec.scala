@@ -3,8 +3,11 @@ package uk.gov.hmrc.agentoverseasfrontend.support
 import akka.util.Timeout
 import com.google.inject.AbstractModule
 import org.jsoup.Jsoup
-import org.scalatest.Assertion
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{Assertion, OptionValues}
 import org.scalatest.matchers.{MatchResult, Matcher}
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
@@ -18,14 +21,14 @@ import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class BaseISpec extends UnitSpec with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport with DefaultAwaitTimeout {
+class BaseISpec extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport with DefaultAwaitTimeout {
 
-  implicit val timeout =  Timeout(5.seconds)
+   implicit val timeout =  Timeout(5.seconds)
 
   override implicit lazy val app: Application = appBuilder.build()
 
@@ -79,8 +82,21 @@ class BaseISpec extends UnitSpec with GuiceOneAppPerSuite with WireMockSupport w
 
   protected implicit val materializer = app.materializer
 
+  private def contentType(result: Result): Option[String] = {
+    result.body.contentType.map(_.split(";").take(1).mkString.trim)
+  }
+
+  private def charset(result: Result): Option[String] = {
+    result.body.contentType match {
+      case Some(s) if s.contains("charset=") => Some(s.split("; *charset=").drop(1).mkString.trim)
+      case _                                 => None
+    }
+  }
+
+  private def bodyOf(result: Result): String = contentAsString(Future.successful(result))
+
   protected def checkHtmlResultWithBodyText(result: Result, expectedSubstring: String): Assertion = {
-    status(result) shouldBe 200
+    result.header.status shouldBe 200
     contentType(result) shouldBe Some("text/html")
     charset(result) shouldBe Some("utf-8")
     bodyOf(result) should include(expectedSubstring)
@@ -101,7 +117,7 @@ class BaseISpec extends UnitSpec with GuiceOneAppPerSuite with WireMockSupport w
     }
 
   protected def checkIsHtml200(result: Result) = {
-    status(result) shouldBe 200
+    result.header.status shouldBe 200
     charset(result) shouldBe Some("utf-8")
     contentType(result) shouldBe Some("text/html")
   }

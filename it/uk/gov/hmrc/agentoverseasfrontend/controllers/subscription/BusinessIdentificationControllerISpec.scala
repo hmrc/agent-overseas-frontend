@@ -1,8 +1,8 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Result}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.LOCATION
+import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
@@ -20,10 +20,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result: Result = await(controller.showCheckAnswers(request))
+      val result = controller.showCheckAnswers(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "subscription.checkAnswers.title",
         "subscription.checkAnswers.description.p1",
         "subscription.checkAnswers.description.p2a",
@@ -37,7 +37,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         "checkAnswers.change.button")
 
 
-      result should containSubstrings(agencyDetails.agencyName, agencyDetails.agencyEmail,
+      result.futureValue should containSubstrings(agencyDetails.agencyName, agencyDetails.agencyEmail,
         agencyDetails.agencyAddress.addressLine1,
         agencyDetails.agencyAddress.addressLine2,
         agencyDetails.agencyAddress.addressLine3.get,
@@ -45,17 +45,17 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         "Belgium"
       )
 
-      result should containSubmitButton("subscription.checkAnswers.confirm.button", "continue")
+      result.futureValue should containSubmitButton("subscription.checkAnswers.confirm.button", "continue")
     }
 
     "redirect to application root path page if no active application available" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenApplicationEmptyResponse()
 
-      val result = await(controller.showCheckAnswers(request))
+      val result = controller.showCheckAnswers(request)
       status(result) shouldBe 303
 
-      result.header.headers(LOCATION) shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk"
+      header(LOCATION, result).get shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk"
     }
   }
 
@@ -65,10 +65,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.showCheckBusinessAddress(request))
+      val result = controller.showCheckBusinessAddress(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "contactTradingAddressCheck.title",
         "contactTradingAddressCheck.p",
         "contactTradingAddressCheck.option.yes",
@@ -86,9 +86,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessAddress(request))
+      val result = controller.submitCheckBusinessAddress(request)
 
-      result should containMessages("error.contact-trading-address-check.invalid")
+      result.futureValue should containMessages("error.contact-trading-address-check.invalid")
     }
 
     "redirect to check-answers page for a Yes answer" in {
@@ -99,10 +99,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessAddress(request))
+      val result = controller.submitCheckBusinessAddress(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
     "redirect to 'update address' page for a No answer" in {
@@ -113,10 +113,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessAddress(request))
+      val result = controller.submitCheckBusinessAddress(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showUpdateBusinessAddressForm().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessAddressForm().url
     }
 
     "redirect to check-answers page for a No answer without session data" in {
@@ -127,10 +127,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
 
-      val result = await(controller.submitCheckBusinessAddress(request))
+      val result = controller.submitCheckBusinessAddress(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
   }
@@ -142,10 +142,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.showUpdateBusinessAddressForm(request))
+      val result = controller.showUpdateBusinessAddressForm(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "updateBusinessAddress.title",
         "updateBusinessAddress.p1",
         "updateBusinessAddress.address_line_1.title",
@@ -160,10 +160,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
 
-      val result = await(controller.showUpdateBusinessAddressForm(request))
+      val result = controller.showUpdateBusinessAddressForm(request)
       status(result) shouldBe 303
 
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
   }
 
@@ -180,12 +180,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
 
-      val updatedBusinessAddress = await(sessionStoreService.fetchAgencyDetails).get.agencyAddress
+      val updatedBusinessAddress = sessionStoreService.fetchAgencyDetails.futureValue.get.agencyAddress
       updatedBusinessAddress.addressLine1 shouldBe "new addressline 1"
       updatedBusinessAddress.addressLine2 shouldBe "new addressline 2"
       updatedBusinessAddress.addressLine3 shouldBe Some("new addressline 3")
@@ -204,10 +204,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
     "show validation error when the form is submitted with empty address line 1" in {
@@ -220,9 +220,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
-      result should containMessages("updateBusinessAddress.address_line_1.title", "error.addressline.1.empty")
+      result.futureValue should containMessages("updateBusinessAddress.address_line_1.title", "error.addressline.1.empty")
     }
 
     "show validation error when the form is submitted with invalid address line 3" in {
@@ -236,9 +236,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
-      result should containMessages("updateBusinessAddress.address_line_3.title", "error.addressline.3.invalid")
+      result.futureValue should containMessages("updateBusinessAddress.address_line_3.title", "error.addressline.3.invalid")
     }
 
     "show validation error when the form is submitted with invalid address line 4" in {
@@ -253,9 +253,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
-      result should containMessages("updateBusinessAddress.address_line_4.title", "error.addressline.4.invalid")
+      result.futureValue should containMessages("updateBusinessAddress.address_line_4.title", "error.addressline.4.invalid")
     }
 
     "show validation error when the form is submitted with invalid address line 1" in {
@@ -269,9 +269,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
-      result should containMessages("updateBusinessAddress.address_line_1.title", "error.addressline.1.invalid")
+      result.futureValue should containMessages("updateBusinessAddress.address_line_1.title", "error.addressline.1.invalid")
     }
 
     "show validation error when the form is submitted with empty country code" in {
@@ -284,9 +284,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
-      result should containMessages("updateBusinessAddress.address_line_1.title", "error.country.empty")
+      result.futureValue should containMessages("updateBusinessAddress.address_line_1.title", "error.country.empty")
     }
 
     "show validation error when the form is submitted with invalid country code" in {
@@ -299,9 +299,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessAddressForm(request))
+      val result = controller.submitUpdateBusinessAddressForm(request)
 
-      result should containMessages("updateBusinessAddress.address_line_1.title", "error.country.invalid")
+      result.futureValue should containMessages("updateBusinessAddress.address_line_1.title", "error.country.invalid")
     }
   }
 
@@ -311,10 +311,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.showCheckBusinessEmail(request))
+      val result = controller.showCheckBusinessEmail(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "contactTradingEmailCheck.title",
         "contactTradingEmailCheck.p",
         "contactTradingEmailCheck.option.yes",
@@ -332,9 +332,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessEmail(request))
+      val result = controller.submitCheckBusinessEmail(request)
 
-      result should containMessages("error.contact-trading-email-check.invalid")
+      result.futureValue should containMessages("error.contact-trading-email-check.invalid")
     }
 
     "redirect to check-answers page for a Yes answer" in {
@@ -345,10 +345,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessEmail(request))
+      val result = controller.submitCheckBusinessEmail(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
     "redirect to 'update email' page for a No answer" in {
@@ -359,10 +359,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessEmail(request))
+      val result = controller.submitCheckBusinessEmail(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showUpdateBusinessEmailForm().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessEmailForm().url
     }
 
     "redirect to check-answers page for a No answer without session data" in {
@@ -373,10 +373,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
 
-      val result = await(controller.submitCheckBusinessEmail(request))
+      val result = controller.submitCheckBusinessEmail(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
   }
@@ -387,10 +387,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.showUpdateBusinessEmailForm(request))
+      val result = controller.showUpdateBusinessEmailForm(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "updateBusinessEmail.title",
         "updateBusinessEmail.description",
         "updateBusinessEmail.continue"
@@ -401,10 +401,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
 
-      val result = await(controller.showUpdateBusinessEmailForm(request))
+      val result = controller.showUpdateBusinessEmailForm(request)
       status(result) shouldBe 303
 
-      result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+      header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
     }
   }
 
@@ -416,12 +416,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessEmailForm(request))
+      val result = controller.submitUpdateBusinessEmailForm(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+      header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
 
-      await(sessionStoreService.fetchAgencyDetails).get.agencyEmail shouldBe "newemail@example.com"
+      sessionStoreService.fetchAgencyDetails.futureValue.get.agencyEmail shouldBe "newemail@example.com"
     }
 
     "redirect to check-answers page for a valid form without session data" in {
@@ -432,10 +432,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessEmailForm(request))
+      val result = controller.submitUpdateBusinessEmailForm(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+      header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
     }
 
     "show validation error when the form is submitted with empty email address" in {
@@ -445,9 +445,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessEmailForm(request))
+      val result = controller.submitUpdateBusinessEmailForm(request)
 
-      result should containMessages("updateBusinessEmail.title", "error.business-email.empty")
+      result.futureValue should containMessages("updateBusinessEmail.title", "error.business-email.empty")
     }
   }
 
@@ -457,10 +457,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.showCheckBusinessName(request))
+      val result = controller.showCheckBusinessName(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "contactTradingNameCheck.title",
         "contactTradingNameCheck.p",
         "contactTradingNameCheck.option.yes",
@@ -478,9 +478,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessName(request))
+      val result = controller.submitCheckBusinessName(request)
 
-      result should containMessages("error.contact-trading-name-check.invalid")
+      result.futureValue should containMessages("error.contact-trading-name-check.invalid")
     }
 
     "redirect to check-answers page for a Yes answer" in {
@@ -491,10 +491,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessName(request))
+      val result = controller.submitCheckBusinessName(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
     "redirect to 'update name' page for a No answer" in {
@@ -505,10 +505,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitCheckBusinessName(request))
+      val result = controller.submitCheckBusinessName(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showUpdateBusinessNameForm().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessNameForm().url
     }
 
     "redirect to check-answers page for a No answer without session data" in {
@@ -519,10 +519,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
 
-      val result = await(controller.submitCheckBusinessName(request))
+      val result = controller.submitCheckBusinessName(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
     }
 
   }
@@ -533,10 +533,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.showUpdateBusinessNameForm(request))
+      val result = controller.showUpdateBusinessNameForm(request)
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "updateBusinessName.title",
         "updateBusinessName.description",
         "updateBusinessName.continue"
@@ -547,10 +547,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
 
-      val result = await(controller.showUpdateBusinessNameForm(request))
+      val result = controller.showUpdateBusinessNameForm(request)
       status(result) shouldBe 303
 
-      result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+      header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
     }
   }
 
@@ -562,12 +562,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessNameForm(request))
+      val result = controller.submitUpdateBusinessNameForm(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+      header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
 
-      await(sessionStoreService.fetchAgencyDetails).get.agencyName shouldBe "New name"
+      sessionStoreService.fetchAgencyDetails.futureValue.get.agencyName shouldBe "New name"
     }
 
     "redirect to check-answers page for a valid form without session data" in {
@@ -578,10 +578,10 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
 
-      val result = await(controller.submitUpdateBusinessNameForm(request))
+      val result = controller.submitUpdateBusinessNameForm(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+      header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
     }
 
     "show validation error when the form is submitted with empty business name" in {
@@ -591,9 +591,9 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
-      val result = await(controller.submitUpdateBusinessNameForm(request))
+      val result = controller.submitUpdateBusinessNameForm(request)
 
-      result should containMessages("updateBusinessName.title", "error.business-name.empty")
+      result.futureValue should containMessages("updateBusinessName.title", "error.business-name.empty")
     }
   }
 
@@ -602,24 +602,24 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       "a valid session id found" in {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
 
-        val sessionId = await(sessionDetailsRepo.create("credId-12345"))
+        val sessionId = sessionDetailsRepo.create("credId-12345").futureValue
 
         givenUpdateAuthIdSuccessResponse("credId-12345")
 
-        val result = await(controller.returnFromGGRegistration(sessionId)(request))
+        val result = controller.returnFromGGRegistration(sessionId)(request)
 
         status(result) shouldBe 303
-        result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+        header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
 
         verifyUpdateAuthIdRequest(1)
       }
 
       "an invalid session id found" in {
         implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-        val result = await(controller.returnFromGGRegistration("invalid-id")(request))
+        val result = controller.returnFromGGRegistration("invalid-id")(request)
 
         status(result) shouldBe 303
-        result.header.headers(LOCATION) should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
+        header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
 
         verifyUpdateAuthIdRequest(0)
       }
