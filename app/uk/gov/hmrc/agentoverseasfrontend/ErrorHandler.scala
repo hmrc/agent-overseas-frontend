@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentoverseasfrontend
 
 import javax.inject.{Inject, Singleton}
-import play.api.Logger.logger
+import play.Logger
 import play.api.i18n.MessagesApi
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
@@ -45,6 +45,7 @@ class ErrorHandler @Inject()(
     extends FrontendErrorHandler with AuthRedirects with ErrorAuditing {
 
   val appName: String = appConfig.appName
+  val logger = Logger.of(appName)
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     auditClientError(request, statusCode, message)

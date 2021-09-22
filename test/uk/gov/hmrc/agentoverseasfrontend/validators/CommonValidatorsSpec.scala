@@ -16,15 +16,16 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.validators
 
-import org.scalatest.{Assertion, EitherValues}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{Assertion, EitherValues, OptionValues}
 import play.api.data.{FormError, Mapping}
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.collection.immutable.Stream
 import scala.util.Random
 
-class CommonValidatorsSpec extends UnitSpec with EitherValues {
+class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValues with EitherValues {
 
   "saUtr bind" should {
     val utrMapping = saUtr.withPrefix("testKey")

@@ -17,7 +17,7 @@ class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStu
   "getCurrentApplication" should {
     "return application record for an auth provider id" in {
       given200OverseasPendingApplication(Some("2019-02-18T15:11:51.729"))
-      await(service.getCurrentApplication) shouldBe Some(ApplicationEntityDetails(LocalDateTime.parse("2019-02-18T15:11:51.729"),
+      service.getCurrentApplication.futureValue shouldBe Some(ApplicationEntityDetails(LocalDateTime.parse("2019-02-18T15:11:51.729"),
         Pending,
         "Testing Agency",
         "test@test.com",
@@ -26,7 +26,7 @@ class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStu
 
     "return active application record that will be the most recently made for the auth provider id" in {
       given200GetOverseasApplications(allRejected = false)
-      val app = await(service.getCurrentApplication)
+      val app = service.getCurrentApplication.futureValue
       app shouldBe Some(ApplicationEntityDetails( LocalDateTime.parse("2019-02-20T15:11:51.729"),
         Accepted,
         "Testing Agency",
@@ -36,7 +36,7 @@ class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStu
 
     "return empty results for an auth provider id" in {
       given404OverseasApplications()
-      await(service.getCurrentApplication) shouldBe None
+      service.getCurrentApplication.futureValue shouldBe None
     }
   }
 
@@ -45,7 +45,7 @@ class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStu
     "return the most recently reviewed Application when there are several applications returned from the BE all in rejected status" in {
       given200GetOverseasApplications(true)
 
-      await(service.rejectedApplication) shouldBe Some(
+      service.rejectedApplication.futureValue shouldBe Some(
         ApplicationEntityDetails(
           applicationCreationDate = LocalDateTime.parse("2019-02-20T15:11:51.729"),
           ApplicationStatus("rejected"),
@@ -58,19 +58,19 @@ class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStu
     "return None when there are several applications returned from the BE and not all are in rejected status" in {
       given200GetOverseasApplications(false)
 
-      await(service.rejectedApplication) shouldBe None
+      service.rejectedApplication.futureValue shouldBe None
     }
 
     "return None when no applications were found in the BE" in {
       given404OverseasApplications()
 
-      await(service.rejectedApplication) shouldBe None
+      service.rejectedApplication.futureValue shouldBe None
     }
 
     "An exception should be thrown when there is a problem with the BE server" in {
       given500GetOverseasApplication()
 
-      an[Exception] should be thrownBy await(service.rejectedApplication)
+      service.rejectedApplication.failed.futureValue shouldBe an[Exception]
     }
   }
 }

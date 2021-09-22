@@ -3,7 +3,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import java.net.URLEncoder
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers.LOCATION
+import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
@@ -17,7 +17,8 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
     "storeAuthProviderId and redirect to GgCreateAccount" in {
       implicit val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
 
-      val result = await(controller.signOutWithContinueUrl(request))
+      val result = controller.signOutWithContinueUrl(request)
+      val _ = result.futureValue // await the completion
 
       val details = findByAuthProviderId("12345-credId")
       val detailsRef = details.map(_.id).get
@@ -25,7 +26,7 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
       status(result) shouldBe 303
 
       val continueUrl = URLEncoder.encode(s"http://localhost:9414${routes.BusinessIdentificationController.returnFromGGRegistration(detailsRef)}", "UTF-8")
-      result.header.headers(LOCATION) should
+      header(LOCATION, result).get should
         include(s"http://localhost:8571/government-gateway-registration-frontend?accountType=agent&origin=unknown&continue=$continueUrl")
     }
   }
@@ -34,10 +35,10 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
     "redirect to feedback survey page" in {
       implicit val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
 
-      val result = await(controller.startFeedbackSurvey(request))
+      val result = controller.startFeedbackSurvey(request)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) should include("/feedback/OVERSEAS_AGENTS")
+      header(LOCATION, result).get should include("/feedback/OVERSEAS_AGENTS")
     }
   }
 
@@ -45,11 +46,11 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
     "redirect to the root page" in {
       implicit val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
 
-      val result = await(controller.signOut(request))
+      val result = controller.signOut(request)
 
       status(result) shouldBe 303
 
-      result.header.headers(LOCATION) should include("/")
+      header(LOCATION, result).get should include("/")
     }
   }
 
@@ -57,7 +58,7 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
     "forbidden with signed_out page containing link to root" in {
       implicit val request = FakeRequest()
 
-      val result = await(controller.signedOut(request))
+      val result = controller.signedOut(request)
 
       status(result) shouldBe 403
 
@@ -70,7 +71,7 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
     "display the timed out page" in {
       implicit val request = FakeRequest()
 
-      val result = await(controller.timedOut(request))
+      val result = controller.timedOut(request)
 
       status(result) shouldBe 403
 
@@ -81,7 +82,7 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
 
 
   private def findByAuthProviderId(authProviderId: String): Option[SessionDetails] = {
-    await(sessionDetailsRepo.find("authProviderId" -> authProviderId).map(results => results.headOption))
+    sessionDetailsRepo.find("authProviderId" -> authProviderId).map(results => results.headOption).futureValue
   }
 
 }

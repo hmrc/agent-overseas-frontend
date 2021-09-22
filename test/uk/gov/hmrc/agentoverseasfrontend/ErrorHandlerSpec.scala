@@ -20,7 +20,6 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Logger
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Result
@@ -28,7 +27,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.BadGatewayException
-import uk.gov.hmrc.play.test.LogCapturing
+import uk.gov.hmrc.agentoverseasfrontend.support.LogCapturing
 
 import scala.concurrent.Future
 
@@ -44,7 +43,7 @@ class ErrorHandlerSpec
 
   "ErrorHandler should show the error page with log" when {
     "a server error occurs of type BadGateway" in {
-      withCaptureOfLoggingFrom(Logger) { logEvents =>
+      withCaptureOfLoggingFrom(handler.logger) { logEvents =>
         val result = handler.onServerError(FakeRequest(), new BadGatewayException("some error"))
 
         status(result) mustBe OK
@@ -57,7 +56,7 @@ class ErrorHandlerSpec
   }
 
   "a client error (400) occurs with log" in {
-    withCaptureOfLoggingFrom(Logger) { logEvents =>
+    withCaptureOfLoggingFrom(handler.logger) { logEvents =>
       val result = handler.onClientError(FakeRequest(), BAD_REQUEST, "some error")
 
       status(result) mustBe BAD_REQUEST
@@ -69,7 +68,7 @@ class ErrorHandlerSpec
   }
 
   "a client error (404) occurs with log" in {
-    withCaptureOfLoggingFrom(Logger) { logEvents =>
+    withCaptureOfLoggingFrom(handler.logger) { logEvents =>
       val result = handler.onClientError(FakeRequest(), NOT_FOUND, "some error")
 
       status(result) mustBe NOT_FOUND

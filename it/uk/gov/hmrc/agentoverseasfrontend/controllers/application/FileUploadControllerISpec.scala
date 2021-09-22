@@ -3,7 +3,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import org.jsoup.Jsoup
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.redirectLocation
+import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, FileUploadStatus}
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, UpscanStubs}
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
@@ -24,11 +24,11 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
       sessionStoreService.currentSession.agentSession = Some(agentSession)
       given200UpscanInitiate()
 
-      val result = await(controller.showTradingAddressUploadForm()(cleanCredsAgent(FakeRequest())))
+      val result = controller.showTradingAddressUploadForm()(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUpload.caption",
         "fileUpload.title.trading-address",
         "fileUpload.p1.trading-address",
@@ -47,11 +47,11 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "display the page with correct content" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
-      val result = await(controller.showTradingAddressNoJsCheckPage(cleanCredsAgent(FakeRequest())))
+      val result = controller.showTradingAddressNoJsCheckPage(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUploadTradingAddress.no_js_page.caption",
         "fileUploadTradingAddress.no_js_page.title",
         "fileUploadTradingAddress.no_js_page.p1",
@@ -66,13 +66,13 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       given200UpscanPollStatusNotReady()
 
-      val result = await(controller.pollStatus("amls","reference")(cleanCredsAgent(FakeRequest())))
+      val result = controller.pollStatus("amls","reference")(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      bodyOf(result) shouldBe """{"reference":"reference","fileStatus":"NOT_READY"}"""
+      contentAsString(result) shouldBe """{"reference":"reference","fileStatus":"NOT_READY"}"""
 
-      await(sessionStoreService.fetchAgentSession.flatMap(_.flatMap(_.amlsUploadStatus))) shouldBe None
+      sessionStoreService.fetchAgentSession.futureValue.flatMap(_.amlsUploadStatus) shouldBe None
 
     }
 
@@ -81,15 +81,15 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       given200UpscanPollStatusReady()
 
-      val result = await(controller.pollStatus("amls","reference")(cleanCredsAgent(FakeRequest())))
+      val result = controller.pollStatus("amls","reference")(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
       val fileUploadStatus = """{"reference":"reference","fileStatus":"READY","fileName":"some"}"""
 
-      bodyOf(result) shouldBe fileUploadStatus
+      contentAsString(result) shouldBe fileUploadStatus
 
-      await(sessionStoreService.fetchAgentSession.flatMap(_.flatMap(_.amlsUploadStatus))) shouldBe
+      sessionStoreService.fetchAgentSession.futureValue.flatMap(_.amlsUploadStatus) shouldBe
         Some(Json.parse(fileUploadStatus).as[FileUploadStatus])
     }
   }
@@ -98,18 +98,18 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "display the page with correct content" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingAddressUploadStatus = Some(FileUploadStatus("reference","READY",Some("filename"))), fileType = Some("trading-address")))
 
-      val result = await(controller.showSuccessfulUploadedForm()(cleanCredsAgent(FakeRequest())))
+      val result = controller.showSuccessfulUploadedForm()(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUpload.success.caption",
         "fileUpload.success.title",
         "fileUpload.success.form.correctFile.yes",
         "fileUpload.success.form.correctFile.no"
       )
 
-      result should containSubstrings("Is filename the correct file?")
+      result.futureValue should containSubstrings("Is filename the correct file?")
 
     }
   }
@@ -120,7 +120,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address","choice.correctFile" -> "true"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.ApplicationController.showRegisteredWithHmrcForm().url)
@@ -131,7 +131,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "false"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.FileUploadController.showTradingAddressUploadForm().url)
@@ -142,10 +142,10 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "abcd"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 200
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUpload.success.caption",
         "fileUpload.success.title",
         "fileUpload.success.form.correctFile.yes",
@@ -153,7 +153,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
         "error.boolean"
       )
 
-      result should containSubstrings("Is filename the correct file?")
+      result.futureValue should containSubstrings("Is filename the correct file?")
     }
 
     "show the form with errors when 'correctFile' field is missing the form" in {
@@ -161,10 +161,10 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctabxgd" -> "true"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 200
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUpload.success.caption",
         "fileUpload.success.title",
         "fileUpload.success.form.correctFile.yes",
@@ -172,7 +172,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
         "fileUpload.correctFile.no-radio.selected"
       )
 
-      result should containSubstrings("Is filename the correct file?")
+      result.futureValue should containSubstrings("Is filename the correct file?")
     }
 
     "show the form with errors when 'fileType' field has been modified by the user and contains invalid value" in {
@@ -180,7 +180,8 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "invalid", "choice.correctFile" -> "true"))
 
-      an[RuntimeException] shouldBe thrownBy(await(controller.submitSuccessfulFileUploadedForm(request)))
+      val e = controller.submitSuccessfulFileUploadedForm(request).failed.futureValue
+      e shouldBe a[RuntimeException]
     }
   }
 
@@ -193,11 +194,11 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest())
 
-      val result = await(controller.showUploadFailedPage()(request))
+      val result = controller.showUploadFailedPage()(request)
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUpload.failed.caption",
         "fileUpload.failed.title",
         "fileUpload.failed.p1",
@@ -206,12 +207,12 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val tradingAddressUploadFormUrl = routes.FileUploadController.showTradingAddressUploadForm().url
 
-      val doc = Jsoup.parse(bodyOf(result))
+      val doc = Jsoup.parse(contentAsString(result))
       val tryAgainLink = doc.getElementById("file-upload-failed")
       tryAgainLink.text() shouldBe "Try again"
       tryAgainLink.attr("href") shouldBe tradingAddressUploadFormUrl
 
-      result should containLink("button.back", tradingAddressUploadFormUrl)
+      result.futureValue should containLink("button.back", tradingAddressUploadFormUrl)
     }
   }
 
@@ -220,11 +221,11 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
       sessionStoreService.currentSession.agentSession = Some(agentSession)
       given200UpscanInitiate()
 
-      val result = await(controller.showAmlsUploadForm()(cleanCredsAgent(FakeRequest())))
+      val result = controller.showAmlsUploadForm()(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUpload.caption",
         "fileUpload.title.amls",
         "fileUpload.p1.amls",
@@ -245,7 +246,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "true"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.ApplicationController.showContactDetailsForm().url)
@@ -256,7 +257,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "false"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.FileUploadController.showAmlsUploadForm().url)
@@ -268,11 +269,11 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
       sessionStoreService.currentSession.agentSession = Some(agentSession)
       given200UpscanInitiate()
 
-      val result = await(controller.showTrnUploadForm()(cleanCredsAgent(FakeRequest())))
+      val result = controller.showTrnUploadForm()(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "fileUpload.caption",
         "fileUpload.title.trn",
         "fileUpload.p1.trn",
@@ -293,7 +294,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trn","choice.correctFile" -> "true"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.ApplicationController.showCheckYourAnswers().url)
@@ -304,7 +305,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
       val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trn", "choice.correctFile" -> "false"))
 
-      val result = await(controller.submitSuccessfulFileUploadedForm(request))
+      val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.FileUploadController.showTrnUploadForm().url)

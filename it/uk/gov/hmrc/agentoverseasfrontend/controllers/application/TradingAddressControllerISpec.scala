@@ -1,7 +1,7 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{LOCATION, redirectLocation}
+import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
@@ -35,22 +35,22 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
-      val result = await(controller.showMainBusinessAddressForm(cleanCredsAgent(FakeRequest())))
+      val result = controller.showMainBusinessAddressForm(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 200
 
-      result should containMessages(
+      result.futureValue should containMessages(
         "mainBusinessAddress.caption",
         "mainBusinessAddress.title"
       )
-      result should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
+      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
     }
 
     "redirect to /money-laundering-registration when session not found" in {
 
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
-      val result = await(controller.showMainBusinessAddressForm(authenticatedRequest))
+      val result = controller.showMainBusinessAddressForm(authenticatedRequest)
 
       status(result) shouldBe 303
 
@@ -65,12 +65,12 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("addressLine1" -> "line1", "addressLine2" -> "line2", "countryCode" -> "IE")
 
-      val result = await(controller.submitMainBusinessAddress(authenticatedRequest))
+      val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.FileUploadController.showTradingAddressUploadForm().url
+      header(LOCATION, result).get shouldBe routes.FileUploadController.showTradingAddressUploadForm().url
 
-      val tradingAddress = await(sessionStoreService.fetchAgentSession).get.overseasAddress
+      val tradingAddress = sessionStoreService.fetchAgentSession.futureValue.get.overseasAddress
 
       tradingAddress shouldBe Some(OverseasAddress("line1", "line2", None, None, "IE"))
     }
@@ -82,12 +82,12 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody("addressLine1" -> "line1", "addressLine2" -> "line2", "countryCode" -> "IE")
 
-      val result = await(controller.submitMainBusinessAddress(authenticatedRequest))
+      val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
       status(result) shouldBe 303
-      result.header.headers(LOCATION) shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
 
-      val session = await(sessionStoreService.fetchAgentSession).get
+      val session = sessionStoreService.fetchAgentSession.futureValue.get
 
       session.overseasAddress shouldBe Some(OverseasAddress("line1", "line2", None, None, "IE"))
 
@@ -103,11 +103,11 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
         implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
           .withFormUrlEncodedBody("addressLine1" -> "", "addressLine2" -> "line2", "countryCode" -> "IE")
 
-        val result = await(controller.submitMainBusinessAddress(authenticatedRequest))
+        val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
         status(result) shouldBe 200
 
-        result should containMessages("error.addressline.1.empty")
+        result.futureValue should containMessages("error.addressline.1.empty")
       }
       "country code is GB" in {
         sessionStoreService.currentSession.agentSession =
@@ -116,11 +116,11 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
         implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
           .withFormUrlEncodedBody("addressLine1" -> "Some address", "addressLine2" -> "line2", "countryCode" -> "GB")
 
-        val result = await(controller.submitMainBusinessAddress(authenticatedRequest))
+        val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
         status(result) shouldBe 200
 
-        result should containMessages("error.country.invalid")
+        result.futureValue should containMessages("error.country.invalid")
 
       }
     }

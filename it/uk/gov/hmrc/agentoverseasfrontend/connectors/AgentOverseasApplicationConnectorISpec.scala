@@ -30,20 +30,22 @@ class AgentOverseasApplicationConnectorISpec
     "create an application successfully" in {
       givenPostOverseasApplication(201)
 
-      await(connector.createOverseasApplication(defaultCreateApplicationRequest)) shouldBe (())
+      connector.createOverseasApplication(defaultCreateApplicationRequest).futureValue shouldBe (())
     }
 
     "return exception" when {
       "the application already exists" in {
         givenPostOverseasApplication(409)
 
-        an[Exception] should be thrownBy (await(connector.createOverseasApplication(defaultCreateApplicationRequest)))
+        val e = connector.createOverseasApplication(defaultCreateApplicationRequest).failed.futureValue
+        e shouldBe a[Exception]
       }
 
       "service is unavailable" in {
         givenPostOverseasApplication(503)
 
-        an[Exception] should be thrownBy (await(connector.createOverseasApplication(defaultCreateApplicationRequest)))
+        val e = connector.createOverseasApplication(defaultCreateApplicationRequest).failed.futureValue
+        e shouldBe a[Exception]
       }
     }
   }
@@ -53,19 +55,20 @@ class AgentOverseasApplicationConnectorISpec
     "return a FileUploadStatus with READY status when the file was received from AWS/Upscan" in {
       given200UpscanPollStatusReady()
 
-      await(connector.upscanPollStatus("reference")) shouldBe FileUploadStatus("reference", "READY", Some("some"))
+      connector.upscanPollStatus("reference").futureValue shouldBe FileUploadStatus("reference", "READY", Some("some"))
     }
 
     "return a FileUploadStatus with NOT_READY status when the file was NOT received from AWS/Upscan" in {
       given200UpscanPollStatusNotReady()
 
-      await(connector.upscanPollStatus("reference")) shouldBe FileUploadStatus("reference", "NOT_READY", None)
+      connector.upscanPollStatus("reference").futureValue shouldBe FileUploadStatus("reference", "NOT_READY", None)
     }
 
     "service is unavailable" in {
       given500UpscanPollStatus()
 
-      an[Exception] should be thrownBy (await(connector.upscanPollStatus("reference")))
+      val e = connector.upscanPollStatus("reference").failed.futureValue
+      e shouldBe a[Exception]
     }
 
   }
@@ -74,23 +77,25 @@ class AgentOverseasApplicationConnectorISpec
     "return applications for an authProviderId" in {
       givenAcceptedApplicationResponse
 
-      await(connector.allApplications) shouldBe List(application)
+      connector.allApplications.futureValue shouldBe List(application)
     }
 
     "return empty result for an authProviderId" in {
       givenApplicationEmptyResponse
 
-      await(connector.allApplications) shouldBe List.empty
+      connector.allApplications.futureValue shouldBe List.empty
     }
 
     "return exception if the service is unavailable" in {
       givenApplicationUnavailable
-      an[Exception] shouldBe thrownBy(await(connector.allApplications))
+      val e = connector.allApplications.failed.futureValue
+      e shouldBe a[Exception]
     }
 
     "return exception if the service respond with internal server error" in {
       givenApplicationServerError
-      an[Exception] shouldBe thrownBy(await(connector.allApplications))
+      val e = connector.allApplications.failed.futureValue
+      e shouldBe a[Exception]
     }
   }
 
@@ -110,7 +115,7 @@ class AgentOverseasApplicationConnectorISpec
     "return successfully if application was updated successfully" in {
       givenApplicationUpdateSuccessResponse()
 
-      await(connector.updateApplicationWithAgencyDetails(agencyDetails))
+      connector.updateApplicationWithAgencyDetails(agencyDetails).futureValue
 
       verifyApplicationUpdate(agencyDetails)
     }
@@ -118,13 +123,15 @@ class AgentOverseasApplicationConnectorISpec
     "return exception if the upstream returns 404" in {
       givenApplicationUpdateNotFoundResponse()
 
-      an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.updateApplicationWithAgencyDetails(agencyDetails)))
+      val e = connector.updateApplicationWithAgencyDetails(agencyDetails).failed.futureValue
+      e shouldBe a[UpstreamErrorResponse]
     }
 
     "return exception if the upstream responds with 500 internal server error" in {
       givenApplicationUpdateServerError()
 
-      an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.updateApplicationWithAgencyDetails(agencyDetails)))
+      val e = connector.updateApplicationWithAgencyDetails(agencyDetails).failed.futureValue
+      e shouldBe a[UpstreamErrorResponse]
     }
   }
 
@@ -133,19 +140,21 @@ class AgentOverseasApplicationConnectorISpec
     "add the new authId to the application" in {
       givenUpdateAuthIdSuccessResponse(oldAuthId)
 
-      await(connector.updateAuthId(oldAuthId)) shouldBe (())
+      connector.updateAuthId(oldAuthId).futureValue shouldBe (())
     }
 
     "return exception if the upstream returns 404" in {
       givenUpdateAuthIdNotFoundResponse()
 
-      an[NotFoundException] shouldBe thrownBy(await(connector.updateAuthId(oldAuthId)))
+      val e = connector.updateAuthId(oldAuthId).failed.futureValue
+      e shouldBe a[NotFoundException]
     }
 
     "return exception if the upstream responds with 500 internal server error" in {
       givenUpdateAuthIdServerError()
 
-      an[UpstreamErrorResponse] shouldBe thrownBy(await(connector.updateAuthId(oldAuthId)))
+      val e = connector.updateAuthId(oldAuthId).failed.futureValue
+      e shouldBe a[UpstreamErrorResponse]
     }
   }
 }

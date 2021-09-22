@@ -1,16 +1,19 @@
 package uk.gov.hmrc.agentoverseasfrontend.repository
 
+import org.scalatest.OptionValues
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
 import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
 import uk.gov.hmrc.agentoverseasfrontend.support.MongoApp
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SessionDetailsRepositoryISpec extends UnitSpec with GuiceOneAppPerSuite with MongoApp {
+class SessionDetailsRepositoryISpec extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures with GuiceOneAppPerSuite with MongoApp {
 
   protected def builder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
@@ -22,7 +25,7 @@ class SessionDetailsRepositoryISpec extends UnitSpec with GuiceOneAppPerSuite wi
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    await(repo.ensureIndexes)
+    repo.ensureIndexes.futureValue
     ()
   }
 
@@ -31,36 +34,36 @@ class SessionDetailsRepositoryISpec extends UnitSpec with GuiceOneAppPerSuite wi
   "SessionDetailsRepository" should {
 
     "create a SessionDetails record" in {
-      val result = await(repo.create(authProviderId))
-      result should not be empty
+      val result = repo.create(authProviderId)
+      result.futureValue should not be empty
 
-      val mappingArnResult = await(repo.find("id" -> result)).head
-      mappingArnResult should have('id (result), 'authProviderId (authProviderId))
+      val mappingArnResult = repo.find("id" -> result.futureValue).futureValue.head
+      mappingArnResult should have('id (result.futureValue), 'authProviderId (authProviderId))
       mappingArnResult.id.size shouldBe 32
     }
 
     "find a SessionDetails record by Id" in {
       val record = SessionDetails(authProviderId)
-      await(repo.insert(record))
+      repo.insert(record).futureValue
 
-      val result = await(repo.findAuthProviderId(record.id))
+      val result = repo.findAuthProviderId(record.id)
 
-      result shouldBe Some(record.authProviderId)
+      result.futureValue shouldBe Some(record.authProviderId)
     }
 
     "delete a SessionDetails record by Id" in {
       val record = SessionDetails(authProviderId)
-      await(repo.insert(record))
+      repo.insert(record).futureValue
 
-      await(repo.delete(record.id))
+      repo.delete(record.id).futureValue
 
-      await(repo.find("id" -> record.id)) shouldBe empty
+      repo.find("id" -> record.id).futureValue shouldBe empty
     }
 
     "not return any SessionDetails record for an invalid Id" in {
-      val result = await(repo.findAuthProviderId("INVALID"))
+      val result = repo.findAuthProviderId("INVALID")
 
-      result shouldBe empty
+      result.futureValue shouldBe empty
     }
   }
 }
