@@ -92,8 +92,6 @@ GET         /timed-out                                   @uk.gov.hmrc.agentovers
 
 #GET         /server-error                                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController.serverError
 
-GET         /accessibility-statement                     @uk.gov.hmrc.agentoverseasfrontend.controllers.application.AccessibilityStatementController.showAccessibilityStatement
-
 GET         /assets/*file                                controllers.Assets.at(path="/public", file)
 
 

@@ -20,7 +20,6 @@ import javax.inject.Inject
 import play.api.Logging
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
@@ -38,8 +37,7 @@ class SubscriptionController @Inject()(
   mcc: MessagesControllerComponents,
   override val sessionStoreService: MongoDBSessionStoreService,
   subscriptionCompleteView: subscription_complete,
-  alreadySubscribedView: already_subscribed,
-  accessibilityStatementView: accessibility_statement)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
+  alreadySubscribedView: already_subscribed)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler
     with Logging {
 
@@ -94,9 +92,4 @@ class SubscriptionController @Inject()(
     }
   }
 
-  def showAccessibilityStatement: Action[AnyContent] = Action { implicit request =>
-    val userAction: String = request.headers.get(HeaderNames.REFERER).getOrElse("")
-    val accessibilityUrl: String = s"${appConfig.accessibilityUrl}$userAction"
-    Ok(accessibilityStatementView(accessibilityUrl))
-  }
 }
