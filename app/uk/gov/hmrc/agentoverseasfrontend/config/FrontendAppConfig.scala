@@ -26,7 +26,6 @@ trait AppConfig {
   val appName: String
   val countryListLocation: String
   val feedbackSurveyUrl: String
-  val accessibilityUrl: String
   val maintainerApplicationReviewDays: Int
   val companyAuthSignInUrl: String
   val ggRegistrationFrontendSosRedirectPath: String
@@ -52,8 +51,6 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
     servicesConfig.getString("country.list.location")
   override val feedbackSurveyUrl: String =
     servicesConfig.getString("feedback-survey-url")
-  override val accessibilityUrl: String =
-    servicesConfig.getString("accessibilityUrl")
   override val maintainerApplicationReviewDays: Int =
     servicesConfig.getInt("maintainer-application-review-days")
   override val companyAuthSignInUrl: String =

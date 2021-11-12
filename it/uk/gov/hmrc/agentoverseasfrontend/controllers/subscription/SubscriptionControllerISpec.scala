@@ -2,7 +2,6 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
@@ -108,13 +107,5 @@ class SubscriptionControllerISpec
     }
   }
 
-  "GET /accessibility-statement" should {
-    "show the accessibility statement content with accessibility link" in {
-      val result = controller.showAccessibilityStatement(FakeRequest().withHeaders(HeaderNames.REFERER -> "foo"))
 
-      status(result) shouldBe 200
-      result.futureValue should containMessages("subscription.accessibility.statement.h1")
-      result.futureValue should containSubstrings("/contact/accessibility?service=AOSS&userAction=foo")
-    }
-  }
 }
