@@ -73,7 +73,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         "contactTradingAddressCheck.p",
         "contactTradingAddressCheck.option.yes",
         "contactTradingAddressCheck.option.no",
-        "contactTradingAddressCheck.continue.button",
+        "button.continue",
         "button.back"
       )
     }
@@ -151,7 +151,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         "updateBusinessAddress.address_line_1.title",
         "updateBusinessAddress.address_line_2.title",
         "updateBusinessAddress.address_line_3.title",
-        "updateBusinessAddress.continue",
+        "button.continue",
         "button.back"
       )
     }
@@ -319,7 +319,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         "contactTradingEmailCheck.p",
         "contactTradingEmailCheck.option.yes",
         "contactTradingEmailCheck.option.no",
-        "contactTradingEmailCheck.continue.button",
+        "button.continue",
         "button.back"
       )
     }
@@ -393,7 +393,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       result.futureValue should containMessages(
         "updateBusinessEmail.title",
         "updateBusinessEmail.description",
-        "updateBusinessEmail.continue"
+        "button.continue"
       )
     }
 
@@ -465,7 +465,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         "contactTradingNameCheck.p",
         "contactTradingNameCheck.option.yes",
         "contactTradingNameCheck.option.no",
-        "contactTradingNameCheck.continue.button",
+        "button.continue",
         "button.back"
       )
     }
@@ -539,7 +539,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       result.futureValue should containMessages(
         "updateBusinessName.title",
         "updateBusinessName.description",
-        "updateBusinessName.continue"
+        "button.continue"
       )
     }
 

@@ -15,19 +15,13 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.main_template
 
-@this(govUkWrapper: govuk_wrapper, uiMainContent: uk.gov.hmrc.play.views.html.layouts.MainContent)
+@this(mainTemplate: main_template)
 
-@(pageTitle: String, heading: String, message: String)(implicit messages: Messages, appConfig: AppConfig, request: Request[_])
+@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit messages: Messages, appConfig: AppConfig, request: Request[_])
 
-@import akka.http.scaladsl.model.headers.LinkParams.title
-@contentHeader = {
-    <h1 class="heading-xlarge">@Messages(heading)</h1>
+@mainTemplate(title = Messages(pageTitleMsgKey)) {
+ <h1 class="govuk-heading-xl">@Messages(headingMsgKey)</h1>
+ <p>@Messages(messageMsgKey)</p>
 }
-
-@uiMainContent = {
-    <p>@Messages(message)</p>
-}
-
-@govUkWrapper(title = Messages(pageTitle), contentHeader = Some(contentHeader), mainContent = uiMainContent)

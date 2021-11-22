@@ -35,7 +35,7 @@ class CountryNamesLoader @Inject()(appConfig: AppConfig) {
         .drop(1)
         .foldLeft(Map.empty[String, String]) { (acc, row) =>
           val Array(code, name) = row.split(",", 2)
-          acc.+(code.trim -> name.trim)
+          acc.+(code.trim -> unquote(name.trim).trim)
         }
     } match {
       case Success(countryMap) if countryMap.nonEmpty => countryMap
@@ -43,4 +43,10 @@ class CountryNamesLoader @Inject()(appConfig: AppConfig) {
       case _                                          => sys.error("No country codes or names found")
     }
 
+  // some country names may be in quotes in the CSV due to containing commas (e.g. "Bonaire, Saint Eustatius and Saba") and we must clean them up
+  private def unquote(str: String): String =
+    if (str.startsWith("\"") && str.endsWith("\""))
+      str.tail.init
+    else
+      str
 }

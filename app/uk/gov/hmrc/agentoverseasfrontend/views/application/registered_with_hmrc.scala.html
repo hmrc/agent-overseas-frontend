@@ -17,43 +17,56 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
-
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 
 @this(
         mainTemplate: main_template,
         errorPrefix: error_prefix,
-        errorSummary: ErrorSummary,
-        form: FormWithCSRF,
-        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom)
+        govukErrorSummary: GovukErrorSummary,
+        govukRadios: GovukRadios,
+        govukButton: GovukButton,
+        form: FormWithCSRF
+)
 
 @(registeredWithHmrcForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(registeredWithHmrcForm) + Messages("registeredWithHmrc.title")) {
-
-    <a href="@backLink.getOrElse(routes.FileUploadController.showSuccessfulUploadedForm())" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(registeredWithHmrcForm) + Messages("registeredWithHmrc.title"), backLinkHref = Some(backLink.getOrElse(routes.FileUploadController.showSuccessfulUploadedForm().url))) {
 
     @if(registeredWithHmrcForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"),registeredWithHmrcForm, Seq.empty, Some("registered-with-hmrc"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(registeredWithHmrcForm))
     }
 
-    @form(action = routes.ApplicationController.submitRegisteredWithHmrc, 'class -> "form js-form") {
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("registeredWithHmrc.caption")</span>
+        @Messages("registeredWithHmrc.title")
+    </h1>
 
-        @inputRadioGroupCustom(
-            registeredWithHmrcForm("registeredWithHmrc"),
-            Seq(
-                "true" -> Messages("registeredWithHmrc.form.registered.yes"),
-                "false" -> Messages("registeredWithHmrc.form.registered.no")
-            ),
-            '_legend -> Html("""<h1 class="heading-xlarge margin-bottom-20"><span class="pre-heading">""" + Messages("registeredWithHmrc.caption") + """</span>""" + Messages("registeredWithHmrc.title") + """</h1>"""),
-            '_groupDivClass -> "form-group",
-            '_inputHint -> Messages("registeredWithHmrc.form.title"),
-            '_inputHintClass -> "hint-text",
-            '_fieldsetAttributes -> Html("""id='registeredWithHmrc'""")
-        )
+    @form(action = routes.ApplicationController.submitRegisteredWithHmrc) {
 
-        <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+        @govukRadios(Radios(
+            classes = "govuk-radios--inline",
+            hint = Some(Hint(content = Text(Messages("registeredWithHmrc.form.title")))),
+            items = Seq(
+                RadioItem(content = Text(Messages("registeredWithHmrc.form.registered.yes")), id = Some("registeredWithHmrc-true"), value = Some("true")),
+                RadioItem(content = Text(Messages("registeredWithHmrc.form.registered.no")), id = Some("registeredWithHmrc-false"), value = Some("false"))
+            )
+        ).withFormField(registeredWithHmrcForm("registeredWithHmrc")))
 
+        @govukButton(Button(
+            attributes = Map("id" -> "continue", "type" -> "submit"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

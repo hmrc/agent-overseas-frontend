@@ -17,44 +17,56 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 
 @this(
         mainTemplate: main_template,
         errorPrefix: error_prefix,
-        errorSummary: ErrorSummary,
-        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom,
-        form: FormWithCSRF
+        govukErrorSummary: GovukErrorSummary,
+        govukRadios: GovukRadios,
+        form: FormWithCSRF,
+        govukButton: GovukButton
 )
 
 @(registeredForUkTaxForm: Form[RadioConfirm], backLinkRoute: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(registeredForUkTaxForm) + Messages("ukTaxRegistration.title")) {
-
-    <a href="@backLinkRoute" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(registeredForUkTaxForm) + Messages("ukTaxRegistration.title"), backLinkHref = Some(backLinkRoute)) {
 
     @if(registeredForUkTaxForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"),registeredForUkTaxForm, Seq.empty, Some("registered-uk-tax-form"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(registeredForUkTaxForm))
     }
 
-    @form(action = routes.ApplicationController.submitUkTaxRegistration, 'class -> "form js-form") {
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("ukTaxRegistration.caption")</span>
+        @Messages("ukTaxRegistration.title")
+    </h1>
 
-        @inputRadioGroupCustom(
-            registeredForUkTaxForm("registeredForUkTax"),
-            Seq(
-                "true" -> Messages("ukTaxRegistration.form.registered.yes"),
-                "false" -> Messages("ukTaxRegistration.form.registered.no")
-            ),
-            '_legend -> Html("""<h1 class="heading-xlarge margin-bottom-20"><span class="pre-heading">""" + Messages("ukTaxRegistration.caption") + """</span>""" + Messages("ukTaxRegistration.title") + """</h1>"""),
-            '_groupDivClass -> "form-group",
-            '_horizontal -> true,
-            '_inputHint -> Messages("ukTaxRegistration.form.title"),
-            '_inputHintClass -> "hint-text",
-            '_fieldsetAttributes -> Html("""id='registeredForUkTax'""")
-        )
+    @form(action = routes.ApplicationController.submitUkTaxRegistration) {
 
-    <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+        @govukRadios(Radios(
+            classes = "govuk-radios--inline",
+            hint = Some(Hint(content = Text(Messages("ukTaxRegistration.form.title")))),
+            items = Seq(
+                RadioItem(content = Text(Messages("ukTaxRegistration.form.registered.yes")), id = Some("registeredForUkTax-true"), value = Some("true")),
+                RadioItem(content = Text(Messages("ukTaxRegistration.form.registered.no")), id = Some("registeredForUkTax-false"), value = Some("false"))
+            )
+        ).withFormField(registeredForUkTaxForm("registeredForUkTax")))
 
+        @govukButton(Button(
+            attributes = Map("id" -> "continue", "type" -> "submit"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

@@ -19,45 +19,48 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 @import uk.gov.hmrc.agentoverseasfrontend.forms.BusinessNameForm
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukButton: GovukButton,
+        form: FormWithCSRF)
+
 @(businessNameForm: Form[BusinessNameForm])(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(businessNameForm) + Messages("updateBusinessName.title"), bodyClasses = None) {
-
-    <a href="@routes.BusinessIdentificationController.showCheckAnswers()" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(businessNameForm) + Messages("updateBusinessName.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
 
     @if(businessNameForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), businessNameForm, Seq.empty, Some("business-name"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessNameForm))
     }
 
-    @form(action = routes.BusinessIdentificationController.submitUpdateBusinessNameForm(),
-        'class -> "form js-form") {
+    <h1 class="govuk-heading-xl">@Messages("updateBusinessName.title")</h1>
 
-        <div class="form-group @if(businessNameForm.hasErrors){form-field--error soft--ends}">
-            <h1>
-                <label class="heading-xlarge" for="name">@Messages("updateBusinessName.title")</label>
-            </h1>
-            <p class="margin-bottom-40" id="name-hint">@Messages("updateBusinessName.description")</p>
-            @businessNameForm.error("name").map { formError => <span class="error-notification" id="name-error">
-                <span class="visuallyhidden">@Messages("error.prefix")</span>
-                @Messages(formError.message)
-            </span>
-            }
-            <input
-            type="text"
-            class="form-control input--cleared"
-            id="name"
-            name="name"
-            spellcheck="false"
-            aria-describedby="name-hint @if(businessNameForm.hasErrors){name-error}"
-            @businessNameForm.data.get("name").map { v => value="@v"}
-            >
-        </div>
+    @form(action = routes.BusinessIdentificationController.submitUpdateBusinessNameForm()) {
 
-        <div class="form-field">
-            <button class="button" type="submit" id="submit-name">@Messages("updateBusinessName.continue")</button>
-        </div>
+        @govukInput(Input(
+            hint = Some(Hint(content = Text(Messages("updateBusinessName.description")))),
+            spellcheck = Some(false),
+            classes = "govuk-input--width-20",
+            inputType = "text",
+        ).withFormField(businessNameForm("name")))
+
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

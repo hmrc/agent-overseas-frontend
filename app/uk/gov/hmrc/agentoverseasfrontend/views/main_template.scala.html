@@ -14,42 +14,64 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukLayout, GovukBackLink}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{BackLink, Text}
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcBanner, Banner}
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.play.views.html.layouts
-@import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components.{header, head}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardFooter, HmrcScripts, HmrcReportTechnicalIssueHelper}
+@import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
 
 @this(
-        govukWrapper: govuk_wrapper,
-        uiSidebar: uk.gov.hmrc.play.views.html.layouts.Sidebar,
-        uiArticle: uk.gov.hmrc.agentoverseasfrontend.views.html.article_as_div
+        head: head,
+        header: header,
+        govukLayout: GovukLayout,
+        govukBackLink: GovukBackLink,
+        hmrcStandardFooter: HmrcStandardFooter,
+        hmrcScripts: HmrcScripts,
+        hmrcBanner : HmrcBanner,
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+        twoThirdsLayout: TwoThirdsMainContent,
 )
 
 @(title: String,
-        sidebarLinks: Option[Html] = None,
-        contentHeader: Option[Html] = None,
-        bodyClasses: Option[String] = None,
-        mainClass: Option[String] = None,
-        scriptElem: Option[Html] = None,
-        hasTimeout: Boolean = true)(mainContent: Html)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+        hasTimeout: Boolean = true,
+        backLinkHref: Option[String] = None,
+        wide: Boolean = false
+)(mainContent: Html)(implicit request : Request[_], messages: Messages, appConfig: AppConfig)
 
-@serviceInfoContent = {}
-
-@sidebar = {
-@if(sidebarLinks.isDefined) {
-    @uiSidebar(sidebarLinks.get, Some("sidebar"))
+@beforeContent = {
+@hmrcBanner(Banner())
+@if(backLinkHref.nonEmpty){
+    <nav aria-label="Back Link">
+    @backLinkHref.map(url =>
+        govukBackLink(BackLink(href = url, content = Text(messages("button.back"))))
+    )
+    </nav>
 }
 }
 
-@scriptElement = {
-@scriptElem
+@mainContentWithHelpLink = {
+@mainContent
+    <div>
+    @hmrcReportTechnicalIssueHelper()
+    </div>
 }
 
-@govukWrapper(title,
-    mainClass,
-    bodyClasses = bodyClasses,
-    sidebar = sidebar,
-    contentHeader = contentHeader,
-    mainContent = uiArticle(mainContent),
-    serviceInfoContent = serviceInfoContent,
-    scriptElem = Some(scriptElement),
-    hasTimeout = hasTimeout)
+@additionalScripts = {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="@controllers.routes.Assets.versioned("javascripts/accessible-autocomplete.min.js")" type="text/javascript"></script>
+    <script src="@controllers.routes.Assets.versioned("javascripts/agent-overseas-frontend.js")" type="text/javascript"></script>
+    <script src="@controllers.routes.Assets.versioned("javascripts/loader.js")" type="text/javascript"></script>
+}
+
+@govukLayout(
+    pageTitle = Some(title),
+    headBlock = Some(head(hasTimeout)),
+    headerBlock = Some(header()),
+    scriptsBlock = Some(hmrcScripts(scriptsBlock = Some(additionalScripts))),
+    beforeContentBlock = Some(beforeContent),
+    footerBlock = Some(hmrcStandardFooter()),
+    mainContentLayout = if (wide) None else Some(twoThirdsLayout(_)),
+    assetPath = None
+)(mainContentWithHelpLink)

@@ -17,21 +17,18 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, govukButton: GovukButton)
 
 @()(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = Messages("taxRegNo.more_info_required.title")) {
+@mainTemplate(title = Messages("taxRegNo.more_info_required.title"), backLinkHref = Some(routes.TaxRegController.showTaxRegistrationNumberForm.url)) {
 
-    <a href="@routes.TaxRegController.showTaxRegistrationNumberForm" class="link-back">@Messages("button.back")</a>
+    <h1 class="govuk-heading-xl margin-bottom-20">@Messages("taxRegNo.more_info_required.title")</h1>
 
-    <h1 class="heading-xlarge margin-bottom-20">@Messages("taxRegNo.more_info_required.title")</h1>
+    <p class="govuk-body">@Messages("taxRegNo.more_info_required.p1")</p>
+    <p class="govuk-body">@Messages("taxRegNo.more_info_required.p2")</p>
 
-    <p>@Messages("taxRegNo.more_info_required.p1")</p>
-
-    <p>@Messages("taxRegNo.more_info_required.p2")</p>
-
-    <a href="@routes.TaxRegController.showTaxRegistrationNumberForm()" draggable="false" role="button" class="button margin-bottom-30">@Messages("button.back")</a>
-
+    <a href="@routes.TaxRegController.showTaxRegistrationNumberForm()" draggable="false" role="button" class="govuk-button">@Messages("button.back")</a>
 }

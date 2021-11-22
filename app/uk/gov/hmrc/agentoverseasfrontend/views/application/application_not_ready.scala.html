@@ -16,14 +16,18 @@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, govukPanel: GovukPanel)
 
 @(tradingName: String, applicationCreatedOn: String, reviewedWithin: Int)(implicit messages: Messages, request : Request[_], appConfig: AppConfig)
 
 @mainTemplate(title = Messages("application_not_ready.title")) {
 
-<h1 class="heading-xlarge">@Messages("application_not_ready.title")</h1>
+<h1 class="govuk-heading-xl">@Messages("application_not_ready.title")</h1>
+
 <p>@Messages("application_not_ready.p1", tradingName, applicationCreatedOn)</p>
 
 <h2>@Messages("application_not_ready.h2")</h2>

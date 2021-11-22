@@ -38,7 +38,7 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
       result.futureValue should containMessages(
         "createNewAccount.title",
         "createNewAccount.p1",
-        "createNewAccount.button")
+        "button.continue")
     }
   }
 

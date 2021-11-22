@@ -21,16 +21,14 @@
 
 @(backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = Messages(s"fileUpload.failed.title")) {
+@mainTemplate(title = Messages(s"fileUpload.failed.title"), backLinkHref = backLink) {
 
-    <a href="@backLink" class="link-back">@Messages("button.back")</a>
-
-    <h1 class="heading-xlarge margin-bottom-20">
-        <span class="pre-heading">@Messages("fileUpload.failed.caption")</span>
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("fileUpload.failed.caption")</span>
         @Messages("fileUpload.failed.title")
     </h1>
 
-    <p>@Messages("fileUpload.failed.p1")</p>
+    <p class="govuk-body">@Messages("fileUpload.failed.p1")</p>
 
-    <a href="@backLink" draggable="false" role="button" class="button margin-bottom-20" type="submit" id="file-upload-failed">@Messages("fileUpload.failed.try-again.label")</a>
+    <a href="@backLink" draggable="false" role="button" class="govuk-button" type="submit" id="file-upload-failed">@Messages("fileUpload.failed.try-again.label")</a>
 }

@@ -1,3 +1,35 @@
+@import "lib/govuk-frontend/govuk/base";
+
+// Agents specific
+.js-enabled .autocomplete-wrapper select{
+  visibility: hidden;
+}
+input[type="text"].autocomplete__input {
+  width: 100%
+}
+
+@media (min-width: 48.0625em) {
+  .autocomplete-wrapper {
+    width: 50%
+  }
+
+  .autocomplete-wrapper #amlsCode {
+    width: 50%
+  }
+
+}
+
+// Ensure the correct font is used in the dropdown
+.autocomplete__wrapper {
+  font-family: $govuk-font-family;
+}
+
+// Ensure if there is a server error on render, then the input has a red border until focused
+.govuk-form-group--error .autocomplete__wrapper input {
+  border: 2px solid $govuk-error-colour;
+}
+
+// Source: https://github.com/alphagov/accessible-autocomplete/blob/master/dist/accessible-autocomplete.min.css
 .autocomplete__wrapper {
   position: relative
 }
@@ -90,7 +122,8 @@
 }
 
 .autocomplete__option > * {
-  pointer-events: none
+  pointer-events: none;
+  font-family: sans-serif;
 }
 
 .autocomplete__option:first-of-type {

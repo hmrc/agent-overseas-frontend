@@ -24,9 +24,10 @@
 
 @mainTemplate(title = Messages("signed-out.header"), hasTimeout = false){
 
-    <h1 class="heading-xlarge margin-bottom-30">@Messages("signed-out.header")</h1>
-            <p>@Messages("signed-out.p1")</p>
-
-        <p>@Html(Messages("signed-out.p2", s"${redirectUrl}"))</p>
+    <h1 class="govuk-heading-xl">
+        @Messages("signed-out.header")
+    </h1>
+    <p class="govuk-body">@Messages("signed-out.p1")</p>
+    <p class="govuk-body">@Html(Messages("signed-out.p2", s"${redirectUrl}"))</p>
 
 }

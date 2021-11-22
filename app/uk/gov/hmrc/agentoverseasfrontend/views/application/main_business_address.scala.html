@@ -18,140 +18,83 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, input: Input)
+@this(mainTemplate: main_template, errorPrefix: error_prefix, govukErrorSummary: GovukErrorSummary, govukInput: GovukInput, govukSelect: GovukSelect, form: FormWithCSRF, govukButton: GovukButton)
 
 @(mainBusinessAddressForm: Form[OverseasAddress], countries: Map[String, String], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
 @value = @{ mainBusinessAddressForm("countryCode").value.getOrElse("")}
 
-@mainTemplate(title = errorPrefix(mainBusinessAddressForm) + Messages("mainBusinessAddress.title")) {
-
-    <a href="@backLink.getOrElse(routes.ApplicationController.showTradingNameForm)" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(mainBusinessAddressForm) + Messages("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
 
     @if(mainBusinessAddressForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), mainBusinessAddressForm, Seq.empty, Some("main-business-address"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(mainBusinessAddressForm))
     }
+
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("mainBusinessAddress.caption")</span>
+        @Messages("mainBusinessAddress.title")
+    </h1>
+    <div class="govuk-body">@Messages("mainBusinessAddress.body.text")</div>
 
     @form(action = routes.TradingAddressController.submitMainBusinessAddress, 'class -> "form js-form") {
 
-      <fieldset>
+      @govukInput(Input(
+          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine1"))),
+          spellcheck = Some(false),
+          classes = "govuk-input--width-20",
+          inputType = "text",
+      ).withFormField(mainBusinessAddressForm("addressLine1")))
 
-        <legend class="margin-bottom-10">
-            <h1 class="heading-xlarge margin-bottom-20">
-                <span class="pre-heading">@Messages("mainBusinessAddress.caption")</span>
-                @Messages("mainBusinessAddress.title")
-            </h1>
-        </legend>
+      @govukInput(Input(
+          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine2"))),
+          spellcheck = Some(false),
+          classes = "govuk-input--width-20",
+          inputType = "text",
+      ).withFormField(mainBusinessAddressForm("addressLine2")))
 
-        <p class="body-text">@Messages("mainBusinessAddress.body.text")</p>
+      @govukInput(Input(
+          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine3"))),
+          spellcheck = Some(false),
+          classes = "govuk-input--width-20",
+          inputType = "text",
+      ).withFormField(mainBusinessAddressForm("addressLine3")))
 
-          <div class="form-group @if(mainBusinessAddressForm.error("addressLine1").isDefined){form-field--error soft--ends}">
-              <label for="addressLine1">@Messages("mainBusinessAddress.form.addressLine1")</label>
-              @mainBusinessAddressForm.error("addressLine1").map { formError => <span class="error-notification" id="addressLine1-error">
-                  <span class="visuallyhidden">@Messages("error.prefix")</span>
-                  @Messages(formError.message)
-              </span>
-              }
-              <input
-              type="text"
-              id="addressLine1"
-              class="form-control--block"
-              name="addressLine1"
-              spellcheck="false"
-              autocomplete="address-line1"
-                  @mainBusinessAddressForm.data.get("addressLine1").map { v => value="@v"}
-                  @if(mainBusinessAddressForm.error("addressLine1").isDefined){aria-describedby="addressLine1-error"}
-              >
+      @govukInput(Input(
+          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine4"))),
+          spellcheck = Some(false),
+          classes = "govuk-input--width-20",
+          inputType = "text",
+      ).withFormField(mainBusinessAddressForm("addressLine4")))
 
-          </div>
+      <div class="autocomplete-wrapper" id="countryCode">
+        @govukSelect(Select(
+            label = Label(content = Text(Messages("mainBusinessAddress.form.country"))),
+            id = "countryCode-auto-complete",
+            name = "countryCode",
+            items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
+        ).withFormField(mainBusinessAddressForm("countryCode")))
+      </div>
 
-          <div class="form-group @if(mainBusinessAddressForm.error("addressLine2").isDefined){form-field--error soft--ends}">
-              <label for="addressLine2">@Messages("mainBusinessAddress.form.addressLine2")</label>
-              @mainBusinessAddressForm.error("addressLine2").map { formError => <span class="error-notification" id="addressLine2-error">
-                  <span class="visuallyhidden">@Messages("error.prefix")</span>
-                  @Messages(formError.message)
-              </span>
-              }
-              <input
-              type="text"
-              id="addressLine2"
-              class="form-control--block"
-              name="addressLine2"
-              spellcheck="false"
-              autocomplete="address-line2"
-                  @mainBusinessAddressForm.data.get("addressLine2").map { v => value="@v"}
-                  @if(mainBusinessAddressForm.error("addressLine2").isDefined){aria-describedby="addressLine2-error"}
-              >
-
-          </div>
-
-
-          <div class="form-group">
-              <label for="addressLine3">@Messages("mainBusinessAddress.form.addressLine3")</label>
-              @mainBusinessAddressForm.error("addressLine3").map { formError => <span class="error-notification" id="addressLine3-error">
-                  <span class="visuallyhidden">@Messages("error.prefix")</span>
-                  @Messages(formError.message)
-              </span>
-              }
-
-              <input
-              type="text"
-              id="addressLine3"
-              class="form-control--block"
-              name="addressLine3"
-              spellcheck="false"
-              autocomplete="address-level2"
-                  @mainBusinessAddressForm.data.get("addressLine3").map { v => value="@v"}
-                  @if(mainBusinessAddressForm.error("addressLine3").isDefined){aria-describedby="addressLine3-error"}
-              >
-
-          </div>
-
-          <div class="form-group">
-              <label for="addressLine4">@Messages("mainBusinessAddress.form.addressLine4")</label>
-              @mainBusinessAddressForm.error("addressLine4").map { formError => <span class="error-notification" id="addressLine4-error">
-                  <span class="visuallyhidden">@Messages("error.prefix")</span>
-                  @Messages(formError.message)
-              </span>
-              }
-
-              <input
-              type="text"
-              id="addressLine4"
-              class="form-control--block"
-              name="addressLine4"
-              spellcheck="false"
-              autocomplete="postal-code"
-                  @mainBusinessAddressForm.data.get("addressLine4").map { v => value="@v"}
-                  @if(mainBusinessAddressForm.error("addressLine4").isDefined){aria-describedby="addressLine4-error"}
-              >
-
-          </div>
-
-          <div class="form-group @if(mainBusinessAddressForm.error("countryCode").isDefined){form-field--error soft--ends}">
-              <label for="countryCode-auto-complete">@Messages("mainBusinessAddress.form.country")</label>
-              @mainBusinessAddressForm.error("countryCode").map { formError => <span class="error-notification" id="countryCode-error">
-                  <span class="visuallyhidden">@Messages("error.prefix")</span>
-                  @Messages(formError.message)
-              </span>
-              }
-              <div class="autocomplete-wrapper" id="countryCode">
-                  <select id="countryCode-auto-complete" name="countryCode">
-                      <option value=""></option>
-                      @for(option <- countries.toSeq) {
-                          <option
-                          id="countryCode-@option._1"
-                          value="@option._1"
-                              @if(value==option._1){selected="selected"}>@option._2</option>
-                      }
-                  </select>
-              </div>
-          </div>
-      </fieldset>
-
-      <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+      @govukButton(Button(
+          attributes = Map("id" -> "continue"),
+          content = Text(Messages("button.continue")),
+      ))
     }
 }

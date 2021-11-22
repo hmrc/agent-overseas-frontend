@@ -23,7 +23,7 @@
 @()(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
 @mainTemplate(title = Messages("nonAgent.title")) {
-    <h1 class="heading-xlarge">@Messages("nonAgent.title")</h1>
+    <h1 class="govuk-heading-xl">@Messages("nonAgent.title")</h1>
 
     <p>@Html(Messages("nonAgent.p1",routes.ApplicationSignOutController.signOut()))</p>
     <p>@Html(Messages("nonAgent.p2",routes.ApplicationSignOutController.signOutWithContinueUrl()))</p>

@@ -407,7 +407,6 @@ start.helpdesklink.text2=if you need help.
 
 createNewAccount.title=Create a new Government Gateway user ID
 createNewAccount.p1=You will need this user ID to sign in to your new agent services account.
-createNewAccount.button=Continue
 
 subscriptionComplete.title=Agent services account created
 subscriptionComplete.accountName=You created an account for
@@ -440,15 +439,12 @@ updateBusinessAddress.address_line_2.title = Address line 2
 updateBusinessAddress.address_line_3.title = Address line 3 (Optional)
 updateBusinessAddress.address_line_4.title = Address line 4 (Optional)
 updateBusinessAddress.country.title = Country
-updateBusinessAddress.continue = Continue
 
 updateBusinessEmail.title=What is the email address you want to use for your agent services account?
 updateBusinessEmail.description=We will use it to tell you when your agent services account has been created and to let you know the status of authorisation requests.
-updateBusinessEmail.continue=Continue
 
 updateBusinessName.title=What is the name you want to show to your clients?
 updateBusinessName.description=Clients will see this name when they accept or manage your authorisations.
-updateBusinessName.continue=Continue
 
 # cannot_check_status /cannot-check-status
 
@@ -472,7 +468,6 @@ contactTradingNameCheck.title=Is this the name you want to show to your clients?
 contactTradingNameCheck.p=Clients will see this name when they accept or manage your authorisations.
 contactTradingNameCheck.option.yes=Yes
 contactTradingNameCheck.option.no=No
-contactTradingNameCheck.continue.button=Continue
 error.contact-trading-name-check.invalid=Select Yes to use the name displayed or No if you trade under a different name
 
 #Contact Trading Email Check
@@ -480,7 +475,6 @@ contactTradingEmailCheck.title=Is this the email address you want to use for you
 contactTradingEmailCheck.p=We will use it to tell you when your agent services account has been created and to let you know the status of authorisation requests.
 contactTradingEmailCheck.option.yes=Yes
 contactTradingEmailCheck.option.no=No - I want to use a different email address
-contactTradingEmailCheck.continue.button=Continue
 error.contact-trading-email-check.invalid=Select if you want to use the email address displayed or a different email address
 
 #Contact Trading Address Check
@@ -488,5 +482,4 @@ contactTradingAddressCheck.title=Is this the address you want to use for your ag
 contactTradingAddressCheck.p=This is the address we will use to check your identity if you call us. We may send some correspondence to this address.
 contactTradingAddressCheck.option.yes=Yes
 contactTradingAddressCheck.option.no=No - I want to enter a different address
-contactTradingAddressCheck.continue.button=Continue
 error.contact-trading-address-check.invalid=Select Yes if this is the main trading address you want to use for your agent services account correspondence

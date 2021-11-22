@@ -14,15 +14,36 @@
  * limitations under the License.
  *@
 
+@import scala.collection.immutable.SortedSet
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models._
-@import uk.gov.hmrc.agentoverseasfrontend.forms._
-@import uk.gov.hmrc.play.views.html.helpers._
-@import scala.collection.immutable.SortedSet
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, inputRadioGroup: InputRadioGroup, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukSummaryList: GovukSummaryList,
+        govukRadios: GovukRadios,
+        form: FormWithCSRF,
+        govukButton: GovukButton)
 
 @(doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn], trns: SortedSet[String], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -30,61 +51,69 @@
     <p class="bold-small">@Messages("yourTaxRegistrationNumbers.want.to.add.another")</p>
 }
 
-@mainTemplate(title = errorPrefix(doYouWantToAddAnotherTrnForm) + Messages("yourTaxRegistrationNumbers.title")) {
-
-<a href="@backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm)" class="link-back">@Messages("button.back")</a>
-
-@if(doYouWantToAddAnotherTrnForm.hasErrors) {
-    @errorSummary(Messages("error.summary.heading"), doYouWantToAddAnotherTrnForm, Seq.empty, Some("enter-tax-registration-numbers"))
+@editTrnForm(trn: String) = {
+    @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'id -> s"""updateTrn$trn""") {
+        <input class="hidden" name="original" type="text" id="actual-trn" value="@trn" />
+        @govukButton(Button(
+            attributes = Map("type" -> "submit", "aria-label" -> Messages("yourTaxRegistrationNumbers.update.button")),
+            content = Text(Messages("yourTaxRegistrationNumbers.update.button"))
+        ))
+    }
 }
 
-  <fieldset class="margin-bottom-30">
-    <legend class="heading-xlarge margin-bottom-30 @if(doYouWantToAddAnotherTrnForm.hasErrors){push--top}">
-        <h1>
-            <span class="pre-heading">@Messages("yourTaxRegistrationNumbers.caption")</span>
-            @Messages("yourTaxRegistrationNumbers.title")
-        </h1>
-    </legend>
+@mainTemplate(title = errorPrefix(doYouWantToAddAnotherTrnForm) + Messages("yourTaxRegistrationNumbers.title"), backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))) {
+
+@if(doYouWantToAddAnotherTrnForm.hasErrors) {
+    @govukErrorSummary(ErrorSummary().withFormErrorsAsText(doYouWantToAddAnotherTrnForm))
+}
+
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("yourTaxRegistrationNumbers.caption")</span>
+        @Messages("yourTaxRegistrationNumbers.title")
+    </h1>
     <p>@Messages("yourTaxRegistrationNumbers.body.text", trns.size)</p>
 
-    <dl class="app-check-your-answers app-check-your-answers--long margin-top-30">
-        @for(trn <- trns) {
-        <div class="app-check-your-answers__contents">
-            <dt class="app-check-your-answers__question">
-                @trn
-            </dt>
-            <dd class="app-check-your-answers__answer">
-                <a href="@routes.TaxRegController.showRemoveTaxRegNumber(trn)" aria-label="@Messages("yourTaxRegistrationNumbers.remove.button") @trn" class="button--link-style" type="submit">@Messages("yourTaxRegistrationNumbers.remove.button")<span class="visuallyhidden"> @trn</span></a>
-            </dd>
-            <dd class="app-check-your-answers__change">
-                @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'class -> "form js-form actionButtons", 'id -> s"""updateTrn$trn""") {
-                    <input class="hidden" name="original" type="text" id="actual-trn" value="@trn" />
-                    <button class="button--link-style" type="submit" aria-label="@Messages("yourTaxRegistrationNumbers.update.button") @trn">
-                        @Messages("yourTaxRegistrationNumbers.update.button")<span class="visuallyhidden"> @trn</span>
-                    </button>
-                }
-            </dd>
-        </div>
-        }
-    </dl>
-  </fieldset>
+    <fieldset class="govuk-fieldset">
+        @govukSummaryList(SummaryList(
+            rows = trns.toList.map { trn =>
+                SummaryListRow(
+                    key = Key(Text(trn)),
+                    value = Value(content = HtmlContent(
+                        s"""<a href="${routes.TaxRegController.showRemoveTaxRegNumber(trn).url}" aria-label="${Messages("yourTaxRegistrationNumbers.remove.button")} $trn" class="govuk-link">
+                           |  ${Messages("yourTaxRegistrationNumbers.remove.button")}<span class="govuk-visually-hidden"> $trn</span>
+                           |</a>
+                           |""".stripMargin
+                    )),
+                    actions = Some(Actions(items = Seq(
+                        ActionItem(
+                            content = HtmlContent(editTrnForm(trn)),
+                            visuallyHiddenText = Some(s" $trn")
+                        )
+                    )))
+                )
+            }
+        ))
+    </fieldset>
 
 @form(action = routes.TaxRegController.submitYourTaxRegNumbers, 'class -> "form js-form") {
 
-    <div class="form-group margin-bottom-30">
-        @inputRadioGroup(
-        doYouWantToAddAnotherTrnForm("value"),
-        Seq(
-        "true" -> Messages("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.yes"),
-        "false" -> Messages("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.no")
-        ),
-        '_groupDivClass -> "soft--ends",
-        '_fieldsetAttributes -> Html("""id='value'"""),
-        '_groupClass -> "inline",
-        '_legend -> headerTitle
+    @govukRadios(Radios(
+        classes = "govuk-radios--inline",
+        fieldset = Some(Fieldset(legend = Some(Legend(content = HtmlContent(headerTitle))))),
+        items = Seq(
+            RadioItem(
+                content = Text(Messages("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.yes")),
+                value = Some("true"),
+            ),
+            RadioItem(
+                content = Text(Messages("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.no")),
+                value = Some("false"),
+            )
         )
-    </div>
+    ).withFormField(doYouWantToAddAnotherTrnForm("value")))
 
-    <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
-}
+    @govukButton(Button(
+        attributes = Map("id" -> "continue"),
+        content = Text(Messages("button.continue")),
+    ))}
 }

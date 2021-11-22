@@ -22,14 +22,13 @@
 
 @()(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = Messages("fileUploadTradingAddress.no_js_page.title")) {
+@mainTemplate(title = Messages("fileUploadTradingAddress.no_js_page.title"), backLinkHref = Some(routes.FileUploadController.showTradingAddressUploadForm().url)) {
 
-    <a href="@routes.FileUploadController.showTradingAddressUploadForm()" class="link-back">@Messages("button.back")</a>
-
-    <h1 class="heading-xlarge margin-bottom-20">
-        <span class="pre-heading">@Messages("fileUploadTradingAddress.no_js_page.caption")</span>
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("fileUploadTradingAddress.no_js_page.caption")</span>
         @Messages("fileUploadTradingAddress.no_js_page.title")
     </h1>
-    <p>@Messages("fileUploadTradingAddress.no_js_page.p1")</p>
-    <p>@Messages("fileUploadTradingAddress.no_js_page.p2")</p>
+
+    <p class="govuk-body">@Messages("fileUploadTradingAddress.no_js_page.p1")</p>
+    <p class="govuk-body">@Messages("fileUploadTradingAddress.no_js_page.p2")</p>
 }

@@ -15,47 +15,66 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
-@import uk.gov.hmrc.play.views.html.helpers._
 @import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 
 @this(
         mainTemplate: main_template,
         errorPrefix: error_prefix,
-        errorSummary: ErrorSummary,
-        form: FormWithCSRF,
-        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukRadios: GovukRadios,
+        form: FormWithCSRF
 )
 
 @(trnForm: Form[RadioConfirm], trn: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(trnForm) + Messages("removeTrn.title")) {
-
-
-    <a href="@routes.TaxRegController.showYourTaxRegNumbersForm" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(trnForm) + Messages("removeTrn.title"), backLinkHref = Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)) {
 
     @if(trnForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"),trnForm, Seq.empty, Some("trn"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(trnForm))
     }
 
-    @form(action = routes.TaxRegController.submitRemoveTaxRegNumber(trn), 'class -> "form js-form") {
+    @form(action = routes.TaxRegController.submitRemoveTaxRegNumber(trn)) {
 
-            @inputRadioGroupCustom(
-                trnForm("isRemovingTrn"),
-                Seq(
-                    "true" -> Messages("removeTrn.form.yes"),
-                    "false" -> Messages("removeTrn.form.no")
+        @govukRadios(Radios(
+            classes = "govuk-radios--inline",
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(Messages("removeTrn.title")),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--xl"
+                ))
+            )),
+            items = Seq(
+                RadioItem(
+                    content = Text(Messages("removeTrn.form.yes")),
+                    value = Some("true"),
                 ),
-                '_legend -> Html("""<h1 class="heading-xlarge margin-bottom-20">""" + Messages("removeTrn.title") + """</h1>"""),
-                '_groupDivClass -> "form-group",
-                '_horizontal -> true,
-                '_fieldsetAttributes -> Html("""id='isRemovingTrn'""")
+                RadioItem(
+                    content = Text(Messages("removeTrn.form.no")),
+                    value = Some("false"),
+                )
             )
+        ).withFormField(trnForm("isRemovingTrn")))
 
-            <div class="form-group">
-                <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-            </div>
-
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

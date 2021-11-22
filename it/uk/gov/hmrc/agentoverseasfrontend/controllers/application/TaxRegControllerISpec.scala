@@ -67,7 +67,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       result.futureValue should containSubstrings(backButtonUrl)
     }
 
-    "if previously answered 'Yes' pre-populate form with 'Yes' and the value provided" in {
+    "`if previously answered 'Yes' pre-populate form with 'Yes' and the value provided`" in {
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
       val taxRegNo = Trn("tax_reg_number_123")
       sessionStoreService.currentSession.agentSession =
@@ -78,9 +78,8 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       status(result) shouldBe 200
 
       val doc = Jsoup.parse(contentAsString(result))
+      doc.select("#canProvideTaxRegNo_true[checked]").toArray should have length 1
 
-      contentAsString(result).contains(
-        """<input id="canProvideTaxRegNo_true" type="radio" name="canProvideTaxRegNo" value="true" checked>""") shouldBe true
       doc.getElementById("value").attr("value") shouldBe taxRegNo.value
     }
 
@@ -91,9 +90,9 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       val result = controller.showTaxRegistrationNumberForm(authenticatedRequest)
 
       status(result) shouldBe 200
+      val doc = Jsoup.parse(contentAsString(result))
 
-      contentAsString(result).contains(
-        """<input id="canProvideTaxRegNo_false" type="radio" name="canProvideTaxRegNo" value="false" checked>""") shouldBe true
+      doc.select("#canProvideTaxRegNo_false[checked]").toArray should have length 1
     }
   }
 
@@ -134,13 +133,12 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       val result = controller.submitTaxRegistrationNumber(authenticatedRequest)
 
       status(result) shouldBe 200
+      val doc = Jsoup.parse(contentAsString(result))
 
       result.futureValue should containSubstrings("This field is required")
 
-      contentAsString(result).contains(
-        """<input id="canProvideTaxRegNo_false" type="radio" name="canProvideTaxRegNo" value="false" checked>""") shouldBe false
-      contentAsString(result).contains(
-        """<input id="canProvideTaxRegNo_true" type="radio" name="canProvideTaxRegNo" value="true" checked>""") shouldBe true
+      doc.select("#canProvideTaxRegNo_true[checked]").toArray should have length 1
+      doc.select("#canProvideTaxRegNo_false[checked]").toArray should have length 0
     }
 
     "Provided selected 'No' on radioButton submit and redirect to next page /more-information-needed" in {

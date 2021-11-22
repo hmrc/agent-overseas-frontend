@@ -18,66 +18,81 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.CompanyRegistrationNumber
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        govukRadios: GovukRadios,
+        govukInsetText: GovukInsetText,
+        form: FormWithCSRF)
 
 @(companyRegistrationNumberForm: Form[CompanyRegistrationNumber], backButtonLink: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(companyRegistrationNumberForm) + Messages("companyRegistrationNumber.title")) {
-
-    <a href="@backButtonLink" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(companyRegistrationNumberForm) + Messages("companyRegistrationNumber.title"), backLinkHref = Some(backButtonLink)) {
 
     @if(companyRegistrationNumberForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), companyRegistrationNumberForm, Seq.empty, Some("enter-tax-registration-numbers"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(companyRegistrationNumberForm))
     }
+
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("companyRegistrationNumber.caption")</span>
+        @Messages("companyRegistrationNumber.title")
+    </h1>
+    <p class="govuk-body">@Messages("companyRegistrationNumber.body.text")</p>
 
     @form(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
 
-        <fieldset>
-            <legend class="margin-bottom-10">
-                <h1 class="heading-xlarge margin-bottom-20 @if(companyRegistrationNumberForm.hasErrors) {push--top}">
-                    <span class="pre-heading">@Messages("companyRegistrationNumber.caption")</span>
-                    @Messages("companyRegistrationNumber.title")
-                </h1>
-            </legend>
+        @govukRadios(Radios(
+            items = Seq(
+                RadioItem(
+                    content = Text(Messages("companyRegistrationNumber.form.registered.yes")),
+                    id = Some("confirmRegistration_true"),
+                    value = Some("true"),
+                    checked = companyRegistrationNumberForm.error("registrationNumber").isDefined || companyRegistrationNumberForm.value.exists(_.confirmRegistration.contains(true)),
+                    conditionalHtml = Some(
+                        govukInput(Input(
+                            label = Label(content = Text(Messages("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn"))),
+                            spellcheck = Some(false),
+                            inputType = "text",
+                            classes = "govuk-input--width-20",
+                            attributes = Map("data-uppercase" -> "false")
+                        ).withFormField(companyRegistrationNumberForm("registrationNumber")))
+                    )
+                ),
+                RadioItem(
+                    content = Text(Messages("companyRegistrationNumber.form.registered.no")),
+                    id = Some("confirmRegistration_false"),
+                    value = Some("false"),
+                    checked = companyRegistrationNumberForm.value.flatMap(_.confirmRegistration).contains(false)
+                ),
+            )
+        ).withFormField(companyRegistrationNumberForm("confirmRegistration")))
 
-            <p>@Messages("companyRegistrationNumber.body.text")</p>
-            <div class="form-group @if(companyRegistrationNumberForm.error("confirmRegistration").isDefined){form-group-error}" id="confirmRegistration">
-
-            @if(companyRegistrationNumberForm.error("confirmRegistration").isDefined){
-                <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages("companyRegistrationNumber.error.no-radio.selected")</span>
-            }
-
-            <div class="multiple-choice" data-target="companyReg">
-                <input id="confirmRegistration_true" type="radio" name="confirmRegistration" value="true" @if(companyRegistrationNumberForm.error("registrationNumber").isDefined || companyRegistrationNumberForm.value.map(_.confirmRegistration == Some(true)).getOrElse(false)) {checked}>
-                <label for="confirmRegistration_true">@Messages("companyRegistrationNumber.form.registered.yes")</label>
-            </div>
-            <div class="panel panel-border-narrow js-hidden @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-group-error}" id="companyReg">
-                <label class="form-label" for="registrationNumber">@Messages("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn")</label>
-                @companyRegistrationNumberForm.errors("registrationNumber").map { formError => <span class="error-message" id="companyReg-error"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages(formError.message)</span> }
-                <input
-                data-uppercase="false"
-                class="form-control @if(companyRegistrationNumberForm.error("registrationNumber").isDefined) {form-control-error}"
-                name="registrationNumber"
-                type="text"
-                spellcheck="false"
-                id="registrationNumber"
-                @companyRegistrationNumberForm.data.get("registrationNumber").map { v => value="@v"}
-                @if(companyRegistrationNumberForm.error("registrationNumber").isDefined){aria-describedby="companyReg-error"}
-                >
-            </div>
-
-            <div class="multiple-choice">
-                <input id="confirmRegistration_false" type="radio" name="confirmRegistration" value="false" @if(companyRegistrationNumberForm.value.flatMap(_.confirmRegistration).exists(_ == false)) { checked = "checked" }>
-                <label for="confirmRegistration_false">@Messages("companyRegistrationNumber.form.registered.no")</label>
-            </div>
-            </div>
-        </fieldset>
-
-
-        <div class="form-group">
-        <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-        </div>
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }
