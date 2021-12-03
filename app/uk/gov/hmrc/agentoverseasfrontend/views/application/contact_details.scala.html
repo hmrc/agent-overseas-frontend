@@ -57,33 +57,31 @@
                 <h1 class="govuk-heading-xl">
                     @Messages("contactDetails.title")
                 </h1>
-                @govukInsetText(InsetText(
-                    content = Text(Messages("contactDetails.inset.p1"))
-                ))
-                <div class="govuk-body">@Messages("contactDetails.body.text")</div>
             </legend>
+
+            @govukInsetText(InsetText(
+                content = Text(Messages("contactDetails.inset.p1"))
+            ))
+            <div class="govuk-body">@Messages("contactDetails.body.text")</div>
 
             @govukInput(Input(
                 label = Label(content = Text(Messages("contactDetails.form.firstName"))),
                 autocomplete = Some("given-name"),
                 spellcheck = Some(false),
-                classes = "govuk-input--width-20",
-                inputType = "text",
+                classes = "govuk-input--width-20"
             ).withFormField(contactDetailsForm("firstName")))
 
             @govukInput(Input(
                 label = Label(content = Text(Messages("contactDetails.form.lastName"))),
                 autocomplete = Some("family-name"),
                 spellcheck = Some(false),
-                classes = "govuk-input--width-20",
-                inputType = "text",
+                classes = "govuk-input--width-20"
             ).withFormField(contactDetailsForm("lastName")))
 
             @govukInput(Input(
                 label = Label(content = Text(Messages("contactDetails.form.jobTitle"))),
                 spellcheck = Some(false),
-                classes = "govuk-input--width-20",
-                inputType = "text",
+                classes = "govuk-input--width-20"
             ).withFormField(contactDetailsForm("jobTitle")))
 
             @govukInput(Input(

@@ -47,50 +47,51 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(mainBusinessAddressForm))
     }
 
-    <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("mainBusinessAddress.caption")</span>
-        @Messages("mainBusinessAddress.title")
-    </h1>
-    <div class="govuk-body">@Messages("mainBusinessAddress.body.text")</div>
-
     @form(action = routes.TradingAddressController.submitMainBusinessAddress, 'class -> "form js-form") {
 
-      @govukInput(Input(
-          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine1"))),
-          spellcheck = Some(false),
-          classes = "govuk-input--width-20",
-          inputType = "text",
-      ).withFormField(mainBusinessAddressForm("addressLine1")))
+        <fieldset class="govuk-fieldset">
 
-      @govukInput(Input(
-          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine2"))),
-          spellcheck = Some(false),
-          classes = "govuk-input--width-20",
-          inputType = "text",
-      ).withFormField(mainBusinessAddressForm("addressLine2")))
+            <legend>
+                <h1 class="govuk-heading-xl">
+                    <span class="govuk-caption-xl">@Messages("mainBusinessAddress.caption")</span>
+                    @Messages("mainBusinessAddress.title")
+                </h1>
+                <div class="govuk-body">@Messages("mainBusinessAddress.body.text")</div>
+            </legend>
 
-      @govukInput(Input(
-          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine3"))),
-          spellcheck = Some(false),
-          classes = "govuk-input--width-20",
-          inputType = "text",
-      ).withFormField(mainBusinessAddressForm("addressLine3")))
+            @govukInput(Input(
+                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine1"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(mainBusinessAddressForm("addressLine1")))
 
-      @govukInput(Input(
-          label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine4"))),
-          spellcheck = Some(false),
-          classes = "govuk-input--width-20",
-          inputType = "text",
-      ).withFormField(mainBusinessAddressForm("addressLine4")))
+            @govukInput(Input(
+                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine2"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(mainBusinessAddressForm("addressLine2")))
 
-      <div class="autocomplete-wrapper" id="countryCode">
-        @govukSelect(Select(
-            label = Label(content = Text(Messages("mainBusinessAddress.form.country"))),
-            id = "countryCode-auto-complete",
-            name = "countryCode",
-            items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
-        ).withFormField(mainBusinessAddressForm("countryCode")))
-      </div>
+            @govukInput(Input(
+                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine3"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(mainBusinessAddressForm("addressLine3")))
+
+            @govukInput(Input(
+                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine4"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(mainBusinessAddressForm("addressLine4")))
+
+            <div class="autocomplete-wrapper" id="countryCode">
+                @govukSelect(Select(
+                    label = Label(content = Text(Messages("mainBusinessAddress.form.country"))),
+                    id = "countryCode-auto-complete",
+                    name = "countryCode",
+                    items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
+                ).withFormField(mainBusinessAddressForm("countryCode")))
+            </div>
+        </fieldset>
 
       @govukButton(Button(
           attributes = Map("id" -> "continue"),

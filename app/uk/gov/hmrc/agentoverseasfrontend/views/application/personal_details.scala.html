@@ -79,7 +79,6 @@
                                 label = Label(content = Text(Messages("personalDetails.form.nino"))),
                                 hint = Some(Hint(content = Text(Messages("personalDetails.form.helper.nino")))),
                                 spellcheck = Some(false),
-                                inputType = "text",
                                 attributes = Map("data-uppercase" -> "true"),
                                 value = if (personalDetailsForm.data.get("personalDetailsChoice").contains("nino")) personalDetailsForm.data.get("nino") else None
                             ).withFormField(personalDetailsForm("nino")))
@@ -94,7 +93,6 @@
                                 label = Label(content = Text(Messages("personalDetails.form.sautr"))),
                                 hint = Some(Hint(content = Text(Messages("personalDetails.form.helper.sautr")))),
                                 spellcheck = Some(false),
-                                inputType = "text",
                                 value = if (personalDetailsForm.data.get("personalDetailsChoice").contains("sautr")) personalDetailsForm.data.get("saUtr") else None
                             ).withFormField(personalDetailsForm("saUtr")))
                         )

@@ -64,11 +64,9 @@
         @uiInput(Input(
             id = "amlsBody",
             name = "amlsBody",
-            inputType = "text",
-            classes = "form-control--block govuk-input--width-20",
+            classes = "govuk-input--width-20",
             spellcheck = Some(false),
             label = Label(
-                classes = "form-label soft--ends",
                 content = Text(Messages("amls.form.supervisory_body")),
             )
         ).withFormField(amlsForm("amlsBody")))
@@ -76,9 +74,8 @@
         @uiInput(Input(
             id = "membershipNumber",
             name = "membershipNumber",
-            classes = "form-control--block govuk-input--width-20",
+            classes = "govuk-input--width-20",
             label = Label(
-                classes = "form-label soft--ends",
                 content = Text(Messages("amls.form.membership_number")),
             )
         ).withFormField(amlsForm("membershipNumber")))

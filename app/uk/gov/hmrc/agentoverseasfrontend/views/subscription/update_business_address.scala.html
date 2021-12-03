@@ -54,48 +54,47 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(addressForm))
     }
 
-    <h1 class="govuk-heading-xl">@Messages("updateBusinessAddress.title")</h1>
-
-    <p>@Messages("updateBusinessAddress.p1")</p>
-
     @form(action = routes.BusinessIdentificationController.submitUpdateBusinessAddressForm) {
 
-        @govukInput(Input(
-            label = Label(content = Text(Messages("updateBusinessAddress.address_line_1.title"))),
-            spellcheck = Some(false),
-            classes = "govuk-input--width-20",
-            inputType = "text",
-        ).withFormField(addressForm("addressLine1")))
+        <fieldset class="govuk-fieldset">
+            <legend>
+                <h1 class="govuk-heading-xl">@Messages("updateBusinessAddress.title")</h1>
+                <p>@Messages("updateBusinessAddress.p1")</p>
+            </legend>
 
-        @govukInput(Input(
-            label = Label(content = Text(Messages("updateBusinessAddress.address_line_2.title"))),
-            spellcheck = Some(false),
-            classes = "govuk-input--width-20",
-            inputType = "text",
-        ).withFormField(addressForm("addressLine2")))
+            @govukInput(Input(
+                label = Label(content = Text(Messages("updateBusinessAddress.address_line_1.title"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(addressForm("addressLine1")))
 
-        @govukInput(Input(
-            label = Label(content = Text(Messages("updateBusinessAddress.address_line_3.title"))),
-            spellcheck = Some(false),
-            classes = "govuk-input--width-20",
-            inputType = "text",
-        ).withFormField(addressForm("addressLine3")))
+            @govukInput(Input(
+                label = Label(content = Text(Messages("updateBusinessAddress.address_line_2.title"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(addressForm("addressLine2")))
 
-        @govukInput(Input(
-            label = Label(content = Text(Messages("updateBusinessAddress.address_line_4.title"))),
-            spellcheck = Some(false),
-            classes = "govuk-input--width-20",
-            inputType = "text",
-        ).withFormField(addressForm("addressLine4")))
+            @govukInput(Input(
+                label = Label(content = Text(Messages("updateBusinessAddress.address_line_3.title"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(addressForm("addressLine3")))
 
-        <div class="autocomplete-wrapper" id="countryCode">
-        @govukSelect(Select(
-            label = Label(content = Text(Messages("updateBusinessAddress.country.title"))),
-            id = "countryCode-auto-complete",
-            name = "countryCode",
-            items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
-        ).withFormField(addressForm("countryCode")))
-        </div>
+            @govukInput(Input(
+                label = Label(content = Text(Messages("updateBusinessAddress.address_line_4.title"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(addressForm("addressLine4")))
+
+            <div class="autocomplete-wrapper" id="countryCode">
+                @govukSelect(Select(
+                    label = Label(content = Text(Messages("updateBusinessAddress.country.title"))),
+                    id = "countryCode-auto-complete",
+                    name = "countryCode",
+                    items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
+                ).withFormField(addressForm("countryCode")))
+            </div>
+        </fieldset>
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
