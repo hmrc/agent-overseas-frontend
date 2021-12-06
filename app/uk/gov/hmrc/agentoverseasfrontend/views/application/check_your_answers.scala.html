@@ -18,35 +18,70 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.view.{AnswerBlock, CheckYourAnswers, CheckYourAnswersConfirmation}
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.check_answers_div
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+@import uk.gov.hmrc.agentoverseasfrontend.config.view.AnswerRow
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Actions
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
 
-@this(mainTemplate: main_template, checkAnswersDiv: check_answers_div, errorPrefix: error_prefix, errorSummary: ErrorSummary, formHelper: FormWithCSRF, singleCheckbox: SingleCheckbox)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukCheckboxes: GovukCheckboxes,
+        govukSummaryList: GovukSummaryList,
+        formHelper: FormWithCSRF)
 
 @(cyaForm: Form[CheckYourAnswersConfirmation], checkYourAnswers: CheckYourAnswers)(implicit request: Request[_],
         messages: Messages, appConfig: AppConfig)
+
+@summaryListRow(answerRow: AnswerRow) = @{
+    SummaryListRow(
+        key = Key(Text(answerRow.question)),
+        value = Value(content = HtmlContent(s"""<span id="${answerRow.id}">""" ++ answerRow.answerLines.map(line => s"<div>$line</div>\n").foldLeft("")(_++_) ++ "</span>")),
+        actions = Some(Actions(items = answerRow.changeLink.toList.map(link =>
+            ActionItem(
+                href = link.url,
+                content = HtmlContent(s"""${Messages("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}</span>"""),
+                attributes = Map("data-include-hidden" -> s"${Messages("checkAnswers.change.button")} ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}")
+            )
+        )))
+    )
+}
 
 @renderAnswerBlock(answerBlock: AnswerBlock) = {
 
     <h2 class="heading-medium margin-bottom-10">@answerBlock.heading</h2>
 
     @for(group <- answerBlock.answerGroups) {
-        <div class="app-check-your-answers--group margin-bottom-30">
-            <dl class="app-check-your-answers app-check-your-answers--long">
-            @for(row <- group.answerRows) { @checkAnswersDiv(row) }
-            </dl>
-        </div>
+        @govukSummaryList(SummaryList(
+            rows = group.answerRows.map(row => summaryListRow(row))
+        ))
     }
 }
 
-@mainTemplate(title = errorPrefix(cyaForm) + Messages("checkAnswers.title"), bodyClasses = None) {
+@mainTemplate(title = errorPrefix(cyaForm) + Messages("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
 
-    <a href="@checkYourAnswers.backLink" class="link-back">@Messages("button.back")</a>
-
-    <h1 class="heading-xlarge margin-bottom-30">@Messages("checkAnswers.title")</h1>
+    <h1 class="govuk-heading-xl margin-bottom-30">@Messages("checkAnswers.title")</h1>
 
     @if(cyaForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), cyaForm)
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(cyaForm))
     }
 
     @renderAnswerBlock(checkYourAnswers.amlsDetails)
@@ -56,29 +91,16 @@
 
     <p class="margin-top-30">@Messages("checkAnswers.confirm.p1")</p>
 
-
     @formHelper(
-        action = routes.ApplicationController.submitCheckYourAnswers(),
-        'class -> "form js-form",
-        'id -> "checkAnswers") {
+        action = routes.ApplicationController.submitCheckYourAnswers(), 'id -> "checkAnswers") {
+        @govukCheckboxes(Checkboxes(
+            items = Seq(CheckboxItem(id = Some("confirmed"), name = Some("confirmed"), content = Text(Messages("checkAnswers.confirm.label")), value = "true"))
+        ).withFormField(cyaForm("confirmed")))
 
-        <div class="form-group @if(cyaForm.error("confirmed").isDefined) {form-field--error}">
-            <div class="checkbox multiple-choice">
-                @if(cyaForm.error("confirmed").isDefined){
-                    <div id="confirmed--error" class="error-notification"><span class="visuallyhidden">@Messages("error.prefix")</span>
-                        @Messages("checkAnswers.confirm.error")
-                    </div>
-                }
-                <fieldset class="form-group">
-                <input type="checkbox" id="confirmed" name="confirmed" value="true">
-                <label class="form-field-single" for="confirmed">@Messages("checkAnswers.confirm.label")</label>
-                </fieldset>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <button type="submit" id="continue" >@Messages("checkAnswers.confirm.button")</button>
-        </div>
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("checkAnswers.confirm.button")),
+        ))
     }
 
 }

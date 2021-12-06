@@ -19,49 +19,48 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 @import uk.gov.hmrc.agentoverseasfrontend.forms.BusinessEmailForm
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, input: Input)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukButton: GovukButton,
+        form: FormWithCSRF)
 
 @(businessEmailForm: Form[BusinessEmailForm])(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(businessEmailForm) + Messages("updateBusinessEmail.title"), bodyClasses = None) {
-
-    <a href="@routes.BusinessIdentificationController.showCheckAnswers()" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(businessEmailForm) + Messages("updateBusinessEmail.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
 
     @if(businessEmailForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), businessEmailForm, Seq.empty, Some("business-email"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessEmailForm))
     }
 
-    @form(
-        action = routes.BusinessIdentificationController.submitUpdateBusinessEmailForm(),
-        'class -> "form js-form") {
+    <h1 class="govuk-heading-xl">@Messages("updateBusinessEmail.title")</h1>
 
-        <div class="form-group @if(businessEmailForm.hasErrors){form-field--error soft--ends}">
-            <h1>
-                <label for="email" class="heading-xlarge">@Messages("updateBusinessEmail.title")</label>
-            </h1>
-            <p class="margin-bottom-40" id="email-hint">@Messages("updateBusinessEmail.description")</p>
-            @businessEmailForm.error("email").map { formError => <span class="error-notification" id="email-error">
-                <span class="visuallyhidden">@Messages("error.prefix")</span>
-                @Messages(formError.message)
-            </span>
-            }
+    @form(action = routes.BusinessIdentificationController.submitUpdateBusinessEmailForm()) {
 
-            <input
-            type="email"
-            name="email"
-            id="email"
-            class="form-control input--cleared"
-            spellcheck="false"
-            @businessEmailForm.data.get("email").map { v => value="@v"}
-            aria-describedby="email-hint @if(businessEmailForm.hasErrors){email-error}"
-            >
+        @govukInput(Input(
+            hint = Some(Hint(content = Text(Messages("updateBusinessEmail.description")))),
+            spellcheck = Some(false),
+            classes = "govuk-input--width-20",
+            inputType = "email",
+        ).withFormField(businessEmailForm("email")))
 
-        </div>
-
-        <div class="form-field">
-            <button class="button" type="submit" id="submit-email">@Messages("updateBusinessEmail.continue")</button>
-        </div>
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

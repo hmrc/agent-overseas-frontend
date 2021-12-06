@@ -18,50 +18,57 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 
 @this(
         mainTemplate: main_template,
         errorPrefix: error_prefix,
-        uiInput: Input,
-        inputRadioGroupCustom: uk.gov.hmrc.agentoverseasfrontend.views.html.helpers.input_radio_group_custom,
+        govukRadios: GovukRadios,
+        govukButton: GovukButton,
         uiFormHelper: FormWithCSRF,
-        errorSummary: ErrorSummary
+        govukErrorSummary: GovukErrorSummary
 )
 
 @(amlsRequiredForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
 
-@mainTemplate(title = errorPrefix(amlsRequiredForm) + Messages("amls.required.title")) {
-
-    @if(backLink.isDefined) {
-        <a href="@backLink" class="link-back">@Messages("button.back")</a>
-    }
+@mainTemplate(title = errorPrefix(amlsRequiredForm) + Messages("amls.required.title"), backLinkHref = backLink) {
 
     @if(amlsRequiredForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), amlsRequiredForm, Seq.empty, Some("amls-required-form"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsRequiredForm))
     }
 
-    @uiFormHelper(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired, 'class -> "form js-form", 'id -> "amlsRequiredForm") {
+    @uiFormHelper(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired) {
+        @govukRadios(Radios(
+            classes = "govuk-radios--inline",
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(Messages("amls.required.title")),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--xl"
+                ))
+            )),
+            items = Seq(
+                RadioItem(content = Text(Messages("amls.required.yes")), value = Some("true")),
+                RadioItem(content = Text(Messages("amls.required.no")), value = Some("false"))
+            )
+        ).withFormField(amlsRequiredForm("amlsRequired")))
 
-          <div class="form-group">
-              @inputRadioGroupCustom(
-                  amlsRequiredForm("amlsRequired"),
-                  Seq(
-                      "true" -> Messages("amls.required.yes"),
-                      "false" -> Messages("amls.required.no")
-                  ),
-                  '_legend -> Html("""<h1 class="heading-xlarge">""" + Messages("amls.required.title") + """</h1>"""),
-                  '_horizontal -> true,
-                  '_groupDivClass -> "form-group",
-                  '_fieldsetAttributes -> Html("""id='amlsRequired'""")
-              )
-          </div>
-
-        <div class="form-group">
-            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-        </div>
-
-
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

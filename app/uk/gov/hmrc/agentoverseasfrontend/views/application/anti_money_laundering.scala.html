@@ -18,75 +18,79 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.AmlsDetails
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukDetails
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, uiInput: Input, errorSummary: ErrorSummary, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        uiInput: GovukInput,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukDetails: GovukDetails,
+        govukInsetText: GovukInsetText,
+        form: FormWithCSRF)
 
 @(amlsForm: Form[AmlsDetails], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(amlsForm) + Messages("amls.title")) {
-
-    <a href="@backLink" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(amlsForm) + Messages("amls.title"), backLinkHref = backLink) {
 
     @if(amlsForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), amlsForm, Seq.empty, Some("amls-form"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsForm))
     }
 
     @form(action = routes.AntiMoneyLaunderingController.submitAntiMoneyLaundering, 'class -> "form js-form", 'id -> "amlsForm") {
 
-      <fieldset>
+        <h1 class="govuk-heading-xl">@Messages("amls.title")</h1>
 
-        <legend>
-          <h1 class="heading-xlarge margin-bottom-20">@Messages("amls.title")</h1>
-        </legend>
+        @govukInsetText(InsetText(
+            content = Text(Messages("amls.inset.p1"))
+        ))
 
-        <div class="panel panel-border-wide margin-bottom-30">@Messages("amls.inset.p1")</div>
+        @uiInput(Input(
+            id = "amlsBody",
+            name = "amlsBody",
+            classes = "govuk-input--width-20",
+            spellcheck = Some(false),
+            label = Label(
+                content = Text(Messages("amls.form.supervisory_body")),
+            )
+        ).withFormField(amlsForm("amlsBody")))
 
-        <div class="form-group @if(amlsForm("amlsBody").hasErrors){form-field--error soft--ends}">
-            <label for="amlsBody">@Messages("amls.form.supervisory_body")</label>
-            @amlsForm.error("amlsBody").map { formError => <span class="error-notification" id="amls-body-error">
-                <span class="visuallyhidden">@Messages("error.prefix")</span>
-                @Messages(formError.message)
-            </span>
-            }
-            <input
-            type="text"
-            class="form-control--block"
-            id="amlsBody"
-            name="amlsBody"
-            spellcheck="false"
-            @amlsForm.data.get("amlsBody").map { v => value="@v"}
-            @amlsForm.error("amlsBody").map { e => aria-describedby="amls-body-error"}
-            >
-        </div>
+        @uiInput(Input(
+            id = "membershipNumber",
+            name = "membershipNumber",
+            classes = "govuk-input--width-20",
+            label = Label(
+                content = Text(Messages("amls.form.membership_number")),
+            )
+        ).withFormField(amlsForm("membershipNumber")))
 
-        <div class="form-group">
-        @uiInput(
-            amlsForm("membershipNumber"),
-            '_label -> Messages("amls.form.membership_number"),
-            '_inputClass -> "form-control--block",
-            '_labelClass -> "soft--ends",
-            '_labelTextClass -> "form-label"
-        )
-        </div>
+        @govukDetails(Details(
+            summary = Text(Messages(s"amls.hint.expandable")),
+            content = HtmlContent(s"""<p>${Messages("amls.hint.expandable.p1")}</p>
+                                     |<p>${Html(Messages(s"amls.hint.expandable.p2", "https://www.gov.uk/guidance/get-an-hmrc-agent-services-account"))}</p>
+                                     |<p>${Html(Messages(s"amls.hint.expandable.sign_out", routes.ApplicationSignOutController.signOut))}</p>
+                                     |""".stripMargin)
+        ))
 
-        <div class="form-group">
-            <details>
-                <summary>
-                    <span class="summary">@Messages(s"amls.hint.expandable")</span>
-                </summary>
-                <div class="panel panel-border-narrow" aria-hidden="true">
-                    <p>@Html(Messages(s"amls.hint.expandable.p1"))</p>
-                    <p>@Html(Messages(s"amls.hint.expandable.p2", "https://www.gov.uk/guidance/get-an-hmrc-agent-services-account"))</p>
-                </div>
-                <p>@Html(Messages(s"amls.hint.expandable.sign_out", routes.ApplicationSignOutController.signOut))</p>
-            </details>
-        </div>
-
-      </fieldset>
-
-      <div class="form-group">
-          <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-      </div>
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

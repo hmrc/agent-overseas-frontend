@@ -16,50 +16,53 @@
 
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.UpdateTrn
-@import uk.gov.hmrc.play.views.html.helpers._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, input: Input, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        form: FormWithCSRF,
+        govukButton: GovukButton,
+        govukInput: GovukInput)
 
 @(updateTrnForm: Form[UpdateTrn])(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(updateTrnForm) + Messages("updateTrn.title")) {
-
-    <a href="@routes.TaxRegController.showYourTaxRegNumbersForm" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(updateTrnForm) + Messages("updateTrn.title"), backLinkHref = Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)) {
 
     @if(updateTrnForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), updateTrnForm, Seq.empty, Some("update-trn"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(updateTrnForm))
     }
 
-    @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'class -> "form js-form", 'id -> "updateTrn") {
+    @form(action = routes.TaxRegController.submitUpdateTaxRegNumber) {
 
-        <div class="form-group @if(updateTrnForm.hasErrors){form-field--error soft--ends}">
-            <h1>
-                <label class="heading-xlarge margin-bottom-20" for="updated">@Messages("updateTrn.title")</label>
-            </h1>
-            @updateTrnForm.error("updated").map { formError => <span class="error-notification" id="updated-error">
-                <span class="visuallyhidden">@Messages("error.prefix")</span>
-                @Messages(formError.message)
-            </span>
-            }
-            <input
-            type="text"
-            name="updated"
-            id="updated"
-            spellcheck="false"
-            class="form-control--block"
-            @updateTrnForm.data.get("updated").map { v => value="@v"}
-            @if(updateTrnForm.hasErrors){aria-describedby="updated-error"}
-            >
-        </div>
+        @govukInput(Input(
+            label = Label(
+                content = Text(Messages("updateTrn.title")),
+                isPageHeading = true,
+                classes = "govuk-label--xl"
+            ),
+            spellcheck = Some(false),
+            classes = "govuk-input--width-20"
+        ).withFormField(updateTrnForm("updated")))
 
-        <div class="form-group">
-            <input data-uppercase="false" class="hidden" name="original" type="text" id="actual-trn" value="@updateTrnForm.data.getOrElse("original", "")"/>
-        </div>
+        <input data-uppercase="false" class="hidden" name="original" type="text" id="actual-trn" value="@updateTrnForm.data.getOrElse("original", "")"/>
 
-        <div class="form-group">
-            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-        </div>
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

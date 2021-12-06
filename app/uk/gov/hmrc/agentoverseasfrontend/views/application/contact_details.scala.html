@@ -18,135 +18,93 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.ContactDetails
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, input: Input)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        govukInsetText: GovukInsetText,
+        form: FormWithCSRF)
 
-@(contactDetailsFrom: Form[ContactDetails], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(contactDetailsForm: Form[ContactDetails], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(contactDetailsFrom) + Messages("contactDetails.title")) {
+@mainTemplate(title = errorPrefix(contactDetailsForm) + Messages("contactDetails.title"), backLinkHref = Some(backLink.getOrElse(routes.FileUploadController.showSuccessfulUploadedForm().url))) {
 
-    <a href="@backLink.getOrElse(routes.FileUploadController.showSuccessfulUploadedForm())" class="link-back">@Messages("button.back")</a>
-
-    @if(contactDetailsFrom.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"), contactDetailsFrom, Seq.empty, Some("contact-details"))
+    @if(contactDetailsForm.hasErrors) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactDetailsForm))
     }
 
-    @form(action = routes.ApplicationController.submitContactDetails, 'class -> "form js-form") {
-
-        <fieldset>
-            <legend class="margin-bottom-10">
-                <h1 class="heading-xlarge margin-bottom-20">
+    @form(action = routes.ApplicationController.submitContactDetails) {
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend-xl">
+                <h1 class="govuk-heading-xl">
                     @Messages("contactDetails.title")
                 </h1>
             </legend>
 
-            <div class="panel panel-border-wide margin-bottom-30">@Messages("contactDetails.inset.p1")</div>
+            @govukInsetText(InsetText(
+                content = Text(Messages("contactDetails.inset.p1"))
+            ))
+            <div class="govuk-body">@Messages("contactDetails.body.text")</div>
 
-            <span class="body-text">@Messages("contactDetails.body.text")</span>
+            @govukInput(Input(
+                label = Label(content = Text(Messages("contactDetails.form.firstName"))),
+                autocomplete = Some("given-name"),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(contactDetailsForm("firstName")))
 
-            <div class="form-group @if(contactDetailsFrom.error("firstName").isDefined){form-field--error soft--ends}">
-                <label for="firstName">@Messages("contactDetails.form.firstName")</label>
-                @contactDetailsFrom.error("firstName").map { formError => <span class="error-notification" id="firstName-error">
-                    <span class="visuallyhidden">@Messages("error.prefix")</span>
-                    @Messages(formError.message)
-                </span>
-                }
-                <input
-                type="text"
-                id="firstName"
-                class="form-control--block"
-                name="firstName"
-                spellcheck="false"
-                autocomplete="given-name"
-                @contactDetailsFrom.data.get("firstName").map { v => value="@v"}
-                @if(contactDetailsFrom.error("firstName").isDefined){aria-describedby="firstName-error"}
-                >
+            @govukInput(Input(
+                label = Label(content = Text(Messages("contactDetails.form.lastName"))),
+                autocomplete = Some("family-name"),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(contactDetailsForm("lastName")))
 
-            </div>
+            @govukInput(Input(
+                label = Label(content = Text(Messages("contactDetails.form.jobTitle"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20"
+            ).withFormField(contactDetailsForm("jobTitle")))
 
-            <div class="form-group @if(contactDetailsFrom.error("lastName").isDefined){form-field--error soft--ends}">
-                <label for="lastName">@Messages("contactDetails.form.lastName")</label>
-                @contactDetailsFrom.error("lastName").map { formError => <span class="error-notification" id="lastName-error">
-                    <span class="visuallyhidden">@Messages("error.prefix")</span>
-                    @Messages(formError.message)
-                </span>
-                }
-                <input
-                type="text"
-                id="lastName"
-                class="form-control--block"
-                name="lastName"
-                spellcheck="false"
-                autocomplete="family-name"
-                    @contactDetailsFrom.data.get("lastName").map { v => value="@v"}
-                    @if(contactDetailsFrom.error("lastName").isDefined){aria-describedby="lastName-error"}
-                >
+            @govukInput(Input(
+                label = Label(content = Text(Messages("contactDetails.form.businessTelephone"))),
+                autocomplete = Some("tel"),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20",
+                inputType = "tel",
+                hint = Some(Hint(id = Some("businessTelephone-hint"), content = Text(Messages("contactDetails.form.businessTelephone.hint")))),
+            ).withFormField(contactDetailsForm("businessTelephone")))
 
-            </div>
-
-            <div class="form-group @if(contactDetailsFrom.error("jobTitle").isDefined){form-field--error soft--ends}">
-                <label for="jobTitle">@Messages("contactDetails.form.jobTitle")</label>
-                @contactDetailsFrom.error("jobTitle").map { formError => <span class="error-notification" id="jobTitle-error">
-                    <span class="visuallyhidden">@Messages("error.prefix")</span>
-                    @Messages(formError.message)
-                </span>
-                }
-                <input
-                type="text"
-                id="jobTitle"
-                class="form-control--block"
-                name="jobTitle"
-                spellcheck="false"
-                    @contactDetailsFrom.data.get("jobTitle").map { v => value="@v"}
-                    @if(contactDetailsFrom.error("jobTitle").isDefined){aria-describedby="jobTitle-error"}
-                >
-
-            </div>
-
-            <div class="form-group @if(contactDetailsFrom.error("businessTelephone").isDefined){form-field--error soft--ends}">
-                <label for="businessTelephone">@Messages("contactDetails.form.businessTelephone")</label>
-                <span class="hint-text" id="businessTelephone-hint">@Messages("contactDetails.form.businessTelephone.hint")</span>
-                @contactDetailsFrom.error("businessTelephone").map { formError => <span class="error-notification" id="businessTelephone-error">
-                    <span class="visuallyhidden">@Messages("error.prefix")</span>
-                    @Messages(formError.message)
-                </span>
-                }
-                <input
-                type="tel"
-                id="businessTelephone"
-                class="form-control"
-                name="businessTelephone"
-                autocomplete="tel"
-                    @contactDetailsFrom.data.get("businessTelephone").map { v => value="@v"}
-                    aria-describedby="businessTelephone-hint @if(contactDetailsFrom.error("businessTelephone").isDefined){businessTelephone-error}"
-                >
-
-            </div>
-
-            <div class="form-group @if(contactDetailsFrom.error("businessEmail").isDefined){form-field--error soft--ends}">
-                <label for="businessEmail">@Messages("contactDetails.form.businessEmail")</label>
-                @contactDetailsFrom.error("businessEmail").map { formError => <span class="error-notification" id="businessEmail-error">
-                    <span class="visuallyhidden">@Messages("error.prefix")</span>
-                    @Messages(formError.message)
-                </span>
-                }
-                <input
-                type="email"
-                id="businessEmail"
-                class="form-control"
-                name="businessEmail"
-                spellcheck="false"
-                    @contactDetailsFrom.data.get("businessEmail").map { v => value="@v"}
-                    @if(contactDetailsFrom.error("businessEmail").isDefined){aria-describedby="businessEmail-error"}
-                >
-
-            </div>
+            @govukInput(Input(
+                label = Label(content = Text(Messages("contactDetails.form.businessEmail"))),
+                spellcheck = Some(false),
+                classes = "govuk-input--width-20",
+                inputType = "email",
+            ).withFormField(contactDetailsForm("businessEmail")))
 
         </fieldset>
 
-        <div class="form-group">
-            <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-        </div>
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

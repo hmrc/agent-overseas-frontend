@@ -50,7 +50,7 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
 
       checkHtmlResultWithBodyText(
         result.futureValue,
-        "<a href=\"/agent-services/apply-from-outside-uk/check-your-answers\" class=\"link-back\"")
+        "<a href=\"/agent-services/apply-from-outside-uk/check-your-answers\"")
     }
   }
 

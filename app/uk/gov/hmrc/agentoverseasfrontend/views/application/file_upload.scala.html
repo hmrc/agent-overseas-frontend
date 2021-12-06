@@ -17,67 +17,92 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukFileUpload
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fileupload.FileUpload
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukInsetText: GovukInsetText,
+        govukFileUpload: GovukFileUpload,
+        govukButton: GovukButton)
 
 @(upscan: UpscanInitiate, fileType: String, backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = "" + Messages(s"fileUpload.title.$fileType")) {
+@mainTemplate(title = "" + Messages(s"fileUpload.title.$fileType"), backLinkHref = backLink) {
 
-    <a href="@backLink" class="link-back">@Messages("button.back")</a>
-
-
-    <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data" class="form js-form">
-
-
+    <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data">
 
         <div class="flash error-summary"
         id="error-summary-display"
         role="alert"
         aria-labelledby="error-summary-heading"
         tabindex="-1">
-            <h2 id="error-summary-heading" class="h3-heading">@Messages("error.summary.heading")</h2>
-            <ul class="js-error-summary-messages">
+            <h2 id="error-summary-heading" class="govuk-error-summary__title">@Messages("error.summary.heading")</h2>
+            <ul class="govuk-list govuk-error-summary__list js-error-summary-messages">
                 <li>
                     <a href="#file-upload" id="#" data-focuses="#file-upload"></a>
                 </li>
             </ul>
         </div>
 
+        <h1 class="govuk-heading-xl">
+            <span class="govuk-caption-xl">@Messages("fileUpload.caption")</span>
+            @Messages(s"fileUpload.title.$fileType")
+        </h1>
 
-        <fieldset>
-            <legend class="margin-bottom-10">
-                <h1 class="heading-xlarge margin-bottom-20">
-                    <span class="pre-heading">@Messages("fileUpload.caption")</span>
-                    @Messages(s"fileUpload.title.$fileType")
-                </h1>
-            </legend>
-            <div class="govuk-box loader" id="file-upload-loading" aria-busy="true"></div>
-            <div class="hide-when-uploading">
-                <p>@Messages(s"fileUpload.p1.$fileType")</p>
-                <p>@Messages("fileUpload.p2")</p>
-                <ul class="list-bullet">
-                    <li>@Messages(s"fileUpload.li.1.$fileType")</li>
-                    <li>@Messages("fileUpload.li.2")</li>
-                    <li>@Messages("fileUpload.li.3")</li>
-                </ul>
-                <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
-                    <label class="" for="file-upload">@Messages("fileUpload.upload")</label>
-                    <span id="file-upload-error" class="error-notification"></span>
-                    @for((key, value) <- upscan.uploadRequest.fields){
-                        <input type="hidden" name="@key" value="@value">
-                    }
-                    <input class="" id="file-upload" name="file" type="file" accept="application/pdf, image/jpeg">
+        <div class="govuk-box loader" id="file-upload-loading" aria-busy="true"></div>
+        <div class="hide-when-uploading">
+            <p>@Messages(s"fileUpload.p1.$fileType")</p>
+            <p>@Messages("fileUpload.p2")</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@Messages(s"fileUpload.li.1.$fileType")</li>
+                <li>@Messages("fileUpload.li.2")</li>
+                <li>@Messages("fileUpload.li.3")</li>
+            </ul>
+            <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
 
-                </div>
-                <div class="panel panel-border-wide margin-bottom-30">
-                @Messages("fileUpload.inset")
-                </div>
+                @govukFileUpload(FileUpload(
+                    id = "file-upload",
+                    name = "file",
+                    attributes = Map("accept" -> "application/pdf, image/jpeg"),
+                    label = Label(content = Text(Messages("fileUpload.upload"))),
+                ))
+
+                @for((key, value) <- upscan.uploadRequest.fields){
+                    <input type="hidden" name="@key" value="@value">
+                }
+
             </div>
-        </fieldset>
+            @govukInsetText(InsetText(
+                content = Text(Messages("fileUpload.inset"))
+            ))
+        </div>
 
         <div class="form-group hide-when-uploading">
-            <input type="submit" class="button file-upload"
+            @govukButton(Button(
+                content = Text(Messages("fileUpload.button")),
+                classes = "file-upload",
+                attributes = Map(
+                    "data-reference"      -> upscan.reference,
+                    "data-filetype"       -> fileType,
+                    "data-nofile"         -> Messages("error.fileUpload.no-file"),
+                    "data-empty-file"     -> Messages("error.fileUpload.empty-file"),
+                    "data-pswd-protected" -> Messages("error.fileUpload.password-protected"),
+                    "data-no-upload"      -> Messages("error.fileUpload.no-upload"),
+                    "data-virus"          -> Messages("error.fileUpload.virus"),
+                    "data-invalid"        -> Messages("error.fileUpload.invalid"),
+                    "data-too-large"      -> Messages("error.fileUpload.too-large")
+               )
+           ))
+
+  @*          <input type="submit" class="button file-upload"
             data-reference="@upscan.reference"
             data-filetype="@fileType"
             data-nofile="@Messages("error.fileUpload.no-file")"
@@ -87,10 +112,9 @@
             data-virus="@Messages("error.fileUpload.virus")"
             data-invalid="@Messages("error.fileUpload.invalid")"
             data-too-large="@Messages("error.fileUpload.too-large")"
-            value="@Messages("fileUpload.button")">
+            value="@Messages("fileUpload.button")"> *@
         </div>
 
     </form>
 
 }
-

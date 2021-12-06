@@ -17,39 +17,38 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-@this(mainTemplate: main_template)
+@this(
+        mainTemplate: main_template,
+        govukPanel: GovukPanel,
+)
 
 @(agentGuidancePageUrl: String, continueUrl: String, arn: String, agencyName: String, agencyEmail: String)(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = Messages("subscriptionComplete.title")) {
 
-    <div class="govuk-box-highlight transaction-banner--complete with-govuk-success-colour margin-top-10">
-        <h1 class="transaction-banner__heading">@Messages("subscriptionComplete.title")</h1>
-        <div class="govuk-panel__body">
-            <p class="margin-bottom-0">@Messages("subscriptionComplete.accountName")
-                <br>
-                <strong class="bold">@agencyName</strong>
-            </p>
-        </div>
-    </div>
+    @govukPanel(Panel(
+        title = Text(Messages("subscriptionComplete.title")),
+        content = Text(s"${Messages("subscriptionComplete.accountName")} $agencyName")
+    ))
 
     <p>@Html(Messages("subscriptionComplete.p1", s"$arn"))</p>
-
     <p>@Html(Messages("subscriptionComplete.p2", s"$agencyEmail"))</p>
 
-    <h2 class="heading-medium">@Messages("subscriptionComplete.h2")</h2>
+    <h2 class="govuk-heading-m">@Messages("subscriptionComplete.h2")</h2>
 
     <p>@Html(Messages("subscriptionComplete.p3", s"$agentGuidancePageUrl"))</p>
 
-
-    <ul class="list list-bullet">
+    <ul class="govuk-list govuk-list--bullet">
         <li>@Messages("subscriptionComplete.bullet-list.1")</li>
         <li>@Messages("subscriptionComplete.bullet-list.2")</li>
     </ul>
 
     <p>
-        <a href="@continueUrl" class="button" id="continue" role="button">@Messages(s"subscriptionComplete.button")</a>
+        <a href="@continueUrl" class="govuk-button" id="continue" role="button">@Messages(s"subscriptionComplete.button")</a>
     </p>
 
 }

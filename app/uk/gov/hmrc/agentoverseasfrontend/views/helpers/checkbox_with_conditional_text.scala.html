@@ -15,30 +15,45 @@
  *@
 
 @import views.html.helper._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
 
-@this(input: Input)
+@this(govukInput: GovukInput,
+      govukCheckboxes: GovukCheckboxes,
+      govukInsetText: GovukInsetText)
 
-@(field: Field, args: (Symbol,Any)*)(implicit messages: Messages)
+@(field: Field, labelCheckbox: String, labelInset: String, args: (Symbol,Any)*)(implicit messages: Messages)
 
-@elements = @{ new FieldElements(field.id, field, null, args.toMap, messages) }
 @value = @{ field.value match { case Some(x) => x case None => "" case x => x }}
 @hasValue = @{ value != "" }
-@labelCheckbox = @{ elements.args.get('_labelCheckbox) }
-@labelInset = @{ elements.args.get('_labelInset).getOrElse("") }
 @checkboxId = @{ field.id + "-checkbox" }
 @conditionalDivId = @{ field.id + "-conditional" }
 
-<div class="multiple-choice" data-target="@conditionalDivId">
-    <input type="checkbox" id="@checkboxId" name="@checkboxId" value="true" @if(hasValue || field.hasErrors){ checked="checked" }>
-    <label class="@if(hasValue){ selected }" for="@checkboxId">@labelCheckbox</label>
-</div>
-
-<div class="panel panel-border-narrow js-hidden" id="@conditionalDivId">
-    @input(field, args ++ Seq(
-      '_label -> Html(labelInset.toString),
-      '_labelTextClass -> "form-label",
-      '_inputClass -> "form-control",
-        '_errorPrefix -> Messages("error.prefix")
-    ): _*)
-</div>
+@govukCheckboxes(Checkboxes(
+    name = checkboxId,
+    items = Seq(
+        CheckboxItem(
+            label = Some(Label(content = Text(labelCheckbox))),
+            id = Some(checkboxId),
+            name = Some(checkboxId),
+            value = "true",
+            checked = hasValue || field.hasErrors,
+            content = Text(labelCheckbox),
+            conditionalHtml = Some(
+                govukInput(Input(
+                    label = Label(content = Text(labelInset)),
+                    attributes = args.toMap.map { case (k,v) => (k.toString, v.toString) }
+                ).withFormField(field))
+            )
+        )
+    ),
+))

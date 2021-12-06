@@ -18,49 +18,65 @@
 @import uk.gov.hmrc.agentoverseasfrontend.models._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers._
-@import uk.gov.hmrc.play.views.html.helpers._
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup, checkBoxWithConditionalText: checkbox_with_conditional_text)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukCheckboxes: GovukCheckboxes,
+        form: FormWithCSRF,
+        checkBoxWithConditionalText: checkbox_with_conditional_text)
 
 @(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(agentCodesForm) + Messages("agentCodes.title")) {
-
-    <a href="@backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm)" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(agentCodesForm) + Messages("agentCodes.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm.url))) {
 
     @if(agentCodesForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"),agentCodesForm, Seq.empty, Some("agent-codes"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(agentCodesForm))
     }
 
-    @form(
-        action = routes.ApplicationController.submitAgentCodes,
-        'class -> "form js-form"
-    ) {
-        <fieldset>
-            <legend>
-                <h1 class="heading-xlarge margin-bottom-20">
-                    <span class="pre-heading">@Messages("agentCodes.caption")</span>
-                    @Messages("agentCodes.title")
-                </h1>
-            </legend>
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">@Messages("agentCodes.caption")</span>
+        @Messages("agentCodes.title")
+    </h1>
 
-            <p>@Messages("agentCodes.p1")</p>
+    <p>@Messages("agentCodes.p1")</p>
+    <p>@Messages("agentCodes.form.hint")</p>
 
-            <p id="agent-codes" class="hint-text">@Messages("agentCodes.form.hint")</p>
+    @form(action = routes.ApplicationController.submitAgentCodes) {
 
+        <fieldset class="govuk-fieldset">
             <div aria-describedby="agent-codes" class="panels-conditionals form-group margin-bottom-30">
-                @checkBoxWithConditionalText(agentCodesForm("self-assessment"),
-                    '_labelCheckbox -> Messages("agentCodes.form.self-assessment.label"),
-                    '_labelInset -> Messages("agentCodes.form.self-assessment.inset"))
-
-                @checkBoxWithConditionalText(agentCodesForm("corporation-tax"),
-                    '_labelCheckbox -> Messages("agentCodes.form.corporation-tax.label"),
-                    '_labelInset -> Messages("agentCodes.form.corporation-tax.inset"))
+                @checkBoxWithConditionalText(
+                    field = agentCodesForm("self-assessment"),
+                    labelCheckbox = Messages("agentCodes.form.self-assessment.label"),
+                    labelInset = Messages("agentCodes.form.self-assessment.inset")
+                )
+                @checkBoxWithConditionalText(
+                    field = agentCodesForm("corporation-tax"),
+                    labelCheckbox = Messages("agentCodes.form.corporation-tax.label"),
+                    labelInset = Messages("agentCodes.form.corporation-tax.inset")
+                )
             </div>
 
         </fieldset>
 
-        <button class="button margin-bottom-30" type="submit" id="continue">@Messages("button.continue")</button>
+        @govukButton(Button(
+            attributes = Map("id" -> "continue", "type" -> "submit"),
+            content = Text(Messages("button.continue")),
+        ))
     }
 }

@@ -17,21 +17,22 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, govukPanel: GovukPanel)
 
 @(tradingName: String, contactEmail: String, guidanceApplicationUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = Messages("applicationComplete.title")){
 
-            <div class="govuk-box-highlight transaction-banner--complete with-govuk-success-colour">
-                <h1 class="flush--top bold-xlarge">@Messages("applicationComplete.title")</h1>
-                <div class="flush--bottom font-large">
-                    @Messages("applicationComplete.panel.body")
-                        @tradingName
-                </div>
-            </div>
-            <h2 class="heading-medium">@Messages("applicationComplete.whatHappensNext.heading")</h2>
+            @govukPanel(Panel(
+                title = Text(Messages("applicationComplete.title")),
+                content = Text(s"${Messages("applicationComplete.panel.body")} $tradingName")
+            ))
+
+            <h2 class="govuk-heading-m">@Messages("applicationComplete.whatHappensNext.heading")</h2>
             <p>
                @Html(Messages("applicationComplete.whatHappensNext.para1",Html(s"<strong class=${"bold"}>$contactEmail</strong>")))
             </p>
@@ -44,20 +45,20 @@
             <p>
                 @Messages("applicationComplete.whatHappensNext.para4")
             </p>
-            <h2 class="heading-medium">@Messages("applicationComplete.whatYouCanDoNext.heading")</h2>
+            <h2 class="govuk-heading-m">@Messages("applicationComplete.whatYouCanDoNext.heading")</h2>
             <p><a href="@guidanceApplicationUrl">@Messages("applicationComplete.whatYouCanDoNext.link")</a>
                 @Messages("applicationComplete.whatYouCanDoNext.text")
             </p>
-            <h2 class="heading-medium">@Messages("applicationComplete.help.heading")</h2>
+            <h2 class="govuk-heading-m">@Messages("applicationComplete.help.heading")</h2>
             <p>
                 @Messages("applicationComplete.help.text")
             </p>
             <p>
             <a href="javascript:window.print()" class="print-link">@Messages("applicationComplete.print")</a>
             </p>
-            <div class="form-group">
-            <a href="@routes.ApplicationSignOutController.startFeedbackSurvey">@Messages("applicationComplete.feedback.link")</a>
-            @Messages("applicationComplete.feedback.text")
+            <div>
+                <a href="@routes.ApplicationSignOutController.startFeedbackSurvey">@Messages("applicationComplete.feedback.link")</a>
+                @Messages("applicationComplete.feedback.text")
             </div>
 
 

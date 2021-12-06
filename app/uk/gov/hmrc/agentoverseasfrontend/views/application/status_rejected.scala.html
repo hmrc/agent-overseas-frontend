@@ -17,26 +17,27 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationEntityDetails
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF, inputRadioGroup: InputRadioGroup)
+@this(mainTemplate: main_template, errorPrefix: error_prefix, govukErrorSummary: GovukErrorSummary, form: FormWithCSRF)
 
 @(agentDetails: ApplicationEntityDetails)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
 @mainTemplate(Messages("statusRejected.title")){
 
-    <h1 class="heading-xlarge">@Messages("statusRejected.title")</h1>
+    <h1 class="govuk-heading-xl">@Messages("statusRejected.title")</h1>
 
-    <p class="flush--top">@Messages("statusRejected.para1", agentDetails.tradingName)</p>
+    <p>@Messages("statusRejected.para1", agentDetails.tradingName)</p>
     <p>@Html(Messages("statusRejected.para2", Html(s"<strong class=bold-small>${agentDetails.businessEmail}</strong>")))</p>
 
-    <h2 class="heading-large">@Messages("statusRejected.heading")</h2>
+    <h2 class="govuk-heading-l">@Messages("statusRejected.heading")</h2>
 
     <p>@Messages("statusRejected.para3")</p>
 
     <p>@Html(Messages("statusRejected.link",
         Html(s"<a href=${routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url}>")))
-    @Messages("statusRejected.link.text")@Html("</a>")
+        @Messages("statusRejected.link.text")@Html("</a>")
     </p>
 }

@@ -18,79 +18,93 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Content
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, errorSummary: ErrorSummary, form: FormWithCSRF)
+@this(
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukRadios: GovukRadios,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        govukInsetText: GovukInsetText,
+        form: FormWithCSRF)
 
 @(personalDetailsForm: Form[PersonalDetailsChoice], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(personalDetailsForm) + Messages("personalDetails.title")) {
-    <a href="@backLink.getOrElse(routes.ApplicationController.showUkTaxRegistrationForm())" class="link-back">@Messages("button.back")</a>
+@mainTemplate(title = errorPrefix(personalDetailsForm) + Messages("personalDetails.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showUkTaxRegistrationForm().url))) {
 
     @if(personalDetailsForm.hasErrors) {
-        @errorSummary(Messages("error.summary.heading"),personalDetailsForm, Seq.empty, Some("personal-details"))
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(personalDetailsForm))
     }
+
+    <h1 class="govuk-heading-xl">
+        @Messages("personalDetails.title")
+    </h1>
+
+    <p class="margin-bottom-10">@Messages("personalDetails.p1")</p>
+
+    <p class="govuk-hint">@Messages("personalDetails.p2")</p>
 
     @form(action = routes.ApplicationController.submitPersonalDetails, 'class -> "form js-form") {
 
-        <fieldset>
-            <legend class="margin-bottom-10">
-                <h1 class="heading-xlarge margin-bottom-20 @if(personalDetailsForm.hasErrors) {push--top}">@Messages("personalDetails.title")</h1>
-            </legend>
-            <p class="margin-bottom-10">@Messages("personalDetails.p1")</p>
-            <p class="hint-text">@Messages("personalDetails.p2")</p>
-            <div class="form-group @if(personalDetailsForm.error("personalDetailsChoice").isDefined) {form-group-error}" id="personalDetailsChoice">
-                @if(personalDetailsForm.error("personalDetailsChoice").isDefined) {
-                    <span class="error-message"><span class="visuallyhidden">@Messages("error.prefix")</span>@Messages("error.personalDetails.no-radio.selected")</span>
-                }
-                <div class="multiple-choice" data-target="ninoRadioInput">
-                    <input id="variant_nino" type="radio" name="personalDetailsChoice" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true) || personalDetailsForm.error("nino").isDefined) {checked} value="nino" >
-                    <label for="variant_nino">@Messages("personalDetails.form.nino")</label>
-                </div>
-                <div class="panel panel-border-narrow js-hidden @if(personalDetailsForm.error("nino").isDefined) {form-group-error}" id="ninoRadioInput">
-                    <label class="form-label" for="nino">@Messages("personalDetails.form.nino")
-                        <span class="form-hint" id="nino-hint">@Messages("personalDetails.form.helper.nino")</span>
-                    </label>
-                    @personalDetailsForm.error("nino").map { formError => <span class="error-message" id="nino-error" ><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span> }
-                    <input
-                    aria-describedby="nino-hint @if(personalDetailsForm.error("nino").isDefined){nino-error}"
-                    spellcheck="false"
-                    data-uppercase="true"
-                    class="form-control"
-                    name="nino"
-                    type="text"
-                    id="nino"
-                        @if(personalDetailsForm.data.getOrElse("personalDetailsChoice", "") == "nino") {
-                        @personalDetailsForm.data.get("nino").map { v => value="@v"}}
-                    >
-                </div>
-                <div class="multiple-choice" data-target="utrRadioInput">
-                    <input id="variant_utr" type="radio" name="personalDetailsChoice" @if(personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true) || personalDetailsForm.error("saUtr").isDefined) {checked} value="saUtr">
-                    <label for="variant_utr">@Messages("personalDetails.form.sautr")</label>
-                </div>
-                <div class="panel panel-border-narrow js-hidden @if(personalDetailsForm.error("saUtr").isDefined) {form-group-error}" id="utrRadioInput">
-                    <label class="form-label" for="saUtr">@Messages("personalDetails.form.sautr")
-                        <span class="form-hint" id="sa-utr">@Messages("personalDetails.form.helper.sautr")</span>
-                    </label>
-                    @personalDetailsForm.error("saUtr").map { formError => <span class="error-message" id="sa-utr-error"><span class="visuallyhidden">@Messages("error.prefix")</span> @Messages(formError.message)</span> }
-                    <input
-                    aria-describedby="sa-utr @if(personalDetailsForm.error("saUtr").isDefined){sa-utr-error}"
-                    class="form-control"
-                    name="saUtr"
-                    spellcheck="false"
-                    type="text"
-                    id="saUtr"
-                        @if(personalDetailsForm.data.getOrElse("personalDetailsChoice", "") == "saUtr") {
-                        @personalDetailsForm.data.get("saUtr").map { v => value="@v"}}
-                    >
-                </div>
-            </div>
+        <fieldset class="govuk-fieldset">
+            @govukRadios(Radios(
+                items = Seq(
+                    RadioItem(
+                        content = Text(Messages("personalDetails.form.nino")),
+                        value = Some("nino"),
+                        checked = personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true) || personalDetailsForm.error("nino").isDefined,
+                        conditionalHtml = Some(
+                            govukInput(Input(
+                                label = Label(content = Text(Messages("personalDetails.form.nino"))),
+                                hint = Some(Hint(content = Text(Messages("personalDetails.form.helper.nino")))),
+                                spellcheck = Some(false),
+                                attributes = Map("data-uppercase" -> "true"),
+                                value = if (personalDetailsForm.data.get("personalDetailsChoice").contains("nino")) personalDetailsForm.data.get("nino") else None
+                            ).withFormField(personalDetailsForm("nino")))
+                        )
+                    ),
+                    RadioItem(
+                        content = Text(Messages("personalDetails.form.sautr")),
+                        value = Some("saUtr"),
+                        checked = personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true) || personalDetailsForm.error("saUtr").isDefined,
+                        conditionalHtml = Some(
+                            govukInput(Input(
+                                label = Label(content = Text(Messages("personalDetails.form.sautr"))),
+                                hint = Some(Hint(content = Text(Messages("personalDetails.form.helper.sautr")))),
+                                spellcheck = Some(false),
+                                value = if (personalDetailsForm.data.get("personalDetailsChoice").contains("sautr")) personalDetailsForm.data.get("saUtr") else None
+                            ).withFormField(personalDetailsForm("saUtr")))
+                        )
+                    )
+                ),
+            ).withFormField(personalDetailsForm("personalDetailsChoice")))
         </fieldset>
 
-            <div class="form-group">
-                <button class="button" type="submit" id="continue">@Messages("button.continue")</button>
-            </div>
-
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(Messages("button.continue")),
+        ))
 
  }
 

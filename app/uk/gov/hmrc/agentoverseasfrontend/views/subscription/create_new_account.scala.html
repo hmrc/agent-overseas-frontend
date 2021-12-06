@@ -24,8 +24,10 @@
 
 @mainTemplate(title = Messages("createNewAccount.title")) {
 
-<h1 class="heading-xlarge margin-bottom-30">@Messages("createNewAccount.title")</h1>
+  <h1 class="govuk-heading-xl">@Messages("createNewAccount.title")</h1>
 
-<p>@Messages("createNewAccount.p1")</p>
-<p><a class="button" href="@routes.SubscriptionSignOutController.signOutWithContinueUrl()" role="button" id="buttonGoToGg">@Messages("createNewAccount.button")</a></p>
+  <p>@Messages("createNewAccount.p1")</p>
+  <p>
+    <a class="govuk-button" href="@routes.SubscriptionSignOutController.signOutWithContinueUrl()" role="button" id="buttonGoToGg">@Messages("button.continue")</a>
+  </p>
 }

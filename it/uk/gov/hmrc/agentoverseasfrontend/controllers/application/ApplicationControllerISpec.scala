@@ -282,8 +282,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "show existing selection if session already contains choice" in
       new RegisteredWithHmrcSetup(agentSession.copy(registeredWithHmrc = Some(Yes))) {
-
-        doc.getElementById("registeredWithHmrc-true").attr("checked") shouldBe "checked"
+        doc.select("#registeredWithHmrc-true[checked]") should have length 1
       }
 
     "contain a continue button" in new RegisteredWithHmrcSetup {
@@ -421,7 +420,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "show existing selection if session already contains choice" in
       new UkTaxRegistrationSetup(defaultAgentSession.copy(registeredForUkTax = Some(Yes))) {
-        doc.getElementById("registeredForUkTax-true").attr("checked") shouldBe "checked"
+        doc.select("#registeredForUkTax-true[checked]") should have length 1
       }
 
     "contain a continue button" in new UkTaxRegistrationSetup {
@@ -740,7 +739,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       val doc = Jsoup.parse(contentAsString(result))
 
-      doc.getElementById("confirmRegistration_false").attr("checked") shouldBe "checked"
+      doc.select("#confirmRegistration_false[checked]") should have length 1
     }
   }
 
@@ -873,11 +872,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         defaultAgentSession.copy(
           agentCodes = Some(AgentCodes(Some(SaAgentCode("saTestCode")), None))
         )) {
-        result.futureValue should containElement(
-          id = "self-assessment-checkbox",
-          tag = "input",
-          attrs = Map("checked" -> "checked")
-        )
+        doc.select("#self-assessment-checkbox[checked]").toArray should have length 1
       }
 
     "contain a continue button" in new UkTaxRegistrationSetup {
