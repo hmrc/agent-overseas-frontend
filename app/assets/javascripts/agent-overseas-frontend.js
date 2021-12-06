@@ -6,7 +6,7 @@ $(document).ready(function() {
     // auto complete country lookup, progressive enhancement
     // need to invoke new enhanceSelectElement()
     //======================================================
-    var selectEl = document.querySelector('#amlsCode');
+    var selectEl = document.querySelector('#countryCode-auto-complete');
     if(selectEl){
         accessibleAutocomplete.enhanceSelectElement({
             autoselect: true,
@@ -16,7 +16,7 @@ $(document).ready(function() {
     }
 
     function findCountry(country) {
-        return country == $("#amlsCode").val();
+        return country == $("#countryCode-auto-complete").val();
     }
 
     //======================================================

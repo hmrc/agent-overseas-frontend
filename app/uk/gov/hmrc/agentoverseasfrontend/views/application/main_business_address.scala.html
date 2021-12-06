@@ -83,14 +83,12 @@
                 classes = "govuk-input--width-20"
             ).withFormField(mainBusinessAddressForm("addressLine4")))
 
-            <div class="autocomplete-wrapper" id="countryCode">
-                @govukSelect(Select(
-                    label = Label(content = Text(Messages("mainBusinessAddress.form.country"))),
-                    id = "countryCode-auto-complete",
-                    name = "countryCode",
-                    items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
-                ).withFormField(mainBusinessAddressForm("countryCode")))
-            </div>
+            @govukSelect(Select(
+                label = Label(content = Text(Messages("mainBusinessAddress.form.country"))),
+                id = "countryCode-auto-complete",
+                name = "countryCode",
+                items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
+            ).withFormField(mainBusinessAddressForm("countryCode")))
         </fieldset>
 
       @govukButton(Button(
