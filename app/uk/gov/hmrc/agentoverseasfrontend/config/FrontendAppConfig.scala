@@ -34,8 +34,7 @@ trait AppConfig {
   val agentOverseasFrontendUrl: String
   val agentOverseasApplicationBaseUrl: String
   val upscanBaseUrl: String
-  val reportAProblemPartialUrl: String
-  val reportAProblemNonJSUrl: String
+  val betaFeedbackUrl: String
   val timeout: Int
   val timeoutCountdown: Int
   val agentGuidancePageFullUrl: String
@@ -65,10 +64,8 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
   override val agentOverseasFrontendUrl: String =
     servicesConfig.getString("microservice.services.agent-overseas-frontend.url")
   override val upscanBaseUrl: String = servicesConfig.baseUrl("upscan")
-  override val reportAProblemPartialUrl: String =
-    servicesConfig.getString("reportAProblemPartialUrl")
-  override val reportAProblemNonJSUrl: String =
-    servicesConfig.getString("reportAProblemNonJSUrl")
+  override val betaFeedbackUrl: String =
+    servicesConfig.getString("betaFeedbackUrl")
   override val timeout: Int =
     servicesConfig.getInt("timeoutDialog.timeout-seconds")
   override val timeoutCountdown: Int =
