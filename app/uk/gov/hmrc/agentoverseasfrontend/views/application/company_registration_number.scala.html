@@ -56,19 +56,19 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(companyRegistrationNumberForm))
     }
 
-    <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("companyRegistrationNumber.caption")</span>
-        @Messages("companyRegistrationNumber.title")
-    </h1>
-    <p class="govuk-body">@Messages("companyRegistrationNumber.body.text")</p>
-
     @form(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
 
         @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(HmrcPageHeadingLegend(
+                    content = Text(Messages("companyRegistrationNumber.title")),
+                    caption = HmrcSectionCaption(Text(Messages("companyRegistrationNumber.caption"))
+                ))
+            )),
+            hint = Some(Hint(content = Text(Messages("companyRegistrationNumber.body.text")))),
             items = Seq(
                 RadioItem(
                     content = Text(Messages("companyRegistrationNumber.form.registered.yes")),
-                    id = Some("confirmRegistration_true"),
                     value = Some("true"),
                     checked = companyRegistrationNumberForm.error("registrationNumber").isDefined || companyRegistrationNumberForm.value.exists(_.confirmRegistration.contains(true)),
                     conditionalHtml = Some(
@@ -82,7 +82,6 @@
                 ),
                 RadioItem(
                     content = Text(Messages("companyRegistrationNumber.form.registered.no")),
-                    id = Some("confirmRegistration_false"),
                     value = Some("false"),
                     checked = companyRegistrationNumberForm.value.flatMap(_.confirmRegistration).contains(false)
                 ),

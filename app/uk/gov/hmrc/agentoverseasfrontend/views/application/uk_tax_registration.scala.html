@@ -48,19 +48,20 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(registeredForUkTaxForm))
     }
 
-    <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("ukTaxRegistration.caption")</span>
-        @Messages("ukTaxRegistration.title")
-    </h1>
-
     @form(action = routes.ApplicationController.submitUkTaxRegistration) {
 
         @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(HmrcPageHeadingLegend(
+                    content = Text(Messages("ukTaxRegistration.title")),
+                    caption = HmrcSectionCaption(Text(Messages("ukTaxRegistration.caption"))
+                ))
+            )),
             classes = "govuk-radios--inline",
             hint = Some(Hint(content = Text(Messages("ukTaxRegistration.form.title")))),
             items = Seq(
-                RadioItem(content = Text(Messages("ukTaxRegistration.form.registered.yes")), id = Some("registeredForUkTax-true"), value = Some("true")),
-                RadioItem(content = Text(Messages("ukTaxRegistration.form.registered.no")), id = Some("registeredForUkTax-false"), value = Some("false"))
+                RadioItem(content = Text(Messages("ukTaxRegistration.form.registered.yes")), value = Some("true")),
+                RadioItem(content = Text(Messages("ukTaxRegistration.form.registered.no")), value = Some("false"))
             )
         ).withFormField(registeredForUkTaxForm("registeredForUkTax")))
 
