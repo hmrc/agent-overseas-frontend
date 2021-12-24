@@ -20,8 +20,8 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
   private val overseasAddress = OverseasAddress("line 1", "line 2", None, None, countryCode = "IE")
   private val personalDetails = PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
-  val failureDetails = FailureDetails("QUARANTINE","a virus was found!")
-  val fileUploadStatus = FileUploadStatus("reference","READY",Some("filename"),Some(failureDetails))
+  val failureDetails: FailureDetails = FailureDetails("QUARANTINE","a virus was found!")
+  val fileUploadStatus: FileUploadStatus = FileUploadStatus("reference","READY",Some("filename"),Some(failureDetails))
 
 
   private val agentSession = AgentSession(
@@ -78,7 +78,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       status(result) shouldBe 200
 
       val doc = Jsoup.parse(contentAsString(result))
-      doc.select("#canProvideTaxRegNo_true[checked]").toArray should have length 1
+      doc.select("#canProvideTaxRegNo[checked]").toArray should have length 1
 
       doc.getElementById("value").attr("value") shouldBe taxRegNo.value
     }
@@ -92,7 +92,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       status(result) shouldBe 200
       val doc = Jsoup.parse(contentAsString(result))
 
-      doc.select("#canProvideTaxRegNo_false[checked]").toArray should have length 1
+      doc.select("#canProvideTaxRegNo-2[checked]").toArray should have length 1
     }
   }
 
@@ -137,8 +137,8 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
 
       result.futureValue should containSubstrings("This field is required")
 
-      doc.select("#canProvideTaxRegNo_true[checked]").toArray should have length 1
-      doc.select("#canProvideTaxRegNo_false[checked]").toArray should have length 0
+      doc.select("#canProvideTaxRegNo[checked]").toArray should have length 1
+      doc.select("#canProvideTaxRegNo-2[checked]").toArray should have length 0
     }
 
     "Provided selected 'No' on radioButton submit and redirect to next page /more-information-needed" in {

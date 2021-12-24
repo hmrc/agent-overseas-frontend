@@ -24,8 +24,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
   private val overseasAddress = OverseasAddress("line 1", "line 2", None, None, countryCode = "IE")
   private val personalDetails = PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
-  val failureDetails = FailureDetails("QUARANTINE", "a virus was found!")
-  val fileUploadStatus = FileUploadStatus("reference", "READY", Some("filename"), Some(failureDetails))
+  val failureDetails: FailureDetails = FailureDetails("QUARANTINE", "a virus was found!")
+  val fileUploadStatus: FileUploadStatus = FileUploadStatus("reference", "READY", Some("filename"), Some(failureDetails))
 
   private val agentSession = AgentSession(
     amlsDetails = Some(amlsDetails),
@@ -259,30 +259,34 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     }
 
     "ask for whether they are registered with HMRC" in new RegisteredWithHmrcSetup {
-      val expectedRadios = Map(
-        "true"  -> "registeredWithHmrc.form.registered.yes",
-        "false" -> "registeredWithHmrc.form.registered.no"
-      )
 
-      expectedRadios.foreach {
-        case (expectedValue, expectedMessage) => {
-          val elRadio = doc.getElementById(s"registeredWithHmrc-$expectedValue")
-          elRadio should not be null
-          elRadio.tagName() shouldBe "input"
-          elRadio.attr("type") shouldBe "radio"
-          elRadio.attr("value") shouldBe expectedValue
+        val elRadio = doc.getElementById(s"registeredWithHmrc")
+        elRadio should not be null
+        elRadio.tagName() shouldBe "input"
+        elRadio.attr("type") shouldBe "radio"
+        elRadio.attr("value") shouldBe "true"
 
-          checkMessageIsDefined(expectedMessage)
-          val elLabel = doc.select(s"label[for=registeredWithHmrc-$expectedValue]").first()
-          elLabel should not be null
-          elLabel.text() shouldBe htmlEscapedMessage(expectedMessage)
-        }
-      }
+        checkMessageIsDefined("registeredWithHmrc.form.registered.yes")
+        val elLabel = doc.select(s"label[for=registeredWithHmrc]").first()
+        elLabel should not be null
+        elLabel.text() shouldBe htmlEscapedMessage("registeredWithHmrc.form.registered.yes")
+
+        val elRadio2 = doc.getElementById(s"registeredWithHmrc-2")
+        elRadio2 should not be null
+        elRadio2.tagName() shouldBe "input"
+        elRadio2.attr("type") shouldBe "radio"
+        elRadio2.attr("value") shouldBe "false"
+
+        checkMessageIsDefined("registeredWithHmrc.form.registered.no")
+        val elLabel2 = doc.select(s"label[for=registeredWithHmrc-2]").first()
+        elLabel2 should not be null
+        elLabel2.text() shouldBe htmlEscapedMessage("registeredWithHmrc.form.registered.no")
+
     }
 
     "show existing selection if session already contains choice" in
       new RegisteredWithHmrcSetup(agentSession.copy(registeredWithHmrc = Some(Yes))) {
-        doc.select("#registeredWithHmrc-true[checked]") should have length 1
+        doc.select("#registeredWithHmrc[checked]") should have length 1
       }
 
     "contain a continue button" in new RegisteredWithHmrcSetup {
@@ -397,30 +401,35 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     }
 
     "ask for whether they are registered for UK tax" in new UkTaxRegistrationSetup {
-      val expectedRadios = Map(
-        "true"  -> "ukTaxRegistration.form.registered.yes",
-        "false" -> "ukTaxRegistration.form.registered.no"
-      )
 
-      expectedRadios.foreach {
-        case (expectedValue, expectedMessage) => {
-          val elRadio = doc.getElementById(s"registeredForUkTax-$expectedValue")
-          elRadio should not be null
-          elRadio.tagName() shouldBe "input"
-          elRadio.attr("type") shouldBe "radio"
-          elRadio.attr("value") shouldBe expectedValue
+      val elRadio = doc.getElementById(s"registeredForUkTax")
+      elRadio should not be null
+      elRadio.tagName() shouldBe "input"
+      elRadio.attr("type") shouldBe "radio"
+      elRadio.attr("value") shouldBe "true"
 
-          checkMessageIsDefined(expectedMessage)
-          val elLabel = doc.select(s"label[for=registeredForUkTax-$expectedValue]").first()
-          elLabel should not be null
-          elLabel.text() shouldBe htmlEscapedMessage(expectedMessage)
-        }
-      }
+      checkMessageIsDefined("ukTaxRegistration.form.registered.yes")
+      val elLabel = doc.select(s"label[for=registeredForUkTax]").first()
+      elLabel should not be null
+      elLabel.text() shouldBe htmlEscapedMessage("ukTaxRegistration.form.registered.yes")
+
+      val elRadio2 = doc.getElementById(s"registeredForUkTax-2")
+      elRadio2 should not be null
+      elRadio2.tagName() shouldBe "input"
+      elRadio2.attr("type") shouldBe "radio"
+      elRadio2.attr("value") shouldBe "false"
+
+      checkMessageIsDefined("ukTaxRegistration.form.registered.no")
+      val elLabel2 = doc.select(s"label[for=registeredForUkTax-2]").first()
+      elLabel2 should not be null
+      elLabel2.text() shouldBe htmlEscapedMessage("ukTaxRegistration.form.registered.no")
+
+
     }
 
     "show existing selection if session already contains choice" in
       new UkTaxRegistrationSetup(defaultAgentSession.copy(registeredForUkTax = Some(Yes))) {
-        doc.select("#registeredForUkTax-true[checked]") should have length 1
+        doc.select("#registeredForUkTax[checked]") should have length 1
       }
 
     "contain a continue button" in new UkTaxRegistrationSetup {
@@ -739,7 +748,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       val doc = Jsoup.parse(contentAsString(result))
 
-      doc.select("#confirmRegistration_false[checked]") should have length 1
+      doc.select("#confirmRegistration-2[checked]") should have length 1
     }
   }
 
@@ -1109,7 +1118,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             "checkAnswers.companyRegistrationNumber.empty"
           )
 
-          testAgentCodes(contentAsString(result), false)
+          testAgentCodes(contentAsString(result), result = false)
         }
 
         "CompanyRegistrationNumber is non empty" in {
@@ -1145,7 +1154,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             "checkAnswers.companyRegistrationNumber.title"
           )
 
-          testAgentCodes(contentAsString(result), false)
+          testAgentCodes(contentAsString(result), result = false)
           contentAsString(result).contains("999999") shouldBe true
         }
 
@@ -1185,7 +1194,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             "checkAnswers.taxRegistrationNumbers.empty"
           )
 
-          testAgentCodes(contentAsString(result), false)
+          testAgentCodes(contentAsString(result), result = false)
         }
 
         "TaxRegistrationNumbers is non empty" in {
@@ -1225,7 +1234,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             "checkAnswers.taxRegistrationNumbers.title"
           )
 
-          testAgentCodes(contentAsString(result), false)
+          testAgentCodes(contentAsString(result), result = false)
           contentAsString(result).contains("TX12345") shouldBe true
           contentAsString(result).contains("tradingAddressFileName") shouldBe true
         }
@@ -1271,7 +1280,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
         result.futureValue shouldNot containMessages("checkAnswers.personalDetails.nino.title")
 
-        testAgentCodes(contentAsString(result), false)
+        testAgentCodes(contentAsString(result), result = false)
         contentAsString(result).contains("tradingAddressFileName") shouldBe true
       }
     }

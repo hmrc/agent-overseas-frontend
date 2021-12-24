@@ -22,20 +22,12 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, Button}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Radios, RadioItem, Fieldset, Hint, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInput, Input, Label}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInsetText, InsetText, HtmlContent}
+@import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
 
 @this(
         mainTemplate: main_template,
@@ -61,7 +53,7 @@
             fieldset = Some(Fieldset(
                 legend = Some(HmrcPageHeadingLegend(
                     content = Text(Messages("taxRegNo.title")),
-                    caption = HmrcSectionCaption(Text(Messages("taxRegNo.caption"))
+                    caption = HmrcSectionCaption(Text(Messages("taxRegNo.caption")))
                 ))
             )),
             hint = Some(Hint(content = Text(Messages("taxRegNo.p1")))),

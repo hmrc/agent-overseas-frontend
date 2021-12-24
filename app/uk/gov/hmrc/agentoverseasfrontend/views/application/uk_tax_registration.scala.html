@@ -22,14 +22,10 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, Button}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Radios, RadioItem, Fieldset, Hint, Text}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
 
 @this(
         mainTemplate: main_template,
@@ -54,7 +50,7 @@
             fieldset = Some(Fieldset(
                 legend = Some(HmrcPageHeadingLegend(
                     content = Text(Messages("ukTaxRegistration.title")),
-                    caption = HmrcSectionCaption(Text(Messages("ukTaxRegistration.caption"))
+                    caption = HmrcSectionCaption(Text(Messages("ukTaxRegistration.caption")))
                 ))
             )),
             classes = "govuk-radios--inline",

@@ -18,25 +18,14 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.CompanyRegistrationNumber
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukErrorSummary, ErrorSummary, GovukButton, Button}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Radios, RadioItem, Fieldset, Hint, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInput, Input, Label}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInsetText, InsetText, HtmlContent}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichRadios, RichInput}
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
 
 @this(
         mainTemplate: main_template,
@@ -62,7 +51,7 @@
             fieldset = Some(Fieldset(
                 legend = Some(HmrcPageHeadingLegend(
                     content = Text(Messages("companyRegistrationNumber.title")),
-                    caption = HmrcSectionCaption(Text(Messages("companyRegistrationNumber.caption"))
+                    caption = HmrcSectionCaption(Text(Messages("companyRegistrationNumber.caption")))
                 ))
             )),
             hint = Some(Hint(content = Text(Messages("companyRegistrationNumber.body.text")))),
@@ -93,4 +82,5 @@
             content = Text(Messages("button.continue")),
         ))
     }
+
 }

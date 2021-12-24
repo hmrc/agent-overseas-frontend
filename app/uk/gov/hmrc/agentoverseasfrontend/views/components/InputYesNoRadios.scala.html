@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
 @import uk.gov.hmrc.govukfrontend.views.html.components.{Radios, Fieldset, Legend, Text, RadioItem, Hint, ErrorMessage}
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
 
 @this(govukRadios: GovukRadios)
 
@@ -42,7 +43,7 @@ headingIsLegend: Boolean = false
         legend = if(caption.isDefined) {
             Some(HmrcPageHeadingLegend(
                 content = Text(legend),
-                caption = HmrcSectionCaption(Text(caption.get)
+                caption = HmrcSectionCaption(Text(caption.get))
             ))
             } else {
             Some(Legend(
