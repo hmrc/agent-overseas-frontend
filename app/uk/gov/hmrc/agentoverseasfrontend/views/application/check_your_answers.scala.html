@@ -67,7 +67,7 @@
 
 @renderAnswerBlock(answerBlock: AnswerBlock) = {
 
-    <h2 class="heading-medium margin-bottom-10">@answerBlock.heading</h2>
+    <h2>@answerBlock.heading</h2>
 
     @for(group <- answerBlock.answerGroups) {
         @govukSummaryList(SummaryList(
@@ -78,7 +78,7 @@
 
 @mainTemplate(title = errorPrefix(cyaForm) + Messages("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
 
-    <h1 class="govuk-heading-xl margin-bottom-30">@Messages("checkAnswers.title")</h1>
+    <h1 class="govuk-heading-xl">@Messages("checkAnswers.title")</h1>
 
     @if(cyaForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(cyaForm))
@@ -89,7 +89,7 @@
     @renderAnswerBlock(checkYourAnswers.businessDetails)
     @renderAnswerBlock(checkYourAnswers.otherBusinessDetails)
 
-    <p class="margin-top-30">@Messages("checkAnswers.confirm.p1")</p>
+    <p>@Messages("checkAnswers.confirm.p1")</p>
 
     @formHelper(
         action = routes.ApplicationController.submitCheckYourAnswers(), 'id -> "checkAnswers") {

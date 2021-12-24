@@ -28,6 +28,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLabel, HmrcSectionCaption}
 
 @this(
         mainTemplate: main_template, 
@@ -45,13 +46,12 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(tradingNameForm))
     }
 
-    <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("tradingName.p1")</span>
-        @Messages("tradingName.title")
-    </h1>
-
     @form(action = routes.ApplicationController.submitTradingName) {
         @govukInput(Input(
+            label = HmrcPageHeadingLabel(
+                    content = Text(Messages("tradingName.title")),
+                    caption = HmrcSectionCaption(Text(Messages("tradingName.p1")))
+            ),
             spellcheck = Some(false),
             classes = "govuk-input--width-20"
         ).withFormField(tradingNameForm("tradingName")))

@@ -250,7 +250,7 @@ $(document).ready(function() {
         $('title').html("Error: " + title);
         $('.js-error-summary-messages a').html(errorMsg);
         $('#file-upload-container').addClass('form-field--error');
-        $('#file-upload-error').html('<span class="visuallyhidden">Error:</span>' + errorMsg);
+        $('#file-upload-error').html('<span class="govuk-visually-hidden">Error:</span>' + errorMsg);
     }
 
     function clearErrors() {
@@ -277,13 +277,16 @@ $(document).ready(function() {
         fileUploadClass.removeAttr('disabled');
     }
 
-    // ------------------------------------
-    // Introduce direct skip link control, to work around voiceover failing of hash links
-    // https://bugs.webkit.org/show_bug.cgi?id=179011
-    // https://axesslab.com/skip-links/
-    // ------------------------------------
-    $('.skiplink').click(function(e) {
-        e.preventDefault();
-        $(':header:first').attr('tabindex', '-1').focus();
+    //TODO - replace as should not be relying on JS
+    $('[type="submit"]').click(function () {
+        $input.each(function () {
+        //Trim inputs and Capitalize postode
+            if ($(this).val() && $(this).attr('data-uppercase') === 'true') {
+                $(this).val($(this).val().toUpperCase().replace(/\s\s+/g, ' ').trim())
+            } else {
+                $(this).val($(this).val().trim())
+            }
+        });
     });
+
 });

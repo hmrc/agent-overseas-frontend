@@ -141,6 +141,8 @@ subscription.servicename.titleSuffix=Finish setting up your agent services accou
 button.continue=Continue
 button.back=Back
 button.register=Create a Government Gateway account
+radio.yes=Yes
+radio.no=No
 
 error.country.empty=Enter your country
 error.country.invalid=Select a country from the list

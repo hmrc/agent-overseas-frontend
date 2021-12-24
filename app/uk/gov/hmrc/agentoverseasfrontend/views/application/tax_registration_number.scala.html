@@ -22,20 +22,12 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukButton, Button}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Radios, RadioItem, Fieldset, Hint, Text}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInput, Input, Label}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukInsetText, InsetText, HtmlContent}
+@import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
 
 @this(
         mainTemplate: main_template,
@@ -55,45 +47,42 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(taxRegistrationNumberForm))
     }
 
-    <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("taxRegNo.caption")</span>
-        @Messages("taxRegNo.title")
-    </h1>
-    <p class="govuk-body">@Messages("taxRegNo.p1")</p>
+    @form(action = routes.TaxRegController.submitTaxRegistrationNumber()) {
 
-
-    @form(action = routes.TaxRegController.submitTaxRegistrationNumber(), 'class -> "form js-form") {
-
-        <fieldset class="govuk-fieldset">
-            @govukRadios(Radios(
-                items = Seq(
-                    RadioItem(
-                        id = Some("canProvideTaxRegNo_true"),
-                        content = Text(Messages("taxRegNo.form.yes")),
-                        value = Some("true"),
-                        checked = taxRegistrationNumberForm.error("value").isDefined || taxRegistrationNumberForm.value.exists(_.canProvideTaxRegNo.contains(true)),
-                        conditionalHtml = Some(
-                            govukInput(Input(
-                                label = Label(content = Text(Messages("taxRegNo.form.yes.prompt"))),
-                                spellcheck = Some(false),
-                                classes = "govuk-input--width-20",
-                                attributes = Map("data-uppercase" -> "false")
-                            ).withFormField(taxRegistrationNumberForm("value")))
-                        )
-                    ),
-                    RadioItem(
-                        id = Some("canProvideTaxRegNo_false"),
-                        content = Text(Messages("taxRegNo.form.no")),
-                        value = Some("false"),
-                        checked = taxRegistrationNumberForm.value.flatMap(_.canProvideTaxRegNo).contains(false)
-                    ),
-                )
-            ).withFormField(taxRegistrationNumberForm("canProvideTaxRegNo")))
-
-        </fieldset>
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(HmrcPageHeadingLegend(
+                    content = Text(Messages("taxRegNo.title")),
+                    caption = HmrcSectionCaption(Text(Messages("taxRegNo.caption")))
+                ))
+            )),
+            hint = Some(Hint(content = Text(Messages("taxRegNo.p1")))),
+            items = Seq(
+                RadioItem(
+                    content = Text(Messages("taxRegNo.form.yes")),
+                    value = Some("true"),
+                    checked = taxRegistrationNumberForm.error("value").isDefined || taxRegistrationNumberForm.value.exists(_.canProvideTaxRegNo.contains(true)),
+                    conditionalHtml = Some(
+                        govukInput(Input(
+                            label = Label(content = Text(Messages("taxRegNo.form.yes.prompt"))),
+                            spellcheck = Some(false),
+                            classes = "govuk-input--width-20",
+                            attributes = Map("data-uppercase" -> "false")
+                        ).withFormField(taxRegistrationNumberForm("value")))
+                    )
+                ),
+                RadioItem(
+                    content = Text(Messages("taxRegNo.form.no")),
+                    value = Some("false"),
+                    checked = taxRegistrationNumberForm.value.flatMap(_.canProvideTaxRegNo).contains(false)
+                ),
+            )
+        ).withFormField(taxRegistrationNumberForm("canProvideTaxRegNo")))
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
             content = Text(Messages("button.continue")),
-        ))    }
+        ))
+    }
+
 }
