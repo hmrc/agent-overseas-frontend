@@ -55,7 +55,7 @@
     SummaryListRow(
         key = Key(Text(answerRow.question)),
         value = Value(content = HtmlContent(s"""<span id="${answerRow.id}">""" ++ answerRow.answerLines.map(line => s"<div>$line</div>\n").foldLeft("")(_++_) ++ "</span>")),
-        actions = Some(Actions(items = answerRow.changeLink.toList.map(link =>
+        actions = answerRow.changeLink.map(link => Actions(items = List(
             ActionItem(
                 href = link.url,
                 content = HtmlContent(s"""${Messages("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}</span>"""),

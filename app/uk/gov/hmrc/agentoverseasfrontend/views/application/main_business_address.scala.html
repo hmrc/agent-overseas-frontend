@@ -34,6 +34,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorLink
 
 @this(mainTemplate: main_template, errorPrefix: error_prefix, govukErrorSummary: GovukErrorSummary, govukInput: GovukInput, govukSelect: GovukSelect, form: FormWithCSRF, govukButton: GovukButton)
 
@@ -41,10 +42,22 @@
 
 @value = @{ mainBusinessAddressForm("countryCode").value.getOrElse("")}
 
+@errorSummary = @{
+    // Fix error link to point to countryCode-auto-complete (which is the JS-enabled input field) instead of to simply countryCode which is the form field name
+    val errorSummaryRaw = ErrorSummary().withFormErrorsAsText(mainBusinessAddressForm)
+    val newErrorList = errorSummaryRaw.errorList.map(errorLink =>
+      if (errorLink.href.contains("#countryCode"))
+        errorLink.copy(href = Some("#countryCode-auto-complete"))
+      else
+        errorLink
+    )
+    errorSummaryRaw.copy(errorList = newErrorList)
+}
+    
 @mainTemplate(title = errorPrefix(mainBusinessAddressForm) + Messages("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
 
     @if(mainBusinessAddressForm.hasErrors) {
-        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(mainBusinessAddressForm))
+        @govukErrorSummary(errorSummary)
     }
 
     @form(action = routes.TradingAddressController.submitMainBusinessAddress, 'class -> "form js-form") {

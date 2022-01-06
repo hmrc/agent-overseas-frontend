@@ -59,7 +59,7 @@
     @form(action = routes.ApplicationController.submitAgentCodes) {
 
         <fieldset class="govuk-fieldset">
-            <div aria-describedby="agent-codes" class="panels-conditionals form-group margin-bottom-30">
+            <div class="panels-conditionals form-group margin-bottom-30">
                 @checkBoxWithConditionalText(
                     field = agentCodesForm("self-assessment"),
                     labelCheckbox = Messages("agentCodes.form.self-assessment.label"),
