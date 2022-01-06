@@ -26,3 +26,14 @@ h3 {
   @extend .govuk-heading-s;
 }
 
+.govuk-header__logo {
+  @extend .govuk-header__logo;
+// This service has a long name and we make some adjustments to avoid it wrapping onto two lines in the header
+  width: 25%;
+}
+
+.hmrc-header__service-name {
+  @extend .hmrc-header__service-name;
+// This service has a long name and we make some adjustments to avoid it wrapping onto two lines in the header
+  white-space: nowrap;
+}
