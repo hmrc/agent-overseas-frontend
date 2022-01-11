@@ -152,8 +152,8 @@ object CheckYourAnswers {
       AnswerGroup(
         List(
           AnswerRow(
-            id = "tradingAddressFileName",
-            question = Messages("checkAnswers.tradingAddressFile.title"),
+            id = "amlsFileName",
+            question = Messages("checkAnswers.amlsFile.title"),
             answerLines = List(formatFileName(fileName)),
             changeLink = Some(routes.ChangingAnswersController.changeTradingAddressFile())
           )

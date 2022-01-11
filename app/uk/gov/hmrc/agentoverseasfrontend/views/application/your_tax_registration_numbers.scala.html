@@ -53,7 +53,7 @@
 
 @editTrnForm(trn: String) = {
     @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'id -> s"""updateTrn$trn""") {
-        <input class="hidden" name="original" type="text" id="actual-trn" value="@trn" />
+        <input class="hidden" name="original" type="text" value="@trn" />
         @govukButton(Button(
             attributes = Map("type" -> "submit", "aria-label" -> Messages("yourTaxRegistrationNumbers.update.button")),
             content = Text(Messages("yourTaxRegistrationNumbers.update.button"))
