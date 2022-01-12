@@ -169,8 +169,8 @@ amls.inset.p1=You must be registered with a money laundering supervisory body be
 amls.form.supervisory_body=Name of supervisory body
 amls.form.membership_number=Membership number (optional)
 amls.hint.expandable=I am not registered with a money laundering supervisory body
-amls.hint.expandable.p1=You cannot apply for an agent services account if you are not registered.
-amls.hint.expandable.p2=For details about who can apply, <a href="{0}" target="_blank" id="guidance">check the guidance (opens in a new window or tab)</a>.
+amls.hint.expandable.p1=You cannot apply for an agent services account until you are registered with a money laundering supervisory body.
+amls.hint.expandable.p2=Check the procedures for registering with a supervisory body in your country.
 amls.hint.expandable.sign_out=<a href="{0}" id="signOut">Finish and sign out</a>
 
 # Contact Details

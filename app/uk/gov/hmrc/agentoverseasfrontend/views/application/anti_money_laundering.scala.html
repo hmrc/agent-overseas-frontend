@@ -79,7 +79,7 @@
         @govukDetails(Details(
             summary = Text(Messages(s"amls.hint.expandable")),
             content = HtmlContent(s"""<p>${Messages("amls.hint.expandable.p1")}</p>
-                                     |<p>${Html(Messages(s"amls.hint.expandable.p2", "https://www.gov.uk/guidance/get-an-hmrc-agent-services-account"))}</p>
+                                     |<p>${Html(Messages(s"amls.hint.expandable.p2"))}</p>
                                      |<p>${Html(Messages(s"amls.hint.expandable.sign_out", routes.ApplicationSignOutController.signOut))}</p>
                                      |""".stripMargin)
         ))
