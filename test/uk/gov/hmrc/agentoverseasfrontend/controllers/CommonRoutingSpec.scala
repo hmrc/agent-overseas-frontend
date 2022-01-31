@@ -65,7 +65,8 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
       contactDetails = Some(contactDetails),
       tradingName = Some("some name"),
       overseasAddress = Some(overseasAddress),
-      tradingAddressUploadStatus = Some(tradingAddressUploadStatus)
+      tradingAddressUploadStatus = Some(tradingAddressUploadStatus),
+      verifiedEmails = Set(contactDetails.businessEmail)
     )
 
   private val applicationEntityDetails = ApplicationEntityDetails(
@@ -315,6 +316,13 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
 
       FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController
         .showCompanyRegistrationNumberForm()
+    }
+
+    "direct to the verify email stage when the email is not verified" in {
+      val agentSession = detailsUpToRegisteredWithHmrc.copy(verifiedEmails = Set.empty)
+      FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
+
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.EmailVerificationController.verifyEmail()
     }
   }
 

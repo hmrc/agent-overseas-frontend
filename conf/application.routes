@@ -85,6 +85,10 @@ GET         /change-company-registration-number          @uk.gov.hmrc.agentovers
 GET         /change-your-tax-registration-numbers        @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ChangingAnswersController.changeYourTaxRegistrationNumbers
 GET         /change-your-tax-registration-numbers-file   @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ChangingAnswersController.changeYourTaxRegistrationNumbersFile
 
+GET         /verify-email                                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.EmailVerificationController.verifyEmail
+
+GET         /cannot-verify-email                         @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationController.showCannotVerifyEmail
+
 GET         /sign-out/create-account                     @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOutWithContinueUrl
 GET         /sign-out                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOut
 GET         /sign-out-to-start                           @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOutToStart

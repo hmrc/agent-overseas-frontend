@@ -43,6 +43,8 @@ trait CommonRouting {
         routes.FileUploadController.showAmlsUploadForm()
       case MissingContactDetails() =>
         routes.ApplicationController.showContactDetailsForm()
+      case EmailUnverified() =>
+        routes.EmailVerificationController.verifyEmail()
       case MissingTradingName() =>
         routes.ApplicationController.showTradingNameForm()
       case MissingTradingAddress() =>

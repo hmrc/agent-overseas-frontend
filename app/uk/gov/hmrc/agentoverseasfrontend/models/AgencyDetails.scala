@@ -18,7 +18,11 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.json.{Format, Json}
 
-case class AgencyDetails(agencyName: String, agencyEmail: String, agencyAddress: OverseasAddress)
+case class AgencyDetails(
+  agencyName: String,
+  agencyEmail: String,
+  agencyAddress: OverseasAddress,
+  emailVerified: Boolean)
 
 object AgencyDetails {
   implicit val formats: Format[AgencyDetails] =
@@ -28,6 +32,7 @@ object AgencyDetails {
     AgencyDetails(
       agencyName = overseasApplication.tradingDetails.tradingName,
       agencyEmail = overseasApplication.contactDetails.businessEmail,
-      agencyAddress = overseasApplication.tradingDetails.tradingAddress
+      agencyAddress = overseasApplication.tradingDetails.tradingAddress,
+      emailVerified = true // When creating AgencyDetails from an overseas application we assume the email has already been verified.
     )
 }

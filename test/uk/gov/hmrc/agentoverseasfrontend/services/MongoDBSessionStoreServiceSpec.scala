@@ -74,7 +74,8 @@ class MongoDBSessionStoreServiceSpec extends AnyWordSpecLike with Matchers with 
       addressLine3 = Some("agencyAddressLine3"),
       addressLine4 = Some("agencyAddressLine4"),
       countryCode = "BE"
-    )
+    ),
+    emailVerified = true
   )
 
   "SessionStoreService AgentSession" should {

@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.{registered
 import uk.gov.hmrc.agentoverseasfrontend.forms._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.{IsRegisteredForUkTax, IsRegisteredWithHmrc}
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, No, Yes, _}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, EmailVerificationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -39,6 +39,7 @@ class ApplicationController @Inject()(
   authAction: ApplicationAuth,
   sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
+  emailVerificationService: EmailVerificationService,
   countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents,
   contactDetailsView: contact_details,
@@ -49,7 +50,8 @@ class ApplicationController @Inject()(
   personalDetailsView: personal_details,
   crnView: company_registration_number,
   cyaView: check_your_answers,
-  applicationCompleteView: application_complete)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
+  applicationCompleteView: application_complete,
+  cannotVerifyEmailView: cannot_verify_email)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
@@ -87,7 +89,7 @@ class ApplicationController @Inject()(
           },
           validForm => {
             updateSession(agentSession.copy(contactDetails = Some(validForm)))(
-              routes.ApplicationController.showTradingNameForm().url)
+              routes.EmailVerificationController.verifyEmail().url)
           }
         )
     }
@@ -389,6 +391,10 @@ class ApplicationController @Inject()(
       else
         Redirect(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm())
     }
+  }
+
+  def showCannotVerifyEmail: Action[AnyContent] = Action { implicit request =>
+    Ok(cannotVerifyEmailView(routes.ApplicationRootController.root()))
   }
 
   private def ukTaxRegistrationBackLink(session: AgentSession) =

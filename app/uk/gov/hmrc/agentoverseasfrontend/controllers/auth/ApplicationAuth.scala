@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSe
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials}
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,8 +40,9 @@ class ApplicationAuth @Inject()(
 )(implicit val env: Environment, val config: Configuration, val appConfig: AppConfig, val ec: ExecutionContext)
     extends AuthBase with CommonRouting {
 
-  def withEnrollingAgent(
-    body: AgentSession => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+  def withCredsAndEnrollingAgent(body: (Credentials, AgentSession) => Future[Result])(
+    implicit hc: HeaderCarrier,
+    request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(credentials and allEnrolments) {
         case Some(credentials) ~ enrolments =>
@@ -50,7 +51,7 @@ class ApplicationAuth @Inject()(
           else
             sessionStoreService.fetchAgentSession.flatMap {
               case Some(agentSession) =>
-                body(agentSession)
+                body(credentials, agentSession)
               case None =>
                 routesIfExistingApplication(s"${appConfig.agentOverseasFrontendUrl}/create-account")
                   .map(Redirect)
@@ -60,4 +61,7 @@ class ApplicationAuth @Inject()(
       }
       .recover(handleFailure(request))
 
+  def withEnrollingAgent(
+    body: AgentSession => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    withCredsAndEnrollingAgent((_, session) => body(session))
 }

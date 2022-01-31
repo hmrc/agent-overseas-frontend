@@ -40,6 +40,8 @@ trait AppConfig {
   val agentGuidancePageFullUrl: String
   val asaFrontendUrl: String
   val agentSubscriptionBaseUrl: String
+  val emailVerificationBaseUrl: String
+  val emailVerificationFrontendBaseUrl: String
   val mongoDbExpireAfterSeconds: Int
 }
 
@@ -74,5 +76,7 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
   override val asaFrontendUrl: String =
     servicesConfig.getString("microservice.services.agent-services-account-frontend.url")
   override val agentSubscriptionBaseUrl: String = servicesConfig.baseUrl("agent-subscription")
+  override val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
+  override val emailVerificationFrontendBaseUrl: String = servicesConfig.baseUrl("email-verification-frontend")
   override val mongoDbExpireAfterSeconds: Int = servicesConfig.getInt("mongodb.session.expireAfterSeconds")
 }

@@ -59,12 +59,16 @@ class BusinessIdentificationController @Inject()(
   def showCheckAnswers: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
       withAgencyDetailsOrWithNewDefaults(overseasApplication).map { agencyDetails =>
-        val countryCode = agencyDetails.agencyAddress.countryCode
-        val countryName = countries.getOrElse(
-          countryCode,
-          throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown"))
+        if (!agencyDetails.emailVerified) {
+          Redirect(routes.EmailVerificationController.verifyEmail())
+        } else {
+          val countryCode = agencyDetails.agencyAddress.countryCode
+          val countryName = countries.getOrElse(
+            countryCode,
+            throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown"))
 
-        Ok(checkAnswersView(agencyDetails, countryName))
+          Ok(checkAnswersView(agencyDetails, countryName))
+        }
       }
     }
   }
@@ -190,7 +194,7 @@ class BusinessIdentificationController @Inject()(
           .fold(
             formWithErrors => Future.successful(Ok(updateBusinessEmailView(formWithErrors))),
             validForm => {
-              val agencyWithUpdatedEmail = agencyDetails.copy(agencyEmail = validForm.email)
+              val agencyWithUpdatedEmail = agencyDetails.copy(agencyEmail = validForm.email, emailVerified = false)
 
               updateAgencyDetails(agencyWithUpdatedEmail).map(_ =>
                 Redirect(routes.BusinessIdentificationController.showCheckAnswers()))

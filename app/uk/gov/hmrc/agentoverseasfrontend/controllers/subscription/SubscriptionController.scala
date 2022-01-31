@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBa
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.{AlreadySubscribed, NoAgencyInSession, NoApplications, WrongApplicationStatus}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.views.html.application.cannot_verify_email
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +38,8 @@ class SubscriptionController @Inject()(
   mcc: MessagesControllerComponents,
   override val sessionStoreService: MongoDBSessionStoreService,
   subscriptionCompleteView: subscription_complete,
-  alreadySubscribedView: already_subscribed)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
+  alreadySubscribedView: already_subscribed,
+  cannotVerifyEmailView: cannot_verify_email)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler
     with Logging {
 
@@ -92,4 +94,10 @@ class SubscriptionController @Inject()(
     }
   }
 
+  def cannotVerifyEmail: Action[AnyContent] = Action.async { implicit request =>
+    withBasicAgentAuth { subRequest =>
+      Future.successful(
+        Ok(cannotVerifyEmailView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm())))
+    }
+  }
 }

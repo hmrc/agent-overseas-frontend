@@ -109,7 +109,8 @@ class AgentOverseasApplicationConnectorISpec
         addressLine4 = Some("agencyAddressLine4"),
         countryCode = "IE"
       ),
-      agencyEmail = "agency_email@domain.com"
+      agencyEmail = "agency_email@domain.com",
+      emailVerified = true
     )
 
     "return successfully if application was updated successfully" in {

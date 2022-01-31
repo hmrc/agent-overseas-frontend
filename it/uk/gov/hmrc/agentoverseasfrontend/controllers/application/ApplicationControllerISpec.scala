@@ -32,7 +32,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     contactDetails = Some(contactDetails),
     tradingName = Some("some name"),
     overseasAddress = Some(overseasAddress),
-    personalDetails = Some(personalDetails)
+    personalDetails = Some(personalDetails),
+    verifiedEmails = Set(contactDetails.businessEmail)
   )
 
   private lazy val controller: ApplicationController = app.injector.instanceOf[ApplicationController]
@@ -72,8 +73,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
   }
 
   "POST /contact-details" should {
-    "submit form and then redirect to trading-name" in {
-      
+    "submit form and then redirect to verify-email when email is not verified" in {
+
       sessionStoreService.cacheAgentSession(
         AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), None)).futureValue
 
@@ -88,7 +89,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.submitContactDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showTradingNameForm().url
+      header(LOCATION, result).get shouldBe routes.EmailVerificationController.verifyEmail().url
 
       val mayBeContactDetails = sessionStoreService.fetchAgentSession.futureValue.get.contactDetails
 
@@ -1045,7 +1046,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             taxRegistrationNumbers = Some(SortedSet(Trn("someTaxRegNo"))),
             amlsUploadStatus = Some(fileUploadStatus),
             tradingAddressUploadStatus = Some(fileUploadStatus),
-            trnUploadStatus = Some(fileUploadStatus)
+            trnUploadStatus = Some(fileUploadStatus),
+            verifiedEmails = Set(contactDetails.businessEmail)
           ))
 
         val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1070,7 +1072,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             taxRegistrationNumbers = None,
             amlsUploadStatus = Some(fileUploadStatus),
             tradingAddressUploadStatus = Some(fileUploadStatus),
-            trnUploadStatus = Some(fileUploadStatus)
+            trnUploadStatus = Some(fileUploadStatus),
+            verifiedEmails = Set(contactDetails.businessEmail)
           ))
 
         val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1101,7 +1104,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(false), None)),
               hasTaxRegNumbers = Some(false),
               tradingAddressUploadStatus = Some(fileUploadStatus),
-              amlsUploadStatus = Some(fileUploadStatus)
+              amlsUploadStatus = Some(fileUploadStatus),
+              verifiedEmails = Set(contactDetails.businessEmail)
             ))
 
           val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1140,7 +1144,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(true), Some(Crn("999999")))),
               hasTaxRegNumbers = Some(false),
               tradingAddressUploadStatus = Some(fileUploadStatus),
-              amlsUploadStatus = Some(fileUploadStatus)
+              amlsUploadStatus = Some(fileUploadStatus),
+              verifiedEmails = Set(contactDetails.businessEmail)
             ))
 
           val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1177,7 +1182,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               hasTaxRegNumbers = Some(false),
               taxRegistrationNumbers = None,
               tradingAddressUploadStatus = Some(fileUploadStatus),
-              amlsUploadStatus = Some(fileUploadStatus)
+              amlsUploadStatus = Some(fileUploadStatus),
+              verifiedEmails = Set(contactDetails.businessEmail)
             ))
 
           val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1218,7 +1224,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               taxRegistrationNumbers = Some(SortedSet(Trn("TX12345"))),
               tradingAddressUploadStatus = Some(fileUploadStatus),
               amlsUploadStatus = Some(fileUploadStatus),
-              trnUploadStatus = Some(fileUploadStatus)
+              trnUploadStatus = Some(fileUploadStatus),
+              verifiedEmails = Set(contactDetails.businessEmail)
             ))
 
           val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1257,7 +1264,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
             companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(false), None)),
             hasTaxRegNumbers = Some(false),
             tradingAddressUploadStatus = Some(fileUploadStatus),
-            amlsUploadStatus = Some(fileUploadStatus)
+            amlsUploadStatus = Some(fileUploadStatus),
+            verifiedEmails = Set(contactDetails.businessEmail)
           ))
 
         val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1303,7 +1311,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           taxRegistrationNumbers = Some(SortedSet(Trn("trn1"), Trn("trn2"))),
           tradingAddressUploadStatus = Some(fileUploadStatus),
           amlsUploadStatus = Some(fileUploadStatus),
-          trnUploadStatus = Some(fileUploadStatus)
+          trnUploadStatus = Some(fileUploadStatus),
+          verifiedEmails = Set(contactDetails.businessEmail)
         ))
 
       val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
@@ -1330,6 +1339,33 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       body.contains("trn2") shouldBe true
       contentAsString(result).contains("tradingAddressFileName") shouldBe true
     }
+
+    "should redirect to the verify email stage when the email address is unverified" in {
+      val registeredWithHmrc = Some(No)
+
+      sessionStoreService.currentSession.agentSession = Some(
+        AgentSession(
+          amlsRequired = Some(true),
+          Some(amlsDetails),
+          Some(contactDetails),
+          Some("tradingName"),
+          Some(overseasAddress),
+          registeredWithHmrc,
+          registeredForUkTax = Some(Yes),
+          personalDetails = Some(personalDetails),
+          companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(true), Some(Crn("crnCode")))),
+          hasTaxRegNumbers = Some(true),
+          taxRegistrationNumbers = Some(SortedSet(Trn("trn1"), Trn("trn2"))),
+          tradingAddressUploadStatus = Some(fileUploadStatus),
+          amlsUploadStatus = Some(fileUploadStatus),
+          trnUploadStatus = Some(fileUploadStatus),
+          verifiedEmails = Set.empty
+        ))
+
+      val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+
+      status(result) shouldBe 303
+      redirectLocation(result) shouldBe Some(routes.EmailVerificationController.verifyEmail().url)    }
   }
 
   "POST /check-your-answers" should {
@@ -1349,7 +1385,8 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         agentCodes = Some(agentCodes),
         amlsUploadStatus = Some(fileUploadStatus),
         tradingAddressUploadStatus = Some(fileUploadStatus),
-        trnUploadStatus = Some(fileUploadStatus)
+        trnUploadStatus = Some(fileUploadStatus),
+        verifiedEmails = Set(contactDetails.businessEmail)
       )
 
       sessionStoreService.currentSession.agentSession = Some(agentSession)
