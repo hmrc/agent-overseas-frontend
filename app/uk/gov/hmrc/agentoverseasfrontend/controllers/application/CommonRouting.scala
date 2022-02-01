@@ -44,7 +44,7 @@ trait CommonRouting {
       case MissingContactDetails() =>
         routes.ApplicationController.showContactDetailsForm()
       case EmailUnverified() =>
-        routes.EmailVerificationController.verifyEmail()
+        routes.ApplicationEmailVerificationController.verifyEmail()
       case MissingTradingName() =>
         routes.ApplicationController.showTradingNameForm()
       case MissingTradingAddress() =>

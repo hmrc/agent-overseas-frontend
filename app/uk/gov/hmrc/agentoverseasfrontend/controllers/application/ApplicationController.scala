@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.{registered
 import uk.gov.hmrc.agentoverseasfrontend.forms._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.{IsRegisteredForUkTax, IsRegisteredWithHmrc}
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, No, Yes, _}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, EmailVerificationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -39,7 +39,6 @@ class ApplicationController @Inject()(
   authAction: ApplicationAuth,
   sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
-  emailVerificationService: EmailVerificationService,
   countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents,
   contactDetailsView: contact_details,
@@ -89,7 +88,7 @@ class ApplicationController @Inject()(
           },
           validForm => {
             updateSession(agentSession.copy(contactDetails = Some(validForm)))(
-              routes.EmailVerificationController.verifyEmail().url)
+              routes.ApplicationEmailVerificationController.verifyEmail().url)
           }
         )
     }

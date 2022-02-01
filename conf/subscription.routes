@@ -34,5 +34,5 @@ POST       /update-business-name               @uk.gov.hmrc.agentoverseasfronten
 
 GET        /cannot-check-status                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.showApplicationIssue
 
-GET        /verify-email                       @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.EmailVerificationController.verifyEmail
+GET        /verify-email                       @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionEmailVerificationController.verifyEmail
 GET        /cannot-verify-email                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.cannotVerifyEmail

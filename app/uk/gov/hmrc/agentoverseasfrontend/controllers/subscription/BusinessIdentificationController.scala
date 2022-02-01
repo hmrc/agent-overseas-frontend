@@ -60,7 +60,7 @@ class BusinessIdentificationController @Inject()(
     withSubscribingAgent { overseasApplication =>
       withAgencyDetailsOrWithNewDefaults(overseasApplication).map { agencyDetails =>
         if (!agencyDetails.emailVerified) {
-          Redirect(routes.EmailVerificationController.verifyEmail())
+          Redirect(routes.SubscriptionEmailVerificationController.verifyEmail())
         } else {
           val countryCode = agencyDetails.agencyAddress.countryCode
           val countryName = countries.getOrElse(

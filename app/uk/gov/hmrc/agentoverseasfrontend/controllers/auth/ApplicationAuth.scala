@@ -40,6 +40,19 @@ class ApplicationAuth @Inject()(
 )(implicit val env: Environment, val config: Configuration, val appConfig: AppConfig, val ec: ExecutionContext)
     extends AuthBase with CommonRouting {
 
+  def getCredsAndAgentSession(implicit hc: HeaderCarrier): Future[(Credentials, AgentSession)] =
+    authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
+      .retrieve(credentials and allEnrolments) {
+        case Some(credentials) ~ enrolments =>
+          sessionStoreService.fetchAgentSession.flatMap {
+            case Some(agentSession) =>
+              Future.successful((credentials, agentSession))
+            case None =>
+              throw new IllegalStateException("Agent session not found")
+          }
+        case None ~ _ => throw UnsupportedCredentialRole("User has no credentials")
+      }
+
   def withCredsAndEnrollingAgent(body: (Credentials, AgentSession) => Future[Result])(
     implicit hc: HeaderCarrier,
     request: Request[_]): Future[Result] =

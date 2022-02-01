@@ -27,9 +27,12 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class EmailVerificationService @Inject()(emailVerificationConnector: EmailVerificationConnector) extends Logging {
 
-  def verifyEmail(credId: String, mEmail: Option[Email], continueUrl: String, mBackUrl: Option[String])(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Option[String]] =
+  def verifyEmail(
+    credId: String,
+    mEmail: Option[Email],
+    continueUrl: String,
+    mBackUrl: Option[String],
+    accessibilityStatementUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] =
     for {
       mVerifyEmailResponse <- emailVerificationConnector.verifyEmail(
                                VerifyEmailRequest(
@@ -37,7 +40,7 @@ class EmailVerificationService @Inject()(emailVerificationConnector: EmailVerifi
                                  continueUrl = continueUrl,
                                  origin = "agent-overseas",
                                  deskproServiceName = Some("agent-overseas"),
-                                 accessibilityStatementUrl = "", // TODO
+                                 accessibilityStatementUrl = accessibilityStatementUrl,
                                  email = mEmail,
                                  lang = None,
                                  backUrl = mBackUrl,
