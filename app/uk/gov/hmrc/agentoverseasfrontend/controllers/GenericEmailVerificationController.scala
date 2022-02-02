@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers
 
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.{Environment, Mode}
+import play.api.Environment
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.EmailVerificationService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,8 +32,14 @@ abstract class GenericEmailVerificationController[S](
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController with I18nSupport {
 
+  def emailVerificationEnabled: Boolean
+
   def emailVerificationFrontendBaseUrl: String
   def accessibilityStatementUrl(implicit request: RequestHeader): String
+
+  // if we are running locally, each service will have a different root URL so we need to use absolute URLs
+  // to redirect between calling service and email verification service
+  def useAbsoluteUrls: Boolean = emailVerificationFrontendBaseUrl.contains("localhost")
 
   /*
   State methods
@@ -56,6 +62,7 @@ abstract class GenericEmailVerificationController[S](
 
   /**
     * An effectful call to mark the email as being verified in our session. Should return the new session state.
+    * This function is expected to be idempotent (marking the same email as verified twice should not lead to unexpected results)
     */
   def markEmailAsVerified(session: S, email: String)(implicit hc: HeaderCarrier): Future[S]
 
@@ -97,8 +104,10 @@ abstract class GenericEmailVerificationController[S](
     getState.flatMap {
       case (session, credId) =>
         val emailToVerify = getEmailToVerify(session)
-        if (isAlreadyVerified(session, emailToVerify)) {
-          Future.successful(Redirect(redirectUrlIfVerified(session)))
+        if (isAlreadyVerified(session, emailToVerify) || !emailVerificationEnabled) {
+          markEmailAsVerified(session, emailToVerify).map { updatedSession =>
+            Redirect(redirectUrlIfVerified(updatedSession))
+          }
         } else {
           // Check the status of the email with the email verification service
           emailVerificationService.checkStatus(credId, emailToVerify).flatMap {
@@ -122,10 +131,7 @@ abstract class GenericEmailVerificationController[S](
                 )
                 .map {
                   case Some(redirectUri) =>
-                    val url = env.mode match {
-                      case Mode.Dev => emailVerificationFrontendBaseUrl + redirectUri
-                      case _        => redirectUri // we need an absolute uri if in Dev, relative otherwise
-                    }
+                    val url = if (useAbsoluteUrls) emailVerificationFrontendBaseUrl + redirectUri else redirectUri
                     Redirect(url)
                   case None => throw new RuntimeException("Could not start email verification journey")
                 }
@@ -141,10 +147,6 @@ abstract class GenericEmailVerificationController[S](
     }
   }
 
-  private def urlFor(call: Call)(implicit request: RequestHeader): String = env.mode match {
-    case Mode.Dev =>
-      call.absoluteURL()
-    case _ =>
-      call.url
-  }
+  private def urlFor(call: Call)(implicit request: RequestHeader): String =
+    if (useAbsoluteUrls) call.absoluteURL() else call.url
 }

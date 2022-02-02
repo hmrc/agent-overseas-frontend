@@ -43,6 +43,7 @@ trait AppConfig {
   val emailVerificationBaseUrl: String
   val emailVerificationFrontendBaseUrl: String
   val mongoDbExpireAfterSeconds: Int
+  val disableEmailVerification: Boolean
 }
 
 @Singleton
@@ -79,4 +80,5 @@ class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: E
   override val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
   override val emailVerificationFrontendBaseUrl: String = servicesConfig.baseUrl("email-verification-frontend")
   override val mongoDbExpireAfterSeconds: Int = servicesConfig.getInt("mongodb.session.expireAfterSeconds")
+  override val disableEmailVerification: Boolean = servicesConfig.getBoolean("disable-email-verification")
 }

@@ -45,6 +45,8 @@ class ApplicationEmailVerificationController @Inject()(
 
   import authAction.getCredsAndAgentSession
 
+  override def emailVerificationEnabled: Boolean = !appConfig.disableEmailVerification
+
   override def emailVerificationFrontendBaseUrl: String = appConfig.emailVerificationFrontendBaseUrl
   override def accessibilityStatementUrl(implicit request: RequestHeader): String =
     accessibilityStatementConfig.url.getOrElse("")
