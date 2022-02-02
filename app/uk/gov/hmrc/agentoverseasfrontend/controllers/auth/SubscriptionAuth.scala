@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.{OverseasApplication, Subscripti
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, authorisedEnrolments, credentials}
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, AuthProviders, Enrolment}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -43,6 +43,12 @@ class SubscriptionAuth @Inject()(
   val subscriptionService: SubscriptionService
 )(implicit val env: Environment, val config: Configuration, val appConfig: AppConfig, val ec: ExecutionContext)
     extends AuthBase with CommonRouting with Logging {
+
+  def getCreds(implicit hc: HeaderCarrier): Future[Credentials] =
+    authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent).retrieve(credentials) {
+      case Some(creds) => Future.successful(creds)
+      case None        => throw new IllegalStateException("credentials expected but not found for the logged in user")
+    }
 
   def withBasicAgentAuth(
     block: SubscriptionRequest => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =

@@ -485,3 +485,8 @@ contactTradingAddressCheck.p=This is the address we will use to check your ident
 contactTradingAddressCheck.option.yes=Yes
 contactTradingAddressCheck.option.no=No - I want to enter a different address
 error.contact-trading-address-check.invalid=Select Yes if this is the main trading address you want to use for your agent services account correspondence
+
+#Cannot verify email
+cannotVerifyEmail.title=We could not verify your email address
+cannotVerifyEmail.p1=Before you can create an agent services account, we need to verify your email address.
+cannotVerifyEmail.p2=<a href="{0}">Try again</a> with a different email address.

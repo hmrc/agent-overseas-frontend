@@ -38,7 +38,8 @@ case class AgentSession(
   trnUploadStatus: Option[FileUploadStatus] = None,
   fileType: Option[String] = None,
   changingAnswers: Boolean = false,
-  hasTrnsChanged: Boolean = false) {
+  hasTrnsChanged: Boolean = false,
+  verifiedEmails: Set[String] = Set.empty) {
 
   def sanitize: AgentSession = {
     val agentCodes =
@@ -71,7 +72,8 @@ case class AgentSession(
       this.trnUploadStatus,
       this.fileType,
       this.changingAnswers,
-      this.hasTrnsChanged
+      this.hasTrnsChanged,
+      this.verifiedEmails
     )
   }
 }
@@ -183,5 +185,12 @@ object AgentSession {
   object MissingTaxRegFile {
     def unapply(session: Option[AgentSession]): Boolean =
       session.exists(_.trnUploadStatus.isEmpty)
+  }
+
+  object EmailUnverified {
+    def unapply(session: Option[AgentSession]): Boolean =
+      session.exists { sesh =>
+        sesh.contactDetails.map(_.businessEmail).fold(false)(!sesh.verifiedEmails.contains(_))
+      }
   }
 }

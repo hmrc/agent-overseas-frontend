@@ -26,7 +26,8 @@ object StubsTestData {
    addressLine3 = Some("agencyAddressLine3"),
    addressLine4 = Some("agencyAddressLine4"),
    countryCode = "BE"
-  )
+  ),
+  emailVerified = true
  )
 
  def pendingApplication(appCreateDate: String) =
