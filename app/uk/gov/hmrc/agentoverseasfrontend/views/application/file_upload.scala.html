@@ -68,16 +68,16 @@
             </ul>
             <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
 
+                @for((key, value) <- upscan.uploadRequest.fields){
+                    <input type="hidden" name="@key" value="@value">
+                }
+
                 @govukFileUpload(FileUpload(
                     id = "file-upload",
                     name = "file",
                     attributes = Map("accept" -> "application/pdf, image/jpeg"),
                     label = Label(content = Text(Messages("fileUpload.upload"))),
                 ))
-
-                @for((key, value) <- upscan.uploadRequest.fields){
-                    <input type="hidden" name="@key" value="@value">
-                }
 
             </div>
             @govukInsetText(InsetText(
