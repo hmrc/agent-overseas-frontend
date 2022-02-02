@@ -5,6 +5,8 @@
 
 This frontend allows overseas agents to submit an application to HMRC for registering as an overseas agent and subscribing to Agent Services.
 
+The journey requires several types of documents to be uploaded as evidence. The file upload function is performed by the UPSCAN service. 
+
 ## Running the tests
 
     sbt test it:test
