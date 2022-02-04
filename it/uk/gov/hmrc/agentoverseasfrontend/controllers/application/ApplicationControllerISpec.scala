@@ -89,7 +89,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.submitContactDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.EmailVerificationController.verifyEmail().url
+      header(LOCATION, result).get shouldBe routes.ApplicationEmailVerificationController.verifyEmail().url
 
       val mayBeContactDetails = sessionStoreService.fetchAgentSession.futureValue.get.contactDetails
 
@@ -1365,7 +1365,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.EmailVerificationController.verifyEmail().url)    }
+      redirectLocation(result) shouldBe Some(routes.ApplicationEmailVerificationController.verifyEmail().url)    }
   }
 
   "POST /check-your-answers" should {

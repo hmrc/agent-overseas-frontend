@@ -322,7 +322,8 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
       val agentSession = detailsUpToRegisteredWithHmrc.copy(verifiedEmails = Set.empty)
       FakeRouting.sessionStoreService.cacheAgentSession(agentSession).futureValue
 
-      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.EmailVerificationController.verifyEmail()
+      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationEmailVerificationController
+        .verifyEmail()
     }
   }
 
