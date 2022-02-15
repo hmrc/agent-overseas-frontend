@@ -41,10 +41,10 @@
         govukErrorSummary: GovukErrorSummary
 )
 
-@(amlsRequiredForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(amlsRequiredForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
 
-@mainTemplate(title = errorPrefix(amlsRequiredForm) + Messages("amls.required.title"), backLinkHref = backLink) {
+@mainTemplate(title = errorPrefix(amlsRequiredForm) + msgs("amls.required.title"), backLinkHref = backLink) {
 
     @if(amlsRequiredForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsRequiredForm))
@@ -55,20 +55,20 @@
             classes = "govuk-radios--inline",
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
-                    content = Text(Messages("amls.required.title")),
+                    content = Text(msgs("amls.required.title")),
                     isPageHeading = true,
                     classes = "govuk-fieldset__legend--xl"
                 ))
             )),
             items = Seq(
-                RadioItem(content = Text(Messages("amls.required.yes")), value = Some("true")),
-                RadioItem(content = Text(Messages("amls.required.no")), value = Some("false"))
+                RadioItem(content = Text(msgs("amls.required.yes")), value = Some("true")),
+                RadioItem(content = Text(msgs("amls.required.no")), value = Some("false"))
             )
         ).withFormField(amlsRequiredForm("amlsRequired")))
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
-            content = Text(Messages("button.continue")),
+            content = Text(msgs("button.continue")),
         ))
     }
 }

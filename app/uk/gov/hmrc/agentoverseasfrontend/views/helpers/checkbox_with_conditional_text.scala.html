@@ -31,7 +31,7 @@
       govukCheckboxes: GovukCheckboxes,
       govukInsetText: GovukInsetText)
 
-@(field: Field, labelCheckbox: String, labelInset: String, args: (Symbol,Any)*)(implicit messages: Messages)
+@(field: Field, labelCheckbox: String, labelInset: String, args: (Symbol,Any)*)(implicit msgs: Messages)
 
 @value = @{ field.value match { case Some(x) => x case None => "" case x => x }}
 @hasValue = @{ value != "" }

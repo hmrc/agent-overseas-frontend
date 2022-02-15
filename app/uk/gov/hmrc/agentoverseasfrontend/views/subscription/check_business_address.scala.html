@@ -44,9 +44,9 @@
         govukButton: GovukButton,
 )
 
-@(businessAddressCheckForm: Form[RadioConfirm], businessAddress: OverseasAddress, businessAddressCountryName: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessAddressCheckForm: Form[RadioConfirm], businessAddress: OverseasAddress, businessAddressCountryName: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("contactTradingAddressCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
+@mainTemplate(title = msgs("contactTradingAddressCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
 
   @if(businessAddressCheckForm.hasErrors) {
       @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessAddressCheckForm))
@@ -58,13 +58,13 @@
       @govukRadios(Radios(
           fieldset = Some(Fieldset(
               legend = Some(Legend(
-                  content = Text(Messages("contactTradingAddressCheck.title")),
+                  content = Text(msgs("contactTradingAddressCheck.title")),
                   isPageHeading = true,
                   classes = "govuk-fieldset__legend--xl"
               ))
           )),
           hint = Some(Hint(content = HtmlContent(Html(
-              s"""<p>${Messages("contactTradingAddressCheck.p")}</p>
+              s"""<p>${msgs("contactTradingAddressCheck.p")}</p>
                  |<p>
                  |    ${businessAddress.addressLine1} <br/>
  				 |    ${businessAddress.addressLine2} <br/>
@@ -74,14 +74,14 @@
                  |</p>
                  |""".stripMargin)))),
           items = Seq(
-              RadioItem(content = Text(Messages("contactTradingAddressCheck.option.yes")), value = Some("true")),
-              RadioItem(content = Text(Messages("contactTradingAddressCheck.option.no")), value = Some("false"))
+              RadioItem(content = Text(msgs("contactTradingAddressCheck.option.yes")), value = Some("true")),
+              RadioItem(content = Text(msgs("contactTradingAddressCheck.option.no")), value = Some("false"))
           )
       ).withFormField(businessAddressCheckForm("useThisAddress")))
 
       @govukButton(Button(
           attributes = Map("id" -> "continue"),
-          content = Text(Messages("button.continue")),
+          content = Text(msgs("button.continue")),
       ))
   }
 }

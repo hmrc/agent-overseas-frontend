@@ -37,9 +37,9 @@
         govukInsetText: GovukInsetText,
         form: FormWithCSRF)
 
-@(companyRegistrationNumberForm: Form[CompanyRegistrationNumber], backButtonLink: String)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(companyRegistrationNumberForm: Form[CompanyRegistrationNumber], backButtonLink: String)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(companyRegistrationNumberForm) + Messages("companyRegistrationNumber.title"), backLinkHref = Some(backButtonLink)) {
+@mainTemplate(title = errorPrefix(companyRegistrationNumberForm) + msgs("companyRegistrationNumber.title"), backLinkHref = Some(backButtonLink)) {
 
     @if(companyRegistrationNumberForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(companyRegistrationNumberForm))
@@ -50,19 +50,19 @@
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(HmrcPageHeadingLegend(
-                    content = Text(Messages("companyRegistrationNumber.title")),
-                    caption = HmrcSectionCaption(Text(Messages("companyRegistrationNumber.caption")))
+                    content = Text(msgs("companyRegistrationNumber.title")),
+                    caption = HmrcSectionCaption(Text(msgs("companyRegistrationNumber.caption")))
                 ))
             )),
-            hint = Some(Hint(content = Text(Messages("companyRegistrationNumber.body.text")))),
+            hint = Some(Hint(content = Text(msgs("companyRegistrationNumber.body.text")))),
             items = Seq(
                 RadioItem(
-                    content = Text(Messages("companyRegistrationNumber.form.registered.yes")),
+                    content = Text(msgs("companyRegistrationNumber.form.registered.yes")),
                     value = Some("true"),
                     checked = companyRegistrationNumberForm.error("registrationNumber").isDefined || companyRegistrationNumberForm.value.exists(_.confirmRegistration.contains(true)),
                     conditionalHtml = Some(
                         govukInput(Input(
-                            label = Label(content = Text(Messages("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn"))),
+                            label = Label(content = Text(msgs("companyRegistrationNumber.radioResponse.hidden.input.label.enter.crn"))),
                             spellcheck = Some(false),
                             classes = "govuk-input--width-20",
                             attributes = Map("data-uppercase" -> "false")
@@ -70,7 +70,7 @@
                     )
                 ),
                 RadioItem(
-                    content = Text(Messages("companyRegistrationNumber.form.registered.no")),
+                    content = Text(msgs("companyRegistrationNumber.form.registered.no")),
                     value = Some("false"),
                     checked = companyRegistrationNumberForm.value.flatMap(_.confirmRegistration).contains(false)
                 ),
@@ -79,7 +79,7 @@
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
-            content = Text(Messages("button.continue")),
+            content = Text(msgs("button.continue")),
         ))
     }
 

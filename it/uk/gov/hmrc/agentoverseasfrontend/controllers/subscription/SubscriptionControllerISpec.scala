@@ -102,7 +102,7 @@ class SubscriptionControllerISpec
       result.futureValue should containMessages(
         "already.subscribed.title",
         "already.subscribed.p1",
-        "already.subscribed.button"
+        "common.finish.signout"
       )
     }
   }

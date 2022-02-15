@@ -21,7 +21,7 @@
 
 @this(hmrcTimeoutDialog: HmrcTimeoutDialog)
 
-@(hasTimeout: Boolean)(implicit appConfig: AppConfig, messages: Messages)
+@(hasTimeout: Boolean)(implicit appConfig: AppConfig, msgs: Messages)
 
 <link rel="stylesheet" type="text/css" href="@controllers.routes.Assets.versioned("stylesheets/application.css")" media="screen">
 
@@ -32,6 +32,6 @@
         keepAliveUrl = Some(routes.ApplicationSignOutController.keepAlive().url),
         signOutUrl = Some(routes.ApplicationSignOutController.signOut().url),
         timeoutUrl = Some(routes.ApplicationSignOutController.timedOut().url),
-        language = Some(messages.lang.code)
+        language = Some(msgs.lang.code)
     ))
 }

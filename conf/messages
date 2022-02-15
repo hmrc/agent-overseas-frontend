@@ -457,12 +457,13 @@ cannot_check_status.p2=Use the ‘Get help with this page’ link at the bottom 
 # Already subscribed
 already.subscribed.title=Your business already has an agent services account
 already.subscribed.p1=Contact your administrator to get access to your business's agent services account.
-already.subscribed.button=Finish and sign out
+common.finish.signout=Finish and sign out
 
 #signed-out
 signed-out.header=You have been signed out
 signed-out.p1=You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
-signed-out.p2=<a href="{0}">Sign in again</a> to use this service.
+signed-out.p2.link=Sign in again
+signed-out.p2= to use this service.
 signed-out.button=start again
 
 #Contact Trading Name Check

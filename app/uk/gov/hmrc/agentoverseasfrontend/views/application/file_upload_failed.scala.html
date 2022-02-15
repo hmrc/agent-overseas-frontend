@@ -19,16 +19,16 @@
 
 @this(mainTemplate: main_template, errorPrefix: error_prefix)
 
-@(backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = Messages(s"fileUpload.failed.title"), backLinkHref = backLink) {
+@mainTemplate(title = msgs(s"fileUpload.failed.title"), backLinkHref = backLink) {
 
     <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("fileUpload.failed.caption")</span>
-        @Messages("fileUpload.failed.title")
+        <span class="govuk-caption-xl">@msgs("fileUpload.failed.caption")</span>
+        @msgs("fileUpload.failed.title")
     </h1>
 
-    <p class="govuk-body">@Messages("fileUpload.failed.p1")</p>
+    <p class="govuk-body">@msgs("fileUpload.failed.p1")</p>
 
-    <a href="@backLink" draggable="false" role="button" class="govuk-button" type="submit" id="file-upload-failed">@Messages("fileUpload.failed.try-again.label")</a>
+    <a href="@backLink" draggable="false" role="button" class="govuk-button" type="submit" id="file-upload-failed">@msgs("fileUpload.failed.try-again.label")</a>
 }

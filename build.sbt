@@ -35,6 +35,10 @@ def testDeps(scope: String) = Seq(
   "uk.gov.hmrc" %% "reactivemongo-test" % "5.0.0-play-28" % scope,
   "com.vladsch.flexmark" %  "flexmark-all" % "0.35.10" % scope
 )
+TwirlKeys.templateImports ++= Seq(
+  "uk.gov.hmrc.agentoverseasfrontend.views.html.components._",
+  "uk.gov.hmrc.agentoverseasfrontend.views.html.main_template",
+)
 
 lazy val root = Project("agent-overseas-frontend", file("."))
   .settings(

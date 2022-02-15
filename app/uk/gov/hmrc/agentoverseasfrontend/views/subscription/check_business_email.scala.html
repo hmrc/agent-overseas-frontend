@@ -43,9 +43,9 @@
   govukButton: GovukButton,
 )
 
-@(businessEmailCheckForm: Form[RadioConfirm], businessEmail: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(businessEmailCheckForm: Form[RadioConfirm], businessEmail: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("contactTradingEmailCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
+@mainTemplate(title = msgs("contactTradingEmailCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
 
   @if(businessEmailCheckForm.hasErrors) {
       @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessEmailCheckForm))
@@ -56,21 +56,21 @@
       @govukRadios(Radios(
           fieldset = Some(Fieldset(
               legend = Some(Legend(
-                  content = Text(Messages("contactTradingEmailCheck.title")),
+                  content = Text(msgs("contactTradingEmailCheck.title")),
                   isPageHeading = true,
                   classes = "govuk-fieldset__legend--xl"
               ))
           )),
-          hint = Some(Hint(content = HtmlContent(Html(s"<p>${Messages("contactTradingEmailCheck.p")}</p><p>$businessEmail</p>")))),
+          hint = Some(Hint(content = HtmlContent(Html(s"<p>${msgs("contactTradingEmailCheck.p")}</p><p>$businessEmail</p>")))),
           items = Seq(
-              RadioItem(content = Text(Messages("contactTradingEmailCheck.option.yes")), value = Some("true")),
-              RadioItem(content = Text(Messages("contactTradingEmailCheck.option.no")), value = Some("false"))
+              RadioItem(content = Text(msgs("contactTradingEmailCheck.option.yes")), value = Some("true")),
+              RadioItem(content = Text(msgs("contactTradingEmailCheck.option.no")), value = Some("false"))
           )
       ).withFormField(businessEmailCheckForm("useThisEmail")))
 
       @govukButton(Button(
           attributes = Map("id" -> "continue"),
-          content = Text(Messages("button.continue")),
+          content = Text(msgs("button.continue")),
       ))
   }
 }

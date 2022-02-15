@@ -38,7 +38,7 @@
 
 @this(mainTemplate: main_template, errorPrefix: error_prefix, govukErrorSummary: GovukErrorSummary, govukInput: GovukInput, govukSelect: GovukSelect, form: FormWithCSRF, govukButton: GovukButton)
 
-@(mainBusinessAddressForm: Form[OverseasAddress], countries: Map[String, String], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(mainBusinessAddressForm: Form[OverseasAddress], countries: Map[String, String], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
 @value = @{ mainBusinessAddressForm("countryCode").value.getOrElse("")}
 
@@ -54,7 +54,7 @@
     errorSummaryRaw.copy(errorList = newErrorList)
 }
     
-@mainTemplate(title = errorPrefix(mainBusinessAddressForm) + Messages("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
+@mainTemplate(title = errorPrefix(mainBusinessAddressForm) + msgs("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
 
     @if(mainBusinessAddressForm.hasErrors) {
         @govukErrorSummary(errorSummary)
@@ -66,38 +66,38 @@
 
             <legend>
                 <h1 class="govuk-heading-xl">
-                    <span class="govuk-caption-xl">@Messages("mainBusinessAddress.caption")</span>
-                    @Messages("mainBusinessAddress.title")
+                    <span class="govuk-caption-xl">@msgs("mainBusinessAddress.caption")</span>
+                    @msgs("mainBusinessAddress.title")
                 </h1>
-                <div class="govuk-body">@Messages("mainBusinessAddress.body.text")</div>
+                <div class="govuk-body">@msgs("mainBusinessAddress.body.text")</div>
             </legend>
 
             @govukInput(Input(
-                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine1"))),
+                label = Label(content = Text(msgs("mainBusinessAddress.form.addressLine1"))),
                 spellcheck = Some(false),
                 classes = "govuk-input--width-20"
             ).withFormField(mainBusinessAddressForm("addressLine1")))
 
             @govukInput(Input(
-                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine2"))),
+                label = Label(content = Text(msgs("mainBusinessAddress.form.addressLine2"))),
                 spellcheck = Some(false),
                 classes = "govuk-input--width-20"
             ).withFormField(mainBusinessAddressForm("addressLine2")))
 
             @govukInput(Input(
-                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine3"))),
+                label = Label(content = Text(msgs("mainBusinessAddress.form.addressLine3"))),
                 spellcheck = Some(false),
                 classes = "govuk-input--width-20"
             ).withFormField(mainBusinessAddressForm("addressLine3")))
 
             @govukInput(Input(
-                label = Label(content = Text(Messages("mainBusinessAddress.form.addressLine4"))),
+                label = Label(content = Text(msgs("mainBusinessAddress.form.addressLine4"))),
                 spellcheck = Some(false),
                 classes = "govuk-input--width-20"
             ).withFormField(mainBusinessAddressForm("addressLine4")))
 
             @govukSelect(Select(
-                label = Label(content = Text(Messages("mainBusinessAddress.form.country"))),
+                label = Label(content = Text(msgs("mainBusinessAddress.form.country"))),
                 id = "countryCode-auto-complete",
                 name = "countryCode",
                 items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
@@ -106,7 +106,7 @@
 
       @govukButton(Button(
           attributes = Map("id" -> "continue"),
-          content = Text(Messages("button.continue")),
+          content = Text(msgs("button.continue")),
       ))
     }
 }

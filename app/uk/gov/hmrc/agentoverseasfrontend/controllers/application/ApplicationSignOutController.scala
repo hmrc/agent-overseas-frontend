@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import java.net.URL
-
 import javax.inject.{Inject, Singleton}
 import play.api.Environment
 import play.api.i18n.I18nSupport
