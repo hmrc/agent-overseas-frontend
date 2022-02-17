@@ -21,13 +21,13 @@
 
 @this(mainTemplate: main_template)
 
-@()(implicit request: Request[_], messages: Messages, config: Configuration, appConfig: AppConfig)
-@mainTemplate(title = Messages("already.subscribed.title")) {
+@()(implicit request: Request[_], msgs: Messages, config: Configuration, appConfig: AppConfig)
+@mainTemplate(title = msgs("already.subscribed.title")) {
 
-<h1 class="govuk-heading-xl">@Messages("already.subscribed.title")</h1>
-<p>@Messages("already.subscribed.p1")</p>
+<h1 class="govuk-heading-xl">@msgs("already.subscribed.title")</h1>
+<p>@msgs("already.subscribed.p1")</p>
 <p>
-    <a href="@routes.SubscriptionSignOutController.signOut().url" class="govuk-button" role="button">@Messages("already.subscribed.button")</a>
+    <a href="@routes.SubscriptionSignOutController.signOut().url" class="govuk-button" role="button">@msgs("already.subscribed.button")</a>
 </p>
 
 }

@@ -20,16 +20,16 @@
 
 @this(mainTemplate: main_template)
 
-@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @timeString=@{
     val timeout = appConfig.timeout
     if(timeout < 60) s"$timeout seconds" else s"${timeout/60} minutes"
 }
 
-@mainTemplate(title = Messages("timed-out.header"), hasTimeout = false) {
+@mainTemplate(title = msgs("timed-out.header"), hasTimeout = false) {
 
-    <h1 class="govuk-heading-xl">@Messages("timed-out.header")</h1>
-    <p class="govuk-body">@Messages("timed-out.p1", timeString)</p>
-    <p class="govuk-body"><a href='@routes.ApplicationSignOutController.signOutToStart()'>@Messages("timed-out.p2.link")&nbsp;</a>@Html(Messages("timed-out.p2"))</p>
+    <h1 class="govuk-heading-xl">@msgs("timed-out.header")</h1>
+    <p class="govuk-body">@msgs("timed-out.p1", timeString)</p>
+    <p class="govuk-body"><a href='@routes.ApplicationSignOutController.signOutToStart()'>@msgs("timed-out.p2.link")&nbsp;</a>@Html(msgs("timed-out.p2"))</p>
 }

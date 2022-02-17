@@ -26,29 +26,29 @@
         govukPanel: GovukPanel,
 )
 
-@(agentGuidancePageUrl: String, continueUrl: String, arn: String, agencyName: String, agencyEmail: String)(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+@(agentGuidancePageUrl: String, continueUrl: String, arn: String, agencyName: String, agencyEmail: String)(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("subscriptionComplete.title")) {
+@mainTemplate(title = msgs("subscriptionComplete.title")) {
 
     @govukPanel(Panel(
-        title = Text(Messages("subscriptionComplete.title")),
-        content = Text(s"${Messages("subscriptionComplete.accountName")} $agencyName")
+        title = Text(msgs("subscriptionComplete.title")),
+        content = Text(s"${msgs("subscriptionComplete.accountName")} $agencyName")
     ))
 
-    <p>@Html(Messages("subscriptionComplete.p1", s"$arn"))</p>
-    <p>@Html(Messages("subscriptionComplete.p2", s"$agencyEmail"))</p>
+    <p>@Html(msgs("subscriptionComplete.p1", s"$arn"))</p>
+    <p>@Html(msgs("subscriptionComplete.p2", s"$agencyEmail"))</p>
 
-    <h2 class="govuk-heading-m">@Messages("subscriptionComplete.h2")</h2>
+    <h2 class="govuk-heading-m">@msgs("subscriptionComplete.h2")</h2>
 
-    <p>@Html(Messages("subscriptionComplete.p3", s"$agentGuidancePageUrl"))</p>
+    <p>@Html(msgs("subscriptionComplete.p3", s"$agentGuidancePageUrl"))</p>
 
     <ul class="govuk-list govuk-list--bullet">
-        <li>@Messages("subscriptionComplete.bullet-list.1")</li>
-        <li>@Messages("subscriptionComplete.bullet-list.2")</li>
+        <li>@msgs("subscriptionComplete.bullet-list.1")</li>
+        <li>@msgs("subscriptionComplete.bullet-list.2")</li>
     </ul>
 
     <p>
-        <a href="@continueUrl" class="govuk-button" id="continue" role="button">@Messages(s"subscriptionComplete.button")</a>
+        <a href="@continueUrl" class="govuk-button" id="continue" role="button">@msgs(s"subscriptionComplete.button")</a>
     </p>
 
 }

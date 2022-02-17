@@ -39,20 +39,20 @@
         govukButton: GovukButton,
         form: FormWithCSRF)
 
-@(businessEmailForm: Form[BusinessEmailForm])(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+@(businessEmailForm: Form[BusinessEmailForm])(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(businessEmailForm) + Messages("updateBusinessEmail.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
+@mainTemplate(title = errorPrefix(businessEmailForm) + msgs("updateBusinessEmail.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
 
     @if(businessEmailForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessEmailForm))
     }
 
-    <h1 class="govuk-heading-xl">@Messages("updateBusinessEmail.title")</h1>
+    <h1 class="govuk-heading-xl">@msgs("updateBusinessEmail.title")</h1>
 
     @form(action = routes.BusinessIdentificationController.submitUpdateBusinessEmailForm()) {
 
         @govukInput(Input(
-            hint = Some(Hint(content = Text(Messages("updateBusinessEmail.description")))),
+            hint = Some(Hint(content = Text(msgs("updateBusinessEmail.description")))),
             spellcheck = Some(false),
             classes = "govuk-input--width-20",
             inputType = "email",
@@ -60,7 +60,7 @@
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
-            content = Text(Messages("button.continue")),
+            content = Text(msgs("button.continue")),
         ))
     }
 }

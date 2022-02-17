@@ -23,42 +23,42 @@
 
 @this(mainTemplate: main_template, govukPanel: GovukPanel)
 
-@(tradingName: String, contactEmail: String, guidanceApplicationUrl: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(tradingName: String, contactEmail: String, guidanceApplicationUrl: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("applicationComplete.title")){
+@mainTemplate(title = msgs("applicationComplete.title")){
 
             @govukPanel(Panel(
-                title = Text(Messages("applicationComplete.title")),
-                content = Text(s"${Messages("applicationComplete.panel.body")} $tradingName")
+                title = Text(msgs("applicationComplete.title")),
+                content = Text(s"${msgs("applicationComplete.panel.body")} $tradingName")
             ))
 
-            <h2 class="govuk-heading-m">@Messages("applicationComplete.whatHappensNext.heading")</h2>
+            <h2 class="govuk-heading-m">@msgs("applicationComplete.whatHappensNext.heading")</h2>
             <p>
-               @Html(Messages("applicationComplete.whatHappensNext.para1",Html(s"<strong class=${"bold"}>$contactEmail</strong>")))
+               @Html(msgs("applicationComplete.whatHappensNext.para1",Html(s"<strong class=${"bold"}>$contactEmail</strong>")))
             </p>
             <p>
-                @Messages("applicationComplete.whatHappensNext.para2")
+                @msgs("applicationComplete.whatHappensNext.para2")
             </p>
             <p>
-                @Messages("applicationComplete.whatHappensNext.para3")
+                @msgs("applicationComplete.whatHappensNext.para3")
             </p>
             <p>
-                @Messages("applicationComplete.whatHappensNext.para4")
+                @msgs("applicationComplete.whatHappensNext.para4")
             </p>
-            <h2 class="govuk-heading-m">@Messages("applicationComplete.whatYouCanDoNext.heading")</h2>
-            <p><a href="@guidanceApplicationUrl">@Messages("applicationComplete.whatYouCanDoNext.link")</a>
-                @Messages("applicationComplete.whatYouCanDoNext.text")
+            <h2 class="govuk-heading-m">@msgs("applicationComplete.whatYouCanDoNext.heading")</h2>
+            <p><a href="@guidanceApplicationUrl">@msgs("applicationComplete.whatYouCanDoNext.link")</a>
+                @msgs("applicationComplete.whatYouCanDoNext.text")
             </p>
-            <h2 class="govuk-heading-m">@Messages("applicationComplete.help.heading")</h2>
+            <h2 class="govuk-heading-m">@msgs("applicationComplete.help.heading")</h2>
             <p>
-                @Messages("applicationComplete.help.text")
+                @msgs("applicationComplete.help.text")
             </p>
             <p>
-            <a href="javascript:window.print()" class="print-link">@Messages("applicationComplete.print")</a>
+            <a href="javascript:window.print()" class="print-link">@msgs("applicationComplete.print")</a>
             </p>
             <div>
-                <a href="@routes.ApplicationSignOutController.startFeedbackSurvey">@Messages("applicationComplete.feedback.link")</a>
-                @Messages("applicationComplete.feedback.text")
+                <a href="@routes.ApplicationSignOutController.startFeedbackSurvey">@msgs("applicationComplete.feedback.link")</a>
+                @msgs("applicationComplete.feedback.text")
             </div>
 
 

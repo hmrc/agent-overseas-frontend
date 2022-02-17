@@ -39,9 +39,9 @@
         govukInsetText: GovukInsetText,
         form: FormWithCSRF)
 
-@(taxRegistrationNumberForm: Form[TaxRegistrationNumber], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(taxRegistrationNumberForm: Form[TaxRegistrationNumber], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(taxRegistrationNumberForm) + Messages("taxRegNo.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showCompanyRegistrationNumberForm().url))) {
+@mainTemplate(title = errorPrefix(taxRegistrationNumberForm) + msgs("taxRegNo.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showCompanyRegistrationNumberForm().url))) {
 
     @if(taxRegistrationNumberForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(taxRegistrationNumberForm))
@@ -52,19 +52,19 @@
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(HmrcPageHeadingLegend(
-                    content = Text(Messages("taxRegNo.title")),
-                    caption = HmrcSectionCaption(Text(Messages("taxRegNo.caption")))
+                    content = Text(msgs("taxRegNo.title")),
+                    caption = HmrcSectionCaption(Text(msgs("taxRegNo.caption")))
                 ))
             )),
-            hint = Some(Hint(content = Text(Messages("taxRegNo.p1")))),
+            hint = Some(Hint(content = Text(msgs("taxRegNo.p1")))),
             items = Seq(
                 RadioItem(
-                    content = Text(Messages("taxRegNo.form.yes")),
+                    content = Text(msgs("taxRegNo.form.yes")),
                     value = Some("true"),
                     checked = taxRegistrationNumberForm.error("value").isDefined || taxRegistrationNumberForm.value.exists(_.canProvideTaxRegNo.contains(true)),
                     conditionalHtml = Some(
                         govukInput(Input(
-                            label = Label(content = Text(Messages("taxRegNo.form.yes.prompt"))),
+                            label = Label(content = Text(msgs("taxRegNo.form.yes.prompt"))),
                             spellcheck = Some(false),
                             classes = "govuk-input--width-20",
                             attributes = Map("data-uppercase" -> "false")
@@ -72,7 +72,7 @@
                     )
                 ),
                 RadioItem(
-                    content = Text(Messages("taxRegNo.form.no")),
+                    content = Text(msgs("taxRegNo.form.no")),
                     value = Some("false"),
                     checked = taxRegistrationNumberForm.value.flatMap(_.canProvideTaxRegNo).contains(false)
                 ),
@@ -81,7 +81,7 @@
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
-            content = Text(Messages("button.continue")),
+            content = Text(msgs("button.continue")),
         ))
     }
 

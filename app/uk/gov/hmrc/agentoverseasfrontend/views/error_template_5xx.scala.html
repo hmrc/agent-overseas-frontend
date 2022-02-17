@@ -19,23 +19,23 @@
 
 @this(mainTemplate: main_template)
 
-@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("global.error.500.title")) {
-    <h1 class="govuk-heading-xl">@Messages("global.error.500.heading")</h1>
+@mainTemplate(title = msgs("global.error.500.title")) {
+    <h1 class="govuk-heading-xl">@msgs("global.error.500.heading")</h1>
 
-<p>@Messages("global.error.500.message")</p>
-<p>@Messages("global.error.500.p2")</p>
+<p>@msgs("global.error.500.message")</p>
+<p>@msgs("global.error.500.p2")</p>
 <p>
     <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/vat-online-services-helpdesk">
-    @Messages("global.error.500.vat_helpline.link")
+    @msgs("global.error.500.vat_helpline.link")
     </a>
-        &nbsp;@Messages("global.error.500.vat_helpline")
+        &nbsp;@msgs("global.error.500.vat_helpline")
 </p>
 <p>
     <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment-online-services-helpdesk">
-    @Messages("global.error.500.sa_helpline.link")
+    @msgs("global.error.500.sa_helpline.link")
     </a>
-        &nbsp;@Messages("global.error.500.sa_helpline")
+        &nbsp;@msgs("global.error.500.sa_helpline")
 </p>
 }
