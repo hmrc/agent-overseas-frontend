@@ -15,7 +15,7 @@ lazy val scoverageSettings = {
 
 lazy val compileDeps = Seq(
   "uk.gov.hmrc"           %% "bootstrap-frontend-play-28"    % "5.16.0",
-  "uk.gov.hmrc"           %% "play-frontend-hmrc"            % "1.22.0-play-28",
+  "uk.gov.hmrc"           %% "play-frontend-hmrc"            % "3.4.0-play-28",
   "uk.gov.hmrc"           %% "play-partials"                 % "8.2.0-play-28",
   "uk.gov.hmrc"           %% "agent-kenshoo-monitoring"      % "4.8.0-play-28",
   "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "0.25.0-play-27",

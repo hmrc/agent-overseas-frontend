@@ -49,7 +49,7 @@
         formHelper: FormWithCSRF)
 
 @(cyaForm: Form[CheckYourAnswersConfirmation], checkYourAnswers: CheckYourAnswers)(implicit request: Request[_],
-        messages: Messages, appConfig: AppConfig)
+        msgs: Messages, appConfig: AppConfig)
 
 @summaryListRow(answerRow: AnswerRow) = @{
     SummaryListRow(
@@ -58,8 +58,8 @@
         actions = answerRow.changeLink.map(link => Actions(items = List(
             ActionItem(
                 href = link.url,
-                content = HtmlContent(s"""${Messages("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}</span>"""),
-                attributes = Map("data-include-hidden" -> s"${Messages("checkAnswers.change.button")} ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}")
+                content = HtmlContent(s"""${msgs("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}</span>"""),
+                attributes = Map("data-include-hidden" -> s"${msgs("checkAnswers.change.button")} ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}")
             )
         )))
     )
@@ -76,9 +76,9 @@
     }
 }
 
-@mainTemplate(title = errorPrefix(cyaForm) + Messages("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
+@mainTemplate(title = errorPrefix(cyaForm) + msgs("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
 
-    <h1 class="govuk-heading-xl">@Messages("checkAnswers.title")</h1>
+    <h1 class="govuk-heading-xl">@msgs("checkAnswers.title")</h1>
 
     @if(cyaForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(cyaForm))
@@ -89,17 +89,17 @@
     @renderAnswerBlock(checkYourAnswers.businessDetails)
     @renderAnswerBlock(checkYourAnswers.otherBusinessDetails)
 
-    <p>@Messages("checkAnswers.confirm.p1")</p>
+    <p>@msgs("checkAnswers.confirm.p1")</p>
 
     @formHelper(
         action = routes.ApplicationController.submitCheckYourAnswers(), 'id -> "checkAnswers") {
         @govukCheckboxes(Checkboxes(
-            items = Seq(CheckboxItem(id = Some("confirmed"), name = Some("confirmed"), content = Text(Messages("checkAnswers.confirm.label")), value = "true"))
+            items = Seq(CheckboxItem(id = Some("confirmed"), name = Some("confirmed"), content = Text(msgs("checkAnswers.confirm.label")), value = "true"))
         ).withFormField(cyaForm("confirmed")))
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
-            content = Text(Messages("checkAnswers.confirm.button")),
+            content = Text(msgs("checkAnswers.confirm.button")),
         ))
     }
 

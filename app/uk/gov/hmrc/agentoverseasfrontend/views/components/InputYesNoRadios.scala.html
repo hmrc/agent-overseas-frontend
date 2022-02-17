@@ -28,14 +28,14 @@ legendClass: Option[String] = None,
 caption: Option[String] = None,
 hint: Option[String] = None,
 headingIsLegend: Boolean = false
-)(implicit messages: Messages)
+)(implicit msgs: Messages)
 
 @govukRadios(Radios(
     idPrefix = Some(field.id),
     name = field.name,
     classes = "govuk-radios--inline",
     errorMessage = field.error match {
-        case Some(e) => Some(ErrorMessage.errorMessageWithDefaultStringsTranslated(content = Text(messages(e.message, e.args:_*))))
+        case Some(e) => Some(ErrorMessage.errorMessageWithDefaultStringsTranslated(content = Text(msgs(e.message, e.args:_*))))
         case None => None
         },
     hint = if(hint.isDefined) Some(Hint(content = Text(hint.get))) else None,
@@ -55,11 +55,11 @@ headingIsLegend: Boolean = false
         )),
     items = Seq(
         RadioItem(
-            content = Text(Messages("global.yes")),
+            content = Text(msgs("global.yes")),
             value = Some("true")
         ),
         RadioItem(
-            content = Text(Messages("global.no")),
+            content = Text(msgs("global.no")),
             value = Some("false")
         )
     )

@@ -40,9 +40,9 @@
         form: FormWithCSRF,
         govukButton: GovukButton)
 
-@(uploadSuccessForm: Form[SuccessfulFileUploadConfirmation], fileName: Option[String], fileType: String, backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(uploadSuccessForm: Form[SuccessfulFileUploadConfirmation], fileName: Option[String], fileType: String, backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(uploadSuccessForm) + Messages("fileUpload.success.title"), backLinkHref = backLink) {
+@mainTemplate(title = errorPrefix(uploadSuccessForm) + msgs("fileUpload.success.title"), backLinkHref = backLink) {
 
     @if(uploadSuccessForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(uploadSuccessForm))
@@ -51,8 +51,8 @@
     @form(action = routes.FileUploadController.submitSuccessfulFileUploadedForm){
 
         <h1 class="govuk-heading-xl margin-bottom-30">
-            <span class="govuk-caption-xl">@Messages("fileUpload.success.caption")</span>
-            @Messages("fileUpload.success.title")
+            <span class="govuk-caption-xl">@msgs("fileUpload.success.caption")</span>
+            @msgs("fileUpload.success.title")
         </h1>
 
         <input type="hidden" name="fileType" value="@fileType">
@@ -61,18 +61,18 @@
             classes = "govuk-radios--inline",
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
-                    content = Text(Messages("fileUpload.success.correctFile.confirmation", fileName.getOrElse(""))),
+                    content = Text(msgs("fileUpload.success.correctFile.confirmation", fileName.getOrElse(""))),
                 ))
             )),
             items = Seq(
-                RadioItem(content = Text(Messages("fileUpload.success.form.correctFile.yes")), value = Some("true")),
-                RadioItem(content = Text(Messages("fileUpload.success.form.correctFile.no")), value = Some("false"))
+                RadioItem(content = Text(msgs("fileUpload.success.form.correctFile.yes")), value = Some("true")),
+                RadioItem(content = Text(msgs("fileUpload.success.form.correctFile.no")), value = Some("false"))
             )
         ).withFormField(uploadSuccessForm("choice.correctFile")))
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
-            content = Text(Messages("button.continue")),
+            content = Text(msgs("button.continue")),
         ))
     }
 }

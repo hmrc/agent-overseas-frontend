@@ -45,9 +45,9 @@
         govukInsetText: GovukInsetText,
         form: FormWithCSRF)
 
-@(amlsForm: Form[AmlsDetails], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(amlsForm: Form[AmlsDetails], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(amlsForm) + Messages("amls.title"), backLinkHref = backLink) {
+@mainTemplate(title = errorPrefix(amlsForm) + msgs("amls.title"), backLinkHref = backLink) {
 
     @if(amlsForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsForm))
@@ -55,38 +55,38 @@
 
     @form(action = routes.AntiMoneyLaunderingController.submitAntiMoneyLaundering, 'class -> "form js-form", 'id -> "amlsForm") {
 
-        <h1 class="govuk-heading-xl">@Messages("amls.title")</h1>
+        <h1 class="govuk-heading-xl">@msgs("amls.title")</h1>
 
         @govukInsetText(InsetText(
-            content = Text(Messages("amls.inset.p1"))
+            content = Text(msgs("amls.inset.p1"))
         ))
 
         @uiInput(Input(
             classes = "govuk-input--width-20",
             spellcheck = Some(false),
             label = Label(
-                content = Text(Messages("amls.form.supervisory_body")),
+                content = Text(msgs("amls.form.supervisory_body")),
             )
         ).withFormField(amlsForm("amlsBody")))
 
         @uiInput(Input(
             classes = "govuk-input--width-20",
             label = Label(
-                content = Text(Messages("amls.form.membership_number")),
+                content = Text(msgs("amls.form.membership_number")),
             )
         ).withFormField(amlsForm("membershipNumber")))
 
         @govukDetails(Details(
-            summary = Text(Messages(s"amls.hint.expandable")),
-            content = HtmlContent(s"""<p>${Messages("amls.hint.expandable.p1")}</p>
-                                     |<p>${Html(Messages(s"amls.hint.expandable.p2"))}</p>
-                                     |<p>${Html(Messages(s"amls.hint.expandable.sign_out", routes.ApplicationSignOutController.signOut))}</p>
+            summary = Text(msgs(s"amls.hint.expandable")),
+            content = HtmlContent(s"""<p>${msgs("amls.hint.expandable.p1")}</p>
+                                     |<p>${Html(msgs(s"amls.hint.expandable.p2"))}</p>
+                                     |<p>${Html(msgs(s"amls.hint.expandable.sign_out", routes.ApplicationSignOutController.signOut))}</p>
                                      |""".stripMargin)
         ))
 
         @govukButton(Button(
             attributes = Map("id" -> "continue"),
-            content = Text(Messages("button.continue")),
+            content = Text(msgs("button.continue")),
         ))
     }
 }

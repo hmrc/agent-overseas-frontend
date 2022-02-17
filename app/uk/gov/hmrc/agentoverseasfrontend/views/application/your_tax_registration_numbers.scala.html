@@ -45,33 +45,33 @@
         form: FormWithCSRF,
         govukButton: GovukButton)
 
-@(doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn], trns: SortedSet[String], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn], trns: SortedSet[String], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
 @headerTitle = {
-    <p class="bold-small">@Messages("yourTaxRegistrationNumbers.want.to.add.another")</p>
+    <p class="bold-small">@msgs("yourTaxRegistrationNumbers.want.to.add.another")</p>
 }
 
 @editTrnForm(trn: String) = {
     @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'id -> s"""updateTrn$trn""") {
         <input class="hidden" name="original" type="text" value="@trn" />
         @govukButton(Button(
-            attributes = Map("type" -> "submit", "aria-label" -> Messages("yourTaxRegistrationNumbers.update.button")),
-            content = Text(Messages("yourTaxRegistrationNumbers.update.button"))
+            attributes = Map("type" -> "submit", "aria-label" -> msgs("yourTaxRegistrationNumbers.update.button")),
+            content = Text(msgs("yourTaxRegistrationNumbers.update.button"))
         ))
     }
 }
 
-@mainTemplate(title = errorPrefix(doYouWantToAddAnotherTrnForm) + Messages("yourTaxRegistrationNumbers.title"), backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))) {
+@mainTemplate(title = errorPrefix(doYouWantToAddAnotherTrnForm) + msgs("yourTaxRegistrationNumbers.title"), backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))) {
 
 @if(doYouWantToAddAnotherTrnForm.hasErrors) {
     @govukErrorSummary(ErrorSummary().withFormErrorsAsText(doYouWantToAddAnotherTrnForm))
 }
 
     <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("yourTaxRegistrationNumbers.caption")</span>
-        @Messages("yourTaxRegistrationNumbers.title")
+        <span class="govuk-caption-xl">@msgs("yourTaxRegistrationNumbers.caption")</span>
+        @msgs("yourTaxRegistrationNumbers.title")
     </h1>
-    <p>@Messages("yourTaxRegistrationNumbers.body.text", trns.size)</p>
+    <p>@msgs("yourTaxRegistrationNumbers.body.text", trns.size)</p>
 
     <fieldset class="govuk-fieldset">
         @govukSummaryList(SummaryList(
@@ -79,8 +79,8 @@
                 SummaryListRow(
                     key = Key(Text(trn)),
                     value = Value(content = HtmlContent(
-                        s"""<a href="${routes.TaxRegController.showRemoveTaxRegNumber(trn).url}" aria-label="${Messages("yourTaxRegistrationNumbers.remove.button")} $trn" class="govuk-link">
-                           |  ${Messages("yourTaxRegistrationNumbers.remove.button")}<span class="govuk-visually-hidden"> $trn</span>
+                        s"""<a href="${routes.TaxRegController.showRemoveTaxRegNumber(trn).url}" aria-label="${msgs("yourTaxRegistrationNumbers.remove.button")} $trn" class="govuk-link">
+                           |  ${msgs("yourTaxRegistrationNumbers.remove.button")}<span class="govuk-visually-hidden"> $trn</span>
                            |</a>
                            |""".stripMargin
                     )),
@@ -102,11 +102,11 @@
         fieldset = Some(Fieldset(legend = Some(Legend(content = HtmlContent(headerTitle))))),
         items = Seq(
             RadioItem(
-                content = Text(Messages("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.yes")),
+                content = Text(msgs("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.yes")),
                 value = Some("true"),
             ),
             RadioItem(
-                content = Text(Messages("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.no")),
+                content = Text(msgs("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.no")),
                 value = Some("false"),
             )
         )
@@ -114,6 +114,6 @@
 
     @govukButton(Button(
         attributes = Map("id" -> "continue"),
-        content = Text(Messages("button.continue")),
+        content = Text(msgs("button.continue")),
     ))}
 }

@@ -42,44 +42,44 @@
         govukDetails: GovukDetails,
         govukSummaryList: GovukSummaryList)
 
-@(agencyDetails: AgencyDetails, addressCountryName: String)(implicit messages: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+@(agencyDetails: AgencyDetails, addressCountryName: String)(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("subscription.checkAnswers.title")) {
+@mainTemplate(title = msgs("subscription.checkAnswers.title")) {
 
-    <h1 class="govuk-heading-xl">@Messages("subscription.checkAnswers.title")</h1>
-    <p>@Messages("subscription.checkAnswers.description.p1")</p>
+    <h1 class="govuk-heading-xl">@msgs("subscription.checkAnswers.title")</h1>
+    <p>@msgs("subscription.checkAnswers.description.p1")</p>
 
     @govukDetails(Details(
-        summary = Text(Messages("subscription.checkAnswers.how-we-use")),
+        summary = Text(msgs("subscription.checkAnswers.how-we-use")),
         content = HtmlContent(
-            s"""<p>${Messages("subscription.checkAnswers.description.p2a")}</p>
-               |<p>${Messages("subscription.checkAnswers.description.p2b")}</p>
-               |<p>${Messages("subscription.checkAnswers.description.p2c")}</p>
+            s"""<p>${msgs("subscription.checkAnswers.description.p2a")}</p>
+               |<p>${msgs("subscription.checkAnswers.description.p2b")}</p>
+               |<p>${msgs("subscription.checkAnswers.description.p2c")}</p>
                |""".stripMargin)
     ))
 
     @govukSummaryList(SummaryList(
         rows = Seq(
             SummaryListRow(
-                key = Key(Text(Messages("subscription.checkAnswers.businessEmailAddress.label"))),
+                key = Key(Text(msgs("subscription.checkAnswers.businessEmailAddress.label"))),
                 value = Value(Text(agencyDetails.agencyEmail)),
                 actions = Some(Actions(items = Seq(ActionItem(
                     href = routes.BusinessIdentificationController.showCheckBusinessEmail().url,
-                    content = Text(Messages("subscription.checkAnswers.change.button")),
-                    visuallyHiddenText = Some(Messages("subscription.checkAnswers.businessEmailAddress.label"))
+                    content = Text(msgs("subscription.checkAnswers.change.button")),
+                    visuallyHiddenText = Some(msgs("subscription.checkAnswers.businessEmailAddress.label"))
                 ))))
             ),
             SummaryListRow(
-                key = Key(Text(Messages("subscription.checkAnswers.businessName.label"))),
+                key = Key(Text(msgs("subscription.checkAnswers.businessName.label"))),
                 value = Value(Text(agencyDetails.agencyName)),
                 actions = Some(Actions(items = Seq(ActionItem(
                     href = routes.BusinessIdentificationController.showCheckBusinessName().url,
-                    content = Text(Messages("subscription.checkAnswers.change.button")),
-                    visuallyHiddenText = Some(Messages("subscription.checkAnswers.businessName.label"))
+                    content = Text(msgs("subscription.checkAnswers.change.button")),
+                    visuallyHiddenText = Some(msgs("subscription.checkAnswers.businessName.label"))
                 ))))
             ),
             SummaryListRow(
-                key = Key(Text(Messages("subscription.checkAnswers.businessAddress.label"))),
+                key = Key(Text(msgs("subscription.checkAnswers.businessAddress.label"))),
                 value = Value(HtmlContent(
                     s"""${agencyDetails.agencyAddress.addressLine1} <br/>
                        |${agencyDetails.agencyAddress.addressLine2} <br/>
@@ -89,19 +89,19 @@
                        |""".stripMargin)),
                 actions = Some(Actions(items = Seq(ActionItem(
                     href = routes.BusinessIdentificationController.showCheckBusinessAddress().url,
-                    content = Text(Messages("subscription.checkAnswers.change.button")),
-                    visuallyHiddenText = Some(Messages("subscription.checkAnswers.businessAddress.label"))
+                    content = Text(msgs("subscription.checkAnswers.change.button")),
+                    visuallyHiddenText = Some(msgs("subscription.checkAnswers.businessAddress.label"))
                 ))))
             )
         )
     ))
 
-    <p>@Messages("subscription.checkAnswers.description.p3")</p>
+    <p>@msgs("subscription.checkAnswers.description.p3")</p>
 
     @form(action = routes.SubscriptionController.subscribe(), 'class -> "form js-form") {
         @govukButton(Button(
             attributes = Map("id" -> "continue", "type" -> "submit"),
-            content = Text(Messages("subscription.checkAnswers.confirm.button")),
+            content = Text(msgs("subscription.checkAnswers.confirm.button")),
         ))
     }
 }

@@ -21,11 +21,11 @@
 
 @this(mainTemplate: main_template)
 
-@(retryLink: Call)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(retryLink: Call)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("cannotVerifyEmail.title")) {
+@mainTemplate(title = msgs("cannotVerifyEmail.title")) {
 
-    <h1 class="govuk-heading-xl">@Messages("cannotVerifyEmail.title")</h1>
-    <p>@Html(Messages("cannotVerifyEmail.p1"))</p>
-    <p>@Html(Messages("cannotVerifyEmail.p2", retryLink))</p>
+    <h1 class="govuk-heading-xl">@msgs("cannotVerifyEmail.title")</h1>
+    <p>@Html(msgs("cannotVerifyEmail.p1"))</p>
+    <p>@Html(msgs("cannotVerifyEmail.p2", retryLink))</p>
 }

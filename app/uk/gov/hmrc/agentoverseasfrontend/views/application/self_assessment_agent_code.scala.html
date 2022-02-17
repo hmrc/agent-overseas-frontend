@@ -40,21 +40,21 @@
         form: FormWithCSRF,
         checkBoxWithConditionalText: checkbox_with_conditional_text)
 
-@(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(agentCodesForm) + Messages("agentCodes.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm.url))) {
+@mainTemplate(title = errorPrefix(agentCodesForm) + msgs("agentCodes.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm.url))) {
 
     @if(agentCodesForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(agentCodesForm))
     }
 
     <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@Messages("agentCodes.caption")</span>
-        @Messages("agentCodes.title")
+        <span class="govuk-caption-xl">@msgs("agentCodes.caption")</span>
+        @msgs("agentCodes.title")
     </h1>
 
-    <p>@Messages("agentCodes.p1")</p>
-    <p>@Messages("agentCodes.form.hint")</p>
+    <p>@msgs("agentCodes.p1")</p>
+    <p>@msgs("agentCodes.form.hint")</p>
 
     @form(action = routes.ApplicationController.submitAgentCodes) {
 
@@ -62,13 +62,13 @@
             <div class="panels-conditionals form-group margin-bottom-30">
                 @checkBoxWithConditionalText(
                     field = agentCodesForm("self-assessment"),
-                    labelCheckbox = Messages("agentCodes.form.self-assessment.label"),
-                    labelInset = Messages("agentCodes.form.self-assessment.inset")
+                    labelCheckbox = msgs("agentCodes.form.self-assessment.label"),
+                    labelInset = msgs("agentCodes.form.self-assessment.inset")
                 )
                 @checkBoxWithConditionalText(
                     field = agentCodesForm("corporation-tax"),
-                    labelCheckbox = Messages("agentCodes.form.corporation-tax.label"),
-                    labelInset = Messages("agentCodes.form.corporation-tax.inset")
+                    labelCheckbox = msgs("agentCodes.form.corporation-tax.label"),
+                    labelInset = msgs("agentCodes.form.corporation-tax.inset")
                 )
             </div>
 
@@ -76,7 +76,7 @@
 
         @govukButton(Button(
             attributes = Map("id" -> "continue", "type" -> "submit"),
-            content = Text(Messages("button.continue")),
+            content = Text(msgs("button.continue")),
         ))
     }
 }

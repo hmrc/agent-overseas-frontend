@@ -33,9 +33,9 @@
         govukFileUpload: GovukFileUpload,
         govukButton: GovukButton)
 
-@(upscan: UpscanInitiate, fileType: String, backLink: Option[String] = None)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(upscan: UpscanInitiate, fileType: String, backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = "" + Messages(s"fileUpload.title.$fileType"), backLinkHref = backLink) {
+@mainTemplate(title = "" + msgs(s"fileUpload.title.$fileType"), backLinkHref = backLink) {
 
     <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data">
 
@@ -44,7 +44,7 @@
         role="alert"
         aria-labelledby="error-summary-heading"
         tabindex="-1">
-            <h2 id="error-summary-heading" class="govuk-error-summary__title">@Messages("error.summary.heading")</h2>
+            <h2 id="error-summary-heading" class="govuk-error-summary__title">@msgs("error.summary.heading")</h2>
             <ul class="govuk-list govuk-error-summary__list js-error-summary-messages">
                 <li>
                     <a href="#file-upload" id="#" data-focuses="#file-upload"></a>
@@ -53,18 +53,18 @@
         </div>
 
         <h1 class="govuk-heading-xl">
-            <span class="govuk-caption-xl">@Messages("fileUpload.caption")</span>
-            @Messages(s"fileUpload.title.$fileType")
+            <span class="govuk-caption-xl">@msgs("fileUpload.caption")</span>
+            @msgs(s"fileUpload.title.$fileType")
         </h1>
 
         <div class="govuk-box loader" id="file-upload-loading" aria-busy="true"></div>
         <div class="hide-when-uploading">
-            <p>@Messages(s"fileUpload.p1.$fileType")</p>
-            <p>@Messages("fileUpload.p2")</p>
+            <p>@msgs(s"fileUpload.p1.$fileType")</p>
+            <p>@msgs("fileUpload.p2")</p>
             <ul class="govuk-list govuk-list--bullet">
-                <li>@Messages(s"fileUpload.li.1.$fileType")</li>
-                <li>@Messages("fileUpload.li.2")</li>
-                <li>@Messages("fileUpload.li.3")</li>
+                <li>@msgs(s"fileUpload.li.1.$fileType")</li>
+                <li>@msgs("fileUpload.li.2")</li>
+                <li>@msgs("fileUpload.li.3")</li>
             </ul>
             <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
 
@@ -76,43 +76,43 @@
                     id = "file-upload",
                     name = "file",
                     attributes = Map("accept" -> "application/pdf, image/jpeg"),
-                    label = Label(content = Text(Messages("fileUpload.upload"))),
+                    label = Label(content = Text(msgs("fileUpload.upload"))),
                 ))
 
             </div>
             @govukInsetText(InsetText(
-                content = Text(Messages("fileUpload.inset"))
+                content = Text(msgs("fileUpload.inset"))
             ))
         </div>
 
         <div class="form-group hide-when-uploading">
             @govukButton(Button(
-                content = Text(Messages("fileUpload.button")),
+                content = Text(msgs("fileUpload.button")),
                 classes = "file-upload",
                 attributes = Map(
                     "data-reference"      -> upscan.reference,
                     "data-filetype"       -> fileType,
-                    "data-nofile"         -> Messages("error.fileUpload.no-file"),
-                    "data-empty-file"     -> Messages("error.fileUpload.empty-file"),
-                    "data-pswd-protected" -> Messages("error.fileUpload.password-protected"),
-                    "data-no-upload"      -> Messages("error.fileUpload.no-upload"),
-                    "data-virus"          -> Messages("error.fileUpload.virus"),
-                    "data-invalid"        -> Messages("error.fileUpload.invalid"),
-                    "data-too-large"      -> Messages("error.fileUpload.too-large")
+                    "data-nofile"         -> msgs("error.fileUpload.no-file"),
+                    "data-empty-file"     -> msgs("error.fileUpload.empty-file"),
+                    "data-pswd-protected" -> msgs("error.fileUpload.password-protected"),
+                    "data-no-upload"      -> msgs("error.fileUpload.no-upload"),
+                    "data-virus"          -> msgs("error.fileUpload.virus"),
+                    "data-invalid"        -> msgs("error.fileUpload.invalid"),
+                    "data-too-large"      -> msgs("error.fileUpload.too-large")
                )
            ))
 
   @*          <input type="submit" class="button file-upload"
             data-reference="@upscan.reference"
             data-filetype="@fileType"
-            data-nofile="@Messages("error.fileUpload.no-file")"
-            data-empty-file="@Messages("error.fileUpload.empty-file")"
-            data-pswd-protected="@Messages("error.fileUpload.password-protected")"
-            data-no-upload="@Messages("error.fileUpload.no-upload")"
-            data-virus="@Messages("error.fileUpload.virus")"
-            data-invalid="@Messages("error.fileUpload.invalid")"
-            data-too-large="@Messages("error.fileUpload.too-large")"
-            value="@Messages("fileUpload.button")"> *@
+            data-nofile="@msgs("error.fileUpload.no-file")"
+            data-empty-file="@msgs("error.fileUpload.empty-file")"
+            data-pswd-protected="@msgs("error.fileUpload.password-protected")"
+            data-no-upload="@msgs("error.fileUpload.no-upload")"
+            data-virus="@msgs("error.fileUpload.virus")"
+            data-invalid="@msgs("error.fileUpload.invalid")"
+            data-too-large="@msgs("error.fileUpload.too-large")"
+            value="@msgs("fileUpload.button")"> *@
         </div>
 
     </form>

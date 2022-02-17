@@ -20,14 +20,14 @@
 
 @this(mainTemplate: main_template)
 
-@(redirectUrl: String)(implicit request: Request[_], messages: Messages, configuration: Configuration, appConfig: AppConfig)
+@(redirectUrl: String)(implicit request: Request[_], msgs: Messages, configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = Messages("signed-out.header"), hasTimeout = false){
+@mainTemplate(title = msgs("signed-out.header"), hasTimeout = false){
 
     <h1 class="govuk-heading-xl">
-        @Messages("signed-out.header")
+        @msgs("signed-out.header")
     </h1>
-    <p class="govuk-body">@Messages("signed-out.p1")</p>
-    <p class="govuk-body">@Html(Messages("signed-out.p2", s"${redirectUrl}"))</p>
+    <p class="govuk-body">@msgs("signed-out.p1")</p>
+    <p class="govuk-body">@Html(msgs("signed-out.p2", s"${redirectUrl}"))</p>
 
 }

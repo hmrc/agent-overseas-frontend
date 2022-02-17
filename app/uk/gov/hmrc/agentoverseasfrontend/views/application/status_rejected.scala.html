@@ -23,21 +23,21 @@
 
 @this(mainTemplate: main_template, errorPrefix: error_prefix, govukErrorSummary: GovukErrorSummary, form: FormWithCSRF)
 
-@(agentDetails: ApplicationEntityDetails)(implicit messages: Messages, request: Request[_], appConfig: AppConfig)
+@(agentDetails: ApplicationEntityDetails)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(Messages("statusRejected.title")){
+@mainTemplate(msgs("statusRejected.title")){
 
-    <h1 class="govuk-heading-xl">@Messages("statusRejected.title")</h1>
+    <h1 class="govuk-heading-xl">@msgs("statusRejected.title")</h1>
 
-    <p>@Messages("statusRejected.para1", agentDetails.tradingName)</p>
-    <p>@Html(Messages("statusRejected.para2", Html(s"<strong class=bold-small>${agentDetails.businessEmail}</strong>")))</p>
+    <p>@msgs("statusRejected.para1", agentDetails.tradingName)</p>
+    <p>@Html(msgs("statusRejected.para2", Html(s"<strong class=bold-small>${agentDetails.businessEmail}</strong>")))</p>
 
-    <h2 class="govuk-heading-l">@Messages("statusRejected.heading")</h2>
+    <h2 class="govuk-heading-l">@msgs("statusRejected.heading")</h2>
 
-    <p>@Messages("statusRejected.para3")</p>
+    <p>@msgs("statusRejected.para3")</p>
 
-    <p>@Html(Messages("statusRejected.link",
+    <p>@Html(msgs("statusRejected.link",
         Html(s"<a href=${routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url}>")))
-        @Messages("statusRejected.link.text")@Html("</a>")
+        @msgs("statusRejected.link.text")@Html("</a>")
     </p>
 }
