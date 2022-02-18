@@ -139,8 +139,7 @@ if (typeof window.GOVUK === 'undefined') document.body.className = document.body
             // Create the loading element
             var element = Loader.prototype.createHtmlElement('div', {
                 'id': 'loader',
-                'class': 'govuk-c-loader',
-                'role': 'progressbar', // role progressbar, slider, status
+                'class': 'your_tax_registration_numbers.scala.html:71govuk-c-loader',
                 'aria-label': options.labelText,
                 // 'aria-valuetext': options.labelText, //human readable text alternative of aria-valuenow
                 'tabindex': '0'
@@ -173,9 +172,7 @@ if (typeof window.GOVUK === 'undefined') document.body.className = document.body
             if (options.label) {
                 var label = Loader.prototype.createHtmlElement('label', {
                     'id': 'loading-label',
-                    'class': 'govuk-c-loader__label',
-                    'role': 'status'
-                    // 'aria-live': 'polite'
+                    'class': 'govuk-c-loader__label'
                 })
                 label.innerHTML = options.labelText
                 element.setAttribute('aria-labelledby', 'loading-label') // for generic or updating messages
@@ -186,7 +183,6 @@ if (typeof window.GOVUK === 'undefined') document.body.className = document.body
 
             // Set ARIA attributes to show progress
             if (options.progress) {
-                // element.setAttribute('role', 'slider')
                 element.setAttribute('aria-valuemin', '0')
                 element.setAttribute('aria-valuenow', '0')
                 element.setAttribute('aria-valuemax', '100')

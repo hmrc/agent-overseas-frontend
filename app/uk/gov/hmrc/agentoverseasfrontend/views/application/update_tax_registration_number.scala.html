@@ -56,7 +56,8 @@
             ),
             spellcheck = Some(false),
             classes = "govuk-input--width-20"
-        ).withFormField(updateTrnForm("updated")))
+        ).withFormField(updateTrnForm("updated"))
+        )
 
         <input data-uppercase="false" class="hidden" name="original" type="text" id="actual-trn" value="@updateTrnForm.data.getOrElse("original", "")"/>
 
