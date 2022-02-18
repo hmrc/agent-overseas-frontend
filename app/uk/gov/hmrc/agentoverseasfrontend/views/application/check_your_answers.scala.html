@@ -54,7 +54,7 @@
 @summaryListRow(answerRow: AnswerRow) = @{
     SummaryListRow(
         key = Key(Text(answerRow.question)),
-        value = Value(content = HtmlContent(s"""<span id="${answerRow.id}">""" ++ answerRow.answerLines.map(line => s"<div>$line</div>\n").foldLeft("")(_++_) ++ "</span>")),
+        value = Value(content = HtmlContent(s"""<div id="${answerRow.id}">""" ++ answerRow.answerLines.map(line => s"<div>$line</div>\n").foldLeft("")(_++_) ++ "</div>")),
         actions = answerRow.changeLink.map(link => Actions(items = List(
             ActionItem(
                 href = link.url,

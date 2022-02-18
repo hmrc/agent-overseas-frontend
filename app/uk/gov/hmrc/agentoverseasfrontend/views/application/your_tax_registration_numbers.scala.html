@@ -35,6 +35,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
         mainTemplate: main_template,
@@ -42,30 +43,29 @@
         govukErrorSummary: GovukErrorSummary,
         govukSummaryList: GovukSummaryList,
         govukRadios: GovukRadios,
-        form: FormWithCSRF,
-        govukButton: GovukButton)
-
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
+        p: p
+)
 @(doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn], trns: SortedSet[String], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@headerTitle = {
-    <p class="bold-small">@msgs("yourTaxRegistrationNumbers.want.to.add.another")</p>
-}
-
 @editTrnForm(trn: String) = {
-    @form(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'id -> s"""updateTrn$trn""") {
-        <input class="hidden" name="original" type="text" value="@trn" />
-        @govukButton(Button(
-            attributes = Map("type" -> "submit", "aria-label" -> msgs("yourTaxRegistrationNumbers.update.button")),
-            content = Text(msgs("yourTaxRegistrationNumbers.update.button"))
-        ))
-    }
+@formWithCSRF(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'id -> s"""updateTrn$trn""") {
+    <input class="hidden" name="original" type="text" value="@trn" />
+    @govukButton(
+        Button(
+        attributes = Map("type" -> "submit", "aria-label" -> msgs("yourTaxRegistrationNumbers.update.button")),
+        content = Text(msgs("yourTaxRegistrationNumbers.update.button"))
+    )
+    )
+}
 }
 
 @mainTemplate(title = errorPrefix(doYouWantToAddAnotherTrnForm) + msgs("yourTaxRegistrationNumbers.title"), backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))) {
 
-@if(doYouWantToAddAnotherTrnForm.hasErrors) {
-    @govukErrorSummary(ErrorSummary().withFormErrorsAsText(doYouWantToAddAnotherTrnForm))
-}
+    @if(doYouWantToAddAnotherTrnForm.hasErrors) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(doYouWantToAddAnotherTrnForm))
+    }
 
     <h1 class="govuk-heading-xl">
         <span class="govuk-caption-xl">@msgs("yourTaxRegistrationNumbers.caption")</span>
@@ -95,25 +95,35 @@
         ))
     </fieldset>
 
-@form(action = routes.TaxRegController.submitYourTaxRegNumbers, 'class -> "form js-form") {
+    @formWithCSRF(action = routes.TaxRegController.submitYourTaxRegNumbers, 'class -> "form js-form") {
 
-    @govukRadios(Radios(
-        classes = "govuk-radios--inline",
-        fieldset = Some(Fieldset(legend = Some(Legend(content = HtmlContent(headerTitle))))),
-        items = Seq(
-            RadioItem(
-                content = Text(msgs("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.yes")),
-                value = Some("true"),
+        @govukRadios(Radios(
+            classes = "govuk-radios--inline",
+            fieldset = Some(
+                Fieldset(
+                    legend = Some(
+                        Legend(
+                            content = Text(msgs("yourTaxRegistrationNumbers.want.to.add.another")),
+                            classes = "govuk-heading-s"
+                        )
+                    )
+                )
             ),
-            RadioItem(
-                content = Text(msgs("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.no")),
-                value = Some("false"),
+            items = Seq(
+                RadioItem(
+                    content = Text(msgs("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.yes")),
+                    value = Some("true"),
+                ),
+                RadioItem(
+                    content = Text(msgs("yourTaxRegistrationNumbers.form.doYouWantToAddAnotherTrn.no")),
+                    value = Some("false"),
+                )
             )
-        )
-    ).withFormField(doYouWantToAddAnotherTrnForm("value")))
+        ).withFormField(doYouWantToAddAnotherTrnForm("value")))
 
-    @govukButton(Button(
-        attributes = Map("id" -> "continue"),
-        content = Text(msgs("button.continue")),
-    ))}
+        @govukButton(Button(
+            attributes = Map("id" -> "continue"),
+            content = Text(msgs("button.continue")),
+        ))
+    }
 }
