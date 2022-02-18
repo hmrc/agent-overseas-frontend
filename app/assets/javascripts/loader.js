@@ -139,7 +139,7 @@ if (typeof window.GOVUK === 'undefined') document.body.className = document.body
             // Create the loading element
             var element = Loader.prototype.createHtmlElement('div', {
                 'id': 'loader',
-                'class': 'your_tax_registration_numbers.scala.html:71govuk-c-loader',
+                'class': 'govuk-c-loader',
                 'aria-label': options.labelText,
                 // 'aria-valuetext': options.labelText, //human readable text alternative of aria-valuenow
                 'tabindex': '0'
