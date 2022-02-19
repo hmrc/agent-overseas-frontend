@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.removeTrnForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.{AddTrnForm, DoYouWantToAddAnotherTrnForm, TaxRegistrationNumberForm, UpdateTrnForm}
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, TaxRegistrationNumber, Trn}
+import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, TaxRegistrationNumber, Trn, UpdateTrn}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
@@ -142,11 +142,16 @@ class TaxRegController @Inject()(
     withEnrollingAgent { agentSession =>
       val trns = agentSession.taxRegistrationNumbers
         .getOrElse(SortedSet.empty[Trn])
-      if (agentSession.changingAnswers) {
-        Ok(yourTrnsView(DoYouWantToAddAnotherTrnForm.form, trns.map(_.value), Some(showCheckYourAnswersUrl)))
-      } else {
-        Ok(yourTrnsView(DoYouWantToAddAnotherTrnForm.form, trns.map(_.value)))
-      }
+      val backLink =
+        if (agentSession.changingAnswers) Some(showCheckYourAnswersUrl)
+        else if (agentSession.hasTrnsChanged)
+          Some(
+            routes.TaxRegController
+              .showUpdateTaxRegNumber(
+                trns.headOption.getOrElse(throw new RuntimeException("no tax registration numbers in session")).value)
+              .url)
+        else None
+      Ok(yourTrnsView(DoYouWantToAddAnotherTrnForm.form, trns.map(_.value), backLink))
     }
   }
 
@@ -179,6 +184,12 @@ class TaxRegController @Inject()(
             }
           }
         )
+    }
+  }
+
+  def showUpdateTaxRegNumber(trn: String): Action[AnyContent] = Action.async { implicit request =>
+    withEnrollingAgent { _ =>
+      Ok(updateTrnView(UpdateTrnForm.form.fill(UpdateTrn(original = trn, Some(trn)))))
     }
   }
 
