@@ -302,6 +302,25 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       )
     }
 
+    "display the /your-tax-registration-numbers page with /update-tax-registration-number back link if user is hasTrnsChanged" in {
+      sessionStoreService.currentSession.agentSession =
+        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), hasTrnsChanged = true))
+
+      val result = controller.showYourTaxRegNumbersForm(cleanCredsAgent(FakeRequest()))
+
+      status(result) shouldBe 200
+
+      result.futureValue should containMessages(
+        "yourTaxRegistrationNumbers.caption",
+        "yourTaxRegistrationNumbers.title"
+      )
+
+      result.futureValue should containLink(
+        expectedMessageKey = "button.back",
+        expectedHref = "/agent-services/apply-from-outside-uk/update-tax-registration-number/123"
+      )
+    }
+
     "display the /your-tax-registration-numbers page with correct text if there are no stored tax registration numbers found in session" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
@@ -371,6 +390,18 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
       status(result) shouldBe 200
 
       result.futureValue should containMessages("doYouWantToAddAnotherTrn.error.no-radio.selected")
+    }
+  }
+
+  "GET /update-tax-registration-number/:trn" should {
+    "display the content" in {
+      sessionStoreService.currentSession.agentSession =
+        Some(agentSession)
+      val result = controller.showUpdateTaxRegNumber("123")(cleanCredsAgent(FakeRequest()))
+
+      status(result) shouldBe 200
+
+      result.futureValue should containMessages("updateTrn.title")
     }
   }
 

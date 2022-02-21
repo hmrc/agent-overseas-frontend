@@ -49,18 +49,6 @@
 )
 @(doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn], trns: SortedSet[String], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@editTrnForm(trn: String) = {
-@formWithCSRF(action = routes.TaxRegController.submitUpdateTaxRegNumber, 'id -> s"""updateTrn$trn""") {
-    <input class="hidden" name="original" type="text" value="@trn" />
-    @govukButton(
-        Button(
-        attributes = Map("type" -> "submit", "aria-label" -> msgs("yourTaxRegistrationNumbers.update.button")),
-        content = Text(msgs("yourTaxRegistrationNumbers.update.button"))
-    )
-    )
-}
-}
-
 @mainTemplate(title = errorPrefix(doYouWantToAddAnotherTrnForm) + msgs("yourTaxRegistrationNumbers.title"), backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))) {
 
     @if(doYouWantToAddAnotherTrnForm.hasErrors) {
@@ -86,7 +74,9 @@
                     )),
                     actions = Some(Actions(items = Seq(
                         ActionItem(
-                            content = HtmlContent(editTrnForm(trn)),
+                            href = s"${routes.TaxRegController.showUpdateTaxRegNumber(trn)}",
+                            content = Text(msgs("yourTaxRegistrationNumbers.update.button")),
+                            classes = s"govuk-button",
                             visuallyHiddenText = Some(s" $trn")
                         )
                     )))
