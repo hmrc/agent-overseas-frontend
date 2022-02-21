@@ -69,7 +69,7 @@
                     <span class="govuk-caption-xl">@msgs("mainBusinessAddress.caption")</span>
                     @msgs("mainBusinessAddress.title")
                 </h1>
-                <div class="govuk-body">@msgs("mainBusinessAddress.body.text")</div>
+                <span class="govuk-body">@msgs("mainBusinessAddress.body.text")</span>
             </legend>
 
             @govukInput(Input(
@@ -100,7 +100,8 @@
                 label = Label(content = Text(msgs("mainBusinessAddress.form.country"))),
                 id = "countryCode-auto-complete",
                 name = "countryCode",
-                items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
+                items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) =>
+                    SelectItem(value = Some(code), text = name) }
             ).withFormField(mainBusinessAddressForm("countryCode")))
         </fieldset>
 
