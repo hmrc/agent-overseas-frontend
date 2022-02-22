@@ -47,7 +47,7 @@
             <h2 id="error-summary-heading" class="govuk-error-summary__title">@msgs("error.summary.heading")</h2>
             <ul class="govuk-list govuk-error-summary__list js-error-summary-messages">
                 <li>
-                    <a href="#file-upload" id="#" data-focuses="#file-upload"></a>
+                    <a href="#file-to-upload" id="file-to-upload-error" data-focuses="#file-to-upload"></a>
                 </li>
             </ul>
         </div>
@@ -57,7 +57,11 @@
             @msgs(s"fileUpload.title.$fileType")
         </h1>
 
-        <div class="govuk-box loader" id="file-upload-loading" aria-busy="true"></div>
+        <div style="display: none;" class="spinner-wrapper">
+            <div class="loader" id="file-upload-loading" aria-busy="true"></div>
+            <p class="govuk-body">This file is being checked and uploaded</p>
+        </div>
+
         <div class="hide-when-uploading">
             <p>@msgs(s"fileUpload.p1.$fileType")</p>
             <p>@msgs("fileUpload.p2")</p>
@@ -73,7 +77,7 @@
                 }
 
                 @govukFileUpload(FileUpload(
-                    id = "file-upload",
+                    id = "file-to-upload",
                     name = "file",
                     attributes = Map("accept" -> "application/pdf, image/jpeg"),
                     label = Label(content = Text(msgs("fileUpload.upload"))),
@@ -88,7 +92,7 @@
         <div class="form-group hide-when-uploading">
             @govukButton(Button(
                 content = Text(msgs("fileUpload.button")),
-                classes = "file-upload",
+                classes = "submit-file-upload",
                 attributes = Map(
                     "data-reference"      -> upscan.reference,
                     "data-filetype"       -> fileType,
@@ -102,17 +106,6 @@
                )
            ))
 
-  @*          <input type="submit" class="button file-upload"
-            data-reference="@upscan.reference"
-            data-filetype="@fileType"
-            data-nofile="@msgs("error.fileUpload.no-file")"
-            data-empty-file="@msgs("error.fileUpload.empty-file")"
-            data-pswd-protected="@msgs("error.fileUpload.password-protected")"
-            data-no-upload="@msgs("error.fileUpload.no-upload")"
-            data-virus="@msgs("error.fileUpload.virus")"
-            data-invalid="@msgs("error.fileUpload.invalid")"
-            data-too-large="@msgs("error.fileUpload.too-large")"
-            value="@msgs("fileUpload.button")"> *@
         </div>
 
     </form>

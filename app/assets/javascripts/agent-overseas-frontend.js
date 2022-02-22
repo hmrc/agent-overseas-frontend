@@ -78,33 +78,17 @@ $(document).ready(function() {
 
     // File upload
 
-    if (document.getElementById('govuk-box')) {
-        var loader = new GOVUK.Loader();
-        loader.init({
-            container: 'govuk-box'
-        })
-    }
-
-    if (document.getElementById('file-upload-loading')) {
-        var loader2 = new GOVUK.Loader();
-        loader2.init({
-            container: 'file-upload-loading',
-            label: true,
-            labelText: 'This file is being checked and uploaded',
-        })
-    }
-
-    var fileUploadClass = $('.file-upload'),
-        file = $('#file-upload'),
+    var fileUploadClass = $('.submit-file-upload'),
+        file = $('#file-to-upload'),
         errorSummary = $('.error-summary'),
-        errorMessageNoFile = $('.file-upload').data('nofile'),
-        errorMessageEmptyFile= $('.file-upload').data('empty-file'),
-        errorMessagePswdProtected = $('.file-upload').data('pswd-protected'),
-        errorMessageNoUpload = $('.file-upload').data('no-upload'),
-        errorMessageVirus = $('.file-upload').data('virus'),
-        errorMessageFileTooLarge = $('.file-upload').data('too-large'),
-        errorMessageInvalid = $('.file-upload').data('invalid'),
-        loadingSection = $('.loader'),
+        errorMessageNoFile = $('.submit-file-upload').data('nofile'),
+        errorMessageEmptyFile= $('.submit-file-upload').data('empty-file'),
+        errorMessagePswdProtected = $('.submit-file-upload').data('pswd-protected'),
+        errorMessageNoUpload = $('.submit-file-upload').data('no-upload'),
+        errorMessageVirus = $('.submit-file-upload').data('virus'),
+        errorMessageFileTooLarge = $('.submit-file-upload').data('too-large'),
+        errorMessageInvalid = $('.submit-file-upload').data('invalid'),
+        loadingSection = $('.spinner-wrapper'),
         uploadFormElements = $('.hide-when-uploading'),
         maxUploadSize = 5000000;
 
@@ -114,7 +98,7 @@ $(document).ready(function() {
 
     var fileIsEncrypted = {};
 
-    $('input#file-upload').change(function () {
+    $('input#file-to-upload').change(function () {
         var reader = new FileReader();
         reader.readAsText(file[0].files[0]);
         reader.onload = function() {
@@ -249,8 +233,8 @@ $(document).ready(function() {
         var title = pageTitle;
         $('title').html("Error: " + title);
         $('.js-error-summary-messages a').html(errorMsg);
-        $('#file-upload-container').addClass('form-field--error');
-        $('#file-upload-error').html('<span class="govuk-visually-hidden">Error:</span>' + errorMsg);
+        $('#file-to-upload-container').addClass('form-field--error');
+        $('#file-to-upload-error').html('<span class="govuk-visually-hidden">Error:</span>' + errorMsg);
     }
 
     function clearErrors() {
@@ -258,8 +242,8 @@ $(document).ready(function() {
         $('title').html(pageTitle);
         file.focus();
         $('.js-error-summary-messages a').html();
-        $('#file-upload-container').removeClass('form-field--error');
-        $('#file-upload-error').html();
+        $('#file-to-upload-container').removeClass('form-field--error');
+        $('#file-to-upload-error').html();
 
     }
 
