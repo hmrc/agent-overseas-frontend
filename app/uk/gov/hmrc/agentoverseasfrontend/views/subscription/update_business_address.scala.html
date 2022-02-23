@@ -91,7 +91,9 @@
                     label = Label(content = Text(msgs("updateBusinessAddress.country.title"))),
                     id = "countryCode-auto-complete",
                     name = "countryCode",
-                    items = SelectItem(value = Some("")) :: countries.toList.sortBy(_._2).map { case (code, name) => SelectItem(value = Some(code), text = name) }
+                    items = SelectItem(value = Some(""), attributes= Map("label"->"empty")) :: countries.toList.sortBy(_._2).map { case
+                        (code,
+                    name) => SelectItem(value = Some(code), text = name) }
                 ).withFormField(addressForm("countryCode")))
             </div>
         </fieldset>
