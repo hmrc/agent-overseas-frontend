@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components.head
 @import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
+@import views.html.helper.CSPNonce
 
 @this(
     hmrcLayout: HmrcLayout,
@@ -43,9 +44,11 @@
 }
 
 @additionalScripts = {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="@controllers.routes.Assets.versioned("javascripts/accessible-autocomplete.min.js")"></script>
-    <script src="@controllers.routes.Assets.versioned("javascripts/agent-overseas-frontend.js")"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous" @{CSPNonce.attr}></script>
+    <script src="@controllers.routes.Assets.versioned("javascripts/accessible-autocomplete.min.js")"  @{CSPNonce.attr}></script>
+    <script src="@controllers.routes.Assets.versioned("javascripts/agent-overseas-frontend.js")"  @{CSPNonce.attr}></script>
 }
 
 @appName = {
@@ -75,5 +78,6 @@
     additionalHeadBlock = Some(head(hasTimeout)),
     additionalScriptsBlock = Some(additionalScripts),
     backLinkUrl = backLinkHref,
-    mainContentLayout = if (wide) None else Some(twoThirdsLayout(_))
+    mainContentLayout = if (wide) None else Some(twoThirdsLayout(_)),
+    nonce = CSPNonce.get
 )(mainContentWithHelpLink)
