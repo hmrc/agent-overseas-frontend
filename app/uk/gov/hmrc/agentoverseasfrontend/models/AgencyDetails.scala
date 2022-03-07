@@ -16,23 +16,34 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json._
 
 case class AgencyDetails(
   agencyName: String,
   agencyEmail: String,
   agencyAddress: OverseasAddress,
-  emailVerified: Boolean)
+  verifiedEmails: Set[String]) {
+  def emailVerified: Boolean = verifiedEmails.contains(agencyEmail)
+}
 
 object AgencyDetails {
-  implicit val formats: Format[AgencyDetails] =
-    Json.format[AgencyDetails]
+  // manual instance for backwards compatibility if there are any stored details without 'verifiedEmails' field
+  // We can remove this and have an auto-generated Format after this has been in production for some time.
+  val reads: Reads[AgencyDetails] = (
+    (__ \ "agencyName").read[String] and
+      (__ \ "agencyEmail").read[String] and
+      (__ \ "agencyAddress").read[OverseasAddress] and
+      (__ \ "verifiedEmails").readWithDefault[Set[String]](Set.empty)
+  )(AgencyDetails.apply _)
+  val writes: Writes[AgencyDetails] = Json.writes[AgencyDetails]
+  implicit val formats: Format[AgencyDetails] = Format(reads, writes)
 
-  def apply(overseasApplication: OverseasApplication): AgencyDetails =
+  def fromOverseasApplication(overseasApplication: OverseasApplication): AgencyDetails =
     AgencyDetails(
       agencyName = overseasApplication.tradingDetails.tradingName,
       agencyEmail = overseasApplication.contactDetails.businessEmail,
       agencyAddress = overseasApplication.tradingDetails.tradingAddress,
-      emailVerified = true // When creating AgencyDetails from an overseas application we assume the email has already been verified.
+      verifiedEmails = Set(overseasApplication.contactDetails.businessEmail) // When creating AgencyDetails from an overseas application we assume the email has already been verified.
     )
 }

@@ -107,5 +107,19 @@ class SubscriptionControllerISpec
     }
   }
 
+  "email verification" should {
+    "be triggered if attempting to subscribe with an unverified email" in {
+      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+      givenAcceptedApplicationResponse
+      givenApplicationUpdateSuccessResponse
+      givenSubscriptionSuccessfulResponse(arn)
+
+      val result = controller.subscribe(request)
+
+      status(result) shouldBe 303
+      redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail().url
+    }
+  }
 
 }

@@ -41,6 +41,8 @@ case class AgentSession(
   hasTrnsChanged: Boolean = false,
   verifiedEmails: Set[String] = Set.empty) {
 
+  def emailNeedsVerifying: Boolean = contactDetails.exists(details => !verifiedEmails.contains(details.businessEmail))
+
   def sanitize: AgentSession = {
     val agentCodes =
       if (this.registeredWithHmrc.contains(Yes)) this.agentCodes else None

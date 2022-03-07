@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.main_template
@@ -23,9 +22,12 @@
 
 @(retryLink: Call)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = msgs("cannotVerifyEmail.title")) {
+@mainTemplate(title = msgs("cannotVerifyEmail.locked.title")) {
 
-    <h1 class="govuk-heading-xl">@msgs("cannotVerifyEmail.title")</h1>
-    <p>@Html(msgs("cannotVerifyEmail.p1"))</p>
-    <p>@Html(msgs("cannotVerifyEmail.p2", retryLink))</p>
+ <h1 class="govuk-heading-xl">@msgs("cannotVerifyEmail.locked.title")</h1>
+ <p>@Html(msgs("cannotVerifyEmail.locked.p1"))</p>
+ <p>@Html(msgs("cannotVerifyEmail.locked.p2"))</p>
+ <h2>@Html(msgs("cannotVerifyEmail.locked.h2"))</h2>
+ <p>@Html(msgs("cannotVerifyEmail.locked.p3"))</p>
+ <p>@Html(msgs("cannotVerifyEmail.locked.p4", retryLink))</p>
 }

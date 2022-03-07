@@ -46,22 +46,22 @@ class FileUploadController @Inject()(
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with Logging {
 
-  import authAction.withEnrollingAgent
+  import authAction.withEnrollingEmailVerifiedAgent
 
   def showAmlsUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit agentSession =>
+    withEnrollingEmailVerifiedAgent { implicit agentSession =>
       showUploadForm("amls")
     }
   }
 
   def showTradingAddressUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit agentSession =>
+    withEnrollingEmailVerifiedAgent { implicit agentSession =>
       showUploadForm("trading-address")
     }
   }
 
   def showTrnUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit agentSession =>
+    withEnrollingEmailVerifiedAgent { implicit agentSession =>
       showUploadForm("trn")
     }
   }
@@ -77,14 +77,14 @@ class FileUploadController @Inject()(
             .map(_ => Ok(fileUploadView(upscan, fileType, getBackLink(fileType)))))
 
   def showTradingAddressNoJsCheckPage: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       Ok(tradingAddressNoJsView())
     }
   }
 
   //these pollStatus functions are called via ajax in the assets/javascripts/script.js
   def pollStatus(fileType: String, reference: String): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           applicationService
@@ -117,7 +117,7 @@ class FileUploadController @Inject()(
   }
 
   def showSuccessfulUploadedForm(): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           agentSession.fileType match {
@@ -150,7 +150,7 @@ class FileUploadController @Inject()(
     }
 
   def submitSuccessfulFileUploadedForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { implicit agentSession =>
+    withEnrollingEmailVerifiedAgent { implicit agentSession =>
       SuccessfulFileUploadConfirmationForm.form
         .bindFromRequest()
         .fold(
@@ -175,7 +175,7 @@ class FileUploadController @Inject()(
   }
 
   def showUploadFailedPage(): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       sessionStoreService.fetchAgentSession.map {
         case Some(agentSession) =>
           agentSession.fileType match {

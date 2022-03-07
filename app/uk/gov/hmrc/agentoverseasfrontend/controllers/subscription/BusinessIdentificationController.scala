@@ -75,7 +75,7 @@ class BusinessIdentificationController @Inject()(
 
   def showCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         val countryCode = agencyDetails.agencyAddress.countryCode
         val countryName = countries.getOrElse(
           countryCode,
@@ -89,7 +89,7 @@ class BusinessIdentificationController @Inject()(
 
   def submitCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { agent =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         businessAddressCheckForm.bindFromRequest
           .fold(
             formWithErrors => {
@@ -114,7 +114,7 @@ class BusinessIdentificationController @Inject()(
 
   def showUpdateBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         Future.successful(
           Ok(
             updateBusinessAddressView(
@@ -126,7 +126,7 @@ class BusinessIdentificationController @Inject()(
 
   def submitUpdateBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         updateBusinessAddressForm(validCountryCodes)
           .bindFromRequest()
           .fold(
@@ -194,7 +194,7 @@ class BusinessIdentificationController @Inject()(
           .fold(
             formWithErrors => Future.successful(Ok(updateBusinessEmailView(formWithErrors))),
             validForm => {
-              val agencyWithUpdatedEmail = agencyDetails.copy(agencyEmail = validForm.email, emailVerified = false)
+              val agencyWithUpdatedEmail = agencyDetails.copy(agencyEmail = validForm.email)
 
               updateAgencyDetails(agencyWithUpdatedEmail).map(_ =>
                 Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
@@ -206,7 +206,7 @@ class BusinessIdentificationController @Inject()(
 
   def showCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         Future.successful(Ok(checkBusinessNameView(businessNameCheckForm, agencyDetails.agencyName)))
       }
     }
@@ -214,7 +214,7 @@ class BusinessIdentificationController @Inject()(
 
   def submitCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { agent =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         businessNameCheckForm.bindFromRequest
           .fold(
             formWithErrors => {
@@ -234,7 +234,7 @@ class BusinessIdentificationController @Inject()(
 
   def showUpdateBusinessNameForm: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         Future.successful(
           Ok(updateBusinessNameView(updateBusinessNameForm.fill(BusinessNameForm(agencyDetails.agencyName)))))
       }
@@ -243,7 +243,7 @@ class BusinessIdentificationController @Inject()(
 
   def submitUpdateBusinessNameForm: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
+      withEmailVerifiedAgencyDetails { agencyDetails =>
         updateBusinessNameForm
           .bindFromRequest()
           .fold(

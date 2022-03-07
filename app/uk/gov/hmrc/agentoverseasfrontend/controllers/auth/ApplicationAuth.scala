@@ -21,7 +21,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.{Request, Result}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
+import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -53,7 +53,8 @@ class ApplicationAuth @Inject()(
         case None ~ _ => throw UnsupportedCredentialRole("User has no credentials")
       }
 
-  def withCredsAndEnrollingAgent(body: (Credentials, AgentSession) => Future[Result])(
+  def withCredsAndEnrollingAgent(checkForEmailVerification: Boolean)(
+    body: (Credentials, AgentSession) => Future[Result])(
     implicit hc: HeaderCarrier,
     request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
@@ -63,6 +64,8 @@ class ApplicationAuth @Inject()(
             Future.successful(Redirect(appConfig.asaFrontendUrl))
           else
             sessionStoreService.fetchAgentSession.flatMap {
+              case Some(agentSession) if checkForEmailVerification && agentSession.emailNeedsVerifying =>
+                Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail()))
               case Some(agentSession) =>
                 body(credentials, agentSession)
               case None =>
@@ -76,5 +79,9 @@ class ApplicationAuth @Inject()(
 
   def withEnrollingAgent(
     body: AgentSession => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
-    withCredsAndEnrollingAgent((_, session) => body(session))
+    withCredsAndEnrollingAgent(checkForEmailVerification = false)((_, session) => body(session))
+
+  def withEnrollingEmailVerifiedAgent(
+    body: AgentSession => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    withCredsAndEnrollingAgent(checkForEmailVerification = true)((_, session) => body(session))
 }

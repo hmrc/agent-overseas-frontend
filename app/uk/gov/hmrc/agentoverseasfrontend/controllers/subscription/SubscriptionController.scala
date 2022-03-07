@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBa
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.{AlreadySubscribed, NoAgencyInSession, NoApplications, WrongApplicationStatus}
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
-import uk.gov.hmrc.agentoverseasfrontend.views.html.application.cannot_verify_email
+import uk.gov.hmrc.agentoverseasfrontend.views.html.application.{cannot_verify_email_locked, cannot_verify_email_technical}
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +39,10 @@ class SubscriptionController @Inject()(
   override val sessionStoreService: MongoDBSessionStoreService,
   subscriptionCompleteView: subscription_complete,
   alreadySubscribedView: already_subscribed,
-  cannotVerifyEmailView: cannot_verify_email)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
+  emailLockedView: cannot_verify_email_locked,
+  emailTechnicalErrorView: cannot_verify_email_technical)(
+  implicit override val ec: ExecutionContext,
+  appConfig: AppConfig)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler
     with Logging {
 
@@ -48,20 +51,25 @@ class SubscriptionController @Inject()(
   def subscribe: Action[AnyContent] = Action.async { implicit request =>
     withBasicAgentAuth { implicit subRequest =>
       if (subRequest.enrolments.isEmpty) {
-        subscriptionService.subscribe.map {
-          case Right(_) =>
-            Redirect(routes.SubscriptionController.subscriptionComplete())
-          case Left(NoApplications) =>
-            logger.info("User has no known applications, redirecting to application frontend")
-            Redirect(s"${appConfig.agentOverseasFrontendUrl}/create-account")
-          case Left(NoAgencyInSession) =>
-            logger.info("No agency details in session, redirecting to /check-answers")
-            Redirect(routes.BusinessIdentificationController.showCheckAnswers())
-          case Left(AlreadySubscribed) =>
-            Redirect(routes.SubscriptionController.alreadySubscribed())
-          case Left(WrongApplicationStatus) =>
-            throw new IllegalStateException(
-              "Can not proceed with application - can not subscribe with an application in this status")
+        sessionStoreService.fetchAgencyDetails.flatMap {
+          case Some(agencyDetails) if !agencyDetails.emailVerified =>
+            Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail()))
+          case _ =>
+            subscriptionService.subscribe.map {
+              case Right(_) =>
+                Redirect(routes.SubscriptionController.subscriptionComplete())
+              case Left(NoApplications) =>
+                logger.info("User has no known applications, redirecting to application frontend")
+                Redirect(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+              case Left(NoAgencyInSession) =>
+                logger.info("No agency details in session, redirecting to /check-answers")
+                Redirect(routes.BusinessIdentificationController.showCheckAnswers())
+              case Left(AlreadySubscribed) =>
+                Redirect(routes.SubscriptionController.alreadySubscribed())
+              case Left(WrongApplicationStatus) =>
+                throw new IllegalStateException(
+                  "Can not proceed with application - can not subscribe with an application in this status")
+            }
         }
       } else {
         logger.info("User has other enrolments, redirecting to /next-step")
@@ -94,10 +102,11 @@ class SubscriptionController @Inject()(
     }
   }
 
-  def cannotVerifyEmail: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { subRequest =>
-      Future.successful(
-        Ok(cannotVerifyEmailView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm())))
-    }
+  def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm())))
+  }
+
+  def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(emailTechnicalErrorView()))
   }
 }

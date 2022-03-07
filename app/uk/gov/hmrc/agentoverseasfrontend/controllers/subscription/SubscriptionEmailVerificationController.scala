@@ -62,17 +62,18 @@ class SubscriptionEmailVerificationController @Inject()(
   override def isAlreadyVerified(session: AgencyDetails, email: String): Boolean = session.emailVerified
   override def markEmailAsVerified(session: AgencyDetails, email: String)(
     implicit hc: HeaderCarrier): Future[AgencyDetails] = {
-    val newAgencyDetails = session.copy(emailVerified = true)
+    val newAgencyDetails = session.copy(verifiedEmails = session.verifiedEmails + email)
     sessionStoreService.cacheAgencyDetails(newAgencyDetails).map(_ => newAgencyDetails)
   }
 
   override def selfRoute: Call = routes.SubscriptionEmailVerificationController.verifyEmail()
   override def redirectUrlIfVerified(session: AgencyDetails): Call =
     routes.BusinessIdentificationController.showCheckAnswers()
-  override def redirectUrlIfLocked(session: AgencyDetails): Call = routes.SubscriptionController.cannotVerifyEmail()
-  override def redirectUrlIfError(session: AgencyDetails): Call = routes.SubscriptionController.cannotVerifyEmail()
+  override def redirectUrlIfLocked(session: AgencyDetails): Call = routes.SubscriptionController.showEmailLocked()
+  override def redirectUrlIfError(session: AgencyDetails): Call =
+    routes.SubscriptionController.showEmailTechnicalError()
   override def backLinkUrl(session: AgencyDetails): Option[Call] =
-    Some(routes.BusinessIdentificationController.showUpdateBusinessEmailForm())
+    Some(routes.BusinessIdentificationController.showCheckBusinessEmail())
   override def enterEmailUrl(session: AgencyDetails): Call =
-    routes.BusinessIdentificationController.showUpdateBusinessEmailForm()
+    routes.BusinessIdentificationController.showCheckBusinessEmail()
 }

@@ -1,6 +1,6 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
@@ -9,6 +9,7 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
 
@@ -625,4 +626,42 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       }
     }
   }
+
+  "email verification" should {
+    "be triggered with an unverified email" when {
+      def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+        givenAcceptedApplicationResponse()
+        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+        val result = f()
+        status(result) shouldBe 303
+        redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail().url
+      }
+      "show check your answers" in checkVerifyEmailIsTriggered(() => controller.showCheckAnswers(cleanCredsAgent(FakeRequest())))
+      "show check business address" in checkVerifyEmailIsTriggered(() => controller.showCheckBusinessAddress(cleanCredsAgent(FakeRequest())))
+      "submit check business address" in checkVerifyEmailIsTriggered(() => controller.submitCheckBusinessAddress(cleanCredsAgent(FakeRequest())))
+      "show update business address" in checkVerifyEmailIsTriggered(() => controller.showUpdateBusinessAddressForm(cleanCredsAgent(FakeRequest())))
+      "submit update business address" in checkVerifyEmailIsTriggered(() => controller.submitUpdateBusinessAddressForm(cleanCredsAgent(FakeRequest())))
+      "show check business name" in checkVerifyEmailIsTriggered(() => controller.showCheckBusinessName(cleanCredsAgent(FakeRequest())))
+      "submit check business name" in checkVerifyEmailIsTriggered(() => controller.submitCheckBusinessName(cleanCredsAgent(FakeRequest())))
+      "show update business name" in checkVerifyEmailIsTriggered(() => controller.showUpdateBusinessNameForm(cleanCredsAgent(FakeRequest())))
+      "submit update business name" in checkVerifyEmailIsTriggered(() => controller.submitUpdateBusinessNameForm(cleanCredsAgent(FakeRequest())))
+    }
+    "not be triggered even with an unverified mail" when {
+      def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+        givenAcceptedApplicationResponse()
+        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+        val result = f()
+        status(result) should (equal(200) or equal(303))
+        if (status(result) == 303) redirectLocation(result) should not be routes.SubscriptionEmailVerificationController.verifyEmail().url
+      }
+      // these pages must display even with an unverified email otherwise the user couldn't enter or correct their email address!
+      "show check business email" in checkVerifyEmailIsNotTriggered(() => controller.showCheckBusinessEmail(cleanCredsAgent(FakeRequest())))
+      "submit check business email" in checkVerifyEmailIsNotTriggered(() => controller.submitCheckBusinessEmail(cleanCredsAgent(FakeRequest())))
+      "show update business email" in checkVerifyEmailIsNotTriggered(() => controller.showUpdateBusinessEmailForm(cleanCredsAgent(FakeRequest())))
+      "submit update business email" in checkVerifyEmailIsNotTriggered(() => controller.submitUpdateBusinessEmailForm(cleanCredsAgent(FakeRequest())))
+    }
+  }
+
 }

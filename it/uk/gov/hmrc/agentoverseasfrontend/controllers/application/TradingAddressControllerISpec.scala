@@ -25,7 +25,8 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
     contactDetails = Some(contactDetails),
     tradingName = Some("some name"),
     overseasAddress = Some(overseasAddress),
-    personalDetails = Some(personalDetails)
+    personalDetails = Some(personalDetails),
+    verifiedEmails = Set("test@email.com")
   )
 
   private lazy val controller: TradingAddressController = app.injector.instanceOf[TradingAddressController]
