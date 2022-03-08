@@ -50,11 +50,14 @@ class ApplicationController @Inject()(
   crnView: company_registration_number,
   cyaView: check_your_answers,
   applicationCompleteView: application_complete,
-  cannotVerifyEmailView: cannot_verify_email)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
+  emailLockedView: cannot_verify_email_locked,
+  emailTechnicalErrorView: cannot_verify_email_technical)(
+  implicit appConfig: AppConfig,
+  override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
-  import authAction.{withBasicAuthAndAgentAffinity, withEnrollingAgent}
+  import authAction.{withBasicAuthAndAgentAffinity, withEnrollingAgent, withEnrollingEmailVerifiedAgent}
 
   private val countries = countryNamesLoader.load
 
@@ -88,14 +91,14 @@ class ApplicationController @Inject()(
           },
           validForm => {
             updateSession(agentSession.copy(contactDetails = Some(validForm)))(
-              routes.ApplicationEmailVerificationController.verifyEmail().url)
+              routes.ApplicationController.showTradingNameForm().url)
           }
         )
     }
   }
 
   def showTradingNameForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       val form = TradingNameForm.form
       if (agentSession.changingAnswers) {
         Ok(tradingNameView(agentSession.tradingName.fold(form)(form.fill), Some(showCheckYourAnswersUrl)))
@@ -106,7 +109,7 @@ class ApplicationController @Inject()(
   }
 
   def submitTradingName: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       TradingNameForm.form
         .bindFromRequest()
         .fold(
@@ -125,7 +128,7 @@ class ApplicationController @Inject()(
   }
 
   def showRegisteredWithHmrcForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       val form = registeredWithHmrcForm
       if (agentSession.changingAnswers) {
         Ok(
@@ -139,7 +142,7 @@ class ApplicationController @Inject()(
   }
 
   def submitRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       registeredWithHmrcForm
         .bindFromRequest()
         .fold(
@@ -172,7 +175,7 @@ class ApplicationController @Inject()(
   }
 
   def showAgentCodesForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       val form = AgentCodesForm.form
 
       if (agentSession.changingAnswers) {
@@ -184,7 +187,7 @@ class ApplicationController @Inject()(
   }
 
   def submitAgentCodes: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       AgentCodesForm.form
         .bindFromRequest()
         .fold(
@@ -204,7 +207,7 @@ class ApplicationController @Inject()(
   }
 
   def showUkTaxRegistrationForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       val form = registeredForUkTaxForm
       if (agentSession.changingAnswers) {
         Ok(
@@ -221,7 +224,7 @@ class ApplicationController @Inject()(
   }
 
   def submitUkTaxRegistration: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       registeredForUkTaxForm
         .bindFromRequest()
         .fold(
@@ -298,7 +301,7 @@ class ApplicationController @Inject()(
   }
 
   def showCompanyRegistrationNumberForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       val form = CompanyRegistrationNumberForm.form
       if (agentSession.changingAnswers) {
         Ok(crnView(agentSession.companyRegistrationNumber.fold(form)(form.fill), showCheckYourAnswersUrl))
@@ -310,7 +313,7 @@ class ApplicationController @Inject()(
   }
 
   def submitCompanyRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       CompanyRegistrationNumberForm.form
         .bindFromRequest()
         .fold(
@@ -337,7 +340,7 @@ class ApplicationController @Inject()(
   }
 
   def showCheckYourAnswers: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       //make sure user has gone through all the required pages, if not redirect to appropriate page
       sessionStoreService.fetchAgentSession
         .map(lookupNextPage)
@@ -354,7 +357,7 @@ class ApplicationController @Inject()(
   }
 
   def submitCheckYourAnswers: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       CheckYourAnswers.form
         .bindFromRequest()
         .fold(
@@ -392,8 +395,12 @@ class ApplicationController @Inject()(
     }
   }
 
-  def showCannotVerifyEmail: Action[AnyContent] = Action { implicit request =>
-    Ok(cannotVerifyEmailView(routes.ApplicationRootController.root()))
+  def showEmailLocked: Action[AnyContent] = Action { implicit request =>
+    Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm()))
+  }
+
+  def showEmailTechnicalError: Action[AnyContent] = Action { implicit request =>
+    Ok(emailTechnicalErrorView())
   }
 
   private def ukTaxRegistrationBackLink(session: AgentSession) =

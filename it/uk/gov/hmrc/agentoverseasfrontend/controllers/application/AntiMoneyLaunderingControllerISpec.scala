@@ -1,6 +1,6 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import play.api.mvc.AnyContentAsFormUrlEncoded
+import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, AmlsDetails}
@@ -9,6 +9,7 @@ import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
 
@@ -299,4 +300,21 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
 
     }
   }
+
+  "email verification" should {
+    "not be triggered even with an unverified mail" when {
+      def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
+        sessionStoreService.cacheAgentSession(AgentSession().copy(changingAnswers = true, verifiedEmails = Set.empty)).futureValue
+        val result = f()
+        status(result) should (equal(200) or equal(303))
+        if (status(result) == 303) redirectLocation(result) should not be routes.ApplicationEmailVerificationController.verifyEmail().url
+      }
+      // email verification must not trigger for the AMLS pages as these come before the email input step.
+      "show amls required form" in checkVerifyEmailIsNotTriggered(() => controller.showMoneyLaunderingRequired(cleanCredsAgent(FakeRequest())))
+      "submit amls required form" in checkVerifyEmailIsNotTriggered(() => controller.submitMoneyLaunderingRequired(cleanCredsAgent(FakeRequest())))
+      "show amls form" in checkVerifyEmailIsNotTriggered(() => controller.showAntiMoneyLaunderingForm(cleanCredsAgent(FakeRequest())))
+      "submit amls" in checkVerifyEmailIsNotTriggered(() => controller.submitAntiMoneyLaundering(cleanCredsAgent(FakeRequest())))
+    }
+  }
+
 }

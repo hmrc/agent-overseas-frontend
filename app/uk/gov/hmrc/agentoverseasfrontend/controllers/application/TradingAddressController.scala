@@ -43,13 +43,13 @@ class TradingAddressController @Inject()(
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
-  import authAction.withEnrollingAgent
+  import authAction.withEnrollingEmailVerifiedAgent
 
   private val countries = countryNamesLoader.load
   private val validCountryCodes = countries.keys.toSet
 
   def showMainBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       val form =
         MainBusinessAddressForm.mainBusinessAddressForm(validCountryCodes)
       if (agentSession.changingAnswers) {
@@ -65,7 +65,7 @@ class TradingAddressController @Inject()(
   }
 
   def submitMainBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { agentSession =>
       MainBusinessAddressForm
         .mainBusinessAddressForm(validCountryCodes)
         .bindFromRequest()

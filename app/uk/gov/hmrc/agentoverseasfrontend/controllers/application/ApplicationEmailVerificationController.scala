@@ -71,8 +71,10 @@ class ApplicationEmailVerificationController @Inject()(
 
   override def selfRoute: Call = routes.ApplicationEmailVerificationController.verifyEmail()
   override def redirectUrlIfVerified(session: AgentSession): Call = lookupNextPage(Some(session))
-  override def redirectUrlIfLocked(session: AgentSession): Call = routes.ApplicationController.showCannotVerifyEmail()
-  override def redirectUrlIfError(session: AgentSession): Call = routes.ApplicationController.showCannotVerifyEmail()
-  override def backLinkUrl(session: AgentSession): Option[Call] = None
-  override def enterEmailUrl(session: AgentSession): Call = routes.ApplicationController.showContactDetailsForm()
+  override def redirectUrlIfLocked(session: AgentSession): Call = routes.ApplicationController.showEmailLocked()
+  override def redirectUrlIfError(session: AgentSession): Call = routes.ApplicationController.showEmailTechnicalError()
+  override def backLinkUrl(session: AgentSession): Option[Call] = Some(enterEmailUrl(session))
+  override def enterEmailUrl(session: AgentSession): Call =
+    if (session.changingAnswers) routes.ChangingAnswersController.changeContactDetails()
+    else routes.ApplicationController.showContactDetailsForm()
 }

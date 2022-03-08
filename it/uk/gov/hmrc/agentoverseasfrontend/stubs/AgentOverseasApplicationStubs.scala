@@ -127,6 +127,12 @@ trait AgentOverseasApplicationStubs {
         .withStatus(200)
     ))
 
+  def givenAcceptedApplicationResponseWithUnverifiedEmail(): StubMapping =
+    stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus())
+        .withStatus(200)
+    ))
+
   def givenPendingApplicationResponse(): StubMapping =
     stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
       okJson(StubsTestData.pendingApplication)

@@ -110,7 +110,7 @@ class AgentOverseasApplicationConnectorISpec
         countryCode = "IE"
       ),
       agencyEmail = "agency_email@domain.com",
-      emailVerified = true
+      verifiedEmails = Set("agency_email@domain.com")
     )
 
     "return successfully if application was updated successfully" in {

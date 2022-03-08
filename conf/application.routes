@@ -89,7 +89,8 @@ GET         /change-your-tax-registration-numbers-file   @uk.gov.hmrc.agentovers
 
 GET         /verify-email                                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationEmailVerificationController.verifyEmail
 
-GET         /cannot-verify-email                         @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationController.showCannotVerifyEmail
+GET         /email-locked                                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationController.showEmailLocked
+GET         /email-technical-error                       @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationController.showEmailTechnicalError
 
 GET         /sign-out/create-account                     @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOutWithContinueUrl
 GET         /sign-out                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOut

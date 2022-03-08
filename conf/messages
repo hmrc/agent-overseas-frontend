@@ -487,6 +487,14 @@ contactTradingAddressCheck.option.no=No - I want to enter a different address
 error.contact-trading-address-check.invalid=Select Yes if this is the main trading address you want to use for your agent services account correspondence
 
 #Cannot verify email
-cannotVerifyEmail.title=We could not verify your email address
-cannotVerifyEmail.p1=Before you can create an agent services account, we need to verify your email address.
-cannotVerifyEmail.p2=<a href="{0}">Try again</a> with a different email address.
+cannotVerifyEmail.locked.title=We could not confirm your identity
+cannotVerifyEmail.locked.p1=We cannot check your identity because you entered an incorrect verification code too many times.
+cannotVerifyEmail.locked.p2=The verification code was emailed to you.
+cannotVerifyEmail.locked.h2=What to do next
+cannotVerifyEmail.locked.p3=You can try again in 24 hours.
+cannotVerifyEmail.locked.p4=If you want to try again with a different email address <a href="{0}">you can change the email address you entered (opens in new tab)</a>.
+
+cannotVerifyEmail.technical.title=We could not confirm your identity
+cannotVerifyEmail.technical.p1=We cannot check your identity because there is a temporary problem with our service.
+cannotVerifyEmail.technical.h2=What to do next
+cannotVerifyEmail.technical.p2=You can try again in 24 hours.

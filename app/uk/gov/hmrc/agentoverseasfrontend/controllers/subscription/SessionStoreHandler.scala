@@ -36,15 +36,26 @@ trait SessionStoreHandler {
       .flatMap {
         case Some(agencyDetails) => Future.successful(agencyDetails)
         case None =>
-          val defaultAgencyDetails = AgencyDetails(defaultsFromThisApplication)
+          val defaultAgencyDetails = AgencyDetails.fromOverseasApplication(defaultsFromThisApplication)
           updateAgencyDetails(defaultAgencyDetails).map(_ => defaultAgencyDetails)
       }
 
+  def withAgencyDetails(checkForEmailVerification: Boolean)(
+    body: AgencyDetails => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+    sessionStoreService.fetchAgencyDetails.flatMap {
+      case None => Future.successful(sessionMissingRedirect("AgencyDetails"))
+      case Some(agencyDetails) if checkForEmailVerification && !agencyDetails.emailVerified =>
+        Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail()))
+      case Some(agencyDetails) => body(agencyDetails)
+    }
+
   def withAgencyDetails(
     body: AgencyDetails => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
-    sessionStoreService.fetchAgencyDetails.flatMap(
-      _.map(body)
-        .getOrElse(Future.successful(sessionMissingRedirect("AgencyDetails"))))
+    withAgencyDetails(checkForEmailVerification = false)(body)
+
+  def withEmailVerifiedAgencyDetails(
+    body: AgencyDetails => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+    withAgencyDetails(checkForEmailVerification = true)(body)
 
   def updateAgencyDetails(
     agencyDetails: AgencyDetails)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
