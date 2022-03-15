@@ -33,15 +33,18 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
-        govukInput: GovukInput,
-        govukInsetText: GovukInsetText,
-        form: FormWithCSRF)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukButton: GovukButton,
+    govukInput: GovukInput,
+    govukInsetText: GovukInsetText,
+    formWithCsrf: FormWithCSRF,
+    submitButton: submitButton, p: p, inset_text: inset_text
+)
 
 @(contactDetailsForm: Form[ContactDetails], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -51,7 +54,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(contactDetailsForm))
     }
 
-    @form(action = routes.ApplicationController.submitContactDetails) {
+    @formWithCsrf(action = routes.ApplicationController.submitContactDetails) {
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend-xl">
                 <h1 class="govuk-heading-xl">
@@ -59,10 +62,8 @@
                 </h1>
             </legend>
 
-            @govukInsetText(InsetText(
-                content = Text(msgs("contactDetails.inset.p1"))
-            ))
-            <div class="govuk-body">@msgs("contactDetails.body.text")</div>
+            @inset_text(key = Some("contactDetails.inset.p1"))
+            @p("contactDetails.body.text")
 
             @govukInput(Input(
                 label = Label(content = Text(msgs("contactDetails.form.firstName"))),
@@ -102,9 +103,7 @@
 
         </fieldset>
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
+
     }
 }

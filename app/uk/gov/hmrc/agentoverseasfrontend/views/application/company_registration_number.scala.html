@@ -26,16 +26,19 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.{RichRadios, RichInput}
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
-        govukInput: GovukInput,
-        govukRadios: GovukRadios,
-        govukInsetText: GovukInsetText,
-        form: FormWithCSRF)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukButton: GovukButton,
+    govukInput: GovukInput,
+    govukRadios: GovukRadios,
+    govukInsetText: GovukInsetText,
+    formWithCsrf: FormWithCSRF,
+    submitButton: submitButton, p: p, h1: h1, h2: h2
+)
 
 @(companyRegistrationNumberForm: Form[CompanyRegistrationNumber], backButtonLink: String)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -45,7 +48,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(companyRegistrationNumberForm))
     }
 
-    @form(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
+    @formWithCsrf(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
 
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
@@ -77,10 +80,7 @@
             )
         ).withFormField(companyRegistrationNumberForm("confirmRegistration")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
     }
 
 }

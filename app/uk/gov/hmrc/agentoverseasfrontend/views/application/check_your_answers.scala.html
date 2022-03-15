@@ -38,18 +38,23 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
-        govukCheckboxes: GovukCheckboxes,
-        govukSummaryList: GovukSummaryList,
-        formHelper: FormWithCSRF)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukButton: GovukButton,
+    govukCheckboxes: GovukCheckboxes,
+    govukSummaryList: GovukSummaryList,
+    formWithCsrf: FormWithCSRF,
+    p: p, h1: h1, h2: h2
+)
 
-@(cyaForm: Form[CheckYourAnswersConfirmation], checkYourAnswers: CheckYourAnswers)(implicit request: Request[_],
-        msgs: Messages, appConfig: AppConfig)
+@(
+    cyaForm: Form[CheckYourAnswersConfirmation],
+    checkYourAnswers: CheckYourAnswers
+)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @summaryListRow(answerRow: AnswerRow) = @{
     SummaryListRow(
@@ -67,7 +72,7 @@
 
 @renderAnswerBlock(answerBlock: AnswerBlock) = {
 
-    <h2>@answerBlock.heading</h2>
+    @h2(answerBlock.heading)
 
     @for(group <- answerBlock.answerGroups) {
         @govukSummaryList(SummaryList(
@@ -78,7 +83,7 @@
 
 @mainTemplate(title = errorPrefix(cyaForm) + msgs("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
 
-    <h1 class="govuk-heading-xl">@msgs("checkAnswers.title")</h1>
+    @h1("checkAnswers.title")
 
     @if(cyaForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(cyaForm))
@@ -89,9 +94,9 @@
     @renderAnswerBlock(checkYourAnswers.businessDetails)
     @renderAnswerBlock(checkYourAnswers.otherBusinessDetails)
 
-    <p>@msgs("checkAnswers.confirm.p1")</p>
+    @p("checkAnswers.confirm.p1")
 
-    @formHelper(
+    @formWithCsrf(
         action = routes.ApplicationController.submitCheckYourAnswers(), 'id -> "checkAnswers") {
         @govukCheckboxes(Checkboxes(
             items = Seq(CheckboxItem(id = Some("confirmed"), name = Some("confirmed"), content = Text(msgs("checkAnswers.confirm.label")), value = "true"))

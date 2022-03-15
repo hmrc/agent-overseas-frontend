@@ -18,59 +18,51 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
-@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukErrorSummary, GovukRadios}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 
 @this(
-  mainTemplate: main_template,
-  errorPrefix: error_prefix,
-  formHelper: FormWithCSRF,
-  govukErrorSummary: GovukErrorSummary,
-  govukRadios: GovukRadios,
-  govukButton: GovukButton,
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    formWithCsrf: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    submitButton: submitButton,
 )
 
 @(businessEmailCheckForm: Form[RadioConfirm], businessEmail: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("contactTradingEmailCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
 
-  @if(businessEmailCheckForm.hasErrors) {
-      @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessEmailCheckForm))
-  }
+    @if(businessEmailCheckForm.hasErrors) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessEmailCheckForm))
+    }
 
-  @formHelper(action = routes.BusinessIdentificationController.submitCheckBusinessEmail) {
+    @formWithCsrf(action = routes.BusinessIdentificationController.submitCheckBusinessEmail) {
 
-      @govukRadios(Radios(
-          fieldset = Some(Fieldset(
-              legend = Some(Legend(
-                  content = Text(msgs("contactTradingEmailCheck.title")),
-                  isPageHeading = true,
-                  classes = "govuk-fieldset__legend--xl"
-              ))
-          )),
-          hint = Some(Hint(content = HtmlContent(Html(s"<p>${msgs("contactTradingEmailCheck.p")}</p><p>$businessEmail</p>")))),
-          items = Seq(
-              RadioItem(content = Text(msgs("contactTradingEmailCheck.option.yes")), value = Some("true")),
-              RadioItem(content = Text(msgs("contactTradingEmailCheck.option.no")), value = Some("false"))
-          )
-      ).withFormField(businessEmailCheckForm("useThisEmail")))
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(msgs("contactTradingEmailCheck.title")),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--xl"
+                ))
+            )),
+            hint = Some(Hint(content = HtmlContent(Html(s"<p>${msgs("contactTradingEmailCheck.p")}</p><p>$businessEmail</p>")))),
+            items = Seq(
+                RadioItem(content = Text(msgs("contactTradingEmailCheck.option.yes")), value = Some("true")),
+                RadioItem(content = Text(msgs("contactTradingEmailCheck.option.no")), value = Some("false"))
+            )
+        ).withFormField(businessEmailCheckForm("useThisEmail")))
 
-      @govukButton(Button(
-          attributes = Map("id" -> "continue"),
-          content = Text(msgs("button.continue")),
-      ))
-  }
+        @submitButton()
+
+    }
 }

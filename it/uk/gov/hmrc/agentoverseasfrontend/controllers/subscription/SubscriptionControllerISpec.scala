@@ -77,8 +77,10 @@ class SubscriptionControllerISpec
         agentServicesAccountBase + agentServicesAccountPath,
         "test agency name",
         htmlMessage("subscriptionComplete.p2", "test-agency-email@domain.com"),
-        htmlMessage("subscriptionComplete.p3", guidancePageUrl)
+        htmlMessage("subscriptionComplete.p3.1", guidancePageUrl),
+        htmlMessage("subscriptionComplete.p3.2")
       )
+
 
       result.futureValue should containMessages(
         "subscriptionComplete.title",

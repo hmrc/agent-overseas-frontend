@@ -26,14 +26,16 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, Radios, RadioItem, Fieldset, Hint, Text}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukRadios: GovukRadios,
-        form: FormWithCSRF,
-        govukButton: GovukButton
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    formWithCsrf: FormWithCSRF,
+    govukButton: GovukButton,
+    submitButton: submitButton
 )
 
 @(registeredForUkTaxForm: Form[RadioConfirm], backLinkRoute: String)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
@@ -44,7 +46,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(registeredForUkTaxForm))
     }
 
-    @form(action = routes.ApplicationController.submitUkTaxRegistration) {
+    @formWithCsrf(action = routes.ApplicationController.submitUkTaxRegistration) {
 
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
@@ -61,9 +63,7 @@
             )
         ).withFormField(registeredForUkTaxForm("registeredForUkTax")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue", "type" -> "submit"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
+
     }
 }

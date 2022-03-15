@@ -33,12 +33,12 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
-        govukRadios: GovukRadios,
-        form: FormWithCSRF
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukButton: GovukButton,
+    govukRadios: GovukRadios,
+    formWithCSRF: FormWithCSRF
 )
 
 @(trnForm: Form[RadioConfirm], trn: String)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
@@ -49,7 +49,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(trnForm))
     }
 
-    @form(action = routes.TaxRegController.submitRemoveTaxRegNumber(trn)) {
+    @formWithCSRF(action = routes.TaxRegController.submitRemoveTaxRegNumber(trn)) {
 
         @govukRadios(Radios(
             classes = "govuk-radios--inline",

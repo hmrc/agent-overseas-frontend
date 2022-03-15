@@ -37,7 +37,7 @@
         errorPrefix: error_prefix,
         govukRadios: GovukRadios,
         govukButton: GovukButton,
-        uiFormHelper: FormWithCSRF,
+        uiformWithCsrf: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary
 )
 
@@ -50,7 +50,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsRequiredForm))
     }
 
-    @uiFormHelper(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired) {
+    @uiformWithCsrf(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired) {
         @govukRadios(Radios(
             classes = "govuk-radios--inline",
             fieldset = Some(Fieldset(

@@ -15,19 +15,19 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.main_template
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, p: p, h1: h1, h2: h2)
 
 @(retryLink: Call)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("cannotVerifyEmail.locked.title")) {
 
- <h1 class="govuk-heading-xl">@msgs("cannotVerifyEmail.locked.title")</h1>
- <p>@Html(msgs("cannotVerifyEmail.locked.p1"))</p>
- <p>@Html(msgs("cannotVerifyEmail.locked.p2"))</p>
- <h2>@Html(msgs("cannotVerifyEmail.locked.h2"))</h2>
- <p>@Html(msgs("cannotVerifyEmail.locked.p3"))</p>
- <p>@Html(msgs("cannotVerifyEmail.locked.p4", retryLink))</p>
+    @h1("cannotVerifyEmail.locked.title")
+    @p("cannotVerifyEmail.locked.p1")
+    @p("cannotVerifyEmail.locked.p2")
+    @h2("cannotVerifyEmail.locked.h2")
+    @p("cannotVerifyEmail.locked.p3")
+    @p(html = Some(Html(msgs("cannotVerifyEmail.locked.p4", retryLink))))
 }

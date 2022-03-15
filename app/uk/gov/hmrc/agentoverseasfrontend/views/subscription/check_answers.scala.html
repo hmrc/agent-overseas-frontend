@@ -34,20 +34,22 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Actions
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        form: FormWithCSRF,
-        govukButton: GovukButton,
-        govukDetails: GovukDetails,
-        govukSummaryList: GovukSummaryList)
+    mainTemplate: main_template,
+    formWithCsrf: FormWithCSRF,
+    govukButton: GovukButton,
+    govukDetails: GovukDetails,
+    govukSummaryList: GovukSummaryList,
+    p: p, h1: h1)
 
 @(agencyDetails: AgencyDetails, addressCountryName: String)(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("subscription.checkAnswers.title")) {
 
-    <h1 class="govuk-heading-xl">@msgs("subscription.checkAnswers.title")</h1>
-    <p>@msgs("subscription.checkAnswers.description.p1")</p>
+    @h1("subscription.checkAnswers.title")
+    @p("subscription.checkAnswers.description.p1")
 
     @govukDetails(Details(
         summary = Text(msgs("subscription.checkAnswers.how-we-use")),
@@ -96,9 +98,9 @@
         )
     ))
 
-    <p>@msgs("subscription.checkAnswers.description.p3")</p>
+    @p("subscription.checkAnswers.description.p3")
 
-    @form(action = routes.SubscriptionController.subscribe(), 'class -> "form js-form") {
+    @formWithCsrf(action = routes.SubscriptionController.subscribe(), 'class -> "form js-form") {
         @govukButton(Button(
             attributes = Map("id" -> "continue", "type" -> "submit"),
             content = Text(msgs("subscription.checkAnswers.confirm.button")),

@@ -17,17 +17,19 @@
 @import play.api.Configuration
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, p: p, h1: h1, a: a, span: span)
 
 @(redirectUrl: String)(implicit request: Request[_], msgs: Messages, configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = msgs("signed-out.header"), hasTimeout = false){
+@mainTemplate(title = msgs("signed-out.header"), hasTimeout = false) {
 
-    <h1 class="govuk-heading-xl">
-        @msgs("signed-out.header")
-    </h1>
-    <p class="govuk-body">@msgs("signed-out.p1")</p>
-    <p class="govuk-body">@Html(msgs("signed-out.p2", s"${redirectUrl}"))</p>
+    @h1("signed-out.header")
+    @p("signed-out.p1")
+    <p>
+        @a("signed-out.p2.1", redirectUrl)
+        @span("signed-out.p2.2")
+    </p>
 
 }

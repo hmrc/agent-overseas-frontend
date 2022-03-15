@@ -18,16 +18,20 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, p: p, h1: h1, h2: h2, linkAsButton: linkAsButton)
 
 @()(implicit request: Request[_], msgs: Messages, config: Configuration, appConfig: AppConfig)
+
 @mainTemplate(title = msgs("already.subscribed.title")) {
 
-<h1 class="govuk-heading-xl">@msgs("already.subscribed.title")</h1>
-<p>@msgs("already.subscribed.p1")</p>
-<p>
-    <a href="@routes.SubscriptionSignOutController.signOut().url" class="govuk-button" role="button">@msgs("already.subscribed.button")</a>
-</p>
+    @h1("already.subscribed.title")
+    @p("already.subscribed.p1")
+    <p>
+        @linkAsButton(
+            href = routes.SubscriptionSignOutController.signOut.url,
+            key = "already.subscribed.button")
+    </p>
 
 }

@@ -20,46 +20,44 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template, govukPanel: GovukPanel)
+@this(
+    mainTemplate: main_template,
+    govukPanel: GovukPanel,
+    p: p, h2: h2, a: a, span: span
+)
 
 @(tradingName: String, contactEmail: String, guidanceApplicationUrl: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("applicationComplete.title")){
 
-            @govukPanel(Panel(
-                title = Text(msgs("applicationComplete.title")),
-                content = Text(s"${msgs("applicationComplete.panel.body")} $tradingName")
-            ))
+    @govukPanel(Panel(
+        title = Text(msgs("applicationComplete.title")),
+        content = Text(s"${msgs("applicationComplete.panel.body")} $tradingName")
+    ))
 
-            <h2 class="govuk-heading-m">@msgs("applicationComplete.whatHappensNext.heading")</h2>
-            <p>
-               @Html(msgs("applicationComplete.whatHappensNext.para1",Html(s"<strong class=${"bold"}>$contactEmail</strong>")))
-            </p>
-            <p>
-                @msgs("applicationComplete.whatHappensNext.para2")
-            </p>
-            <p>
-                @msgs("applicationComplete.whatHappensNext.para3")
-            </p>
-            <p>
-                @msgs("applicationComplete.whatHappensNext.para4")
-            </p>
-            <h2 class="govuk-heading-m">@msgs("applicationComplete.whatYouCanDoNext.heading")</h2>
-            <p><a href="@guidanceApplicationUrl">@msgs("applicationComplete.whatYouCanDoNext.link")</a>
-                @msgs("applicationComplete.whatYouCanDoNext.text")
-            </p>
-            <h2 class="govuk-heading-m">@msgs("applicationComplete.help.heading")</h2>
-            <p>
-                @msgs("applicationComplete.help.text")
-            </p>
-            <p>
-            <a href="javascript:window.print()" class="print-link">@msgs("applicationComplete.print")</a>
-            </p>
-            <div>
-                <a href="@routes.ApplicationSignOutController.startFeedbackSurvey">@msgs("applicationComplete.feedback.link")</a>
-                @msgs("applicationComplete.feedback.text")
-            </div>
-
-
+    @h2("applicationComplete.whatHappensNext.heading")
+    @p(html = Some(Html(
+        msgs("applicationComplete.whatHappensNext.para1",
+            Html(s"<strong class=${"bold"}>$contactEmail</strong>"))))
+    )
+    @p("applicationComplete.whatHappensNext.para2")
+    @p("applicationComplete.whatHappensNext.para3")
+    @p("applicationComplete.whatHappensNext.para4")
+    @h2("applicationComplete.whatYouCanDoNext.heading")
+    <p>
+        @a("applicationComplete.whatYouCanDoNext.link", href = guidanceApplicationUrl)
+        @span("applicationComplete.whatYouCanDoNext.text")
+    </p>
+    @h2("applicationComplete.help.heading")
+    @p("applicationComplete.help.text")
+    <p>
+     <a href="javascript:window.print()" class="print-link govuk-link">@msgs("applicationComplete.print")</a>
+    </p>
+    <div>
+        @a( "applicationComplete.feedback.link",
+            href = routes.ApplicationSignOutController.startFeedbackSurvey.url)
+        @span("applicationComplete.feedback.text")
+    </div>
 }

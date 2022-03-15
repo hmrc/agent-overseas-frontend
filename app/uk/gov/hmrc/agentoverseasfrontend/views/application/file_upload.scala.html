@@ -25,13 +25,16 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukInsetText: GovukInsetText,
-        govukFileUpload: GovukFileUpload,
-        govukButton: GovukButton)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukInsetText: GovukInsetText,
+    govukFileUpload: GovukFileUpload,
+    govukButton: GovukButton,
+    p: p, h1: h1, h2: h2, ul: ul
+)
 
 @(upscan: UpscanInitiate, fileType: String, backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -59,17 +62,14 @@
 
         <div style="display: none;" class="spinner-wrapper">
             <div class="loader" id="file-upload-loading" aria-busy="true"></div>
-            <p class="govuk-body">This file is being checked and uploaded</p>
+            @p("This file is being checked and uploaded")
         </div>
 
         <div class="hide-when-uploading">
-            <p>@msgs(s"fileUpload.p1.$fileType")</p>
-            <p>@msgs("fileUpload.p2")</p>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>@msgs(s"fileUpload.li.1.$fileType")</li>
-                <li>@msgs("fileUpload.li.2")</li>
-                <li>@msgs("fileUpload.li.3")</li>
-            </ul>
+            @p(s"fileUpload.p1.$fileType")
+            @p("fileUpload.p2")
+            @ul(Seq(s"fileUpload.li.1.$fileType","fileUpload.li.2", "fileUpload.li.3"))
+
             <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
 
                 @for((key, value) <- upscan.uploadRequest.fields){

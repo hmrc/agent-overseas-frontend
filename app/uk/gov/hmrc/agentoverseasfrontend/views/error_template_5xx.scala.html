@@ -16,26 +16,27 @@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, h1: h1, p: p, a: a, span: span)
 
 @()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("global.error.500.title")) {
-    <h1 class="govuk-heading-xl">@msgs("global.error.500.heading")</h1>
 
-<p>@msgs("global.error.500.message")</p>
-<p>@msgs("global.error.500.p2")</p>
-<p>
-    <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/vat-online-services-helpdesk">
-    @msgs("global.error.500.vat_helpline.link")
-    </a>
-        &nbsp;@msgs("global.error.500.vat_helpline")
-</p>
-<p>
-    <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment-online-services-helpdesk">
-    @msgs("global.error.500.sa_helpline.link")
-    </a>
-        &nbsp;@msgs("global.error.500.sa_helpline")
-</p>
+    @h1("global.error.500.heading")
+    @p("global.error.500.message")
+    @p("global.error.500.p2")
+    <p>
+        @a("global.error.500.vat_helpline.link",
+            href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/vat-online-services-helpdesk"
+        )
+        @span("global.error.500.vat_helpline")
+    </p>
+    <p>
+        @a("global.error.500.sa_helpline.link",
+            href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/self-assessment-online-services-helpdesk"
+        )
+        @span("global.error.500.sa_helpline")
+    </p>
 }

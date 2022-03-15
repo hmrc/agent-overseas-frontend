@@ -43,7 +43,7 @@
         govukButton: GovukButton,
         govukDetails: GovukDetails,
         govukInsetText: GovukInsetText,
-        form: FormWithCSRF)
+        formWithCsrf: FormWithCSRF)
 
 @(amlsForm: Form[AmlsDetails], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -53,7 +53,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsForm))
     }
 
-    @form(action = routes.AntiMoneyLaunderingController.submitAntiMoneyLaundering, 'class -> "form js-form", 'id -> "amlsForm") {
+    @formWithCsrf(action = routes.AntiMoneyLaunderingController.submitAntiMoneyLaundering, 'class -> "form js-form", 'id -> "amlsForm") {
 
         <h1 class="govuk-heading-xl">@msgs("amls.title")</h1>
 

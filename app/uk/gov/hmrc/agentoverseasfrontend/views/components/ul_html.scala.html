@@ -14,19 +14,12 @@
  * limitations under the License.
  *@
 
-@import play.api.Configuration
-@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
+@this()
 
-@this(mainTemplate: main_template, p: p, h1: h1, h2: h2)
+@(items: Seq[Html])(implicit msgs: Messages)
 
-@()(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
-
-@mainTemplate(title = msgs("cannot_check_status.title")) {
-
-    @h1("cannot_check_status.title")
-    @p("cannot_check_status.p1")
-    @p("cannot_check_status.p2")
-
-}
+<ul class="govuk-list govuk-list--bullet">
+    @for(html <- items) {
+        <li class="govuk-list--item">@html</li>
+    }
+</ul>
