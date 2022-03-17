@@ -17,15 +17,16 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, p: p, h1: h1)
 
 @()(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
 @mainTemplate(title = msgs("nonAgent.title")) {
-    <h1 class="govuk-heading-xl">@msgs("nonAgent.title")</h1>
 
-    <p>@Html(msgs("nonAgent.p1",routes.ApplicationSignOutController.signOut()))</p>
-    <p>@Html(msgs("nonAgent.p2",routes.ApplicationSignOutController.signOutWithContinueUrl()))</p>
+   @h1("nonAgent.title")
+   @p(html = Some(Html(msgs("nonAgent.p1", routes.ApplicationSignOutController.signOut.url))))
+   @p(html = Some(Html(msgs("nonAgent.p2", routes.ApplicationSignOutController.signOutWithContinueUrl.url))))
 
 }

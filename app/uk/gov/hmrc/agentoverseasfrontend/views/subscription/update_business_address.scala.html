@@ -34,15 +34,17 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        form: FormWithCSRF,
-        govukInput: GovukInput,
-        govukSelect: GovukSelect,
-        govukButton: GovukButton,
-        govukErrorSummary: GovukErrorSummary)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    formWithCsrf: FormWithCSRF,
+    govukInput: GovukInput,
+    govukSelect: GovukSelect,
+    submitButton: submitButton,
+    govukErrorSummary: GovukErrorSummary
+)
 
 @(addressForm: Form[BusinessAddressForm], countries: Map[String, String])(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
@@ -54,7 +56,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(addressForm))
     }
 
-    @form(action = routes.BusinessIdentificationController.submitUpdateBusinessAddressForm) {
+    @formWithCsrf(action = routes.BusinessIdentificationController.submitUpdateBusinessAddressForm) {
 
         <fieldset class="govuk-fieldset">
             <legend>
@@ -98,9 +100,7 @@
             </div>
         </fieldset>
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
+
     }
 }

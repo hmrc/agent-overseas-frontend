@@ -233,8 +233,8 @@ fileUpload.failed.try-again.label=Try again
 
 #Non agent
 nonAgent.title=You have not signed in with an agent user ID
-nonAgent.p1=To continue, <a href="{0}">sign in with an agent user ID</a>.
-nonAgent.p2=If you do not have one, <a href="{0}"> create a new Government Gateway user ID</a>, selecting the ‘Agent’ option.
+nonAgent.p1=To continue, <a class="govuk-link" href="{0}">sign in with an agent user ID</a>.
+nonAgent.p2=If you do not have one, <a class="govuk-link" href="{0}"> create a new Government Gateway user ID</a>, selecting the ‘Agent’ option.
 
 # Trading name
 tradingName.title=What is the trading name of your business?
@@ -415,7 +415,8 @@ subscriptionComplete.accountName=You created an account for
 subscriptionComplete.h2=What you can do next
 subscriptionComplete.p1=Make a note of your account reference number <strong class="bold">{0}</strong>. Make sure you have this with you if you contact us about your agent services account.
 subscriptionComplete.p2=We have sent an email to {0} confirming these details.
-subscriptionComplete.p3=<a href="{0}">Check the guidance</a> to find out how to:
+subscriptionComplete.p3.1=Check the guidance
+subscriptionComplete.p3.2= to find out how to: 
 subscriptionComplete.bullet-list.1=sign in to your agent services account
 subscriptionComplete.bullet-list.2=use HMRC services on behalf of your clients
 subscriptionComplete.button=View your agent services account
@@ -462,7 +463,8 @@ already.subscribed.button=Finish and sign out
 #signed-out
 signed-out.header=You have been signed out
 signed-out.p1=You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
-signed-out.p2=<a href="{0}">Sign in again</a> to use this service.
+signed-out.p2.1=Sign in again
+signed-out.p2.2=to use this service.
 signed-out.button=start again
 
 #Contact Trading Name Check

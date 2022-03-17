@@ -1,59 +1,56 @@
 @*
- * Copyright 2022 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *@
-
-@import views.html.helper._
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+* Copyright 2022 HM Revenue & Customs
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
+@import uk.gov.hmrc.govukfrontend.views.html.components.{GovukCheckboxes, GovukInput, GovukInsetText}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.{CheckboxItem, Checkboxes}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 
-@this(govukInput: GovukInput,
-      govukCheckboxes: GovukCheckboxes,
-      govukInsetText: GovukInsetText)
+@this(
+    govukInput: GovukInput,
+    govukCheckboxes: GovukCheckboxes,
+    govukInsetText: GovukInsetText
+)
 
-@(field: Field, labelCheckbox: String, labelInset: String, args: (Symbol,Any)*)(implicit msgs: Messages)
+@(field: Field, labelCheckbox: String, labelInset: String, args: (Symbol, Any)*)(implicit msgs: Messages)
 
 @value = @{ field.value match { case Some(x) => x case None => "" case x => x }}
 @hasValue = @{ value != "" }
 @checkboxId = @{ field.id + "-checkbox" }
 @conditionalDivId = @{ field.id + "-conditional" }
 
-@govukCheckboxes(Checkboxes(
-    name = checkboxId,
-    items = Seq(
-        CheckboxItem(
-            label = Some(Label(content = Text(labelCheckbox))),
-            id = Some(checkboxId),
-            name = Some(checkboxId),
-            value = "true",
-            checked = hasValue || field.hasErrors,
-            content = Text(labelCheckbox),
-            conditionalHtml = Some(
-                govukInput(Input(
-                    label = Label(content = Text(labelInset)),
-                    attributes = args.toMap.map { case (k,v) => (k.toString, v.toString) }
-                ).withFormField(field))
+@govukCheckboxes(
+    Checkboxes(
+        name = checkboxId,
+        items = Seq(
+            CheckboxItem(
+                label = Some(Label(content = Text(labelCheckbox))),
+                id = Some(checkboxId),
+                name = Some(checkboxId),
+                value = "true",
+                checked = hasValue || field.hasErrors,
+                content = Text(labelCheckbox),
+                conditionalHtml = Some(
+                    govukInput(Input(
+                        label = Label(content = Text(labelInset)),
+                        attributes = args.toMap.map { case (k, v) => (k.toString, v.toString) }
+                    ).withFormField(field))
+                )
             )
-        )
-    ),
-))
+        ),
+    )
+)

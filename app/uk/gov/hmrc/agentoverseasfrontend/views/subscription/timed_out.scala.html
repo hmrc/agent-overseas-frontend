@@ -18,8 +18,10 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, p: p, h1: h1, h2: h2, a: a, span: span)
+
 @()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig, configuration: Configuration)
 
 @timeString=@{
@@ -29,7 +31,10 @@
 
 @mainTemplate(title = msgs("timed-out.header"), hasTimeout = false) {
 
-    <h1 class="govuk-heading-xl">@msgs("timed-out.header")</h1>
-    <p class="govuk-body">@msgs("timed-out.p1", timeString)</p>
-    <p class="govuk-body"><a href='@routes.SubscriptionSignOutController.signOut()'>@msgs("timed-out.p2.link")&nbsp;</a>@Html(msgs("timed-out.p2"))</p>
+    @h1("timed-out.header")
+    @p(msgs("timed-out.p1", timeString))
+    <p class="govuk-body">
+        @a("timed-out.p2.link", href = routes.SubscriptionSignOutController.signOut.url)
+        @span("timed-out.p2")
+    </p>
 }

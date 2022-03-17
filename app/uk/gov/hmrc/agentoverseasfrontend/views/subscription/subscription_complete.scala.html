@@ -20,10 +20,13 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        govukPanel: GovukPanel,
+    mainTemplate: main_template,
+    govukPanel: GovukPanel,
+    linkAsButton: linkAsButton,
+    p: p, h1: h1, h2: h2, ul: ul, a: a, span: span
 )
 
 @(agentGuidancePageUrl: String, continueUrl: String, arn: String, agencyName: String, agencyEmail: String)(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
@@ -35,20 +38,18 @@
         content = Text(s"${msgs("subscriptionComplete.accountName")} $agencyName")
     ))
 
-    <p>@Html(msgs("subscriptionComplete.p1", s"$arn"))</p>
-    <p>@Html(msgs("subscriptionComplete.p2", s"$agencyEmail"))</p>
+    @p(html = Some(Html(msgs("subscriptionComplete.p1", s"$arn"))))
+    @p(msgs("subscriptionComplete.p2", s"$agencyEmail"))
 
-    <h2 class="govuk-heading-m">@msgs("subscriptionComplete.h2")</h2>
-
-    <p>@Html(msgs("subscriptionComplete.p3", s"$agentGuidancePageUrl"))</p>
-
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@msgs("subscriptionComplete.bullet-list.1")</li>
-        <li>@msgs("subscriptionComplete.bullet-list.2")</li>
-    </ul>
+    @h2("subscriptionComplete.h2")
+    <p>
+        @a("subscriptionComplete.p3.1", href = agentGuidancePageUrl)
+        @span("subscriptionComplete.p3.2")
+    </p>
+    @ul(Seq("subscriptionComplete.bullet-list.1", "subscriptionComplete.bullet-list.2"))
 
     <p>
-        <a href="@continueUrl" class="govuk-button" id="continue" role="button">@msgs(s"subscriptionComplete.button")</a>
+        @linkAsButton(continueUrl, key = "subscriptionComplete.button")
     </p>
 
 }

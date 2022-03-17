@@ -15,17 +15,17 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.main_template
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, p: p, h1: h1, h2: h2)
 
 @()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("cannotVerifyEmail.technical.title")) {
 
- <h1 class="govuk-heading-xl">@msgs("cannotVerifyEmail.technical.title")</h1>
- <p>@Html(msgs("cannotVerifyEmail.technical.p1"))</p>
- <h2>@Html(msgs("cannotVerifyEmail.technical.h2"))</h2>
- <p>@Html(msgs("cannotVerifyEmail.technical.p2"))</p>
+    @h1("cannotVerifyEmail.technical.title")
+    @p("cannotVerifyEmail.technical.p1")
+    @h2("cannotVerifyEmail.technical.h2")
+    @p("cannotVerifyEmail.technical.p2")
 }

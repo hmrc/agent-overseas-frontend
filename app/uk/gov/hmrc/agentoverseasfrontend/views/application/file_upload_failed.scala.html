@@ -16,8 +16,9 @@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix)
+@this(mainTemplate: main_template, errorPrefix: error_prefix, p: p)
 
 @(backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -28,7 +29,7 @@
         @msgs("fileUpload.failed.title")
     </h1>
 
-    <p class="govuk-body">@msgs("fileUpload.failed.p1")</p>
+    @p("fileUpload.failed.p1")
 
     <a href="@backLink" draggable="false" role="button" class="govuk-button" type="submit" id="file-upload-failed">@msgs("fileUpload.failed.try-again.label")</a>
 }

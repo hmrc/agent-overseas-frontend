@@ -34,14 +34,15 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        formHelper: FormWithCSRF,
-        govukErrorSummary: GovukErrorSummary,
-        govukRadios: GovukRadios,
-        govukButton: GovukButton,
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    formWithCsrf: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    submitButton: submitButton,
 )
 
 @(businessAddressCheckForm: Form[RadioConfirm], businessAddress: OverseasAddress, businessAddressCountryName: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
@@ -52,7 +53,7 @@
       @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessAddressCheckForm))
   }
 
-  @formHelper(
+  @formWithCsrf(
     action = routes.BusinessIdentificationController.submitCheckBusinessAddress) {
 
       @govukRadios(Radios(
@@ -79,9 +80,7 @@
           )
       ).withFormField(businessAddressCheckForm("useThisAddress")))
 
-      @govukButton(Button(
-          attributes = Map("id" -> "continue"),
-          content = Text(msgs("button.continue")),
-      ))
+      @submitButton()
+
   }
 }

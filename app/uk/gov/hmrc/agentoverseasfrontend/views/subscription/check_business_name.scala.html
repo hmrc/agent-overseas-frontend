@@ -33,14 +33,15 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        formHelper: FormWithCSRF,
-        govukErrorSummary: GovukErrorSummary,
-        govukRadios: GovukRadios,
-        govukButton: GovukButton
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    formWithCsrf: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    submitButton: submitButton,
 )
 
 @(businessNameCheckForm: Form[RadioConfirm], businessName: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
@@ -51,7 +52,7 @@
       @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessNameCheckForm))
   }
 
-  @formHelper(
+  @formWithCsrf(
     action = routes.BusinessIdentificationController.submitCheckBusinessName) {
 
       @govukRadios(Radios(
@@ -69,10 +70,7 @@
           )
       ).withFormField(businessNameCheckForm("useThisName")))
 
-      @govukButton(Button(
-          attributes = Map("id" -> "continue"),
-          content = Text(msgs("button.continue")),
-      ))
+      @submitButton()
 
   }
 }

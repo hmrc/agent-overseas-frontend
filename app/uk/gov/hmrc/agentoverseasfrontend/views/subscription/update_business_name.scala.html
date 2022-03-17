@@ -30,14 +30,17 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukInput: GovukInput,
-        govukButton: GovukButton,
-        form: FormWithCSRF)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    submitButton: submitButton,
+    formWithCsrf: FormWithCSRF,
+    h1: h1,
+)
 
 @(businessNameForm: Form[BusinessNameForm])(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
@@ -47,9 +50,9 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessNameForm))
     }
 
-    <h1 class="govuk-heading-xl">@msgs("updateBusinessName.title")</h1>
+    @h1("updateBusinessName.title")
 
-    @form(action = routes.BusinessIdentificationController.submitUpdateBusinessNameForm()) {
+    @formWithCsrf(action = routes.BusinessIdentificationController.submitUpdateBusinessNameForm()) {
 
         @govukInput(Input(
             hint = Some(Hint(content = Text(msgs("updateBusinessName.description")))),
@@ -57,9 +60,7 @@
             classes = "govuk-input--width-20"
         ).withFormField(businessNameForm("name")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
+
     }
 }

@@ -36,16 +36,17 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukSummaryList: GovukSummaryList,
-        govukRadios: GovukRadios,
-        formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton,
-        p: p
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukSummaryList: GovukSummaryList,
+    govukRadios: GovukRadios,
+    formWithCSRF: FormWithCSRF,
+    submitButton: submitButton,
+    p: p, span: span
 )
 @(doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn], trns: SortedSet[String], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -56,10 +57,10 @@
     }
 
     <h1 class="govuk-heading-xl">
-        <span class="govuk-caption-xl">@msgs("yourTaxRegistrationNumbers.caption")</span>
-        @msgs("yourTaxRegistrationNumbers.title")
+        @span("yourTaxRegistrationNumbers.caption", classes = Some("govuk-caption-xl"))
+        @span("yourTaxRegistrationNumbers.title")
     </h1>
-    <p>@msgs("yourTaxRegistrationNumbers.body.text", trns.size)</p>
+    @p(msgs("yourTaxRegistrationNumbers.body.text", trns.size))
 
     <fieldset class="govuk-fieldset">
         @govukSummaryList(SummaryList(
@@ -111,9 +112,7 @@
             )
         ).withFormField(doYouWantToAddAnotherTrnForm("value")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
+
     }
 }

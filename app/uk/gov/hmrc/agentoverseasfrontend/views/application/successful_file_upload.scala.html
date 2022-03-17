@@ -31,14 +31,17 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukRadios: GovukRadios,
-        form: FormWithCSRF,
-        govukButton: GovukButton)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    formWithCsrf: FormWithCSRF,
+    govukButton: GovukButton,
+    submitButton: submitButton
+)
 
 @(uploadSuccessForm: Form[SuccessfulFileUploadConfirmation], fileName: Option[String], fileType: String, backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -48,7 +51,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(uploadSuccessForm))
     }
 
-    @form(action = routes.FileUploadController.submitSuccessfulFileUploadedForm){
+    @formWithCsrf(action = routes.FileUploadController.submitSuccessfulFileUploadedForm){
 
         <h1 class="govuk-heading-xl margin-bottom-30">
             <span class="govuk-caption-xl">@msgs("fileUpload.success.caption")</span>
@@ -70,9 +73,7 @@
             )
         ).withFormField(uploadSuccessForm("choice.correctFile")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
+
     }
 }

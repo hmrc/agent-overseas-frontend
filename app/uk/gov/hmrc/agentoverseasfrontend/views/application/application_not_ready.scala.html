@@ -16,25 +16,25 @@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-@this(mainTemplate: main_template, govukPanel: GovukPanel)
+@this(
+    mainTemplate: main_template,
+    govukPanel: GovukPanel,
+    p: p, h1: h1, h2: h2
+)
 
-@(tradingName: String, applicationCreatedOn: String, reviewedWithin: Int)(implicit msgs: Messages, request : Request[_], appConfig: AppConfig)
+@(tradingName: String, applicationCreatedOn: String, reviewedWithin: Int)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
 @mainTemplate(title = msgs("application_not_ready.title")) {
 
-<h1 class="govuk-heading-xl">@msgs("application_not_ready.title")</h1>
-
-<p>@msgs("application_not_ready.p1", tradingName, applicationCreatedOn)</p>
-
-<h2>@msgs("application_not_ready.h2")</h2>
-<p>@msgs("application_not_ready.p2")</p>
-<p>@msgs("application_not_ready.p3", reviewedWithin)</p>
-<p>@msgs("application_not_ready.p4")</p>
-
-<h2>@msgs("application_not_ready.h3")</h2>
-<p>@msgs("application_not_ready.p5")</p>
+    @h1("application_not_ready.title")
+    @p(msgs("application_not_ready.p1", tradingName, applicationCreatedOn))
+    @h2("application_not_ready.h2")
+    @p("application_not_ready.p2")
+    @p(msgs("application_not_ready.p3", reviewedWithin))
+    @p("application_not_ready.p4")
+    @h2("application_not_ready.h3")
+    @p("application_not_ready.p5")
 }

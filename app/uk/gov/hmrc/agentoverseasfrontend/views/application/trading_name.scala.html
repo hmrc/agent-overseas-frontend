@@ -29,14 +29,16 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLabel, HmrcSectionCaption}
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template, 
-        errorPrefix: error_prefix, 
-        govukErrorSummary: GovukErrorSummary, 
-        form: FormWithCSRF,
-        govukInput: GovukInput,
-        govukButton: GovukButton)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    formWithCsrf: FormWithCSRF,
+    govukInput: GovukInput,
+    submitButton: submitButton
+)
 
 @(tradingNameForm: Form[String], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -46,7 +48,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(tradingNameForm))
     }
 
-    @form(action = routes.ApplicationController.submitTradingName) {
+    @formWithCsrf(action = routes.ApplicationController.submitTradingName) {
         @govukInput(Input(
             label = HmrcPageHeadingLabel(
                     content = Text(msgs("tradingName.title")),
@@ -56,9 +58,7 @@
             classes = "govuk-input--width-20"
         ).withFormField(tradingNameForm("tradingName")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
+
     }
 }

@@ -14,22 +14,28 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, h1: h1, p: p, a: a, span: span)
 
 @()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@timeString=@{
+@timeString = @{
     val timeout = appConfig.timeout
-    if(timeout < 60) s"$timeout seconds" else s"${timeout/60} minutes"
+    if(timeout < 60) s"$timeout seconds" else s"${timeout / 60} minutes"
 }
 
 @mainTemplate(title = msgs("timed-out.header"), hasTimeout = false) {
 
-    <h1 class="govuk-heading-xl">@msgs("timed-out.header")</h1>
-    <p class="govuk-body">@msgs("timed-out.p1", timeString)</p>
-    <p class="govuk-body"><a href='@routes.ApplicationSignOutController.signOutToStart()'>@msgs("timed-out.p2.link")&nbsp;</a>@Html(msgs("timed-out.p2"))</p>
+    @h1("timed-out.header")
+    @p(msgs("timed-out.p1", timeString))
+    @p(html = Some(Html(
+        a("timed-out.p2.link", href = routes.ApplicationSignOutController.signOutToStart.url) + "" +
+                span("timed-out.p2")
+        )
+    ))
+
 }

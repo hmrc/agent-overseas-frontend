@@ -15,13 +15,14 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.main_template
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, h1: h1, p: p)
 
 @(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit msgs: Messages, appConfig: AppConfig, request: Request[_])
 
 @mainTemplate(title = msgs(pageTitleMsgKey)) {
- <h1 class="govuk-heading-xl">@msgs(headingMsgKey)</h1>
- <p>@msgs(messageMsgKey)</p>
+    @h1(headingMsgKey)
+    @p(messageMsgKey)
 }

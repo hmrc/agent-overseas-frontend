@@ -18,16 +18,16 @@
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template)
+@this(mainTemplate: main_template, p: p, h1: h1, linkAsButton: linkAsButton)
 @()(implicit msgs: Messages, request : Request[_], configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("createNewAccount.title")) {
 
-  <h1 class="govuk-heading-xl">@msgs("createNewAccount.title")</h1>
-
-  <p>@msgs("createNewAccount.p1")</p>
+  @h1("createNewAccount.title")
+  @p("createNewAccount.p1")
   <p>
-    <a class="govuk-button" href="@routes.SubscriptionSignOutController.signOutWithContinueUrl()" role="button" id="buttonGoToGg">@msgs("button.continue")</a>
+    @linkAsButton(href=routes.SubscriptionSignOutController.signOutWithContinueUrl.url)
   </p>
 }

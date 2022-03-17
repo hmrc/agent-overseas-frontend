@@ -18,36 +18,29 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Aliases.Input
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukInput
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Content
+@import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichRadios}
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukErrorSummary, GovukInput, GovukInsetText, GovukRadios}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukRadios: GovukRadios,
-        govukButton: GovukButton,
-        govukInput: GovukInput,
-        govukInsetText: GovukInsetText,
-        form: FormWithCSRF)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
+    govukInput: GovukInput,
+    govukInsetText: GovukInsetText,
+    formWithCsrf: FormWithCSRF,
+    p: p, h1: h1, h2: h2,
+    submitButton: submitButton
+)
 
 @(personalDetailsForm: Form[PersonalDetailsChoice], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -57,55 +50,49 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(personalDetailsForm))
     }
 
-    <h1 class="govuk-heading-xl">
-        @msgs("personalDetails.title")
-    </h1>
-
-    <p class="margin-bottom-10">@msgs("personalDetails.p1")</p>
+    @h1("personalDetails.title")
+    @p("personalDetails.p1", classes = Some("margin-bottom-10"))
 
     <p class="govuk-hint">@msgs("personalDetails.p2")</p>
 
-    @form(action = routes.ApplicationController.submitPersonalDetails, 'class -> "form js-form") {
+    @formWithCsrf(action = routes.ApplicationController.submitPersonalDetails, 'class -> "form js-form") {
 
         <fieldset class="govuk-fieldset">
-            @govukRadios(Radios(
-                items = Seq(
-                    RadioItem(
-                        content = Text(msgs("personalDetails.form.nino")),
-                        value = Some("nino"),
-                        checked = personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true) || personalDetailsForm.error("nino").isDefined,
-                        conditionalHtml = Some(
-                            govukInput(Input(
-                                label = Label(content = Text(msgs("personalDetails.form.nino"))),
-                                hint = Some(Hint(content = Text(msgs("personalDetails.form.helper.nino")))),
-                                spellcheck = Some(false),
-                                attributes = Map("data-uppercase" -> "true"),
-                                value = if (personalDetailsForm.data.get("personalDetailsChoice").contains("nino")) personalDetailsForm.data.get("nino") else None
-                            ).withFormField(personalDetailsForm("nino")))
-                        )
-                    ),
-                    RadioItem(
-                        content = Text(msgs("personalDetails.form.sautr")),
-                        value = Some("saUtr"),
-                        checked = personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true) || personalDetailsForm.error("saUtr").isDefined,
-                        conditionalHtml = Some(
-                            govukInput(Input(
-                                label = Label(content = Text(msgs("personalDetails.form.sautr"))),
-                                hint = Some(Hint(content = Text(msgs("personalDetails.form.helper.sautr")))),
-                                spellcheck = Some(false),
-                                value = if (personalDetailsForm.data.get("personalDetailsChoice").contains("sautr")) personalDetailsForm.data.get("saUtr") else None
-                            ).withFormField(personalDetailsForm("saUtr")))
-                        )
+        @govukRadios(Radios(
+            items = Seq(
+                RadioItem(
+                    content = Text(msgs("personalDetails.form.nino")),
+                    value = Some("nino"),
+                    checked = personalDetailsForm.value.flatMap(_.choice.map(_.value == "nino")).contains(true) || personalDetailsForm.error("nino").isDefined,
+                    conditionalHtml = Some(
+                        govukInput(Input(
+                            label = Label(content = Text(msgs("personalDetails.form.nino"))),
+                            hint = Some(Hint(content = Text(msgs("personalDetails.form.helper.nino")))),
+                            spellcheck = Some(false),
+                            attributes = Map("data-uppercase" -> "true"),
+                            value = if(personalDetailsForm.data.get("personalDetailsChoice").contains("nino")) personalDetailsForm.data.get("nino") else None
+                        ).withFormField(personalDetailsForm("nino")))
                     )
                 ),
-            ).withFormField(personalDetailsForm("personalDetailsChoice")))
+                RadioItem(
+                    content = Text(msgs("personalDetails.form.sautr")),
+                    value = Some("saUtr"),
+                    checked = personalDetailsForm.value.flatMap(_.choice.map(_.value == "saUtr")).contains(true) || personalDetailsForm.error("saUtr").isDefined,
+                    conditionalHtml = Some(
+                        govukInput(Input(
+                            label = Label(content = Text(msgs("personalDetails.form.sautr"))),
+                            hint = Some(Hint(content = Text(msgs("personalDetails.form.helper.sautr")))),
+                            spellcheck = Some(false),
+                            value = if(personalDetailsForm.data.get("personalDetailsChoice").contains("sautr")) personalDetailsForm.data.get("saUtr") else None
+                        ).withFormField(personalDetailsForm("saUtr")))
+                    )
+                )
+            ),
+        ).withFormField(personalDetailsForm("personalDetailsChoice")))
         </fieldset>
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
 
- }
+    }
 
 }
