@@ -43,7 +43,8 @@
     govukInput: GovukInput,
     govukInsetText: GovukInsetText,
     formWithCsrf: FormWithCSRF,
-    submitButton: submitButton, p: p, inset_text: inset_text
+    submitButton: submitButton, p: p,
+    inset_text: inset_text, h1: h1
 )
 
 @(contactDetailsForm: Form[ContactDetails], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
@@ -57,9 +58,7 @@
     @formWithCsrf(action = routes.ApplicationController.submitContactDetails) {
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend-xl">
-                <h1 class="govuk-heading-xl">
-                    @msgs("contactDetails.title")
-                </h1>
+                @h1("contactDetails.title")
             </legend>
 
             @inset_text(key = Some("contactDetails.inset.p1"))

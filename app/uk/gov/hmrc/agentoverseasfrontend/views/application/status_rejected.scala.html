@@ -14,30 +14,37 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationEntityDetails
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukErrorSummary}
 
-@this(mainTemplate: main_template, errorPrefix: error_prefix, govukErrorSummary: GovukErrorSummary, formWithCsrf: FormWithCSRF)
+@this(
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    formWithCsrf: FormWithCSRF,
+    p: p, h1: h1, h2: h2, span: span, a: a
+)
 
 @(agentDetails: ApplicationEntityDetails)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(msgs("statusRejected.title")){
+@mainTemplate(msgs("statusRejected.title")) {
 
-    <h1 class="govuk-heading-xl">@msgs("statusRejected.title")</h1>
+    @h1("statusRejected.title")
+    @p(msgs("statusRejected.para1", agentDetails.tradingName))
+    @p(html = Some(Html(msgs("statusRejected.para2",
+        Html(s"<strong class=bold-small>${agentDetails.businessEmail}</strong>"))))
+    )
 
-    <p>@msgs("statusRejected.para1", agentDetails.tradingName)</p>
-    <p>@Html(msgs("statusRejected.para2", Html(s"<strong class=bold-small>${agentDetails.businessEmail}</strong>")))</p>
+    @h2("statusRejected.heading")
+    @p("statusRejected.para3")
 
-    <h2 class="govuk-heading-l">@msgs("statusRejected.heading")</h2>
-
-    <p>@msgs("statusRejected.para3")</p>
-
-    <p>@Html(msgs("statusRejected.link",
-        Html(s"<a href=${routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url}>")))
-        @msgs("statusRejected.link.text")@Html("</a>")
-    </p>
+    @p(html = Some(Html(
+        span("statusRejected.link") + "" +
+                a("statusRejected.link.text",
+                    href = routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url)
+    )))
 }

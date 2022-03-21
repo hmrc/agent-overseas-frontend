@@ -48,7 +48,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(updateTrnForm))
     }
 
-    formWithCsrfaction = routes.TaxRegController.submitUpdateTaxRegNumber) {
+    @formWithCsrf(action = routes.TaxRegController.submitUpdateTaxRegNumber) {
 
         @govukInput(Input(
             label = Label(
