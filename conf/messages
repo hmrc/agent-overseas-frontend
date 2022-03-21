@@ -390,7 +390,7 @@ statusRejected.para1=We have rejected your application for an agent services acc
 statusRejected.para2=We have sent an email to {0} to confirm our decision.
 statusRejected.heading=If you want to apply again
 statusRejected.para3=Before you apply again, you should read the decision to find out why your application was rejected.
-statusRejected.link=If you want to apply again, you will need to {0}
+statusRejected.link=If you want to apply again, you will need to
 statusRejected.link.text=start a new application
 
 # Accessibility link

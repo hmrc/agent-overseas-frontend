@@ -48,7 +48,7 @@
     govukCheckboxes: GovukCheckboxes,
     govukSummaryList: GovukSummaryList,
     formWithCsrf: FormWithCSRF,
-    p: p, h1: h1, h2: h2
+    p: p, h1: h1, h2: h2, submitButton: submitButton,
 )
 
 @(
@@ -102,10 +102,7 @@
             items = Seq(CheckboxItem(id = Some("confirmed"), name = Some("confirmed"), content = Text(msgs("checkAnswers.confirm.label")), value = "true"))
         ).withFormField(cyaForm("confirmed")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("checkAnswers.confirm.button")),
-        ))
+        @submitButton(messageKey = "checkAnswers.confirm.button")
     }
 
 }

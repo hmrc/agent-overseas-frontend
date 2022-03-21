@@ -19,30 +19,20 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers._
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukDetails
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Value
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Actions
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukDetails, GovukSummaryList}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 @this(
     mainTemplate: main_template,
     formWithCsrf: FormWithCSRF,
-    govukButton: GovukButton,
+    submitButton: submitButton,
     govukDetails: GovukDetails,
     govukSummaryList: GovukSummaryList,
-    p: p, h1: h1)
+    p: p, h1: h1
+)
 
 @(agencyDetails: AgencyDetails, addressCountryName: String)(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
@@ -101,9 +91,6 @@
     @p("subscription.checkAnswers.description.p3")
 
     @formWithCsrf(action = routes.SubscriptionController.subscribe(), 'class -> "form js-form") {
-        @govukButton(Button(
-            attributes = Map("id" -> "continue", "type" -> "submit"),
-            content = Text(msgs("subscription.checkAnswers.confirm.button")),
-        ))
+        @submitButton(messageKey = "subscription.checkAnswers.confirm.button")
     }
 }

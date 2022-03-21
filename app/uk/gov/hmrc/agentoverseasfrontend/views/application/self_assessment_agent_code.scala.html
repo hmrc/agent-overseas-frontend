@@ -23,22 +23,17 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.Checkboxes
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukErrorSummary: GovukErrorSummary,
-        govukButton: GovukButton,
-        govukCheckboxes: GovukCheckboxes,
-        formWithCsrf: FormWithCSRF,
-        checkBoxWithConditionalText: checkbox_with_conditional_text)
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukErrorSummary: GovukErrorSummary,
+    submitButton: submitButton, p: p,
+    govukCheckboxes: GovukCheckboxes,
+    formWithCsrf: FormWithCSRF,
+    checkBoxWithConditionalText: checkbox_with_conditional_text)
 
 @(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
@@ -53,8 +48,8 @@
         @msgs("agentCodes.title")
     </h1>
 
-    <p>@msgs("agentCodes.p1")</p>
-    <p>@msgs("agentCodes.form.hint")</p>
+    @p("agentCodes.p1")
+    @p("agentCodes.form.hint")
 
     @formWithCsrf(action = routes.ApplicationController.submitAgentCodes) {
 
@@ -74,9 +69,6 @@
 
         </fieldset>
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue", "type" -> "submit"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
     }
 }

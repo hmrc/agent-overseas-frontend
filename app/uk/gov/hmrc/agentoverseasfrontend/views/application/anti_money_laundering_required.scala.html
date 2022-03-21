@@ -31,14 +31,15 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentoverseasfrontend.views.html.components.submitButton
 
 @this(
-        mainTemplate: main_template,
-        errorPrefix: error_prefix,
-        govukRadios: GovukRadios,
-        govukButton: GovukButton,
-        uiformWithCsrf: FormWithCSRF,
-        govukErrorSummary: GovukErrorSummary
+    mainTemplate: main_template,
+    errorPrefix: error_prefix,
+    govukRadios: GovukRadios,
+    submitButton: submitButton,
+    formWithCsrf: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
 )
 
 @(amlsRequiredForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
@@ -50,7 +51,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsRequiredForm))
     }
 
-    @uiformWithCsrf(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired) {
+    @formWithCsrf(action = routes.AntiMoneyLaunderingController.submitMoneyLaunderingRequired) {
         @govukRadios(Radios(
             classes = "govuk-radios--inline",
             fieldset = Some(Fieldset(
@@ -66,9 +67,6 @@
             )
         ).withFormField(amlsRequiredForm("amlsRequired")))
 
-        @govukButton(Button(
-            attributes = Map("id" -> "continue"),
-            content = Text(msgs("button.continue")),
-        ))
+        @submitButton()
     }
 }
