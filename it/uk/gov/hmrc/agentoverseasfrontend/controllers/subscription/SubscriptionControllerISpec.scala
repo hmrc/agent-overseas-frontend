@@ -22,10 +22,10 @@ class SubscriptionControllerISpec
 
   "subscribe" should {
     "redirect to /complete upon successful subscription" in {
-      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
-      givenAcceptedApplicationResponse
-      givenApplicationUpdateSuccessResponse
+      givenAcceptedApplicationResponse()
+      givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(arn)
 
       val result = controller.subscribe(request)
@@ -35,9 +35,9 @@ class SubscriptionControllerISpec
     }
 
     "redirect to /check-answers if there's no agency details in the session" in {
-      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
       sessionStoreService.currentSession.agencyDetails = None
-      givenAcceptedApplicationResponse
+      givenAcceptedApplicationResponse()
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
@@ -91,11 +91,22 @@ class SubscriptionControllerISpec
         "subscriptionComplete.button"
       )
     }
+
+    "redirect to /create-account if no agent session" in {
+      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      sessionStoreService.currentSession.agencyDetails = None
+      givenRegisteredApplicationResponse()
+      val result = controller.subscribe(request)
+
+      status(result) shouldBe 303
+      header(LOCATION, result).get shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk/create-account"
+    }
+
   }
 
   "/already-subscribed" should {
     "show the already subscribed page for a user with Agent affinity group" in {
-      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
 
       val result = controller.alreadySubscribed(request)
 
@@ -111,10 +122,10 @@ class SubscriptionControllerISpec
 
   "email verification" should {
     "be triggered if attempting to subscribe with an unverified email" in {
-      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
-      givenAcceptedApplicationResponse
-      givenApplicationUpdateSuccessResponse
+      givenAcceptedApplicationResponse()
+      givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(arn)
 
       val result = controller.subscribe(request)
