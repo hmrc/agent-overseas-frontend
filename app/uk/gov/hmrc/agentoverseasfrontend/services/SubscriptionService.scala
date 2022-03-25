@@ -52,11 +52,11 @@ class SubscriptionService @Inject()(
         case None                        => Future.successful(Left(NoApplications))
       }
       .flatMap {
-        case Right(_)      => callOverseasSubscription
+        case Right(_)      => updateOverseasSubscription
         case Left(failure) => Future.successful(Left(failure))
       }
 
-  private def callOverseasSubscription(
+  private def updateOverseasSubscription(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext): Future[Either[FailureToSubscribe, Arn]] =
     subscriptionConnector.overseasSubscription
