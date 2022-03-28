@@ -94,8 +94,10 @@ class SubscriptionAuth @Inject()(
               else Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep()))
             case Some(application) if application.status == Registered || application.status == Complete =>
               subscriptionService.subscribe.flatMap {
-                case Right(_) => Future.successful(Redirect(subscription.routes.SubscriptionController.subscriptionComplete()))
-                case Left(_)  => Future.successful(Redirect(subscription.routes.SubscriptionController.alreadySubscribed()))
+                case Right(_) =>
+                  Future.successful(Redirect(subscription.routes.SubscriptionController.subscriptionComplete()))
+                case Left(_) =>
+                  Future.successful(Redirect(subscription.routes.SubscriptionController.alreadySubscribed()))
               }
             case Some(application) if application.status == AttemptingRegistration =>
               Future.successful(Redirect(subscription.routes.SubscriptionRootController.showApplicationIssue()))

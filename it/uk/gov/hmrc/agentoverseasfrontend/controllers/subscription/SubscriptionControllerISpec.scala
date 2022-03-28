@@ -92,16 +92,6 @@ class SubscriptionControllerISpec
       )
     }
 
-    "redirect to /create-account if no agent session" in {
-      implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
-      sessionStoreService.currentSession.agencyDetails = None
-      givenRegisteredApplicationResponse()
-      val result = controller.subscribe(request)
-
-      status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk/create-account"
-    }
-
   }
 
   "/already-subscribed" should {
