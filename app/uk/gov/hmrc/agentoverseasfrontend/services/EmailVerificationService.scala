@@ -38,8 +38,8 @@ class EmailVerificationService @Inject()(emailVerificationConnector: EmailVerifi
                                VerifyEmailRequest(
                                  credId = credId,
                                  continueUrl = continueUrl,
-                                 origin = "agent-overseas",
-                                 deskproServiceName = Some("agent-overseas"),
+                                 origin = "HMRC Agent Services",
+                                 deskproServiceName = None,
                                  accessibilityStatementUrl = accessibilityStatementUrl,
                                  email = mEmail,
                                  lang = None,
