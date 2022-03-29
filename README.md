@@ -1,11 +1,16 @@
 
 # agent-overseas-frontend
 
-# Frontend for Overseas Agents to apply to become an Agent and subscribe to Agent Services
-
 This frontend allows overseas agents to submit an application to HMRC for registering as an overseas agent and subscribing to Agent Services.
 
-The journey requires several types of documents to be uploaded as evidence. The file upload function is performed by the UPSCAN service. 
+## Journey 
+1. The agent submits an application - The journey requires several types of documents to be uploaded as evidence. The file upload function is performed by the UPSCAN service. 
+
+2. The application is sent the HMRC Agent Maintainer Team where helpdesk staff with the correct stride role manaully check the application, and approve or reject it via agent-helpdesk-frontend. The status is updated from "pending" see [agent-overseas-application](https://github.com/hmrc/agent-overseas-application#application-statuses) for different statuses.
+
+3. The agent comes back, and they can see the status of their application. Once they have been accepted they're asked to confirm their agency details. This allows them to finish 'creating their account' and the confirmation screen lets them go to their new Agent Services Account home page.
+
+
 
 ## Running the tests
 
