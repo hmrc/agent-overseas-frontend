@@ -1,9 +1,11 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
+import org.jsoup.Jsoup
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Result}
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
-import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
+import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AgentSubscriptionStubs}
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
@@ -11,18 +13,23 @@ import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
+class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseasApplicationStubs with AgentSubscriptionStubs  {
 
   lazy val controller: BusinessIdentificationController = app.injector.instanceOf[BusinessIdentificationController]
 
   "GET /check-answers" should {
-    "display the check-answers page" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+    "display the check-answers page if status is Accepted" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showCheckAnswers(request)
       status(result) shouldBe 200
+
+      val htmlString = Helpers.contentAsString(result)
+      val html = Jsoup.parse(htmlString)
+
+      html.title().contains("Confirm your contact details before creating your account")
 
       result.futureValue should containMessages(
         "subscription.checkAnswers.title",
@@ -37,7 +44,6 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         "subscription.checkAnswers.confirm.button",
         "checkAnswers.change.button")
 
-
       result.futureValue should containSubstrings(agencyDetails.agencyName, agencyDetails.agencyEmail,
         agencyDetails.agencyAddress.addressLine1,
         agencyDetails.agencyAddress.addressLine2,
@@ -50,13 +56,57 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to application root path page if no active application available" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
       givenApplicationEmptyResponse()
 
       val result = controller.showCheckAnswers(request)
       status(result) shouldBe 303
 
       header(LOCATION, result).get shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk"
+    }
+
+    "redirect to /application-status if Pending" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      givenPendingApplicationResponse()
+
+      val result = controller.showCheckAnswers(request)
+      status(result) shouldBe 303
+
+      header(LOCATION, result).get shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk/application-status"
+    }
+
+    "redirect to /application-status if Rejected" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      givenRejectedApplicationResponse()
+
+      val result = controller.showCheckAnswers(request)
+      status(result) shouldBe 303
+
+      header(LOCATION, result).get shouldBe "http://localhost:9414/agent-services/apply-from-outside-uk/application-status"
+    }
+
+    "attempt subscribeAndEnrol if Registered then redirect to /complete" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      givenRegisteredApplicationResponse()
+      givenApplicationUpdateSuccessResponse()
+      givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
+
+      val result: Future[Result] = controller.showCheckAnswers(request)
+      status(result) shouldBe 303
+
+      header(LOCATION, result).get shouldBe "/agent-services/apply-from-outside-uk/create-account/complete"
+
+    }
+
+    "attempt subscribeAndEnrol if Complete then redirect to /agent-services-account" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForHMRCASAGENT())
+      givenCompleteApplicationResponse()
+
+      val result = controller.showCheckAnswers(request)
+      status(result) shouldBe 303
+
+      header(LOCATION, result).get shouldBe "http://localhost:9401/agent-services-account"
+
     }
   }
 

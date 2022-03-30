@@ -30,7 +30,7 @@ object StubsTestData {
   verifiedEmails = Set("test-agency-email@domain.com")
  )
 
- def pendingApplication(appCreateDate: String) =
+ def pendingApplication(appCreateDate: String): String =
   s"""|[
      |  {
      |    "applicationReference": "25eaab89",
@@ -77,7 +77,7 @@ object StubsTestData {
    """.stripMargin
 
 
- def acceptedApplication =
+ def acceptedApplication: String =
   s"""|[
      |  {
      |    "applicationReference": "25eaab89",
@@ -127,7 +127,7 @@ object StubsTestData {
      |]
    """.stripMargin
 
- def applicationInRedirectStatus(redirectStatus: String) =
+ def applicationInRedirectStatus(redirectStatus: String): String =
   s"""|[
       |  {
       |    "applicationReference": "25eaab89",
@@ -178,7 +178,7 @@ object StubsTestData {
    """.stripMargin
 
 
- def allRejected =
+ def allRejected: String =
   s"""|[
      |  {
      |    "applicationReference": "25eaab89",
@@ -327,7 +327,7 @@ object StubsTestData {
      |]
    """.stripMargin
 
- def notAllRejected =
+ def notAllRejected: String =
   s"""[
      | {
      |    "applicationReference": "25eaab89",
@@ -473,7 +473,7 @@ object StubsTestData {
      |]
    """.stripMargin
 
- def applicationWithStatus(status: String = "accepted") =
+ def applicationWithStatus(status: String = "accepted"): String =
   s"""|[{
       |    "applicationReference": "25eaab89",
       |    "createdDate": "2019-02-20T15:11:51.729",
@@ -521,7 +521,126 @@ object StubsTestData {
       |  }]
      """.stripMargin
 
- def pendingApplication =
+ def applicationWithCompleteStatus(arn: String): String =
+  s"""|[{
+      |    "applicationReference": "25eaab89",
+      |    "createdDate": "2019-02-20T15:11:51.729",
+      |    "amls": {
+      |      "supervisoryBody": "International Association of Bookkeepers (IAB)",
+      |      "membershipNumber": "0987654321"
+      |    },
+      |    "contactDetails": {
+      |      "firstName": "Testing",
+      |      "lastName": "Agent",
+      |      "jobTitle": "Tester",
+      |      "businessTelephone": "011565438754",
+      |      "businessEmail": "test@test.com"
+      |    },
+      |    "tradingDetails": {
+      |      "tradingName": "Testing Agency",
+      |      "tradingAddress": {
+      |        "addressLine1": "addressLine1",
+      |        "addressLine2": "addressLine2",
+      |        "addressLine3": "addressLine3",
+      |        "addressLine4": "addressLine4",
+      |        "countryCode": "CC"
+      |      },
+      |      "isUkRegisteredTaxOrNino": "yes",
+      |      "isHmrcAgentRegistered": "yes",
+      |      "saAgentCode": "KOOH67",
+      |      "companyRegistrationNumber": "regNumber here",
+      |      "taxRegistrationNumbers": [
+      |        "anotherTaxRegNumber here",
+      |        "taxRegNumber here"
+      |      ]
+      |    },
+      |    "personalDetails": {
+      |      "saUtr": "4000000009",
+      |      "nino": "AA000000A"
+      |    },
+      |    "status": "complete",
+      |    "authProviderIds": [
+      |      "9865690"
+      |    ],
+      |    "maintainerDetails": {
+      |      "reviewedDate": "2019-02-20T10:35:21.65",
+      |      "reviewerPid": "PID"
+      |    },
+      |    "receivedInDms": "yes",
+      |    "agencyDetails": {
+      |        "agencyAddress": {
+      |            "addressLine1": "17 Roth Terrace",
+      |            "addressLine2": "Boloni",
+      |            "countryCode": "BE"
+      |        },
+      |        "agencyEmail": "even@and.com",
+      |        "agencyName": "Safez"
+      |    },
+      |    "safeId": "XX0000646231987",
+      |    "arn": "$arn"
+      |  }]
+     """.stripMargin
+
+ def applicationWithRegisteredStatus: String =
+  s"""|[{
+      |    "applicationReference": "25eaab89",
+      |    "createdDate": "2019-02-20T15:11:51.729",
+      |    "amls": {
+      |      "supervisoryBody": "International Association of Bookkeepers (IAB)",
+      |      "membershipNumber": "0987654321"
+      |    },
+      |    "contactDetails": {
+      |      "firstName": "Testing",
+      |      "lastName": "Agent",
+      |      "jobTitle": "Tester",
+      |      "businessTelephone": "011565438754",
+      |      "businessEmail": "test@test.com"
+      |    },
+      |    "tradingDetails": {
+      |      "tradingName": "Testing Agency",
+      |      "tradingAddress": {
+      |        "addressLine1": "addressLine1",
+      |        "addressLine2": "addressLine2",
+      |        "addressLine3": "addressLine3",
+      |        "addressLine4": "addressLine4",
+      |        "countryCode": "CC"
+      |      },
+      |      "isUkRegisteredTaxOrNino": "yes",
+      |      "isHmrcAgentRegistered": "yes",
+      |      "saAgentCode": "KOOH67",
+      |      "companyRegistrationNumber": "regNumber here",
+      |      "taxRegistrationNumbers": [
+      |        "anotherTaxRegNumber here",
+      |        "taxRegNumber here"
+      |      ]
+      |    },
+      |    "personalDetails": {
+      |      "saUtr": "4000000009",
+      |      "nino": "AA000000A"
+      |    },
+      |    "status": "registered",
+      |    "authProviderIds": [
+      |      "9865690"
+      |    ],
+      |    "maintainerDetails": {
+      |      "reviewedDate": "2019-02-20T10:35:21.65",
+      |      "reviewerPid": "PID"
+      |    },
+      |    "receivedInDms": "yes",
+      |    "agencyDetails": {
+      |        "agencyAddress": {
+      |            "addressLine1": "17 Roth Terrace",
+      |            "addressLine2": "Boloni",
+      |            "countryCode": "BE"
+      |        },
+      |        "agencyEmail": "even@and.com",
+      |        "agencyName": "Safez"
+      |    },
+      |    "safeId": "XX0000646231987"
+      |  }]
+     """.stripMargin
+
+ def pendingApplication: String =
   s"""|[{
       |    "applicationReference": "25eaab89",
       |    "createdDate": "2019-02-20T15:11:51.729",
@@ -565,7 +684,7 @@ object StubsTestData {
       |  }]
      """.stripMargin
 
- def rejectedApplication =
+ def rejectedApplication: String =
   s"""|[{
       |    "applicationReference": "25eaab89",
       |    "createdDate": "2019-02-20T15:11:51.729",

@@ -141,7 +141,7 @@ trait AgentOverseasApplicationStubs {
 
   def givenRegisteredApplicationResponse(): StubMapping =
     stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-      okJson(StubsTestData.applicationWithStatus("registered"))
+      okJson(StubsTestData.applicationWithRegisteredStatus)
         .withStatus(200)
     ))
 
@@ -157,9 +157,9 @@ trait AgentOverseasApplicationStubs {
         .withStatus(200)
     ))
 
-  def givenCompleteApplicationResponse(): StubMapping =
+  def givenCompleteApplicationResponse(arn: Option[String] = None): StubMapping =
     stubFor(get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-      okJson(StubsTestData.applicationWithStatus("complete"))
+      okJson(StubsTestData.applicationWithCompleteStatus(arn.getOrElse("TARN0000001")))
         .withStatus(200)
     ))
 

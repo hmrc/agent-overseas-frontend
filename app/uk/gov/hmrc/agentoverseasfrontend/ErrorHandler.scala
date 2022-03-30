@@ -49,7 +49,7 @@ class ErrorHandler @Inject()(
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
     auditClientError(request, statusCode, message)
-    logger.error(s"onClientError $message")
+    logger.error(s"onClientError $message | status: $statusCode request: $request")
     super.onClientError(request, statusCode, message)
   }
 
