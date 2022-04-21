@@ -6,19 +6,19 @@ lazy val scoverageSettings = {
   Seq(
     // Semicolon-separated list of regexs matching classes to exclude
     ScoverageKeys.coverageExcludedPackages := """uk\.gov\.hmrc\.BuildInfo;.*\.Routes;.*\.RoutesPrefix;.*Filters?;MicroserviceAuditConnector;Module;GraphiteStartUp;.*\.Reverse[^.]*""",
-    ScoverageKeys.coverageMinimum := 80.00,
+    ScoverageKeys.coverageMinimumStmtTotal := 80.00,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
-    parallelExecution in Test := false
+    Test / parallelExecution := false
   )
 }
 
 lazy val compileDeps = Seq(
-  "uk.gov.hmrc"           %% "bootstrap-frontend-play-28"    % "5.20.0",
-  "uk.gov.hmrc"           %% "play-frontend-hmrc"            % "3.4.0-play-28",
-  "uk.gov.hmrc"           %% "play-partials"                 % "8.2.0-play-28",
+  "uk.gov.hmrc"           %% "bootstrap-frontend-play-28"    % "5.23.0",
+  "uk.gov.hmrc"           %% "play-frontend-hmrc"            % "3.14.0-play-28",
+  "uk.gov.hmrc"           %% "play-partials"                 % "8.3.0-play-28",
   "uk.gov.hmrc"           %% "agent-kenshoo-monitoring"      % "4.8.0-play-28",
-  "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "0.32.0-play-28",
+  "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "0.35.0-play-28",
   "uk.gov.hmrc"           %% "mongo-caching"                 % "7.1.0-play-28",
   "uk.gov.hmrc"           %% "play-conditional-form-mapping" % "1.11.0-play-28",
   "uk.gov.hmrc"           %% "simple-reactivemongo"          % "8.0.0-play-28",
@@ -40,7 +40,7 @@ lazy val root = Project("agent-overseas-frontend", file("."))
   .settings(
     name := "agent-overseas-frontend",
     organization := "uk.gov.hmrc",
-    scalaVersion := "2.12.12",
+    scalaVersion := "2.12.15",
     scalacOptions ++= Seq(
       "-Xfatal-warnings",
       "-Xlint:-missing-interpolator,_",
@@ -56,22 +56,21 @@ lazy val root = Project("agent-overseas-frontend", file("."))
     ),
     libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
     libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.7.0" % Provided cross CrossVersion.full
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.8" cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % "1.7.8" % Provided cross CrossVersion.full
     ),
     publishingSettings,
     scoverageSettings,
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
-    scalafmtOnCompile in Compile := true,
-    scalafmtOnCompile in Test := true,
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
+    Compile / scalafmtOnCompile := true,
+    Test / scalafmtOnCompile := true,
     majorVersion := 0
   )
   .configs(IntegrationTest)
   .settings(
-    Keys.fork in IntegrationTest := true,
+    IntegrationTest / Keys.fork := true,
     Defaults.itSettings,
-    unmanagedSourceDirectories in IntegrationTest += baseDirectory(_ / "it").value,
-    parallelExecution in IntegrationTest := false,
-    scalafmtOnCompile in IntegrationTest := true
+    IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
+    IntegrationTest / parallelExecution := false
   )
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
