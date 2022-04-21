@@ -16,7 +16,7 @@ trait AuthStubs {
 
   protected def authenticatedAs(user: SampleUser): FakeRequest[AnyContentAsEmpty.type] = {
     userIsAuthenticated(user)
-    FakeRequest()
+    FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
 
   def authenticated[A](request: FakeRequest[A], enrolment: Enrolment, isAgent: Boolean): FakeRequest[A] = {
