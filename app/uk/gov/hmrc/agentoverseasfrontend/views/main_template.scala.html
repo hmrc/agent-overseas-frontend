@@ -37,10 +37,8 @@
 )(mainContent: Html)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
 @mainContentWithHelpLink = {
-@mainContent
-    <div class="govuk-!-margin-bottom-9">
-    @hmrcReportTechnicalIssueHelper()
-    </div>
+    @mainContent
+    <p class="govuk-!-margin-bottom-9 govuk-!-margin-top-8 govuk-body-s">@hmrcReportTechnicalIssueHelper()</p>
 }
 
 @additionalScripts = {

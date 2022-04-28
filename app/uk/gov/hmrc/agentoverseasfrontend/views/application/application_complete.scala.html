@@ -25,7 +25,7 @@
 @this(
     mainTemplate: main_template,
     govukPanel: GovukPanel,
-    p: p, h2: h2, a: a, span: span
+    p: p, h2: h2, a: a, span: span, linkAsButton: linkAsButton
 )
 
 @(tradingName: String, contactEmail: String, guidanceApplicationUrl: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
@@ -55,9 +55,18 @@
     <p>
      <a href="javascript:window.print()" class="print-link govuk-link">@msgs("applicationComplete.print")</a>
     </p>
-    <div>
-        @a( "applicationComplete.feedback.link",
-            href = routes.ApplicationSignOutController.startFeedbackSurvey.url)
-        @span("applicationComplete.feedback.text")
-    </div>
+
+    <p>
+        @a(href = routes.ApplicationSignOutController.signOut.url, key = "finish.signout")
+    </p>
+
+    @p(
+        html = Some(Html(
+            a( "applicationComplete.feedback.link",
+            href = routes.ApplicationSignOutController.startFeedbackSurvey.url).toString +
+            span("applicationComplete.feedback.text").toString
+        )
+        )
+    )
+
 }

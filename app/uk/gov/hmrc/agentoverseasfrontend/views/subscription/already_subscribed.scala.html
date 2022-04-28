@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
-@this(mainTemplate: main_template, p: p, h1: h1, h2: h2, linkAsButton: linkAsButton)
+@this(mainTemplate: main_template, p: p, h1: h1, h2: h2, a: a)
 
 @()(implicit request: Request[_], msgs: Messages, config: Configuration, appConfig: AppConfig)
 
@@ -28,10 +28,6 @@
 
     @h1("already.subscribed.title")
     @p("already.subscribed.p1")
-    <p>
-        @linkAsButton(
-            href = routes.SubscriptionSignOutController.signOut.url,
-            key = "already.subscribed.button")
-    </p>
+    <p>@a(href = routes.SubscriptionSignOutController.signOut.url, key = "finish.signout")</p>
 
 }
