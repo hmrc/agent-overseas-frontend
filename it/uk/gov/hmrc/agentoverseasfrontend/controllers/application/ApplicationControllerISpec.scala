@@ -10,7 +10,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOptio
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption.SaUtrChoice
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
-import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.agentoverseasfrontend.support.{BaseISpec, Css}
 import uk.gov.hmrc.domain.{Nino, SaUtr}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -1460,32 +1460,29 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           basicAgentRequest(FakeRequest().withFlash("tradingName" -> tradingName, "contactDetail" -> email)))
 
       status(result) shouldBe 200
-      result.futureValue should containMessages(
-        "applicationComplete.title",
-        "applicationComplete.panel.body",
-        "applicationComplete.whatHappensNext.heading",
-        "applicationComplete.whatHappensNext.para2",
-        "applicationComplete.whatHappensNext.para3",
-        "applicationComplete.whatHappensNext.para4",
-        "applicationComplete.whatYouCanDoNext.heading",
-        "applicationComplete.whatYouCanDoNext.link",
-        "applicationComplete.whatYouCanDoNext.text",
-        "applicationComplete.help.heading",
-        "applicationComplete.help.text",
-        "applicationComplete.print",
-        "applicationComplete.feedback.link",
-        "applicationComplete.feedback.text"
-      )
 
-      result.futureValue should containLink("applicationComplete.whatYouCanDoNext.link", "guidancePageUrl")
+      val html = Jsoup.parse(contentAsString(result))
+      html.title() shouldBe "Application complete - Apply for an agent services account if you are not in the UK - GOV.UK"
+      html.select(Css.H1).text() shouldBe "Application complete"
 
-      contentAsString(result).contains(
-        htmlEscapedMessage("applicationComplete.whatHappensNext.para1", contactDetails.businessEmail))
-      result.futureValue should containSubstrings(
-        "We will send a confirmation email to",
-        email,
-        tradingName,
-        routes.ApplicationSignOutController.startFeedbackSurvey().url)
+      val h2s = html.select(Css.H2)
+      h2s.get(0).text() shouldBe "What happens next"
+      h2s.get(1).text() shouldBe "What you can do next"
+      h2s.get(2).text() shouldBe "If you need help"
+
+      val paras = html.select(Css.paragraphs)
+      paras.get(0).text() shouldBe "We will send a confirmation email to testEmail@test.com."
+      paras.get(1).text() shouldBe "We may get in touch with you to discuss your application."
+      paras.get(2).text() shouldBe "We will tell you within 28 calendar days if your application has been approved. We will also tell you how to set up your account."
+      paras.get(3).text() shouldBe "If your application is rejected we will tell you why."
+      paras.get(4).text() shouldBe "Check the guidance on GOV.UK to find out how to track the progress of your application."
+      paras.get(6).text() shouldBe "Print this page"
+      paras.get(6).select("a").text() shouldBe "Print this page"
+      paras.get(6).select("a").attr("href") shouldBe "javascript:window.print()"
+      paras.get(7).text() shouldBe "Finish and sign out"
+      paras.get(7).select("a").text() shouldBe "Finish and sign out"
+      paras.get(7).select("a").attr("href") shouldBe "/agent-services/apply-from-outside-uk/sign-out"
+      paras.get(8).text() shouldBe "What did you think of this service? (takes 30 seconds)"
     }
 
     "303 to JOURNEY START when no required fields in flash, authAction should deal with routing circumstances" in {

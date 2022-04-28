@@ -1,11 +1,13 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
+import org.jsoup.Jsoup
+
 import java.time.{Clock, LocalDateTime}
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.stubs._
-import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.agentoverseasfrontend.support.{BaseISpec, Css}
 
 class ApplicationRootControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
 
@@ -16,8 +18,18 @@ class ApplicationRootControllerISpec extends BaseISpec with AgentOverseasApplica
       val result = controller.showNotAgent(basicRequest(FakeRequest()))
 
       status(result) shouldBe 200
-      result.futureValue should containMessages("nonAgent.title")
-      result.futureValue should containSubstrings(htmlMessage("nonAgent.p1", routes.ApplicationSignOutController.signOut().url),htmlMessage("nonAgent.p2", routes.ApplicationSignOutController.signOutWithContinueUrl()))
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.title() shouldBe "You have not signed in with an agent user ID - Apply for an agent services account if you are not in the UK - GOV.UK"
+
+      val paras = html.select(Css.paragraphs)
+      paras.get(0).text() shouldBe "To continue, sign in with an agent user ID."
+      paras.get(0).select("a").attr("href") shouldBe "/agent-services/apply-from-outside-uk/sign-out"
+      paras.get(0).select("a").text() shouldBe "sign in with an agent user ID"
+      paras.get(1).text() shouldBe "If you do not have one, create a new Government Gateway user ID, selecting the ‘Agent’ option."
+      paras.get(1).select("a").attr("href") shouldBe "/agent-services/apply-from-outside-uk/sign-out/create-account"
+      paras.get(1).select("a").text() shouldBe "create a new Government Gateway user ID"
+
     }
   }
 
@@ -38,14 +50,25 @@ class ApplicationRootControllerISpec extends BaseISpec with AgentOverseasApplica
       val result = controller.applicationStatus(basicRequest(FakeRequest()))
 
       status(result) shouldBe 200
-      result.futureValue should containSubstrings(htmlMessage("application_not_ready.p1", "Testing Agency", "1 February 2018"),
-        htmlMessage("application_not_ready.p3", 0))
-      result.futureValue should containMessages("application_not_ready.title",
-        "application_not_ready.h2",
-        "application_not_ready.p2",
-        "application_not_ready.p4",
-        "application_not_ready.h3",
-        "application_not_ready.p5")
+
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.title() shouldBe "Application received - Apply for an agent services account if you are not in the UK - GOV.UK"
+      html.select(Css.H1).text() shouldBe "Application received"
+
+      val h2s = html.select(Css.H2)
+      h2s.get(0).text() shouldBe "What happens next"
+      h2s.get(1).text() shouldBe "If you need help"
+
+      val paras = html.select(Css.paragraphs)
+      paras.get(0).text() shouldBe "We received your application for approval to create an agent services account for Testing Agency on 1 February 2018."
+      paras.get(1).text() shouldBe "We may get in touch with you to discuss your application."
+      paras.get(2).text() shouldBe "We will tell you within 0 calendar days if your application has been approved. We will also tell you how to set up your account."
+      paras.get(3).text() shouldBe "If your application is rejected we will tell you why."
+      paras.get(4).text() shouldBe "If you need help using this service, use the ‘get help with this page’ link at the bottom of this page."
+      paras.get(5).text() shouldBe "Finish and sign out"
+      paras.get(5).select("a").text() shouldBe "Finish and sign out"
+      paras.get(5).select("a").attr("href") shouldBe "/agent-services/apply-from-outside-uk/sign-out"
     }
 
     "200 28 days to review when fresh application" in {
