@@ -29,9 +29,9 @@
     @hmrcTimeoutDialog(TimeoutDialog(
         timeout = Some(appConfig.timeout),
         countdown = Some(appConfig.timeoutCountdown),
-        keepAliveUrl = Some(routes.ApplicationSignOutController.keepAlive().url),
-        signOutUrl = Some(routes.ApplicationSignOutController.signOut().url),
-        timeoutUrl = Some(routes.ApplicationSignOutController.timedOut().url),
+        keepAliveUrl = Some(routes.ApplicationSignOutController.keepAlive.url),
+        signOutUrl = Some(routes.ApplicationSignOutController.signOut.url),
+        timeoutUrl = Some(routes.ApplicationSignOutController.timedOut.url),
         language = Some(msgs.lang.code)
     ))
 }

@@ -44,13 +44,13 @@
 
 @(taxRegistrationNumberForm: Form[TaxRegistrationNumber], backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(taxRegistrationNumberForm) + msgs("taxRegNo.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showCompanyRegistrationNumberForm().url))) {
+@mainTemplate(title = errorPrefix(taxRegistrationNumberForm) + msgs("taxRegNo.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showCompanyRegistrationNumberForm.url))) {
 
     @if(taxRegistrationNumberForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(taxRegistrationNumberForm))
     }
 
-    @formWithCsrf(action = routes.TaxRegController.submitTaxRegistrationNumber()) {
+    @formWithCsrf(action = routes.TaxRegController.submitTaxRegistrationNumber) {
 
         @govukRadios(Radios(
             fieldset = Some(Fieldset(

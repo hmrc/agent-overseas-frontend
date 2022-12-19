@@ -132,7 +132,7 @@ class FileUploadController @Inject()(
               }
             case None =>
               logger.info(s"could not find fileType in session")
-              Redirect(routes.FileUploadController.showAmlsUploadForm())
+              Redirect(routes.FileUploadController.showAmlsUploadForm)
           }
         case None => throw new RuntimeException("no agent session")
       }
@@ -142,17 +142,16 @@ class FileUploadController @Inject()(
   private def backToFileUploadPage(fileType: String): Option[String] =
     fileType match {
 
-      case "amls" => Some(routes.FileUploadController.showAmlsUploadForm().url)
+      case "amls" => Some(routes.FileUploadController.showAmlsUploadForm.url)
       case "trading-address" =>
-        Some(routes.FileUploadController.showTradingAddressUploadForm().url)
-      case "trn" => Some(routes.FileUploadController.showTrnUploadForm().url)
+        Some(routes.FileUploadController.showTradingAddressUploadForm.url)
+      case "trn" => Some(routes.FileUploadController.showTrnUploadForm.url)
       case _     => None
     }
 
   def submitSuccessfulFileUploadedForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { implicit agentSession =>
-      SuccessfulFileUploadConfirmationForm.form
-        .bindFromRequest()
+      SuccessfulFileUploadConfirmationForm.form.bindFromRequest
         .fold(
           formWithErrors => {
             val fileType = formWithErrors.data("fileType")
@@ -166,15 +165,14 @@ class FileUploadController @Inject()(
               nextPage(fileType).map(url => Redirect(url))
             } else
               Redirect(
-                backToFileUploadPage(fileType).getOrElse(routes.AntiMoneyLaunderingController
-                  .showAntiMoneyLaunderingForm()
-                  .url))
+                backToFileUploadPage(fileType).getOrElse(
+                  routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url))
           }
         )
     }
   }
 
-  def showUploadFailedPage(): Action[AnyContent] = Action.async { implicit request =>
+  def showUploadFailedPage: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
       sessionStoreService.fetchAgentSession.map {
         case Some(agentSession) =>
@@ -183,7 +181,7 @@ class FileUploadController @Inject()(
               Ok(fileUploadFailedView(backToFileUploadPage(fileType)))
             case None =>
               logger.info("expecting a fileType in session for failed upload but none found")
-              Redirect(routes.FileUploadController.showAmlsUploadForm())
+              Redirect(routes.FileUploadController.showAmlsUploadForm)
           }
         case None => throw new RuntimeException("no agent session")
       }
@@ -221,14 +219,11 @@ class FileUploadController @Inject()(
     } else {
       fileType match {
         case "trading-address" =>
-          Some(routes.TradingAddressController.showMainBusinessAddressForm().url)
+          Some(routes.TradingAddressController.showMainBusinessAddressForm.url)
         case "amls" =>
-          Some(
-            routes.AntiMoneyLaunderingController
-              .showAntiMoneyLaunderingForm()
-              .url)
+          Some(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
         case "trn" =>
-          Some(routes.TaxRegController.showYourTaxRegNumbersForm().url)
+          Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)
         case _ =>
           logger.info("routing error for back link- unrecognized document proof file key!")
           None
@@ -243,9 +238,9 @@ class FileUploadController @Inject()(
     } else {
       fileType match {
         case "trading-address" =>
-          routes.ApplicationController.showRegisteredWithHmrcForm().url
-        case "amls" => routes.ApplicationController.showContactDetailsForm().url
-        case "trn"  => routes.ApplicationController.showCheckYourAnswers().url
+          routes.ApplicationController.showRegisteredWithHmrcForm.url
+        case "amls" => routes.ApplicationController.showContactDetailsForm.url
+        case "trn"  => routes.ApplicationController.showCheckYourAnswers.url
         case _ =>
           throw new RuntimeException("routing error for next page- unrecognized document proof file key!")
       }

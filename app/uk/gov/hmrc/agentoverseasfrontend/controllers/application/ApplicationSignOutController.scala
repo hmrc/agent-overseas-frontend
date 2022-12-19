@@ -51,7 +51,7 @@ class ApplicationSignOutController @Inject()(
   }
 
   def signOutToStart: Action[AnyContent] = Action {
-    Redirect(routes.ApplicationRootController.root()).withNewSession
+    Redirect(routes.ApplicationRootController.root).withNewSession
   }
 
   def startFeedbackSurvey: Action[AnyContent] = Action.async { implicit request =>

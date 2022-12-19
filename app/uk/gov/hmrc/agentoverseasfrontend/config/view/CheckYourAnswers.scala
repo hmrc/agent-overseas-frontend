@@ -100,9 +100,9 @@ object CheckYourAnswers {
         ).flatten
       ),
       backLink = if (agentSession.taxRegistrationNumbers.exists(_.nonEmpty)) {
-        routes.FileUploadController.showSuccessfulUploadedForm().url
+        routes.FileUploadController.showSuccessfulUploadedForm.url
       } else {
-        routes.TaxRegController.showTaxRegistrationNumberForm().url
+        routes.TaxRegController.showTaxRegistrationNumberForm.url
       }
     )
 
@@ -116,7 +116,7 @@ object CheckYourAnswers {
             id = "amls-details-amls-required",
             question = Messages("checkAnswers.amlsDetails.amlsRequired"),
             answerLines = List(Messages(s"checkAnswers.amlsDetails.amlsRequired.$amlsRequired")),
-            changeLink = Some(routes.ChangingAnswersController.changeAmlsRequired())
+            changeLink = Some(routes.ChangingAnswersController.changeAmlsRequired)
           )
         )
       )
@@ -131,7 +131,7 @@ object CheckYourAnswers {
             id = "amls-details-supervisory-body",
             question = Messages("checkAnswers.amlsDetails.supervisoryBody"),
             answerLines = List(details.supervisoryBody),
-            changeLink = Some(routes.ChangingAnswersController.changeAmlsDetails())
+            changeLink = Some(routes.ChangingAnswersController.changeAmlsDetails)
           ),
           AnswerRow(
             id = "amls-details",
@@ -155,7 +155,7 @@ object CheckYourAnswers {
             id = "amlsFileName",
             question = Messages("checkAnswers.amlsFile.title"),
             answerLines = List(formatFileName(fileName)),
-            changeLink = Some(routes.ChangingAnswersController.changeTradingAddressFile())
+            changeLink = Some(routes.ChangingAnswersController.changeTradingAddressFile)
           )
         )
       )
@@ -169,7 +169,7 @@ object CheckYourAnswers {
             id = "name",
             question = Messages("checkAnswers.contactDetails.name"),
             answerLines = List(s"${details.firstName} ${details.lastName}"),
-            changeLink = Some(routes.ChangingAnswersController.changeContactDetails()),
+            changeLink = Some(routes.ChangingAnswersController.changeContactDetails),
             visuallyHiddenText = Some(Messages("checkAnswers.contactDetails.visuallyHiddenText"))
           ),
           AnswerRow(
@@ -205,7 +205,7 @@ object CheckYourAnswers {
               address.addressLine3,
               address.addressLine4,
               Some(countryName)).flatten,
-            changeLink = Some(routes.ChangingAnswersController.changeTradingAddress())
+            changeLink = Some(routes.ChangingAnswersController.changeTradingAddress)
           )
         )
       )
@@ -220,7 +220,7 @@ object CheckYourAnswers {
             id = "tradingAddressFileName",
             question = Messages("checkAnswers.tradingAddressFile.title"),
             answerLines = List(formatFileName(fileName)),
-            Some(routes.ChangingAnswersController.changeTradingAddressFile())
+            Some(routes.ChangingAnswersController.changeTradingAddressFile)
           )
         )
       )
@@ -234,7 +234,7 @@ object CheckYourAnswers {
             id = "tradingName",
             question = Messages("checkAnswers.tradingName.title"),
             answerLines = List(name),
-            changeLink = Some(routes.ChangingAnswersController.changeTradingName())
+            changeLink = Some(routes.ChangingAnswersController.changeTradingName)
           )
         )
       )
@@ -249,7 +249,7 @@ object CheckYourAnswers {
               id = "sa",
               question = Messages("checkAnswers.agentCode.selfAssessment"),
               answerLines = List(sa.value),
-              Some(routes.ChangingAnswersController.changeAgentCodes())
+              Some(routes.ChangingAnswersController.changeAgentCodes)
             )
           }
           val maybeCtRow = session.agentCodes.flatMap(_.corporationTax).map { ct =>
@@ -257,7 +257,7 @@ object CheckYourAnswers {
               id = "ct",
               question = Messages("checkAnswers.agentCode.corporationTax"),
               answerLines = List(ct.value),
-              Some(routes.ChangingAnswersController.changeAgentCodes())
+              Some(routes.ChangingAnswersController.changeAgentCodes)
             )
           }
           List(maybeSaRow, maybeCtRow).flatten
@@ -267,7 +267,7 @@ object CheckYourAnswers {
               id = "agentCodeEmpty",
               question = Messages("checkAnswers.agentCode.title"),
               answerLines = List(Messages("checkAnswers.agentCode.empty")),
-              Some(routes.ChangingAnswersController.changeAgentCodes())
+              Some(routes.ChangingAnswersController.changeAgentCodes)
             ))
         }
       case No => List.empty
@@ -280,7 +280,7 @@ object CheckYourAnswers {
           id = "isRegisteredForTax",
           question = Messages("checkAnswers.registeredForUKTax.title"),
           answerLines = List(isRegisteredForUKTax.value),
-          changeLink = Some(routes.ChangingAnswersController.changeRegisteredForUKTax())
+          changeLink = Some(routes.ChangingAnswersController.changeRegisteredForUKTax)
         )
       )
       val personalDetails = if (isRegisteredForUKTax == Yes) {
@@ -289,7 +289,7 @@ object CheckYourAnswers {
             id = "nino",
             question = Messages("checkAnswers.personalDetails.nino.title"),
             answerLines = List(nino.nino),
-            changeLink = Some(routes.ChangingAnswersController.changePersonalDetails())
+            changeLink = Some(routes.ChangingAnswersController.changePersonalDetails)
           )
         }
         val maybeSaUtrRow = session.personalDetails.flatMap(_.saUtr).map { saUtr =>
@@ -319,9 +319,7 @@ object CheckYourAnswers {
             id = "companyRegNo",
             question = Messages("checkAnswers.companyRegistrationNumber.title"),
             answerLines = List(crn.fold(Messages("checkAnswers.companyRegistrationNumber.empty"))(_.value)),
-            changeLink = Some(
-              routes.ChangingAnswersController
-                .changeCompanyRegistrationNumber())
+            changeLink = Some(routes.ChangingAnswersController.changeCompanyRegistrationNumber)
           )
         }
         .toList
@@ -334,7 +332,7 @@ object CheckYourAnswers {
             taxNumbers.toList.map(_.value)
           case _ => List(Messages("checkAnswers.taxRegistrationNumbers.empty"))
         },
-        changeLink = Some(routes.ChangingAnswersController.changeYourTaxRegistrationNumbers())
+        changeLink = Some(routes.ChangingAnswersController.changeYourTaxRegistrationNumbers)
       )
 
       AnswerGroup(
@@ -343,7 +341,7 @@ object CheckYourAnswers {
             id = "isRegistered",
             question = Messages("checkAnswers.registeredWithHmrc.title"),
             answerLines = List(isRegistered.value),
-            changeLink = Some(routes.ChangingAnswersController.changeRegisteredWithHmrc())
+            changeLink = Some(routes.ChangingAnswersController.changeRegisteredWithHmrc)
           )
         ) ++ agentCodeRows ++ ukRegistrationRows ++ regCompanyNoRows :+ regTaxNoRows
       )
@@ -361,8 +359,7 @@ object CheckYourAnswers {
               id = "trnFileName",
               question = Messages("checkAnswers.taxRegistrationNumbersFile.title"),
               answerLines = List(formatFileName(fileName)),
-              changeLink = Some(routes.ChangingAnswersController
-                .changeYourTaxRegistrationNumbersFile())
+              changeLink = Some(routes.ChangingAnswersController.changeYourTaxRegistrationNumbersFile)
             )
           )
         )

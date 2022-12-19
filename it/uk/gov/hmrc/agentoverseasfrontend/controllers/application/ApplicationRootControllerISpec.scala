@@ -39,7 +39,7 @@ class ApplicationRootControllerISpec extends BaseISpec with AgentOverseasApplica
       val result = controller.root(basicRequest(FakeRequest()))
 
       status(result) shouldBe 303
-      redirectLocation(result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      redirectLocation(result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
     }
   }
 
@@ -84,7 +84,7 @@ class ApplicationRootControllerISpec extends BaseISpec with AgentOverseasApplica
 
       val result = controller.applicationStatus(basicRequest(FakeRequest()))
 
-      redirectLocation(result).get shouldBe routes.ApplicationRootController.root().url
+      redirectLocation(result).get shouldBe routes.ApplicationRootController.root.url
     }
   }
 
@@ -101,7 +101,7 @@ class ApplicationRootControllerISpec extends BaseISpec with AgentOverseasApplica
       result.futureValue should containSubstrings(htmlEscapedMessage("statusRejected.para1", stubMatchingTradingName),
         htmlMessage("statusRejected.para2", s"<strong class=bold-small>$stubMatchingEmail</strong>"))
 
-      result.futureValue should containLink("statusRejected.link.text", routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url)
+      result.futureValue should containLink("statusRejected.link.text", routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
     }
   }
 

@@ -16,44 +16,48 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.repositories
 
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
+import org.mongodb.scala.model.Indexes.ascending
+
 import javax.inject.{Inject, Singleton}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
-import uk.gov.hmrc.mongo.ReactiveRepository
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
+import scala.concurrent.duration.SECONDS
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionDetailsRepository @Inject()(mongoComponent: ReactiveMongoComponent)
-    extends ReactiveRepository[SessionDetails, BSONObjectID](
-      "session-details",
-      mongoComponent.mongoConnector.db,
-      SessionDetails.format,
-      ReactiveMongoFormats.objectIdFormats) {
-
-  override def indexes: Seq[Index] =
-    Seq(
-      Index(key = Seq("id" -> IndexType.Ascending), name = Some("idUnique"), unique = true),
-      Index(
-        key = Seq("createdDate" -> IndexType.Ascending),
-        name = Some("createDate"),
-        unique = false,
-        options = BSONDocument("expireAfterSeconds" -> 900)
+class SessionDetailsRepository @Inject()(mongoComponent: MongoComponent)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[SessionDetails](
+      mongoComponent = mongoComponent,
+      collectionName = "session-details",
+      domainFormat = SessionDetails.format,
+      indexes = Seq(
+        IndexModel(ascending("id"), IndexOptions().name("idUnique").unique(true)),
+        IndexModel(ascending("createdDate"), IndexOptions().name("createDate").unique(false).expireAfter(900, SECONDS))
       )
-    )
+    ) {
 
-  def findAuthProviderId(id: SessionDetailsId)(implicit ec: ExecutionContext): Future[Option[String]] =
-    find("id" -> id).map(_.headOption.map(_.authProviderId))
+  def findAuthProviderId(id: SessionDetailsId): Future[Option[String]] =
+    collection
+      .find(Filters.equal("id", id))
+      .headOption()
+      .map(_.map(_.authProviderId))
 
-  def create(authProviderId: String)(implicit ec: ExecutionContext): Future[SessionDetailsId] = {
+  def create(authProviderId: String): Future[SessionDetailsId] = {
     val record = SessionDetails(authProviderId)
-    insert(record).map(_ => record.id)
+    collection
+      .insertOne(record)
+      .toFuture()
+      .map(_ => record.id)
   }
 
-  def delete(id: SessionDetailsId)(implicit ec: ExecutionContext): Future[Unit] =
-    remove("id" -> id).map(_ => ())
+  def delete(id: SessionDetailsId): Future[Unit] =
+    collection
+      .deleteOne(Filters.equal("id", id))
+      .toFuture()
+      .map(_ => ())
+
 }

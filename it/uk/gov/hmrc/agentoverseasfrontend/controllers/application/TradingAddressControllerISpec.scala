@@ -44,7 +44,7 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
         "mainBusinessAddress.caption",
         "mainBusinessAddress.title"
       )
-      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
+      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers.url)
     }
 
     "redirect to /money-laundering-registration when session not found" in {
@@ -55,7 +55,7 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
 
       status(result) shouldBe 303
 
-      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url)
+      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
     }
   }
 
@@ -63,13 +63,13 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
     "submit form and then redirect to trading-address-upload page" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("addressLine1" -> "line1", "addressLine2" -> "line2", "countryCode" -> "IE")
 
       val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.FileUploadController.showTradingAddressUploadForm().url
+      header(LOCATION, result).get shouldBe routes.FileUploadController.showTradingAddressUploadForm.url
 
       val tradingAddress = sessionStoreService.fetchAgentSession.futureValue.get.overseasAddress
 
@@ -80,13 +80,13 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("addressLine1" -> "line1", "addressLine2" -> "line2", "countryCode" -> "IE")
 
       val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
@@ -101,7 +101,7 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
         sessionStoreService.currentSession.agentSession =
           Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
-        implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+        implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody("addressLine1" -> "", "addressLine2" -> "line2", "countryCode" -> "IE")
 
         val result = controller.submitMainBusinessAddress(authenticatedRequest)
@@ -114,7 +114,7 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
         sessionStoreService.currentSession.agentSession =
           Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
-        implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+        implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody("addressLine1" -> "Some address", "addressLine2" -> "line2", "countryCode" -> "GB")
 
         val result = controller.submitMainBusinessAddress(authenticatedRequest)

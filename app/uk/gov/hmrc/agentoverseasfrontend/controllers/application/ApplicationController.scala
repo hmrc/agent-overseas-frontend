@@ -69,9 +69,9 @@ class ApplicationController @Inject()(
       } else {
         val backLink =
           if (agentSession.amlsRequired.getOrElse(false))
-            routes.FileUploadController.showSuccessfulUploadedForm()
+            routes.FileUploadController.showSuccessfulUploadedForm
           else
-            routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired()
+            routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
         Ok(contactDetailsView(agentSession.contactDetails.fold(form)(form.fill), Some(backLink.url)))
       }
     }
@@ -79,8 +79,7 @@ class ApplicationController @Inject()(
 
   def submitContactDetails: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
-      ContactDetailsForm.form
-        .bindFromRequest()
+      ContactDetailsForm.form.bindFromRequest
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -91,7 +90,7 @@ class ApplicationController @Inject()(
           },
           validForm => {
             updateSession(agentSession.copy(contactDetails = Some(validForm)))(
-              routes.ApplicationController.showTradingNameForm().url)
+              routes.ApplicationController.showTradingNameForm.url)
           }
         )
     }
@@ -110,8 +109,7 @@ class ApplicationController @Inject()(
 
   def submitTradingName: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      TradingNameForm.form
-        .bindFromRequest()
+      TradingNameForm.form.bindFromRequest
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -122,7 +120,7 @@ class ApplicationController @Inject()(
           },
           validForm =>
             updateSession(agentSession.copy(tradingName = Some(validForm)))(
-              routes.TradingAddressController.showMainBusinessAddressForm().url)
+              routes.TradingAddressController.showMainBusinessAddressForm.url)
         )
     }
   }
@@ -143,16 +141,15 @@ class ApplicationController @Inject()(
 
   def submitRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      registeredWithHmrcForm
-        .bindFromRequest()
+      registeredWithHmrcForm.bindFromRequest
         .fold(
           formWithErrors => Ok(registeredWithHmrcView(formWithErrors)),
           validFormValue => {
             val newValue = YesNo(validFormValue)
             val redirectTo =
               if (Yes == newValue)
-                routes.ApplicationController.showAgentCodesForm().url
-              else routes.ApplicationController.showUkTaxRegistrationForm().url
+                routes.ApplicationController.showAgentCodesForm.url
+              else routes.ApplicationController.showUkTaxRegistrationForm.url
             val toUpdate =
               agentSession.copy(registeredWithHmrc = Some(newValue))
             if (agentSession.changingAnswers) {
@@ -188,8 +185,7 @@ class ApplicationController @Inject()(
 
   def submitAgentCodes: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      AgentCodesForm.form
-        .bindFromRequest()
+      AgentCodesForm.form.bindFromRequest
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -200,7 +196,7 @@ class ApplicationController @Inject()(
           },
           validFormValue => {
             updateSession(agentSession.copy(agentCodes = Some(validFormValue), changingAnswers = false))(
-              routes.ApplicationController.showUkTaxRegistrationForm().url)
+              routes.ApplicationController.showUkTaxRegistrationForm.url)
           }
         )
     }
@@ -225,8 +221,7 @@ class ApplicationController @Inject()(
 
   def submitUkTaxRegistration: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      registeredForUkTaxForm
-        .bindFromRequest()
+      registeredForUkTaxForm.bindFromRequest
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -239,11 +234,9 @@ class ApplicationController @Inject()(
             val newValue = YesNo(validFormValue)
             val redirectTo =
               if (Yes == newValue)
-                routes.ApplicationController.showPersonalDetailsForm().url
+                routes.ApplicationController.showPersonalDetailsForm.url
               else
-                routes.ApplicationController
-                  .showCompanyRegistrationNumberForm()
-                  .url
+                routes.ApplicationController.showCompanyRegistrationNumberForm.url
             val toUpdate =
               agentSession.copy(registeredForUkTax = Some(newValue))
 
@@ -252,7 +245,7 @@ class ApplicationController @Inject()(
                 case Some(oldValue) =>
                   if (oldValue == newValue) {
                     updateSession(agentSession.copy(changingAnswers = false))(
-                      routes.ApplicationController.showCheckYourAnswers().url)
+                      routes.ApplicationController.showCheckYourAnswers.url)
                   } else {
                     updateSession(toUpdate.copy(changingAnswers = false))(redirectTo)
                   }
@@ -280,8 +273,7 @@ class ApplicationController @Inject()(
 
   def submitPersonalDetails: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
-      PersonalDetailsForm.form
-        .bindFromRequest()
+      PersonalDetailsForm.form.bindFromRequest
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -292,9 +284,7 @@ class ApplicationController @Inject()(
           },
           validForm => {
             updateSession(agentSession.copy(personalDetails = Some(validForm)))(
-              routes.ApplicationController
-                .showCompanyRegistrationNumberForm()
-                .url)
+              routes.ApplicationController.showCompanyRegistrationNumberForm.url)
           }
         )
     }
@@ -314,8 +304,7 @@ class ApplicationController @Inject()(
 
   def submitCompanyRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      CompanyRegistrationNumberForm.form
-        .bindFromRequest()
+      CompanyRegistrationNumberForm.form.bindFromRequest
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -326,7 +315,7 @@ class ApplicationController @Inject()(
           },
           validFormValue => {
             updateSession(agentSession.copy(companyRegistrationNumber = Some(validFormValue)))(
-              routes.TaxRegController.showTaxRegistrationNumberForm().url)
+              routes.TaxRegController.showTaxRegistrationNumberForm.url)
           }
         )
     }
@@ -345,9 +334,7 @@ class ApplicationController @Inject()(
       sessionStoreService.fetchAgentSession
         .map(lookupNextPage)
         .map { call =>
-          if (call == routes.ApplicationController
-                .showCheckYourAnswers() || call == routes.TaxRegController
-                .showYourTaxRegNumbersForm()) {
+          if (call == routes.ApplicationController.showCheckYourAnswers || call == routes.TaxRegController.showYourTaxRegNumbersForm) {
 
             sessionStoreService.cacheAgentSession(agentSession.copy(changingAnswers = false))
             Ok(cyaView(CheckYourAnswers.form, CheckYourAnswers(agentSession, getCountryName(agentSession))))
@@ -358,8 +345,7 @@ class ApplicationController @Inject()(
 
   def submitCheckYourAnswers: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      CheckYourAnswers.form
-        .bindFromRequest()
+      CheckYourAnswers.form.bindFromRequest
         .fold(
           formWithErrors => {
             BadRequest(
@@ -371,7 +357,7 @@ class ApplicationController @Inject()(
               _ <- applicationService.createApplication(agentSession)
               _ <- sessionStoreService.removeAgentSession
             } yield
-              Redirect(routes.ApplicationController.showApplicationComplete())
+              Redirect(routes.ApplicationController.showApplicationComplete)
                 .flashing(
                   "tradingName" -> agentSession.tradingName
                     .getOrElse(""),
@@ -391,12 +377,12 @@ class ApplicationController @Inject()(
       if (tradingName.isDefined && contactDetail.isDefined)
         Ok(applicationCompleteView(tradingName.get, contactDetail.get, appConfig.guidancePageApplicationUrl))
       else
-        Redirect(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm())
+        Redirect(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm)
     }
   }
 
   def showEmailLocked: Action[AnyContent] = Action { implicit request =>
-    Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm()))
+    Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm))
   }
 
   def showEmailTechnicalError: Action[AnyContent] = Action { implicit request =>
@@ -406,16 +392,16 @@ class ApplicationController @Inject()(
   private def ukTaxRegistrationBackLink(session: AgentSession) =
     Some(session) match {
       case IsRegisteredWithHmrc(Yes) =>
-        routes.ApplicationController.showAgentCodesForm()
+        routes.ApplicationController.showAgentCodesForm
       case IsRegisteredWithHmrc(No) =>
-        routes.ApplicationController.showRegisteredWithHmrcForm()
+        routes.ApplicationController.showRegisteredWithHmrcForm
     }
 
   private def companyRegNumberBackLink(session: AgentSession) =
     Some(session) match {
       case IsRegisteredForUkTax(Yes) =>
-        routes.ApplicationController.showPersonalDetailsForm().url
+        routes.ApplicationController.showPersonalDetailsForm.url
       case IsRegisteredForUkTax(No) =>
-        routes.ApplicationController.showUkTaxRegistrationForm().url
+        routes.ApplicationController.showUkTaxRegistrationForm.url
     }
 }

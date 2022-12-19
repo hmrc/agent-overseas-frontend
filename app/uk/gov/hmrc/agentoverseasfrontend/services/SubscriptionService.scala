@@ -83,10 +83,10 @@ class SubscriptionService @Inject()(
       apps.sortBy(_.createdDate).lastOption
     }
 
-  def authProviderId(detailsId: SessionDetailsId)(implicit ec: ExecutionContext): Future[Option[String]] =
+  def authProviderId(detailsId: SessionDetailsId): Future[Option[String]] =
     repository.findAuthProviderId(detailsId)
 
-  def storeSessionDetails(authProviderId: String)(implicit ec: ExecutionContext): Future[SessionDetailsId] =
+  def storeSessionDetails(authProviderId: String): Future[SessionDetailsId] =
     repository.create(authProviderId)
 
   def updateAuthProviderId(

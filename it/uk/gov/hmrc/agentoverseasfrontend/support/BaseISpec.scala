@@ -5,9 +5,9 @@ import com.google.inject.AbstractModule
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.{Assertion, OptionValues}
 import org.scalatest.matchers.{MatchResult, Matcher}
 import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{Assertion, OptionValues}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
@@ -20,13 +20,23 @@ import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
 import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AuthStubs, DataStreamStubs}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.test.MongoSupport
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class BaseISpec extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures with GuiceOneAppPerSuite with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport with DefaultAwaitTimeout {
+class BaseISpec extends AnyWordSpecLike
+  with Matchers
+  with OptionValues
+  with ScalaFutures
+  with GuiceOneAppPerSuite
+  with WireMockSupport
+  with AuthStubs
+  with DataStreamStubs
+  with MetricsTestSupport
+  with DefaultAwaitTimeout
+  with MongoSupport {
 
    implicit val timeout =  Timeout(5.seconds)
 
@@ -53,7 +63,9 @@ class BaseISpec extends AnyWordSpecLike with Matchers with OptionValues with Sca
         "metrics.enabled" -> true,
         "auditing.enabled" -> true,
         "auditing.consumer.baseUri.host" -> wireMockHost,
-        "auditing.consumer.baseUri.port" -> wireMockPort)
+        "auditing.consumer.baseUri.port" -> wireMockPort,
+        "mongodb.uri" -> mongoUri
+      )
       .overrides(new TestGuiceModule)
   }
 
@@ -76,7 +88,7 @@ class BaseISpec extends AnyWordSpecLike with Matchers with OptionValues with Sca
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     sessionStoreService.clear()
-    sessionDetailsRepo.drop(global)
+    sessionDetailsRepo.collection.drop()
     ()
   }
 

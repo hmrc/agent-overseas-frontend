@@ -118,29 +118,29 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "read the form and redirect to /registered-with-hmrc page if the user selects Yes" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address","choice.correctFile" -> "true"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address","choice.correctFile" -> "true"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.ApplicationController.showRegisteredWithHmrcForm().url)
+      redirectLocation(result) shouldBe Some(routes.ApplicationController.showRegisteredWithHmrcForm.url)
     }
 
     "read the form and redirect to /upload-proof-trading-address page if the user selects No" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "false"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "false"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.FileUploadController.showTradingAddressUploadForm().url)
+      redirectLocation(result) shouldBe Some(routes.FileUploadController.showTradingAddressUploadForm.url)
     }
 
     "show the form with errors when invalid value for 'correctFile' is passed in the form" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingAddressUploadStatus = Some(FileUploadStatus("reference","READY",Some("filename")))))
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "abcd"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "abcd"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
@@ -159,7 +159,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "show the form with errors when 'correctFile' field is missing the form" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingAddressUploadStatus = Some(FileUploadStatus("reference","READY",Some("filename")))))
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctabxgd" -> "true"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctabxgd" -> "true"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
@@ -178,7 +178,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "show the form with errors when 'fileType' field has been modified by the user and contains invalid value" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingAddressUploadStatus = Some(FileUploadStatus("reference","READY",Some("filename")))))
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "invalid", "choice.correctFile" -> "true"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "invalid", "choice.correctFile" -> "true"))
 
       val e = controller.submitSuccessfulFileUploadedForm(request).failed.futureValue
       e shouldBe a[RuntimeException]
@@ -205,7 +205,7 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
         "fileUpload.failed.try-again.label"
       )
 
-      val tradingAddressUploadFormUrl = routes.FileUploadController.showTradingAddressUploadForm().url
+      val tradingAddressUploadFormUrl = routes.FileUploadController.showTradingAddressUploadForm.url
 
       val doc = Jsoup.parse(contentAsString(result))
       val tryAgainLink = doc.getElementById("file-upload-failed")
@@ -244,23 +244,23 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "read the form and redirect to /contact-details page if the user selects Yes" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "true"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "true"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.ApplicationController.showContactDetailsForm().url)
+      redirectLocation(result) shouldBe Some(routes.ApplicationController.showContactDetailsForm.url)
     }
 
     "read the form and redirect to /upload-proof-anti-money-laundering-registration page if the user selects No" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "false"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "false"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.FileUploadController.showAmlsUploadForm().url)
+      redirectLocation(result) shouldBe Some(routes.FileUploadController.showAmlsUploadForm.url)
     }
   }
 
@@ -292,23 +292,23 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "read the form and redirect to /check-your-answers page if the user selects Yes" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trn","choice.correctFile" -> "true"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trn","choice.correctFile" -> "true"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.ApplicationController.showCheckYourAnswers().url)
+      redirectLocation(result) shouldBe Some(routes.ApplicationController.showCheckYourAnswers.url)
     }
 
     "read the form and redirect to /upload-proof-tax-registration-number page if the user selects No" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession)
 
-      val request = cleanCredsAgent(FakeRequest().withFormUrlEncodedBody("fileType" -> "trn", "choice.correctFile" -> "false"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trn", "choice.correctFile" -> "false"))
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.FileUploadController.showTrnUploadForm().url)
+      redirectLocation(result) shouldBe Some(routes.FileUploadController.showTrnUploadForm.url)
     }
   }
 }

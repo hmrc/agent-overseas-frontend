@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import play.api.test.Helpers.GET
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 import uk.gov.hmrc.http.SessionKeys
 
@@ -14,9 +15,9 @@ trait AuthStubs {
 
   def authorisedAsValidAgent[A](request: FakeRequest[A], arn: String) = authenticated(request, Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn), isAgent = true)
 
-  protected def authenticatedAs(user: SampleUser): FakeRequest[AnyContentAsEmpty.type] = {
+  protected def authenticatedAs(user: SampleUser, method: String = GET): FakeRequest[AnyContentAsEmpty.type] = {
     userIsAuthenticated(user)
-    FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
+    FakeRequest(method, "/").withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
 
   def authenticated[A](request: FakeRequest[A], enrolment: Enrolment, isAgent: Boolean): FakeRequest[A] = {

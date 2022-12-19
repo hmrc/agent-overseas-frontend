@@ -46,7 +46,7 @@
 
 @(businessNameCheckForm: Form[RadioConfirm], businessName: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = msgs("contactTradingNameCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
+@mainTemplate(title = msgs("contactTradingNameCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 
   @if(businessNameCheckForm.hasErrors) {
       @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessNameCheckForm))

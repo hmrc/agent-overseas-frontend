@@ -7,14 +7,14 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, FileUploadStatus, OverseasAddress}
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AuthStubs, DataStreamStubs}
-import uk.gov.hmrc.agentoverseasfrontend.support.{BaseISpec, MetricsTestSupport, MongoApp, WireMockSupport}
+import uk.gov.hmrc.agentoverseasfrontend.support.{BaseISpec, MetricsTestSupport, WireMockSupport}
 import uk.gov.hmrc.http._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AgentOverseasApplicationConnectorISpec
     extends BaseISpec with AgentOverseasApplicationStubs with WsScalaTestClient
-    with ScalaFutures with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport with MongoApp {
+    with ScalaFutures with WireMockSupport with AuthStubs with DataStreamStubs with MetricsTestSupport {
 
   private lazy val metrics = app.injector.instanceOf[Metrics]
   private lazy val http = app.injector.instanceOf[HttpClient]

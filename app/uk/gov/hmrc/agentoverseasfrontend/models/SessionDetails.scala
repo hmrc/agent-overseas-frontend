@@ -17,16 +17,16 @@
 package uk.gov.hmrc.agentoverseasfrontend.models
 
 import java.util.UUID
-
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 case class SessionDetails(
   id: SessionDetailsId,
   authProviderId: String,
-  createdDate: DateTime = DateTime.now(DateTimeZone.UTC))
+  createdDate: LocalDateTime = Instant.now().atZone(ZoneOffset.UTC).toLocalDateTime)
 
 object SessionDetails {
   type SessionDetailsId = String
@@ -36,6 +36,6 @@ object SessionDetails {
     SessionDetails(id, authProviderId)
   }
 
-  implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
+  implicit val localDateTimeFormats = MongoJavatimeFormats.localDateTimeFormat
   implicit val format = Json.format[SessionDetails]
 }

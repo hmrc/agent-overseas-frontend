@@ -73,7 +73,7 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
 
     case _: UnsupportedAffinityGroup =>
       logger.warn(s"user logged in with unsupported affinity group")
-      Redirect(application.routes.ApplicationRootController.showNotAgent())
+      Redirect(application.routes.ApplicationRootController.showNotAgent)
   }
 
   private def getString(key: String): String = config.underlying.getString(key)

@@ -85,7 +85,7 @@ class TaxRegController @Inject()(
                     taxRegistrationNumbers = validForm.value.flatMap(taxId => Some(SortedSet(taxId))),
                     hasTrnsChanged = validForm.value.isDefined
                   ),
-                  routes.TaxRegController.showYourTaxRegNumbersForm().url)
+                  routes.TaxRegController.showYourTaxRegNumbersForm.url)
               } else {
                 (
                   agentSession.copy(
@@ -94,7 +94,7 @@ class TaxRegController @Inject()(
                     trnUploadStatus = None,
                     hasTrnsChanged = false
                   ),
-                  routes.TaxRegController.showMoreInformationNeeded().url)
+                  routes.TaxRegController.showMoreInformationNeeded.url)
               }
 
             updateSession(updatedSession)(redirectLink)
@@ -132,7 +132,7 @@ class TaxRegController @Inject()(
                   taxRegistrationNumbers = Some(trns),
                   hasTaxRegNumbers = Some(true),
                   changingAnswers = false,
-                  hasTrnsChanged = true))(routes.TaxRegController.showYourTaxRegNumbersForm().url)
+                  hasTrnsChanged = true))(routes.TaxRegController.showYourTaxRegNumbersForm.url)
           }
         )
     }
@@ -172,14 +172,14 @@ class TaxRegController @Inject()(
           validForm => {
             validForm.value match {
               case Some(true) =>
-                Redirect(routes.TaxRegController.showAddTaxRegNoForm().url)
+                Redirect(routes.TaxRegController.showAddTaxRegNoForm.url)
               case _ =>
                 if (agentSession.hasTrnsChanged) {
                   updateSession(agentSession.copy(trnUploadStatus = None, hasTrnsChanged = false))(
-                    routes.FileUploadController.showTrnUploadForm().url)
+                    routes.FileUploadController.showTrnUploadForm.url)
                 } else {
                   updateSession(agentSession.copy(hasTrnsChanged = false))(
-                    routes.ApplicationController.showCheckYourAnswers().url)
+                    routes.ApplicationController.showCheckYourAnswers.url)
                 }
             }
           }
@@ -211,7 +211,7 @@ class TaxRegController @Inject()(
 
                 updateSession(agentSession
                   .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true))(
-                  routes.TaxRegController.showYourTaxRegNumbersForm().url)
+                  routes.TaxRegController.showYourTaxRegNumbersForm.url)
 
               case None =>
                 Ok(updateTrnView(UpdateTrnForm.form.fill(validForm.copy(updated = Some(validForm.original)))))
@@ -254,11 +254,11 @@ class TaxRegController @Inject()(
 
               val redirectUrl =
                 if (updatedSet.nonEmpty)
-                  routes.TaxRegController.showYourTaxRegNumbersForm().url
-                else routes.TaxRegController.showTaxRegistrationNumberForm().url
+                  routes.TaxRegController.showYourTaxRegNumbersForm.url
+                else routes.TaxRegController.showTaxRegistrationNumberForm.url
               updateSession(toUpdate)(redirectUrl)
             } else {
-              Redirect(routes.TaxRegController.showYourTaxRegNumbersForm())
+              Redirect(routes.TaxRegController.showYourTaxRegNumbersForm)
             }
           }
         )

@@ -65,7 +65,7 @@ class ApplicationAuth @Inject()(
           else
             sessionStoreService.fetchAgentSession.flatMap {
               case Some(agentSession) if checkForEmailVerification && agentSession.emailNeedsVerifying =>
-                Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail()))
+                Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail))
               case Some(agentSession) =>
                 body(credentials, agentSession)
               case None =>

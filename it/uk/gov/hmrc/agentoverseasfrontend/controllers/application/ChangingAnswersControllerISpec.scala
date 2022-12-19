@@ -27,7 +27,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
     "update session with changingAnswers=true and redirect to money-laundering form" in new SetUp {
 
       val result = controller.changeAmlsDetails(authenticatedRequest)
-      verify(result, routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm().url)
+      verify(result, routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
     }
   }
 
@@ -37,7 +37,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changeContactDetails(authenticatedRequest)
 
-      verify(result, routes.ApplicationController.showContactDetailsForm().url)
+      verify(result, routes.ApplicationController.showContactDetailsForm.url)
     }
   }
 
@@ -47,7 +47,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changeTradingName(authenticatedRequest)
 
-      verify(result, routes.ApplicationController.showTradingNameForm().url)
+      verify(result, routes.ApplicationController.showTradingNameForm.url)
     }
   }
 
@@ -57,7 +57,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changeTradingAddress(authenticatedRequest)
 
-      verify(result, routes.TradingAddressController.showMainBusinessAddressForm().url)
+      verify(result, routes.TradingAddressController.showMainBusinessAddressForm.url)
     }
   }
 
@@ -67,7 +67,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changeTradingAddressFile(authenticatedRequest)
 
-      verify(result, routes.FileUploadController.showTradingAddressUploadForm().url)
+      verify(result, routes.FileUploadController.showTradingAddressUploadForm.url)
     }
   }
 
@@ -77,7 +77,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changeRegisteredWithHmrc(authenticatedRequest)
 
-      verify(result, routes.ApplicationController.showRegisteredWithHmrcForm().url)
+      verify(result, routes.ApplicationController.showRegisteredWithHmrcForm.url)
     }
   }
 
@@ -87,7 +87,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changeAgentCodes(authenticatedRequest)
 
-      verify(result, routes.ApplicationController.showAgentCodesForm().url)
+      verify(result, routes.ApplicationController.showAgentCodesForm.url)
     }
   }
 
@@ -97,7 +97,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changeRegisteredForUKTax(authenticatedRequest)
 
-      verify(result, routes.ApplicationController.showUkTaxRegistrationForm().url)
+      verify(result, routes.ApplicationController.showUkTaxRegistrationForm.url)
     }
   }
 
@@ -107,7 +107,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
 
       val result = controller.changePersonalDetails(authenticatedRequest)
 
-      verify(result, routes.ApplicationController.showPersonalDetailsForm().url)
+      verify(result, routes.ApplicationController.showPersonalDetailsForm.url)
     }
   }
 
@@ -116,7 +116,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
     "update session with changingAnswers=true and redirect to company-reg-number form" in new SetUp {
       val result = controller.changeCompanyRegistrationNumber(authenticatedRequest)
 
-      verify(result, routes.ApplicationController.showCompanyRegistrationNumberForm().url)
+      verify(result, routes.ApplicationController.showCompanyRegistrationNumberForm.url)
     }
   }
 
@@ -125,7 +125,7 @@ class ChangingAnswersControllerISpec extends BaseISpec {
     "update session with changingAnswers=true and redirect to your-tax-registration-numbers form" in new SetUp {
       val result = controller.changeYourTaxRegistrationNumbers(authenticatedRequest)
 
-      verify(result, routes.TaxRegController.showYourTaxRegNumbersForm().url)
+      verify(result, routes.TaxRegController.showYourTaxRegNumbersForm.url)
     }
   }
 
