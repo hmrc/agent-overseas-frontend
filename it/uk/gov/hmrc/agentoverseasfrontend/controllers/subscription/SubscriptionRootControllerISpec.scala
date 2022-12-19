@@ -17,7 +17,7 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
     "303 to start of journey: showCheckAnswers" in {
       val result = controller.root(authenticatedAs(subscribingCleanAgentWithoutEnrolments))
       status(result) shouldBe 303
-      redirectLocation(result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      redirectLocation(result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
   }
 

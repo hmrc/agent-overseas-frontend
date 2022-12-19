@@ -70,7 +70,7 @@ class SubscriptionSignOutController @Inject()(
 
   def signOut: Action[AnyContent] = Action.async { implicit request =>
     withBasicAgentAuth { subRequest =>
-      Future.successful(SeeOther(routes.SubscriptionRootController.root().url).withNewSession)
+      Future.successful(SeeOther(routes.SubscriptionRootController.root.url).withNewSession)
     }
   }
 
@@ -83,7 +83,7 @@ class SubscriptionSignOutController @Inject()(
   }
 
   def signedOut = Action.async { implicit request =>
-    val continueUrl = CallOps.addParamsToUrl(routes.SubscriptionRootController.root().url)
+    val continueUrl = CallOps.addParamsToUrl(routes.SubscriptionRootController.root.url)
     Future successful Forbidden(signedOutView(continueUrl)).withNewSession
   }
 }

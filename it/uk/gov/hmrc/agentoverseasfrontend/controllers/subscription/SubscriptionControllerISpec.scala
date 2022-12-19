@@ -31,7 +31,7 @@ class SubscriptionControllerISpec
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.SubscriptionController.subscriptionComplete().url
+      header(LOCATION, result).get shouldBe routes.SubscriptionController.subscriptionComplete.url
     }
 
     "redirect to /check-answers if there's no agency details in the session" in {
@@ -41,7 +41,7 @@ class SubscriptionControllerISpec
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
     "redirect to /next-steps if user has unclean credentials (they have 1 or more enrolments)" in {
@@ -49,7 +49,7 @@ class SubscriptionControllerISpec
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.SubscriptionRootController.nextStep().url
+      header(LOCATION, result).get shouldBe routes.SubscriptionRootController.nextStep.url
     }
 
     "redirect to /already-subscribed if the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group" in {
@@ -60,7 +60,7 @@ class SubscriptionControllerISpec
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.SubscriptionController.alreadySubscribed().url
+      header(LOCATION, result).get shouldBe routes.SubscriptionController.alreadySubscribed.url
     }
   }
 
@@ -121,7 +121,7 @@ class SubscriptionControllerISpec
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail().url
+      redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail.url
     }
   }
 

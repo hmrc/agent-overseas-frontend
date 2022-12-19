@@ -44,7 +44,7 @@
 
 @(businessNameForm: Form[BusinessNameForm])(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(businessNameForm) + msgs("updateBusinessName.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
+@mainTemplate(title = errorPrefix(businessNameForm) + msgs("updateBusinessName.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 
     @if(businessNameForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessNameForm))
@@ -52,7 +52,7 @@
 
     @h1("updateBusinessName.title")
 
-    @formWithCsrf(action = routes.BusinessIdentificationController.submitUpdateBusinessNameForm()) {
+    @formWithCsrf(action = routes.BusinessIdentificationController.submitUpdateBusinessNameForm) {
 
         @govukInput(Input(
             hint = Some(Hint(content = Text(msgs("updateBusinessName.description")))),

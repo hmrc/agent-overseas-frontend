@@ -66,14 +66,14 @@ class SubscriptionEmailVerificationController @Inject()(
     sessionStoreService.cacheAgencyDetails(newAgencyDetails).map(_ => newAgencyDetails)
   }
 
-  override def selfRoute: Call = routes.SubscriptionEmailVerificationController.verifyEmail()
+  override def selfRoute: Call = routes.SubscriptionEmailVerificationController.verifyEmail
   override def redirectUrlIfVerified(session: AgencyDetails): Call =
-    routes.BusinessIdentificationController.showCheckAnswers()
-  override def redirectUrlIfLocked(session: AgencyDetails): Call = routes.SubscriptionController.showEmailLocked()
+    routes.BusinessIdentificationController.showCheckAnswers
+  override def redirectUrlIfLocked(session: AgencyDetails): Call = routes.SubscriptionController.showEmailLocked
   override def redirectUrlIfError(session: AgencyDetails): Call =
-    routes.SubscriptionController.showEmailTechnicalError()
+    routes.SubscriptionController.showEmailTechnicalError
   override def backLinkUrl(session: AgencyDetails): Option[Call] =
-    Some(routes.BusinessIdentificationController.showCheckBusinessEmail())
+    Some(routes.BusinessIdentificationController.showCheckBusinessEmail)
   override def enterEmailUrl(session: AgencyDetails): Call =
-    routes.BusinessIdentificationController.showCheckBusinessEmail()
+    routes.BusinessIdentificationController.showCheckBusinessEmail
 }

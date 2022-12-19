@@ -56,7 +56,7 @@
                 key = Key(Text(msgs("subscription.checkAnswers.businessEmailAddress.label"))),
                 value = Value(Text(agencyDetails.agencyEmail)),
                 actions = Some(Actions(items = Seq(ActionItem(
-                    href = routes.BusinessIdentificationController.showCheckBusinessEmail().url,
+                    href = routes.BusinessIdentificationController.showCheckBusinessEmail.url,
                     content = Text(msgs("subscription.checkAnswers.change.button")),
                     visuallyHiddenText = Some(msgs("subscription.checkAnswers.businessEmailAddress.label"))
                 ))))
@@ -65,7 +65,7 @@
                 key = Key(Text(msgs("subscription.checkAnswers.businessName.label"))),
                 value = Value(Text(agencyDetails.agencyName)),
                 actions = Some(Actions(items = Seq(ActionItem(
-                    href = routes.BusinessIdentificationController.showCheckBusinessName().url,
+                    href = routes.BusinessIdentificationController.showCheckBusinessName.url,
                     content = Text(msgs("subscription.checkAnswers.change.button")),
                     visuallyHiddenText = Some(msgs("subscription.checkAnswers.businessName.label"))
                 ))))
@@ -80,7 +80,7 @@
                        |${addressCountryName} <br/>
                        |""".stripMargin)),
                 actions = Some(Actions(items = Seq(ActionItem(
-                    href = routes.BusinessIdentificationController.showCheckBusinessAddress().url,
+                    href = routes.BusinessIdentificationController.showCheckBusinessAddress.url,
                     content = Text(msgs("subscription.checkAnswers.change.button")),
                     visuallyHiddenText = Some(msgs("subscription.checkAnswers.businessAddress.label"))
                 ))))
@@ -90,7 +90,7 @@
 
     @p("subscription.checkAnswers.description.p3")
 
-    @formWithCsrf(action = routes.SubscriptionController.subscribe(), 'class -> "form js-form") {
+    @formWithCsrf(action = routes.SubscriptionController.subscribe, 'class -> "form js-form") {
         @submitButton(messageKey = "subscription.checkAnswers.confirm.button")
     }
 }

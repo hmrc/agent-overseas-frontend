@@ -53,19 +53,19 @@ class SubscriptionController @Inject()(
       if (subRequest.enrolments.isEmpty) {
         sessionStoreService.fetchAgencyDetails.flatMap {
           case Some(agencyDetails) if !agencyDetails.emailVerified =>
-            Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail()))
+            Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
           case _ =>
             subscriptionService.subscribe.map {
               case Right(_) =>
-                Redirect(routes.SubscriptionController.subscriptionComplete())
+                Redirect(routes.SubscriptionController.subscriptionComplete)
               case Left(NoApplications) =>
                 logger.info("User has no known applications, redirecting to application frontend")
                 Redirect(s"${appConfig.agentOverseasFrontendUrl}/create-account")
               case Left(NoAgencyInSession) =>
                 logger.info("No agency details in session, redirecting to /check-answers")
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers())
+                Redirect(routes.BusinessIdentificationController.showCheckAnswers)
               case Left(AlreadySubscribed) =>
-                Redirect(routes.SubscriptionController.alreadySubscribed())
+                Redirect(routes.SubscriptionController.alreadySubscribed)
               case Left(WrongApplicationStatus) =>
                 throw new IllegalStateException(
                   "Can not proceed with application - can not subscribe with an application in this status")
@@ -73,7 +73,7 @@ class SubscriptionController @Inject()(
         }
       } else {
         logger.info("User has other enrolments, redirecting to /next-step")
-        Future.successful(Redirect(routes.SubscriptionRootController.nextStep()))
+        Future.successful(Redirect(routes.SubscriptionRootController.nextStep))
       }
     }
   }
@@ -103,7 +103,7 @@ class SubscriptionController @Inject()(
   }
 
   def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm())))
+    Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm)))
   }
 
   def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>

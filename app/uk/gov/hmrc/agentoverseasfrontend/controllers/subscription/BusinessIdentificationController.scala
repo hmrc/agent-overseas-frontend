@@ -60,7 +60,7 @@ class BusinessIdentificationController @Inject()(
     withSubscribingAgent { overseasApplication =>
       withAgencyDetailsOrWithNewDefaults(overseasApplication).map { agencyDetails =>
         if (!agencyDetails.emailVerified) {
-          Redirect(routes.SubscriptionEmailVerificationController.verifyEmail())
+          Redirect(routes.SubscriptionEmailVerificationController.verifyEmail)
         } else {
           val countryCode = agencyDetails.agencyAddress.countryCode
           val countryName = countries.getOrElse(
@@ -103,7 +103,7 @@ class BusinessIdentificationController @Inject()(
             validForm => {
               val useCurrentAddress = validForm.value
               if (useCurrentAddress)
-                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
               else
                 Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessAddressForm))
             }
@@ -142,7 +142,7 @@ class BusinessIdentificationController @Inject()(
               val agencyWithUpdatedAddress = agencyDetails.copy(agencyAddress = updatedAddress)
 
               updateAgencyDetails(agencyWithUpdatedAddress).map(_ =>
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+                Redirect(routes.BusinessIdentificationController.showCheckAnswers))
             }
           )
       }
@@ -168,7 +168,7 @@ class BusinessIdentificationController @Inject()(
             validForm => {
               val useCurrentEmail = validForm.value
               if (useCurrentEmail)
-                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
               else
                 Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessEmailForm))
             }
@@ -197,7 +197,7 @@ class BusinessIdentificationController @Inject()(
               val agencyWithUpdatedEmail = agencyDetails.copy(agencyEmail = validForm.email)
 
               updateAgencyDetails(agencyWithUpdatedEmail).map(_ =>
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+                Redirect(routes.BusinessIdentificationController.showCheckAnswers))
             }
           )
       }
@@ -223,7 +223,7 @@ class BusinessIdentificationController @Inject()(
             validForm => {
               val useCurrentName = validForm.value
               if (useCurrentName)
-                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
               else
                 Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessNameForm))
             }
@@ -252,7 +252,7 @@ class BusinessIdentificationController @Inject()(
               val agencyWithUpdatedName = agencyDetails.copy(agencyName = validForm.name)
 
               updateAgencyDetails(agencyWithUpdatedName).map(_ =>
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+                Redirect(routes.BusinessIdentificationController.showCheckAnswers))
             }
           )
       }
@@ -263,7 +263,7 @@ class BusinessIdentificationController @Inject()(
     withBasicAgentAuth { _ =>
       subscriptionService
         .updateAuthProviderId(sessionId)
-        .map(_ => Redirect(routes.BusinessIdentificationController.showCheckAnswers()))
+        .map(_ => Redirect(routes.BusinessIdentificationController.showCheckAnswers))
     }
   }
 }

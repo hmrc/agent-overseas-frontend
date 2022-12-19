@@ -47,7 +47,7 @@
 
 @(businessAddressCheckForm: Form[RadioConfirm], businessAddress: OverseasAddress, businessAddressCountryName: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
 
-@mainTemplate(title = msgs("contactTradingAddressCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
+@mainTemplate(title = msgs("contactTradingAddressCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 
   @if(businessAddressCheckForm.hasErrors) {
       @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessAddressCheckForm))

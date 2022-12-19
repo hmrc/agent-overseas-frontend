@@ -36,30 +36,30 @@ trait CommonRouting {
   def lookupNextPage(agentSession: Option[AgentSession]): Call =
     agentSession match {
       case MissingAmlsRequired() =>
-        routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired()
+        routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
       case MissingAmlsDetails() =>
-        routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm()
+        routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm
       case MissingAmlsUploadStatus() =>
-        routes.FileUploadController.showAmlsUploadForm()
+        routes.FileUploadController.showAmlsUploadForm
       case MissingContactDetails() =>
-        routes.ApplicationController.showContactDetailsForm()
+        routes.ApplicationController.showContactDetailsForm
       case EmailUnverified() =>
-        routes.ApplicationEmailVerificationController.verifyEmail()
+        routes.ApplicationEmailVerificationController.verifyEmail
       case MissingTradingName() =>
-        routes.ApplicationController.showTradingNameForm()
+        routes.ApplicationController.showTradingNameForm
       case MissingTradingAddress() =>
-        routes.TradingAddressController.showMainBusinessAddressForm()
+        routes.TradingAddressController.showMainBusinessAddressForm
       case MissingTradingAddressUploadStatus() =>
-        routes.FileUploadController.showTradingAddressUploadForm()
+        routes.FileUploadController.showTradingAddressUploadForm
       case MissingRegisteredWithHmrc() =>
-        routes.ApplicationController.showRegisteredWithHmrcForm()
+        routes.ApplicationController.showRegisteredWithHmrcForm
       case IsRegisteredWithHmrc(Yes) =>
         routesFromAgentCodesOnwards(agentSession)
       case IsRegisteredWithHmrc(No) =>
         routesFromUkTaxRegistrationOnwards(agentSession)
 
       case _ =>
-        routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired()
+        routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
     }
 
   def routesIfExistingApplication(
@@ -68,14 +68,14 @@ trait CommonRouting {
       applicationService.getCurrentApplication.map {
         case Some(application) if application.status == Rejected || application.status == Pending => {
           val initialiseSession = application.status == Rejected
-          StatusRouting(routes.ApplicationRootController.applicationStatus(), initialiseSession)
+          StatusRouting(routes.ApplicationRootController.applicationStatus, initialiseSession)
         }
         case Some(application)
             if Set(Accepted, AttemptingRegistration, Registered, Complete)
               .contains(application.status) =>
           StatusRouting(Call(GET, subscriptionRootPath), false)
         case None =>
-          StatusRouting(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired(), true)
+          StatusRouting(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired, true)
       }
 
     for {
@@ -88,14 +88,14 @@ trait CommonRouting {
 
   private def routesFromAgentCodesOnwards(agentSession: Option[AgentSession]): Call = agentSession match {
     case MissingAgentCodes() =>
-      routes.ApplicationController.showAgentCodesForm()
+      routes.ApplicationController.showAgentCodesForm
     case HasAnsweredAgentCodes() =>
       routesFromUkTaxRegistrationOnwards(agentSession)
   }
 
   private def routesFromUkTaxRegistrationOnwards(agentSession: Option[AgentSession]): Call = agentSession match {
     case MissingRegisteredForUkTax() =>
-      routes.ApplicationController.showUkTaxRegistrationForm()
+      routes.ApplicationController.showUkTaxRegistrationForm
     case IsRegisteredForUkTax(Yes) =>
       showPersonalDetailsOrContinue(agentSession)
     case IsRegisteredForUkTax(No) => collectCompanyRegNoOrContinue(agentSession)
@@ -103,33 +103,33 @@ trait CommonRouting {
 
   private def showPersonalDetailsOrContinue(agentSession: Option[AgentSession]): Call = agentSession match {
     case MissingPersonalDetails() =>
-      routes.ApplicationController.showPersonalDetailsForm()
+      routes.ApplicationController.showPersonalDetailsForm
     case _ => collectCompanyRegNoOrContinue(agentSession)
   }
 
   private def collectCompanyRegNoOrContinue(agentSession: Option[AgentSession]): Call = agentSession match {
     case MissingPersonalDetails() => showPersonalDetailsOrContinue(agentSession)
     case MissingCompanyRegistrationNumber() =>
-      routes.ApplicationController.showCompanyRegistrationNumberForm()
+      routes.ApplicationController.showCompanyRegistrationNumberForm
     case _ => collectTaxRegNoOrContinue(agentSession)
   }
 
   private def collectTaxRegNoOrContinue(agentSession: Option[AgentSession]): Call = agentSession match {
     case MissingHasTaxRegistrationNumber() =>
-      routes.TaxRegController.showTaxRegistrationNumberForm()
+      routes.TaxRegController.showTaxRegistrationNumberForm
     case HasTaxRegistrationNumber() =>
       collectTaxRegFileUploadOrContinue(agentSession)
     case NoTaxRegistrationNumber() =>
-      routes.ApplicationController.showCheckYourAnswers()
+      routes.ApplicationController.showCheckYourAnswers
   }
 
   private def collectTaxRegFileUploadOrContinue(agentSession: Option[AgentSession]): Call = agentSession match {
     case MissingHasTaxRegistrationNumber() =>
       collectTaxRegNoOrContinue(agentSession)
     case TaxRegistrationNumbersEmpty() =>
-      routes.TaxRegController.showAddTaxRegNoForm()
-    case MissingTaxRegFile() => routes.FileUploadController.showTrnUploadForm()
-    case _                   => routes.ApplicationController.showCheckYourAnswers()
+      routes.TaxRegController.showAddTaxRegNoForm
+    case MissingTaxRegFile() => routes.FileUploadController.showTrnUploadForm
+    case _                   => routes.ApplicationController.showCheckYourAnswers
 
   }
 }

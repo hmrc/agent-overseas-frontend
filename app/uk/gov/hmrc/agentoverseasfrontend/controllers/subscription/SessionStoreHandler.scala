@@ -45,7 +45,7 @@ trait SessionStoreHandler {
     sessionStoreService.fetchAgencyDetails.flatMap {
       case None => Future.successful(sessionMissingRedirect("AgencyDetails"))
       case Some(agencyDetails) if checkForEmailVerification && !agencyDetails.emailVerified =>
-        Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail()))
+        Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
       case Some(agencyDetails) => body(agencyDetails)
     }
 
@@ -63,7 +63,7 @@ trait SessionStoreHandler {
 
   private def sessionMissingRedirect(missingSessionItem: String): Result = {
     Logger(getClass).warn(s"Missing $missingSessionItem in session or keystore, redirecting back to /check-answers")
-    Redirect(routes.BusinessIdentificationController.showCheckAnswers())
+    Redirect(routes.BusinessIdentificationController.showCheckAnswers)
   }
 
 }

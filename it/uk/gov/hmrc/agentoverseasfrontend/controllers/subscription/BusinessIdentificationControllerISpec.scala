@@ -133,7 +133,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
   "POST /check-business-address" should {
     "show validation error when the form is submitted blank" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody("useThisAddress" -> "")
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("useThisAddress" -> "")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -143,7 +143,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to check-answers page for a Yes answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisAddress" -> "true",
       )
 
@@ -153,11 +154,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessAddress(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
     "redirect to 'update address' page for a No answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisAddress" -> "false",
       )
 
@@ -167,11 +169,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessAddress(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessAddressForm().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessAddressForm.url
     }
 
     "redirect to check-answers page for a No answer without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisAddress" -> "false"
       )
 
@@ -181,7 +184,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessAddress(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
   }
@@ -214,13 +217,14 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.showUpdateBusinessAddressForm(request)
       status(result) shouldBe 303
 
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
   }
 
   "POST /update-business-address" should {
     "redirect to check-answers page for a valid form with session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "addressLine1" -> "new addressline 1",
         "addressLine2" -> "new addressline 2",
         "addressLine3" -> "new addressline 3",
@@ -234,7 +238,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitUpdateBusinessAddressForm(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
 
       val updatedBusinessAddress = sessionStoreService.fetchAgencyDetails.futureValue.get.agencyAddress
       updatedBusinessAddress.addressLine1 shouldBe "new addressline 1"
@@ -245,7 +249,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to check-answers page for a valid form without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "addressLine1" -> "new addressline 1",
         "addressLine2" -> "new addressline 2",
         "addressLine3" -> "new addressline 3",
@@ -258,12 +263,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitUpdateBusinessAddressForm(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
     "show validation error when the form is submitted with empty address line 1" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "addressLine1" -> " ",
           "addressLine2" -> "new addressline 2",
           "addressLine3" -> "new addressline 3",
@@ -278,7 +283,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     "show validation error when the form is submitted with invalid address line 3" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "addressLine1" -> "address line 1",
           "addressLine2" -> "new addressline 2",
           "addressLine3" -> "new addressline **!",
@@ -294,7 +299,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     "show validation error when the form is submitted with invalid address line 4" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "addressLine1" -> "address line 1",
           "addressLine2" -> "new addressline 2",
           "addressLine3" -> "new addressline 3",
@@ -311,7 +316,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     "show validation error when the form is submitted with invalid address line 1" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "addressLine1" -> "address line 1**",
           "addressLine2" -> "new addressline 2",
           "addressLine3" -> "new addressline 3",
@@ -327,7 +332,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     "show validation error when the form is submitted with empty country code" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "addressLine1" -> " ",
           "addressLine2" -> "new addressline 2",
           "addressLine3" -> "new addressline 3",
@@ -342,7 +347,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     "show validation error when the form is submitted with invalid country code" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "addressLine1" -> " ",
           "addressLine2" -> "new addressline 2",
           "addressLine3" -> "new addressline 3",
@@ -379,7 +384,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
   "POST /check-business-email" should {
     "show validation error when the form is submitted blank" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody("useThisEmail" -> "")
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("useThisEmail" -> "")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -389,7 +394,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to check-answers page for a Yes answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisEmail" -> "true",
       )
 
@@ -399,11 +405,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessEmail(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
     "redirect to 'update email' page for a No answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisEmail" -> "false",
       )
 
@@ -413,11 +420,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessEmail(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessEmailForm().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessEmailForm.url
     }
 
     "redirect to check-answers page for a No answer without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisEmail" -> "false"
       )
 
@@ -427,7 +435,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessEmail(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
   }
@@ -461,7 +469,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
   "POST /update-business-email" should {
     "redirect to check-answers page for a valid form with session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "email" -> "newemail@example.com")
 
       givenAcceptedApplicationResponse()
@@ -476,7 +485,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to check-answers page for a valid form without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "email" -> "newemail@example.com"
       )
 
@@ -491,7 +501,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     "show validation error when the form is submitted with empty email address" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "email" -> " ")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -525,7 +535,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
   "POST /check-business-name" should {
     "show validation error when the form is submitted blank" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody("useThisName" -> "")
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("useThisName" -> "")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -535,7 +545,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to check-answers page for a Yes answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisName" -> "true",
       )
 
@@ -545,11 +556,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessName(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
     "redirect to 'update name' page for a No answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisName" -> "false",
       )
 
@@ -559,11 +571,12 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessName(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessNameForm().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showUpdateBusinessNameForm.url
     }
 
     "redirect to check-answers page for a No answer without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "useThisName" -> "false"
       )
 
@@ -573,7 +586,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       val result = controller.submitCheckBusinessName(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers().url
+      header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
   }
@@ -607,7 +620,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
   "POST /update-business-name" should {
     "redirect to check-answers page for a valid form with session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "name" -> "New name")
 
       givenAcceptedApplicationResponse()
@@ -622,7 +636,8 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to check-answers page for a valid form without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
         "name" -> "New name"
       )
 
@@ -637,7 +652,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     "show validation error when the form is submitted with empty business name" in {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments).withFormUrlEncodedBody(
+        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
           "name" -> " ")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -685,7 +700,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
         val result = f()
         status(result) shouldBe 303
-        redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail().url
+        redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail.url
       }
       "show check your answers" in checkVerifyEmailIsTriggered(() => controller.showCheckAnswers(cleanCredsAgent(FakeRequest())))
       "show check business address" in checkVerifyEmailIsTriggered(() => controller.showCheckBusinessAddress(cleanCredsAgent(FakeRequest())))
@@ -704,7 +719,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
         sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
         val result = f()
         status(result) should (equal(200) or equal(303))
-        if (status(result) == 303) redirectLocation(result) should not be routes.SubscriptionEmailVerificationController.verifyEmail().url
+        if (status(result) == 303) redirectLocation(result) should not be routes.SubscriptionEmailVerificationController.verifyEmail.url
       }
       // these pages must display even with an unverified email otherwise the user couldn't enter or correct their email address!
       "show check business email" in checkVerifyEmailIsNotTriggered(() => controller.showCheckBusinessEmail(cleanCredsAgent(FakeRequest())))

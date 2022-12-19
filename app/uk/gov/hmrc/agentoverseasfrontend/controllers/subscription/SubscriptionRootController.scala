@@ -46,7 +46,7 @@ class SubscriptionRootController @Inject()(
   import authAction.withBasicAgentAuth
 
   def root: Action[AnyContent] = Action {
-    Redirect(routes.BusinessIdentificationController.showCheckAnswers())
+    Redirect(routes.BusinessIdentificationController.showCheckAnswers)
   }
 
   def nextStep: Action[AnyContent] = Action.async { implicit request =>

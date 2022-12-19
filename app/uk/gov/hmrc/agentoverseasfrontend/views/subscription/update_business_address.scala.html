@@ -50,7 +50,7 @@
 
 @value = @{ addressForm("countryCode").value.getOrElse("")}
 
-@mainTemplate(title = errorPrefix(addressForm) + msgs("updateBusinessAddress.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers().url)) {
+@mainTemplate(title = errorPrefix(addressForm) + msgs("updateBusinessAddress.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 
     @if(addressForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(addressForm))

@@ -32,7 +32,7 @@ class TestSessionStoreService extends MongoDBSessionStoreService(null) {
   override def cacheAgentSession(agentSession: AgentSession)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     Future.successful(currentSession.agentSession = Some(agentSession))
 
-  override def removeAgentSession(implicit ec: ExecutionContext) = {
+  override def removeAgentSession(implicit hc: HeaderCarrier) = {
     Future.successful(sessions.clear())
   }
 
@@ -43,7 +43,7 @@ class TestSessionStoreService extends MongoDBSessionStoreService(null) {
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     Future.successful(currentSession.agencyDetails = Some(agencyDetails))
 
-  override def remove()(implicit ec: ExecutionContext): Future[Unit] = {
+  override def remove()(implicit hc: HeaderCarrier): Future[Unit] = {
     Future.successful{
       sessions.clear()
       ()

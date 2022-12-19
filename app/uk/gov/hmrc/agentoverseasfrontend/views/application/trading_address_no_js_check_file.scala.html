@@ -23,7 +23,7 @@
 
 @()(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
 
-@mainTemplate(title = msgs("fileUploadTradingAddress.no_js_page.title"), backLinkHref = Some(routes.FileUploadController.showTradingAddressUploadForm().url)) {
+@mainTemplate(title = msgs("fileUploadTradingAddress.no_js_page.title"), backLinkHref = Some(routes.FileUploadController.showTradingAddressUploadForm.url)) {
 
     <h1 class="govuk-heading-xl">
         <span class="govuk-caption-xl">@msgs("fileUploadTradingAddress.no_js_page.caption")</span>

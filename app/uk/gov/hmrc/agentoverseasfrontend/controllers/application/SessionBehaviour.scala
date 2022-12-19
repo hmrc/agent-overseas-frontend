@@ -28,7 +28,7 @@ trait SessionBehaviour extends CommonRouting with Results {
   implicit val ec: ExecutionContext
 
   val showCheckYourAnswersUrl: String =
-    routes.ApplicationController.showCheckYourAnswers().url
+    routes.ApplicationController.showCheckYourAnswers.url
 
   def updateSessionAndRedirect(agentSession: AgentSession)(redirectTo: String)(
     implicit hc: HeaderCarrier): Future[Result] =

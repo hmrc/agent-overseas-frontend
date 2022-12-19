@@ -79,7 +79,7 @@ class TradingAddressController @Inject()(
           },
           validForm =>
             updateSession(agentSession.copy(overseasAddress = Some(validForm)))(
-              routes.FileUploadController.showTradingAddressUploadForm().url)
+              routes.FileUploadController.showTradingAddressUploadForm.url)
         )
     }
   }

@@ -16,15 +16,23 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.repositories
 
-import play.modules.reactivemongo.ReactiveMongoComponent
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.cache.repository.CacheMongoRepository
+import uk.gov.hmrc.mongo.cache.CacheIdType.SimpleCacheId
+import uk.gov.hmrc.mongo.cache.MongoCacheRepository
+import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
 
 @Singleton
-class SessionCacheRepository @Inject()(mongo: ReactiveMongoComponent)(
+class SessionCacheRepository @Inject()(mongo: MongoComponent, timestampSupport: TimestampSupport)(
   implicit ec: ExecutionContext,
   appConfig: AppConfig)
-    extends CacheMongoRepository("sessions", appConfig.mongoDbExpireAfterSeconds)(mongo.mongoConnector.db, ec)
+    extends MongoCacheRepository(
+      mongoComponent = mongo,
+      collectionName = "sessions",
+      ttl = appConfig.mongoDbExpireAfterSeconds.seconds,
+      timestampSupport = timestampSupport,
+      cacheIdType = SimpleCacheId
+    )

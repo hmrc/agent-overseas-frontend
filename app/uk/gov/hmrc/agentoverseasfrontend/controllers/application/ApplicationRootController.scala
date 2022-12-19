@@ -47,7 +47,7 @@ class ApplicationRootController @Inject()(
 
   def root: Action[AnyContent] = Action.async { implicit request =>
     withBasicAuth { _ =>
-      Future.successful(Redirect(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired()))
+      Future.successful(Redirect(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired))
     }
   }
 
@@ -70,14 +70,14 @@ class ApplicationRootController @Inject()(
           Ok(statusRejectedView(application))
         case Some(_) =>
           SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")
-        case None => Redirect(routes.ApplicationRootController.root())
+        case None => Redirect(routes.ApplicationRootController.root)
       }
     }
   }
 
   private def daysUntilApplicationReviewed(applicationCreationDate: LocalDateTime): Int = {
     val daysUntilAppReviewed = LocalDate
-      .now(Clock.systemUTC())
+      .now(Clock.systemUTC)
       .until(applicationCreationDate.plusDays(appConfig.maintainerApplicationReviewDays), ChronoUnit.DAYS)
       .toInt
     if (daysUntilAppReviewed > 0) daysUntilAppReviewed else 0

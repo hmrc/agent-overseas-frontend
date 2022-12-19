@@ -59,7 +59,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         "contactDetails.form.businessTelephone",
         "contactDetails.form.businessEmail"
       )
-      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
+      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers.url)
     }
 
     "redirect to /money-laundering-registration when session not found" in {
@@ -69,7 +69,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       status(result) shouldBe 303
 
-      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url)
+      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
     }
   }
 
@@ -79,7 +79,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.cacheAgentSession(
         AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), None)).futureValue
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "firstName"         -> "test",
           "lastName"          -> "last",
@@ -90,7 +90,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.submitContactDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showTradingNameForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showTradingNameForm.url
 
       val mayBeContactDetails = sessionStoreService.fetchAgentSession.futureValue.get.contactDetails
 
@@ -103,7 +103,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.cacheAgentSession(
         AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)).futureValue
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "firstName"         -> "test",
           "lastName"          -> "last",
@@ -114,7 +114,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.submitContactDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
@@ -130,7 +130,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.cacheAgentSession(
         AgentSession(amlsRequired = Some(true), Some(AmlsDetails("body", Some("123"))), changingAnswers = true)).futureValue
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "firstName"         -> "",
           "lastName"          -> "last**",
@@ -160,7 +160,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         "tradingName.p1"
       )
 
-      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers().url)
+      result.futureValue should containSubstrings(routes.ApplicationController.showCheckYourAnswers.url)
     }
 
     "redirect to /money-laundering-registration when session not found" in {
@@ -171,7 +171,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       status(result) shouldBe 303
 
-      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url)
+      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
     }
 
     "pre-fill trading name if previously has used the endpoint POST /trading-name" in {
@@ -196,13 +196,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(tradingName = None, overseasAddress = None))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("tradingName" -> "test")
 
       val result = controller.submitTradingName(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.TradingAddressController.showMainBusinessAddressForm().url
+      header(LOCATION, result).get shouldBe routes.TradingAddressController.showMainBusinessAddressForm.url
 
       val tradingName = sessionStoreService.fetchAgentSession.futureValue.get.tradingName
 
@@ -213,13 +213,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(tradingName = None, overseasAddress = None, changingAnswers = true))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("tradingName" -> "test")
 
       val result = controller.submitTradingName(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
@@ -233,7 +233,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(tradingName = None, overseasAddress = None, changingAnswers = true))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("tradingName" -> "")
 
       val result = controller.submitTradingName(authenticatedRequest)
@@ -330,7 +330,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.showRegisteredWithHmrcForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
     }
   }
 
@@ -338,13 +338,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     "store choice in session after successful submission and redirect to next page" in {
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(registeredWithHmrc = None, changingAnswers = true))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
 
       val result = controller.submitRegisteredWithHmrc(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showAgentCodesForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showAgentCodesForm.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
@@ -356,13 +356,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
     "show /check-your-answers page when the user in the amending state but clicks Continue without making any changes to the state" in {
       sessionStoreService.currentSession.agentSession =
         Some(agentSession.copy(registeredWithHmrc = Some(Yes), changingAnswers = true))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
 
       val result = controller.submitRegisteredWithHmrc(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
@@ -373,7 +373,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
     "show validation error if no choice was selected" in {
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
 
       controller.submitRegisteredWithHmrc(authenticatedRequest).futureValue should containMessages(
         "error.registeredWithHmrc.no-radio.selected")
@@ -492,7 +492,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
     }
   }
 
@@ -505,13 +505,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           personalDetails = None,
           changingAnswers = true
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("registeredForUkTax" -> "true")
 
       val result = controller.submitUkTaxRegistration(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showPersonalDetailsForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showPersonalDetailsForm.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.registeredForUkTax shouldBe Some(Yes)
@@ -526,13 +526,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           personalDetails = None,
           changingAnswers = true
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("registeredForUkTax" -> "false")
 
       val result = controller.submitUkTaxRegistration(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.registeredForUkTax shouldBe Some(No)
@@ -545,7 +545,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredWithHmrc = Some(No),
           registeredForUkTax = None
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
 
       controller.submitUkTaxRegistration(authenticatedRequest).futureValue should containMessages(
         "error.registeredForUkTaxForm.no-radio.selected")
@@ -605,7 +605,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
     }
   }
 
@@ -617,13 +617,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredForUkTax = Some(Yes),
           personalDetails = None
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("personalDetailsChoice" -> "nino", "nino" -> "AB123456A", "saUtr" -> "")
 
       val result = controller.submitPersonalDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm.url
 
       val savedPersonalDetails = sessionStoreService.fetchAgentSession.futureValue.get.personalDetails.get
       savedPersonalDetails shouldBe PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
@@ -638,13 +638,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           changingAnswers = true
         ))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("personalDetailsChoice" -> "nino", "nino" -> "AB123456A", "saUtr" -> "")
 
       val result = controller.submitPersonalDetails(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.personalDetails.get shouldBe PersonalDetailsChoice(
@@ -661,7 +661,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredForUkTax = Some(Yes),
           personalDetails = None
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("personalDetailsChoice" -> "", "nino" -> "", "saUtr" -> "")
 
       controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages(
@@ -676,7 +676,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredForUkTax = Some(Yes),
           personalDetails = None
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("personalDetailsChoice" -> "nino", "nino" -> "", "saUtr" -> "")
 
       controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages("error.nino.blank")
@@ -690,7 +690,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredForUkTax = Some(Yes),
           personalDetails = None
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("personalDetailsChoice" -> "saUtr", "nino" -> "", "saUtr" -> "")
 
       controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages("error.sautr.blank")
@@ -704,7 +704,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         Some(agentSession.copy(registeredForUkTax = Some(Yes), companyRegistrationNumber = None))
 
       val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
-      val backButtonUrl = routes.ApplicationController.showPersonalDetailsForm().url
+      val backButtonUrl = routes.ApplicationController.showPersonalDetailsForm.url
 
       status(result) shouldBe 200
       result.futureValue should containMessages(
@@ -720,7 +720,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         agentSession.copy(registeredForUkTax = Some(Yes), companyRegistrationNumber = None, changingAnswers = true))
 
       val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
-      val backButtonUrl = routes.ApplicationController.showCheckYourAnswers().url
+      val backButtonUrl = routes.ApplicationController.showCheckYourAnswers.url
 
       status(result) shouldBe 200
       result.futureValue should containMessages(
@@ -738,7 +738,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(false), None))))
 
       val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
-      val backButtonUrl = routes.ApplicationController.showUkTaxRegistrationForm().url
+      val backButtonUrl = routes.ApplicationController.showUkTaxRegistrationForm.url
 
       status(result) shouldBe 200
       result.futureValue should containMessages(
@@ -764,13 +764,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           agentCodes = None,
           personalDetails = Some(personalDetails)))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
 
       val result = controller.submitCompanyRegistrationNumber(authenticatedRequest)
       status(result) shouldBe 303
 
-      header(LOCATION, result).get shouldBe routes.TaxRegController.showTaxRegistrationNumberForm().url
+      header(LOCATION, result).get shouldBe routes.TaxRegController.showTaxRegistrationNumberForm.url
       sessionStoreService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe Some(
         CompanyRegistrationNumber(Some(true), Some(Crn("AB123456"))))
     }
@@ -786,13 +786,13 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           changingAnswers = true
         ))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
 
       val result = controller.submitCompanyRegistrationNumber(authenticatedRequest)
       status(result) shouldBe 303
 
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
@@ -807,7 +807,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredForUkTax = Some(No)
         ))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
 
       controller.submitCompanyRegistrationNumber(authenticatedRequest).futureValue should containMessages(
         "companyRegistrationNumber.error.no-radio.selected")
@@ -821,7 +821,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           registeredForUkTax = Some(No)
         ))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "")
 
       controller.submitCompanyRegistrationNumber(authenticatedRequest).futureValue should containMessages("error.crn.blank")
@@ -926,7 +926,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url
+      header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
     }
   }
 
@@ -938,7 +938,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
           agentCodes = None,
           changingAnswers = true
         ))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "self-assessment-checkbox" -> "true",
           "self-assessment"          -> "SA1234",
@@ -949,7 +949,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.submitAgentCodes(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
@@ -977,7 +977,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.submitAgentCodes(authenticatedRequest)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm.url
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
       session.agentCodes shouldBe Some(AgentCodes(None, None))
@@ -993,7 +993,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
               registeredWithHmrc = Some(Yes),
               agentCodes = None
             ))
-          implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
+          implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
             .withFormUrlEncodedBody(
               s"$value-checkbox" -> "true",
               "self-assessment"  -> "",
@@ -1054,7 +1054,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
         status(result) shouldBe 200
-        result.futureValue should containLink("button.back", routes.FileUploadController.showSuccessfulUploadedForm().url)
+        result.futureValue should containLink("button.back", routes.FileUploadController.showSuccessfulUploadedForm.url)
       }
 
       "no agent codes no taxRegNumbers provided, back link to ask if has tax-registration-number" in {
@@ -1080,7 +1080,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
         status(result) shouldBe 200
-        result.futureValue should containLink("button.back", routes.TaxRegController.showTaxRegistrationNumberForm().url)
+        result.futureValue should containLink("button.back", routes.TaxRegController.showTaxRegistrationNumberForm.url)
       }
     }
 
@@ -1366,7 +1366,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
 
       status(result) shouldBe 303
-      redirectLocation(result) shouldBe Some(routes.ApplicationEmailVerificationController.verifyEmail().url)    }
+      redirectLocation(result) shouldBe Some(routes.ApplicationEmailVerificationController.verifyEmail.url)    }
   }
 
   "POST /check-your-answers" should {
@@ -1399,7 +1399,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       givenPostOverseasApplication(201, Json.toJson(CreateOverseasApplicationRequest(agentSession)).toString())
 
-      val result = controller.submitCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+      val result = controller.submitCheckYourAnswers(cleanCredsAgent(FakeRequest(POST, "/")))
 
       status(result) shouldBe 400
 
@@ -1414,12 +1414,12 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       val result = 
         controller.submitCheckYourAnswers(
           cleanCredsAgent(
-            FakeRequest().withFormUrlEncodedBody("confirmed" -> "true")
+            FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
           )
         )
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.ApplicationController.showApplicationComplete().url
+      header(LOCATION, result).get shouldBe routes.ApplicationController.showApplicationComplete.url
 
       flash(result).get("tradingName").get shouldBe "tradingName"
       flash(result).get("contactDetail").get shouldBe "test@email.com"
@@ -1436,17 +1436,17 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       val e = controller.submitCheckYourAnswers(
         cleanCredsAgent(
-          FakeRequest().withFormUrlEncodedBody("confirmed" -> "true")
+          FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
         )).failed.futureValue
       e shouldBe a[Exception]
     }
 
     "redirect to /money-laundering-registration when session not found" in {
-      val result = controller.submitCheckYourAnswers()(cleanCredsAgent(FakeRequest()))
+      val result = controller.submitCheckYourAnswers()(cleanCredsAgent(FakeRequest(POST, "/")))
 
       status(result) shouldBe 303
 
-      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired().url)
+      redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
     }
   }
 
@@ -1490,7 +1490,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
 
       //as the Agent should have no agentSession at this point, previous last created application would be shown or start of Journey
       status(result) shouldBe 303
-      redirectLocation(result).get shouldBe routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm().url
+      redirectLocation(result).get shouldBe routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url
     }
   }
 
@@ -1500,7 +1500,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
         val result = f()
         status(result) shouldBe 303
-        redirectLocation(result).get shouldBe routes.ApplicationEmailVerificationController.verifyEmail().url
+        redirectLocation(result).get shouldBe routes.ApplicationEmailVerificationController.verifyEmail.url
       }
       "show trading name" in checkVerifyEmailIsTriggered(() => controller.showTradingNameForm(cleanCredsAgent(FakeRequest())))
       "submit trading name" in checkVerifyEmailIsTriggered(() => controller.submitTradingName(cleanCredsAgent(FakeRequest())))
@@ -1520,7 +1520,7 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
         sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
         val result = f()
         status(result) should (equal(200) or equal(303))
-        if (status(result) == 303) redirectLocation(result) should not be routes.ApplicationEmailVerificationController.verifyEmail().url
+        if (status(result) == 303) redirectLocation(result) should not be routes.ApplicationEmailVerificationController.verifyEmail.url
       }
       // these pages must display even with an unverified email otherwise the user couldn't enter or correct their email address!
       "show contact details form" in checkVerifyEmailIsNotTriggered(() => controller.showContactDetailsForm(cleanCredsAgent(FakeRequest())))
