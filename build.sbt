@@ -1,12 +1,11 @@
-import AppDependencies.{compileDeps, testDeps}
 import CodeCoverageSettings.scoverageSettings
 import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 lazy val root = Project("agent-overseas-frontend", file("."))
   .settings(
     name := "agent-overseas-frontend",
     organization := "uk.gov.hmrc",
+    majorVersion := 1,
     scalaVersion := "2.12.15",
     scalacOptions ++= Seq(
       "-Xfatal-warnings",
@@ -15,23 +14,17 @@ lazy val root = Project("agent-overseas-frontend", file("."))
       "-deprecation",
       "-feature",
       "-unchecked",
-      "-language:implicitConversions",
-      "-P:silencer:pathFilters=views;routes"),
+      "-Wconf:src=target/.*:s", // silence warnings from compiled files
+      "-Wconf:src=*html:w",     // silence html warnings as they are wrong
+      "-Wconf:src=routes/.*:s", // silence warnings from routes
+      "-language:implicitConversions"),
     PlayKeys.playDefaultPort := 9414,
-    resolvers ++= Seq(
-      Resolver.typesafeRepo("releases"),
-    ),
-    libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.8" cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % "1.7.8" % Provided cross CrossVersion.full
-    ),
-    publishingSettings,
+    resolvers ++= Seq(Resolver.typesafeRepo("releases")),
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     scoverageSettings,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     Compile / scalafmtOnCompile := true,
-    Test / scalafmtOnCompile := true,
-    majorVersion := 0
+    Test / scalafmtOnCompile := true
   )
   .configs(IntegrationTest)
   .settings(

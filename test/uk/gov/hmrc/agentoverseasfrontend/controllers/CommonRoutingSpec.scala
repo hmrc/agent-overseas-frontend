@@ -304,7 +304,9 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     }
   }
 
-  def testRoutesForApplicationStatuses(applications: List[ApplicationEntityDetails], responseRoute: String): Assertion = {
+  def testRoutesForApplicationStatuses(
+    applications: List[ApplicationEntityDetails],
+    responseRoute: String): Assertion = {
     when(FakeRouting.connector.getUserApplications).thenReturn(Future.successful(applications))
 
     FakeRouting.routesIfExistingApplication(subscriptionRootPath).futureValue.url shouldBe responseRoute

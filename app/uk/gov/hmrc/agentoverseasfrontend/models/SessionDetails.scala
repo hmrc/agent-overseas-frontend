@@ -36,6 +36,6 @@ object SessionDetails {
     SessionDetails(id, authProviderId)
   }
 
-  implicit val localDateTimeFormats = MongoJavatimeFormats.localDateTimeFormat
-  implicit val format = Json.format[SessionDetails]
+  implicit val localDateTimeFormats: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+  implicit val format: OFormat[SessionDetails] = Json.format[SessionDetails]
 }
