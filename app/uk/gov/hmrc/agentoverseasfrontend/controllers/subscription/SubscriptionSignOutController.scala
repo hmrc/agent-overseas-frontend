@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class SubscriptionSignOutController @Inject()(
     }
   }
 
-  def keepAlive = Action.async {
+  def keepAlive: Action[AnyContent] = Action.async {
     Future successful Ok("OK")
   }
 
@@ -82,7 +82,7 @@ class SubscriptionSignOutController @Inject()(
     Future successful Forbidden(timedOutView())
   }
 
-  def signedOut = Action.async { implicit request =>
+  def signedOut: Action[AnyContent] = Action.async { implicit request =>
     val continueUrl = CallOps.addParamsToUrl(routes.SubscriptionRootController.root.url)
     Future successful Forbidden(signedOutView(continueUrl)).withNewSession
   }

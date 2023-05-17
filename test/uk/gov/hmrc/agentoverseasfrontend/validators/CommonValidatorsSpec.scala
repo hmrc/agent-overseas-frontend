@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -390,7 +390,7 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
     testAgentCode("ctAgentCode")(ctAgentCode.withPrefix("testKey"))
   }
 
-  def testAgentCode(codeType: String)(mapping: => Mapping[String]) = {
+  def testAgentCode(codeType: String)(mapping: => Mapping[String]): Unit = {
     def bind(fieldValue: String) = mapping.bind(Map("testKey" -> fieldValue))
 
     s"accept valid $codeType" in {
@@ -818,8 +818,8 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
   def randomString(limit: Int): String = {
     def nextAlphaNum: Char = {
       val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-      chars charAt (Random.nextInt(chars.length))
+      chars charAt Random.nextInt(chars.length)
     }
-    (Stream.continually(nextAlphaNum)).take(limit).mkString
+    Stream.continually(nextAlphaNum).take(limit).mkString
   }
 }

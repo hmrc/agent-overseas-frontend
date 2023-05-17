@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers
 
 import org.mockito.Mockito.when
-import org.scalatest.OptionValues
+import org.scalatest.{Assertion, OptionValues}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -304,7 +304,7 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     }
   }
 
-  def testRoutesForApplicationStatuses(applications: List[ApplicationEntityDetails], responseRoute: String) = {
+  def testRoutesForApplicationStatuses(applications: List[ApplicationEntityDetails], responseRoute: String): Assertion = {
     when(FakeRouting.connector.getUserApplications).thenReturn(Future.successful(applications))
 
     FakeRouting.routesIfExistingApplication(subscriptionRootPath).futureValue.url shouldBe responseRoute
@@ -313,10 +313,10 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
 }
 
 object FakeRouting extends CommonRouting with Results with MockitoSugar {
-  val connector = mock[AgentOverseasApplicationConnector]
+  val connector: AgentOverseasApplicationConnector = mock[AgentOverseasApplicationConnector]
   protected val mockSessionCacheRepository: SessionCacheRepository = mock[SessionCacheRepository]
 
-  val cacheItem = CacheItem("id", Json.obj(), Instant.now, Instant.now)
+  val cacheItem: CacheItem = CacheItem("id", Json.obj(), Instant.now, Instant.now)
 
   when(mockSessionCacheRepository.put("sessionId123456")(DataKey[AgentSession]("agentSession"), AgentSession.empty))
     .thenReturn(Future.successful(cacheItem))

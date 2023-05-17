@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ object PersonalDetailsChoice {
 
     def unapply(answer: RadioOption): Option[String] = Some(answer.value)
 
-    implicit val format = new Format[RadioOption] {
+    implicit val format: Format[RadioOption] = new Format[RadioOption] {
 
       override def reads(json: JsValue): JsResult[RadioOption] =
         json match {
@@ -61,5 +61,5 @@ object PersonalDetailsChoice {
     PersonalDetailsChoice(Some(RadioOption(choice)), nino, saUtr)
   }
 
-  implicit val personalDetailsFormat = Json.format[PersonalDetailsChoice]
+  implicit val personalDetailsFormat: OFormat[PersonalDetailsChoice] = Json.format[PersonalDetailsChoice]
 }

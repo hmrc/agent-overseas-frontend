@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ object CommonValidators {
 
   private type UtrErrors = (String, String)
 
-  def saAgentCode = text verifying agentCodeConstraint("saAgentCode")
+  def saAgentCode: Mapping[String] = text verifying agentCodeConstraint("saAgentCode")
 
   def ctAgentCode: Mapping[String] =
     text verifying agentCodeConstraint("ctAgentCode")
@@ -227,8 +227,8 @@ object CommonValidators {
   private def validEmailAddress = Constraint { fieldValue: String =>
     nonEmptyWithMessage("error.email.blank")(fieldValue) match {
       case i: Invalid => i
-      case Valid => {
-        if (fieldValue.size > EmailMaxLength) {
+      case Valid =>
+        if (fieldValue.length > EmailMaxLength) {
           Invalid(ValidationError("error.email.maxlength"))
         } else if (fieldValue.contains('@')) {
           val email = fieldValue.split('@')
@@ -239,7 +239,6 @@ object CommonValidators {
           } else Constraints.emailAddress(fieldValue)
         } else
           Invalid(ValidationError("error.email.invalid"))
-      }
     }
   }
 

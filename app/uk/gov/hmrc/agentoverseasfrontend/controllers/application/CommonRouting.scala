@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,9 +73,9 @@ trait CommonRouting {
         case Some(application)
             if Set(Accepted, AttemptingRegistration, Registered, Complete)
               .contains(application.status) =>
-          StatusRouting(Call(GET, subscriptionRootPath), false)
+          StatusRouting(Call(GET, subscriptionRootPath), initialiseAgentSession = false)
         case None =>
-          StatusRouting(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired, true)
+          StatusRouting(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired, initialiseAgentSession = true)
       }
 
     for {

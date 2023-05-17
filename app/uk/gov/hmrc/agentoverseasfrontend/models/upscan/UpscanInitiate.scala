@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ case class UploadRequest(href: String, fields: Map[String, String])
 
 object UploadRequest {
   implicit val writes = new Writes[UploadRequest] {
-    def writes(uploadRequest: UploadRequest) = Json.obj(
+    def writes(uploadRequest: UploadRequest): JsObject = Json.obj(
       "href"   -> uploadRequest.href,
       "fields" -> uploadRequest.fields
     )
@@ -36,7 +36,7 @@ object UploadRequest {
 
 object UpscanInitiate {
   implicit val writes = new Writes[UpscanInitiate] {
-    def writes(upscan: UpscanInitiate) = Json.obj(
+    def writes(upscan: UpscanInitiate): JsObject = Json.obj(
       "reference"     -> upscan.reference,
       "uploadRequest" -> upscan.uploadRequest
     )
