@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class MongoDBSessionStoreServiceSpec extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures {
 
-  implicit val hc = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
+  implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
 
   private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
@@ -91,7 +91,7 @@ class MongoDBSessionStoreServiceSpec extends AnyWordSpecLike with Matchers with 
 
     "always sanitise data when stored" in new Setup {
 
-      val agentSession = defaultAgentSession
+      val agentSession: AgentSession = defaultAgentSession
         .copy(registeredWithHmrc = Some(No), agentCodes = Some(agentCodes), personalDetails = Some(personalDetails))
 
       when(mockSessionCacheRepository.put(sessionId)(DataKey[AgentSession]("agentSession"), agentSession.sanitize))
@@ -141,7 +141,7 @@ class MongoDBSessionStoreServiceSpec extends AnyWordSpecLike with Matchers with 
 
   trait Setup {
     protected val mockSessionCacheRepository: SessionCacheRepository = mock[SessionCacheRepository]
-    val mockCacheItem = CacheItem("id", Json.obj(), Instant.now, Instant.now)
+    val mockCacheItem: CacheItem = CacheItem("id", Json.obj(), Instant.now, Instant.now)
     val store = new MongoDBSessionStoreService(mockSessionCacheRepository)
   }
 }

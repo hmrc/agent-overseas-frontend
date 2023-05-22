@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class UpscanConnector @Inject()(appConfig: AppConfig, httpClient: HttpClient, me
   def initiate()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UpscanInitiate] =
     monitor("ConsumedAPI-upscan-initiate-POST") {
       httpClient
-        .POST[JsValue, JsValue](upscanUrl.toString, payload, Seq("content-Type" -> "application/json"))
+        .POST[JsValue, JsValue](upscanUrl, payload, Seq("content-Type" -> "application/json"))
         .map(_.as[UpscanInitiate])
 
     }

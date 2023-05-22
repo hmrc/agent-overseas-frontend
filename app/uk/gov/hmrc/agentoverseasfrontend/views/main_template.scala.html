@@ -1,5 +1,5 @@
 @*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcLayout, HmrcReportTechnicalIssueHelper}
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components.head
-@import uk.gov.hmrc.govukfrontend.views.html.components.TwoThirdsMainContent
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcReportTechnicalIssueHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 @import views.html.helper.CSPNonce
 
 @this(
-    hmrcLayout: HmrcLayout,
-    standardBetaBanner: StandardBetaBanner,
+    hmrcStandardPage: HmrcStandardPage,
+    fullWidthMainContent: fullWidthMainContentLayout,
     hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-    twoThirdsLayout: TwoThirdsMainContent,
     head: head,
 )
 
@@ -38,7 +37,9 @@
 
 @mainContentWithHelpLink = {
     @mainContent
-    <p class="govuk-!-margin-bottom-9 govuk-!-margin-top-8 govuk-body-s">@hmrcReportTechnicalIssueHelper()</p>
+    <p class="govuk-!-margin-bottom-9 govuk-!-margin-top-8">
+        @hmrcReportTechnicalIssueHelper()
+    </p>
 }
 
 @additionalScripts = {
@@ -63,17 +64,19 @@
     }
 }
 
-@hmrcLayout(
+@hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(title + " - " + serviceNameSuffix.toString),
     serviceName = Some(appName.toString),
-    phaseBanner = Some(standardBetaBanner(appConfig.betaFeedbackUrl)),
     isWelshTranslationAvailable = false,
-    displayHmrcBanner = true,
-    serviceUrl = None,
-    signOutUrl = None,
-    additionalHeadBlock = Some(head(hasTimeout)),
-    additionalScriptsBlock = Some(additionalScripts),
-    backLinkUrl = backLinkHref,
-    mainContentLayout = if (wide) None else Some(twoThirdsLayout(_)),
-    nonce = CSPNonce.get
-)(mainContentWithHelpLink)
+    backLink = if(backLinkHref.isDefined) Some(BackLink(href = backLinkHref.get)) else None,
+    serviceURLs = ServiceURLs(
+        serviceUrl = None,
+        signOutUrl = None
+    ),
+    banners = Banners(displayHmrcBanner = true),
+    templateOverrides = TemplateOverrides(
+        additionalHeadBlock = Some(head(hasTimeout)),
+        additionalScriptsBlock = Some(additionalScripts),
+        mainContentLayout = if(wide) Some(fullWidthMainContent(_)) else None
+    )
+))(mainContentWithHelpLink)

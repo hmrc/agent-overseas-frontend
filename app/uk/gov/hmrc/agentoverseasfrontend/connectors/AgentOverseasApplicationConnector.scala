@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class AgentOverseasApplicationConnector @Inject()(
   implicit val localDateTimeOrdering: Ordering[LocalDateTime] =
     Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
-  val allStatuses = ApplicationStatus.allStatuses
+  val allStatuses: String = ApplicationStatus.allStatuses
     .map(status => s"statusIdentifier=${status.key}")
     .mkString("&")
 
@@ -71,7 +71,7 @@ class AgentOverseasApplicationConnector @Inject()(
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
     monitor("ConsumedAPI-Agent-Overseas-Application-application-POST") {
       http
-        .POST[CreateOverseasApplicationRequest, HttpResponse](url.toString, request)
+        .POST[CreateOverseasApplicationRequest, HttpResponse](url, request)
         .map { response =>
           response.status match {
             case status if is4xx(status) || is5xx(status) =>
@@ -87,7 +87,7 @@ class AgentOverseasApplicationConnector @Inject()(
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-poll-status/$reference"
     monitor("ConsumedAPI-Agent-overseas-Application-upscan-poll-status-GET") {
       http
-        .GET[FileUploadStatus](url.toString)
+        .GET[FileUploadStatus](url)
     }
   }
 
@@ -135,7 +135,7 @@ class AgentOverseasApplicationConnector @Inject()(
 
     monitor(s"ConsumedAPI-agent-overseas-application-auth-provider-id-PUT") {
       http
-        .PUT[JsValue, HttpResponse](url.toString, Json.obj("authId" -> oldAuthId))
+        .PUT[JsValue, HttpResponse](url, Json.obj("authId" -> oldAuthId))
         .map { response =>
           response.status match {
             case NOT_FOUND =>

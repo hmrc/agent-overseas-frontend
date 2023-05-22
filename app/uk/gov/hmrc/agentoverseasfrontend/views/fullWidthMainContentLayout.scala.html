@@ -16,13 +16,11 @@
 
 @this()
 
-@(key: String, classes: Option[String] = None, id: Option[String] = None)(implicit msgs: Messages)
+@(contentBlock: Html)
 
-@cls = @{"govuk-heading-xl ".concat(classes.getOrElse(""))}
-
-<h1 class="@cls">@Html(msgs(key))</h1>
-
-
-
-
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @contentBlock
+    </div>
+</div>
 
