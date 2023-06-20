@@ -2,7 +2,7 @@ import sbt._
 
 object AppDependencies {
 
-  private val mongoVersion = "0.74.0"
+  private val mongoVersion = "1.1.0"
   private val bootstrapVer = "7.15.0"
 
   lazy val compile = Seq(
@@ -10,7 +10,7 @@ object AppDependencies {
     "uk.gov.hmrc"           %% "play-frontend-hmrc"            % "7.7.0-play-28",
     "uk.gov.hmrc"           %% "play-partials"                 % "8.4.0-play-28",
     "uk.gov.hmrc"           %% "agent-kenshoo-monitoring"      % "5.4.0",
-    "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "1.2.0",
+    "uk.gov.hmrc"           %% "agent-mtd-identifiers"         % "1.10.0",
     "uk.gov.hmrc.mongo"     %% "hmrc-mongo-play-28"            % mongoVersion,
     "uk.gov.hmrc"           %% "play-conditional-form-mapping" % "1.13.0-play-28",
     "org.typelevel"         %% "cats-core"                     % "2.6.1",
