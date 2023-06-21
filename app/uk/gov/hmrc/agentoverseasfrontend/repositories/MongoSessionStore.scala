@@ -37,7 +37,7 @@ trait MongoSessionStore[T] extends Logging {
         cacheRepository
           .findById(sessionId)
           .map {
-            case Some(entity) => Right(Some((entity.data \ sessionName).as[T]))
+            case Some(entity) => Right((entity.data \ sessionName).asOpt[T])
             case _ =>
               Right(None)
           }
