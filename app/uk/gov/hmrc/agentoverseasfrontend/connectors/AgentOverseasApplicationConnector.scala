@@ -75,7 +75,7 @@ class AgentOverseasApplicationConnector @Inject()(
         .map { response =>
           response.status match {
             case status if is4xx(status) || is5xx(status) =>
-              throw new Exception(s"createOverseasApplication Error for $request, Http Status: ${response.status}")
+              throw new Exception(s"createOverseasApplication returned status ${response.status}")
             case _ => ()
           }
         }
