@@ -44,7 +44,7 @@ class SubscriptionSignOutController @Inject()(
   implicit val appConfig: AppConfig,
   override val ec: ExecutionContext,
   config: Configuration)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler {
+    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) {
 
   import authAction.withBasicAgentAuth
 

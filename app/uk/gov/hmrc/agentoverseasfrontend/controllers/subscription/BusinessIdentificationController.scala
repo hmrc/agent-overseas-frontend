@@ -49,7 +49,7 @@ class BusinessIdentificationController @Inject()(
   checkBusinessEmailView: check_business_email,
   updateBusinessEmailView: update_business_email
 )(implicit override val ec: ExecutionContext, appConfig: AppConfig)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler {
+    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) {
 
   private lazy val countries = countryNamesLoader.load
   private lazy val validCountryCodes = countries.keys.toSet
@@ -57,205 +57,178 @@ class BusinessIdentificationController @Inject()(
   import authAction.{config, withBasicAgentAuth, withSubscribingAgent}
 
   def showCheckAnswers: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withAgencyDetailsOrWithNewDefaults(overseasApplication).map { agencyDetails =>
-        if (!agencyDetails.emailVerified) {
-          Redirect(routes.SubscriptionEmailVerificationController.verifyEmail)
-        } else {
-          val countryCode = agencyDetails.agencyAddress.countryCode
-          val countryName = countries.getOrElse(
-            countryCode,
-            throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown"))
+    withSubscribingAgent(checkForEmailVerification = true, generateNewDetailsIfNoSession = true) { agencyDetails =>
+      val countryCode = agencyDetails.agencyAddress.countryCode
+      val countryName = countries.getOrElse(
+        countryCode,
+        throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown"))
 
-          Ok(checkAnswersView(agencyDetails, countryName))
-        }
-      }
+      Future.successful(Ok(checkAnswersView(agencyDetails, countryName)))
     }
   }
 
   def showCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        val countryCode = agencyDetails.agencyAddress.countryCode
-        val countryName = countries.getOrElse(
-          countryCode,
-          throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
-        )
-        Future.successful(
-          Ok(checkBusinessAddressView(businessAddressCheckForm, agencyDetails.agencyAddress, countryName)))
-      }
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      val countryCode = agencyDetails.agencyAddress.countryCode
+      val countryName = countries.getOrElse(
+        countryCode,
+        throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
+      )
+      Future.successful(
+        Ok(checkBusinessAddressView(businessAddressCheckForm, agencyDetails.agencyAddress, countryName)))
     }
   }
 
   def submitCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { agent =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        businessAddressCheckForm.bindFromRequest
-          .fold(
-            formWithErrors => {
-              val countryCode = agencyDetails.agencyAddress.countryCode
-              val countryName = countries.getOrElse(
-                countryCode,
-                throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
-              )
-              Future.successful(Ok(checkBusinessAddressView(formWithErrors, agencyDetails.agencyAddress, countryName)))
-            },
-            validForm => {
-              val useCurrentAddress = validForm.value
-              if (useCurrentAddress)
-                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-              else
-                Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessAddressForm))
-            }
-          )
-      }
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      businessAddressCheckForm.bindFromRequest
+        .fold(
+          formWithErrors => {
+            val countryCode = agencyDetails.agencyAddress.countryCode
+            val countryName = countries.getOrElse(
+              countryCode,
+              throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
+            )
+            Future.successful(Ok(checkBusinessAddressView(formWithErrors, agencyDetails.agencyAddress, countryName)))
+          },
+          validForm => {
+            val useCurrentAddress = validForm.value
+            if (useCurrentAddress)
+              Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+            else
+              Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessAddressForm))
+          }
+        )
     }
   }
 
   def showUpdateBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        Future.successful(
-          Ok(
-            updateBusinessAddressView(
-              updateBusinessAddressForm(validCountryCodes).fill(BusinessAddressForm(agencyDetails.agencyAddress)),
-              countries)))
-      }
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      Future.successful(
+        Ok(
+          updateBusinessAddressView(
+            updateBusinessAddressForm(validCountryCodes).fill(BusinessAddressForm(agencyDetails.agencyAddress)),
+            countries)))
     }
   }
 
   def submitUpdateBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        updateBusinessAddressForm(validCountryCodes)
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(Ok(updateBusinessAddressView(formWithErrors, countries))),
-            validForm => {
-              val updatedAddress = OverseasAddress(
-                addressLine1 = validForm.addressLine1,
-                addressLine2 = validForm.addressLine2,
-                addressLine3 = validForm.addressLine3,
-                addressLine4 = validForm.addressLine4,
-                countryCode = validForm.countryCode
-              )
-              val agencyWithUpdatedAddress = agencyDetails.copy(agencyAddress = updatedAddress)
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      updateBusinessAddressForm(validCountryCodes)
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(Ok(updateBusinessAddressView(formWithErrors, countries))),
+          validForm => {
+            val updatedAddress = OverseasAddress(
+              addressLine1 = validForm.addressLine1,
+              addressLine2 = validForm.addressLine2,
+              addressLine3 = validForm.addressLine3,
+              addressLine4 = validForm.addressLine4,
+              countryCode = validForm.countryCode
+            )
+            val agencyWithUpdatedAddress = agencyDetails.copy(agencyAddress = updatedAddress)
 
-              updateAgencyDetails(agencyWithUpdatedAddress).map(_ =>
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-            }
-          )
-      }
+            sessionStoreService
+              .cacheAgencyDetails(agencyWithUpdatedAddress)
+              .map(_ => Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+          }
+        )
     }
   }
 
   def showCheckBusinessEmail: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
-        Future.successful(Ok(checkBusinessEmailView(businessEmailCheckForm, agencyDetails.agencyEmail)))
-      }
+    withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
+      Future.successful(Ok(checkBusinessEmailView(businessEmailCheckForm, agencyDetails.agencyEmail)))
     }
   }
 
   def submitCheckBusinessEmail: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { agent =>
-      withAgencyDetails { agencyDetails =>
-        businessEmailCheckForm.bindFromRequest
-          .fold(
-            formWithErrors => {
-              Future.successful(Ok(checkBusinessEmailView(formWithErrors, agencyDetails.agencyEmail)))
-            },
-            validForm => {
-              val useCurrentEmail = validForm.value
-              if (useCurrentEmail)
-                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-              else
-                Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessEmailForm))
-            }
-          )
-      }
+    withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
+      businessEmailCheckForm.bindFromRequest
+        .fold(
+          formWithErrors => {
+            Future.successful(Ok(checkBusinessEmailView(formWithErrors, agencyDetails.agencyEmail)))
+          },
+          validForm => {
+            val useCurrentEmail = validForm.value
+            if (useCurrentEmail)
+              Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+            else
+              Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessEmailForm))
+          }
+        )
     }
   }
 
   def showUpdateBusinessEmailForm: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
-        Future.successful(
-          Ok(updateBusinessEmailView(updateBusinessEmailForm.fill(BusinessEmailForm(agencyDetails.agencyEmail)))))
-      }
+    withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
+      Future.successful(
+        Ok(updateBusinessEmailView(updateBusinessEmailForm.fill(BusinessEmailForm(agencyDetails.agencyEmail)))))
     }
   }
 
   def submitUpdateBusinessEmailForm: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withAgencyDetails { agencyDetails =>
-        updateBusinessEmailForm
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(Ok(updateBusinessEmailView(formWithErrors))),
-            validForm => {
-              val agencyWithUpdatedEmail = agencyDetails.copy(agencyEmail = validForm.email)
+    withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
+      updateBusinessEmailForm
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(Ok(updateBusinessEmailView(formWithErrors))),
+          validForm => {
+            val agencyWithUpdatedEmail = agencyDetails.copy(agencyEmail = validForm.email)
 
-              updateAgencyDetails(agencyWithUpdatedEmail).map(_ =>
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-            }
-          )
-      }
+            sessionStoreService
+              .cacheAgencyDetails(agencyWithUpdatedEmail)
+              .map(_ => Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+          }
+        )
     }
   }
 
   def showCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        Future.successful(Ok(checkBusinessNameView(businessNameCheckForm, agencyDetails.agencyName)))
-      }
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      Future.successful(Ok(checkBusinessNameView(businessNameCheckForm, agencyDetails.agencyName)))
     }
   }
 
   def submitCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { agent =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        businessNameCheckForm.bindFromRequest
-          .fold(
-            formWithErrors => {
-              Future.successful(Ok(checkBusinessNameView(formWithErrors, agencyDetails.agencyName)))
-            },
-            validForm => {
-              val useCurrentName = validForm.value
-              if (useCurrentName)
-                Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-              else
-                Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessNameForm))
-            }
-          )
-      }
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      businessNameCheckForm.bindFromRequest
+        .fold(
+          formWithErrors => {
+            Future.successful(Ok(checkBusinessNameView(formWithErrors, agencyDetails.agencyName)))
+          },
+          validForm => {
+            val useCurrentName = validForm.value
+            if (useCurrentName)
+              Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+            else
+              Future.successful(Redirect(routes.BusinessIdentificationController.showUpdateBusinessNameForm))
+          }
+        )
     }
   }
 
   def showUpdateBusinessNameForm: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        Future.successful(
-          Ok(updateBusinessNameView(updateBusinessNameForm.fill(BusinessNameForm(agencyDetails.agencyName)))))
-      }
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      Future.successful(
+        Ok(updateBusinessNameView(updateBusinessNameForm.fill(BusinessNameForm(agencyDetails.agencyName)))))
     }
   }
 
   def submitUpdateBusinessNameForm: Action[AnyContent] = Action.async { implicit request =>
-    withSubscribingAgent { overseasApplication =>
-      withEmailVerifiedAgencyDetails { agencyDetails =>
-        updateBusinessNameForm
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(Ok(updateBusinessNameView(formWithErrors))),
-            validForm => {
-              val agencyWithUpdatedName = agencyDetails.copy(agencyName = validForm.name)
+    withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
+      updateBusinessNameForm
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(Ok(updateBusinessNameView(formWithErrors))),
+          validForm => {
+            val agencyWithUpdatedName = agencyDetails.copy(agencyName = validForm.name)
 
-              updateAgencyDetails(agencyWithUpdatedName).map(_ =>
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-            }
-          )
-      }
+            sessionStoreService
+              .cacheAgencyDetails(agencyWithUpdatedName)
+              .map(_ => Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+          }
+        )
     }
   }
 

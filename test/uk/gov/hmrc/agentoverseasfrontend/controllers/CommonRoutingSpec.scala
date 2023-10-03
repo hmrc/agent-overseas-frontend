@@ -17,13 +17,12 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers
 
 import org.mockito.Mockito.when
-import org.scalatest.{Assertion, OptionValues}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{Assertion, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import play.api.mvc.Results
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Accepted, AttemptingRegistration, Complete, Registered, Rejected}
@@ -314,7 +313,7 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
 
 }
 
-object FakeRouting extends CommonRouting with Results with MockitoSugar {
+object FakeRouting extends CommonRouting with MockitoSugar {
   val connector: AgentOverseasApplicationConnector = mock[AgentOverseasApplicationConnector]
   protected val mockSessionCacheRepository: SessionCacheRepository = mock[SessionCacheRepository]
 

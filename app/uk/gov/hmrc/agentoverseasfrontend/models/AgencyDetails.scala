@@ -24,7 +24,7 @@ case class AgencyDetails(
   agencyEmail: String,
   agencyAddress: OverseasAddress,
   verifiedEmails: Set[String]) {
-  def emailVerified: Boolean = verifiedEmails.contains(agencyEmail)
+  def emailVerified: Boolean = verifiedEmails.exists(verifiedEmail => agencyEmail.equalsIgnoreCase(verifiedEmail))
 }
 
 object AgencyDetails {

@@ -693,15 +693,24 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
   }
 
   "email verification" should {
+    def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+      val result = f()
+      status(result) shouldBe 303
+      redirectLocation(result) shouldBe Some(routes.SubscriptionEmailVerificationController.verifyEmail.url)
+    }
+    def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      givenAcceptedApplicationResponse()
+      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+      val result = f()
+      status(result) should (equal(200) or equal(303))
+      if (status(result) == 303) redirectLocation(result) should not be Some(routes.SubscriptionEmailVerificationController.verifyEmail.url)
+    }
+
     "be triggered with an unverified email" when {
-      def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-        givenAcceptedApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
-        val result = f()
-        status(result) shouldBe 303
-        redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail.url
-      }
       "show check your answers" in checkVerifyEmailIsTriggered(() => controller.showCheckAnswers(cleanCredsAgent(FakeRequest())))
       "show check business address" in checkVerifyEmailIsTriggered(() => controller.showCheckBusinessAddress(cleanCredsAgent(FakeRequest())))
       "submit check business address" in checkVerifyEmailIsTriggered(() => controller.submitCheckBusinessAddress(cleanCredsAgent(FakeRequest())))
@@ -712,15 +721,16 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
       "show update business name" in checkVerifyEmailIsTriggered(() => controller.showUpdateBusinessNameForm(cleanCredsAgent(FakeRequest())))
       "submit update business name" in checkVerifyEmailIsTriggered(() => controller.submitUpdateBusinessNameForm(cleanCredsAgent(FakeRequest())))
     }
-    "not be triggered even with an unverified mail" when {
-      def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
+    "not be triggered when using with the email retrieved by auth" when {
+      "show check your answers" in checkVerifyEmailIsNotTriggered { () =>
         implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-        givenAcceptedApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
-        val result = f()
-        status(result) should (equal(200) or equal(303))
-        if (status(result) == 303) redirectLocation(result) should not be routes.SubscriptionEmailVerificationController.verifyEmail.url
+        // we use the email (authemail@email.com) which is returned in the mock auth response
+        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(agencyEmail = "authemail@email.com", verifiedEmails = Set.empty))
+        controller.showCheckAnswers(cleanCredsAgent(FakeRequest()))
       }
+      // also all other pages but checking one should be enough as they all use the same logic
+    }
+    "not be triggered even with an unverified mail" when {
       // these pages must display even with an unverified email otherwise the user couldn't enter or correct their email address!
       "show check business email" in checkVerifyEmailIsNotTriggered(() => controller.showCheckBusinessEmail(cleanCredsAgent(FakeRequest())))
       "submit check business email" in checkVerifyEmailIsNotTriggered(() => controller.submitCheckBusinessEmail(cleanCredsAgent(FakeRequest())))

@@ -1495,13 +1495,19 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
   }
 
   "email verification" should {
+    def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
+      val result = f()
+      status(result) shouldBe 303
+      redirectLocation(result).get shouldBe routes.ApplicationEmailVerificationController.verifyEmail.url
+    }
+    def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
+      val result = f()
+      status(result) should (equal(200) or equal(303))
+      if (status(result) == 303) redirectLocation(result) should not be routes.ApplicationEmailVerificationController.verifyEmail.url
+    }
     "be triggered with an unverified email" when {
-      def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
-        sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
-        val result = f()
-        status(result) shouldBe 303
-        redirectLocation(result).get shouldBe routes.ApplicationEmailVerificationController.verifyEmail.url
-      }
       "show trading name" in checkVerifyEmailIsTriggered(() => controller.showTradingNameForm(cleanCredsAgent(FakeRequest())))
       "submit trading name" in checkVerifyEmailIsTriggered(() => controller.submitTradingName(cleanCredsAgent(FakeRequest())))
       "show registered with HMRC" in checkVerifyEmailIsTriggered(() => controller.showRegisteredWithHmrcForm(cleanCredsAgent(FakeRequest())))
@@ -1515,13 +1521,16 @@ class ApplicationControllerISpec extends BaseISpec with AgentOverseasApplication
       "check answers" in checkVerifyEmailIsTriggered(() => controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest())))
       "submit check answers" in checkVerifyEmailIsTriggered(() => controller.submitCheckYourAnswers(cleanCredsAgent(FakeRequest())))
     }
-    "not be triggered even with an unverified mail" when {
-      def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
-        sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
-        val result = f()
-        status(result) should (equal(200) or equal(303))
-        if (status(result) == 303) redirectLocation(result) should not be routes.ApplicationEmailVerificationController.verifyEmail.url
+    "not be triggered when using with the email retrieved by auth" when {
+      "check answers" in checkVerifyEmailIsNotTriggered { () =>
+        // we use the email (authemail@email.com) which is returned in the mock auth response
+        sessionStoreService.currentSession.agentSession = Some(agentSession.copy(contactDetails = agentSession.contactDetails.map(_.copy(businessEmail = "authemail@email.com")), verifiedEmails = Set.empty))
+        controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
       }
+      // also all other pages but checking one should be enough as they all use the same logic
+    }
+
+    "not be triggered even with an unverified mail" when {
       // these pages must display even with an unverified email otherwise the user couldn't enter or correct their email address!
       "show contact details form" in checkVerifyEmailIsNotTriggered(() => controller.showContactDetailsForm(cleanCredsAgent(FakeRequest())))
       "submit contact details" in checkVerifyEmailIsNotTriggered(() => controller.submitContactDetails(cleanCredsAgent(FakeRequest())))
