@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials, email}
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -58,22 +58,29 @@ class ApplicationAuth @Inject()(
     implicit hc: HeaderCarrier,
     request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
-      .retrieve(credentials and allEnrolments) {
-        case Some(credentials) ~ enrolments =>
+      .retrieve(credentials and allEnrolments and email) {
+        case Some(credentials) ~ enrolments ~ maybeAuthEmail =>
           if (hasAgentEnrolment(enrolments))
             Future.successful(Redirect(appConfig.asaFrontendUrl))
           else
             sessionStoreService.fetchAgentSession.flatMap {
-              case Some(agentSession) if checkForEmailVerification && agentSession.emailNeedsVerifying =>
-                Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail))
               case Some(agentSession) =>
-                body(credentials, agentSession)
+                // Consider the auth email as verified for email verification purposes (APB-7317)
+                val agentSessionPlusAuth =
+                  agentSession.copy(verifiedEmails = agentSession.verifiedEmails ++ maybeAuthEmail.toSet)
+                if (checkForEmailVerification && agentSessionPlusAuth.emailNeedsVerifying) {
+                  // email needs verifying
+                  Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail))
+                } else {
+                  // happy path
+                  body(credentials, agentSession)
+                }
               case None =>
                 routesIfExistingApplication(s"${appConfig.agentOverseasFrontendUrl}/create-account")
                   .map(Redirect)
             }
 
-        case None ~ _ => throw UnsupportedCredentialRole("User has no credentials")
+        case None ~ _ ~ _ => throw UnsupportedCredentialRole("User has no credentials")
       }
       .recover(handleFailure(request))
 

@@ -16,14 +16,15 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import play.api.mvc.{Result, Results}
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait SessionBehaviour extends CommonRouting with Results {
+trait SessionBehaviour extends CommonRouting {
   val sessionStoreService: MongoDBSessionStoreService
   implicit val ec: ExecutionContext
 

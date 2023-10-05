@@ -43,8 +43,7 @@ class SubscriptionController @Inject()(
   emailTechnicalErrorView: cannot_verify_email_technical)(
   implicit override val ec: ExecutionContext,
   appConfig: AppConfig)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with SessionStoreHandler
-    with Logging {
+    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with Logging {
 
   import authAction.{config, withBasicAgentAuth, withHmrcAsAgentAction}
 

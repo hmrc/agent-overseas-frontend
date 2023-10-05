@@ -41,7 +41,9 @@ case class AgentSession(
   hasTrnsChanged: Boolean = false,
   verifiedEmails: Set[String] = Set.empty) {
 
-  def emailNeedsVerifying: Boolean = contactDetails.exists(details => !verifiedEmails.contains(details.businessEmail))
+  def emailNeedsVerifying: Boolean =
+    contactDetails.exists(details =>
+      !verifiedEmails.exists(verifiedEmail => details.businessEmail.equalsIgnoreCase(verifiedEmail)))
 
   def sanitize: AgentSession = {
     val agentCodes =
@@ -191,8 +193,6 @@ object AgentSession {
 
   object EmailUnverified {
     def unapply(session: Option[AgentSession]): Boolean =
-      session.exists { sesh =>
-        sesh.contactDetails.map(_.businessEmail).fold(false)(!sesh.verifiedEmails.contains(_))
-      }
+      session.exists(_.emailNeedsVerifying)
   }
 }

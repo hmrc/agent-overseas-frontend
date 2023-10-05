@@ -83,15 +83,17 @@ trait AuthStubs {
            """.stripMargin,
       s"""
          |{
-         |"allEnrolments": [
-         |  { "key":"${enrolment.serviceName}", "identifiers": [
-         |    {"key":"${enrolment.identifierName}", "value": "${enrolment.identifierValue}"}
-         |  ]}
-         |],
-         |    "optionalCredentials": {
+         |  "allEnrolments": [
+         |    { "key":"${enrolment.serviceName}", "identifiers": [
+         |      {"key":"${enrolment.identifierName}", "value": "${enrolment.identifierValue}"}
+         |    ]}
+         |  ],
+         |  "optionalCredentials": {
          |    "providerId": "12345-credId",
          |    "providerType": "GovernmentGateway"
-         |  }}
+         |  },
+         |  "email":"authemail@email.com"
+         |}
           """.stripMargin)
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
@@ -110,7 +112,7 @@ trait AuthStubs {
          |}
            """.stripMargin,
       s"""
-         |{"allEnrolments": []}""".stripMargin)
+         |{"allEnrolments": [], "email":"authemail@email.com"}""".stripMargin)
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
 
@@ -129,11 +131,12 @@ trait AuthStubs {
            """.stripMargin,
       s"""
          |{
-         |"allEnrolments": [],
-         |    "optionalCredentials": {
+         |  "allEnrolments": [],
+         |  "optionalCredentials": {
          |    "providerId": "12345-credId",
          |    "providerType": "GovernmentGateway"
-         |  }
+         |  },
+         |  "email":"authemail@email.com"
          |}
           """.stripMargin)
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
@@ -149,10 +152,11 @@ trait AuthStubs {
            """.stripMargin,
       s"""
          |{
-         |    "optionalCredentials": {
+         |  "optionalCredentials": {
          |    "providerId": "12345-credId",
          |    "providerType": "GovernmentGateway"
-         |  }
+         |  },
+         |  "email":"authemail@email.com"
          |}
           """.stripMargin)
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
@@ -170,10 +174,11 @@ trait AuthStubs {
            """.stripMargin,
       s"""
          |{
-         |    "optionalCredentials": {
+         |  "optionalCredentials": {
          |    "providerId": "12345-credId",
          |    "providerType": "GovernmentGateway"
-         |  }
+         |  },
+         |  "email":"authemail@email.com"
          |}
           """.stripMargin)
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
