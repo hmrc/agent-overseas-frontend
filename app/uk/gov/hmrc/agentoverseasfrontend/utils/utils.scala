@@ -22,4 +22,6 @@ package object utils {
 
   implicit def toFuture[T](a: T): Future[T] = Future.successful(a)
 
+  /** A function to compare emails in a whitespace and case-tolerant way. */
+  def compareEmail(email1: String, email2: String): Boolean = email1.trim.equalsIgnoreCase(email2.trim)
 }

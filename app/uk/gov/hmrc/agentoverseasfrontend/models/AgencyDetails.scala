@@ -18,13 +18,15 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
+import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 
 case class AgencyDetails(
   agencyName: String,
   agencyEmail: String,
   agencyAddress: OverseasAddress,
   verifiedEmails: Set[String]) {
-  def emailVerified: Boolean = verifiedEmails.exists(verifiedEmail => agencyEmail.equalsIgnoreCase(verifiedEmail))
+  def isEmailVerified(email: String): Boolean = verifiedEmails.exists(compareEmail(email, _))
+  def isEmailVerified: Boolean = isEmailVerified(agencyEmail)
 }
 
 object AgencyDetails {

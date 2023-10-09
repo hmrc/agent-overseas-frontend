@@ -61,7 +61,7 @@ class ApplicationEmailVerificationController @Inject()(
     throw new IllegalStateException("A verify email call has been made but no email to verify is present.")
   }
 
-  override def isAlreadyVerified(session: AgentSession, email: String): Boolean = session.verifiedEmails.contains(email)
+  override def isAlreadyVerified(session: AgentSession, email: String): Boolean = !session.emailNeedsVerifying(email)
 
   override def markEmailAsVerified(session: AgentSession, email: String)(
     implicit hc: HeaderCarrier): Future[AgentSession] = {

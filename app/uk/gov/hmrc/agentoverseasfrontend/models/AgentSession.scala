@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 import play.api.libs.json.{Json, OFormat}
 
 import scala.collection.immutable.SortedSet
+import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 
 case class AgentSession(
   amlsRequired: Option[Boolean] = None,
@@ -41,9 +42,10 @@ case class AgentSession(
   hasTrnsChanged: Boolean = false,
   verifiedEmails: Set[String] = Set.empty) {
 
-  def emailNeedsVerifying: Boolean =
-    contactDetails.exists(details =>
-      !verifiedEmails.exists(verifiedEmail => details.businessEmail.equalsIgnoreCase(verifiedEmail)))
+  def emailNeedsVerifying(email: String): Boolean =
+    !verifiedEmails.exists(compareEmail(email, _))
+
+  def emailNeedsVerifying: Boolean = contactDetails.exists(details => emailNeedsVerifying(details.businessEmail))
 
   def sanitize: AgentSession = {
     val agentCodes =
