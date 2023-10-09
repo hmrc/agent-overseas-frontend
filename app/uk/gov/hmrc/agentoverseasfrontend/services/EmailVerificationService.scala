@@ -20,6 +20,7 @@ import play.api.Logging
 import uk.gov.hmrc.agentoverseasfrontend.connectors.EmailVerificationConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.{Email, EmailVerificationStatus, VerifyEmailRequest}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,11 +54,12 @@ class EmailVerificationService @Inject()(emailVerificationConnector: EmailVerifi
     implicit hc: HeaderCarrier,
     ec: ExecutionContext): Future[EmailVerificationStatus] =
     emailVerificationConnector.checkEmail(credId).map {
-      case Some(vsr) if vsr.emails.filter(_.emailAddress == email).exists(_.verified) =>
+      case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.verified) =>
         EmailVerificationStatus.Verified
-      case Some(vsr) if vsr.emails.filter(_.emailAddress == email).exists(_.locked) => EmailVerificationStatus.Locked
-      case Some(x)                                                                  => EmailVerificationStatus.Unverified
-      case None                                                                     => EmailVerificationStatus.Error
+      case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.locked) =>
+        EmailVerificationStatus.Locked
+      case Some(x) => EmailVerificationStatus.Unverified
+      case None    => EmailVerificationStatus.Error
     }
 
 }

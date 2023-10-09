@@ -59,7 +59,7 @@ class SubscriptionEmailVerificationController @Inject()(
     }
 
   override def getEmailToVerify(session: AgencyDetails): String = session.agencyEmail
-  override def isAlreadyVerified(session: AgencyDetails, email: String): Boolean = session.emailVerified
+  override def isAlreadyVerified(session: AgencyDetails, email: String): Boolean = session.isEmailVerified(email)
   override def markEmailAsVerified(session: AgencyDetails, email: String)(
     implicit hc: HeaderCarrier): Future[AgencyDetails] = {
     val newAgencyDetails = session.copy(verifiedEmails = session.verifiedEmails + email)

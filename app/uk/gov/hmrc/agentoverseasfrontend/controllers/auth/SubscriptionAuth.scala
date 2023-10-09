@@ -107,7 +107,7 @@ class SubscriptionAuth @Inject()(
                         // Consider the auth email as verified for email verification purposes (APB-7317)
                         val agencyDetailsPlusAuth =
                           agencyDetails.copy(verifiedEmails = agencyDetails.verifiedEmails ++ maybeAuthEmail.toSet)
-                        if (checkForEmailVerification && !agencyDetailsPlusAuth.emailVerified) {
+                        if (checkForEmailVerification && !agencyDetailsPlusAuth.isEmailVerified) {
                           // email needs verifying
                           Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
                         } else {

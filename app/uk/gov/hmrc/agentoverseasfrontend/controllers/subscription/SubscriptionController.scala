@@ -51,7 +51,7 @@ class SubscriptionController @Inject()(
     withBasicAgentAuth { implicit subRequest =>
       if (subRequest.enrolments.isEmpty) {
         sessionStoreService.fetchAgencyDetails.flatMap {
-          case Some(agencyDetails) if !agencyDetails.emailVerified =>
+          case Some(agencyDetails) if !agencyDetails.isEmailVerified =>
             Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
           case _ =>
             subscriptionService.subscribe.map {
