@@ -18,13 +18,13 @@ case class SampleUser(userId: String, enrolments: Seq[Enrolment], affinity: Affi
 
 object SampleUser {
 
-  def subscribingAgentEnrolledForHMRCASAGENT() =
+  val subscribingAgentEnrolledForHMRCASAGENT: SampleUser =
     SampleUser(
       "12345-credId",
       Seq(Enrolment("HMRC-AS-AGENT", Seq(EnrolmentIdentifier("AgentReferenceNumber", "TARN0000001")), "Activated")),
       AffinityGroup.Agent)
 
-  def subscribingAgentEnrolledForNonMTD() =
+  val subscribingAgentEnrolledForNonMTD: SampleUser =
     SampleUser(
       "12345-credId",
       Seq(
@@ -34,13 +34,13 @@ object SampleUser {
       AffinityGroup.Agent
     )
 
-  def subscribingCleanAgentWithoutEnrolments() =
+  val subscribingCleanAgentWithoutEnrolments: SampleUser =
     SampleUser("12345-credId", Seq(), AffinityGroup.Agent)
 
-  def subscribing2ndCleanAgentWithoutEnrolments() =
+  val subscribing2ndCleanAgentWithoutEnrolments: SampleUser =
     SampleUser("54321-credId", Seq(), AffinityGroup.Agent)
 
-  def individual() =
+  val individual: SampleUser =
     SampleUser(
       "individual",
       Seq(Enrolment("FOO", Seq(EnrolmentIdentifier("foo", "AAAAA")), "Activated")),

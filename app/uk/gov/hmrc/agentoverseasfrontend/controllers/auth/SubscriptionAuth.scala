@@ -105,14 +105,21 @@ class SubscriptionAuth @Inject()(
                     .flatMap {
                       case Some(agencyDetails) =>
                         // Consider the auth email as verified for email verification purposes (APB-7317)
-                        val agencyDetailsPlusAuth =
+                        val agencyDetailsFixed =
                           agencyDetails.copy(verifiedEmails = agencyDetails.verifiedEmails ++ maybeAuthEmail.toSet)
-                        if (checkForEmailVerification && !agencyDetailsPlusAuth.isEmailVerified) {
-                          // email needs verifying
-                          Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
-                        } else {
-                          // happy path
-                          block(agencyDetails)
+                        def maybeUpdateSession(): Future[Unit] = {
+                          val sessionNeedsUpdating = agencyDetailsFixed != agencyDetails
+                          if (sessionNeedsUpdating) sessionStoreService.cacheAgencyDetails(agencyDetailsFixed)
+                          else Future.successful(())
+                        }
+                        maybeUpdateSession().flatMap { _ =>
+                          if (checkForEmailVerification && !agencyDetailsFixed.isEmailVerified) {
+                            // email needs verifying
+                            Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
+                          } else {
+                            // happy path
+                            block(agencyDetailsFixed)
+                          }
                         }
                       case None =>
                         logger.warn(s"Missing agency details in session, redirecting back to /check-answers")

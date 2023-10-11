@@ -19,7 +19,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
   "GET /check-answers" should {
     "display the check-answers page if status is Accepted" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -56,7 +56,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to application root path page if no active application available" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenApplicationEmptyResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -66,7 +66,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to /application-status if Pending" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenPendingApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -76,7 +76,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "redirect to /application-status if Rejected" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenRejectedApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -86,7 +86,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "attempt subscribeAndEnrol if Registered then redirect to /complete" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenRegisteredApplicationResponse()
       givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
@@ -99,7 +99,7 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
     }
 
     "attempt subscribeAndEnrol if Complete then redirect to /agent-services-account" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForHMRCASAGENT())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForHMRCASAGENT)
       givenCompleteApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
