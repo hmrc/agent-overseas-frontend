@@ -88,7 +88,7 @@ class BaseISpec extends AnyWordSpecLike
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     sessionStoreService.clear()
-    sessionDetailsRepo.collection.drop()
+    sessionDetailsRepo.collection.drop().toFuture().futureValue
     ()
   }
 

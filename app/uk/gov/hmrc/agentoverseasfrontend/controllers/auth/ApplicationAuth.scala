@@ -62,23 +62,31 @@ class ApplicationAuth @Inject()(
         case Some(credentials) ~ enrolments ~ maybeAuthEmail =>
           if (hasAgentEnrolment(enrolments))
             Future.successful(Redirect(appConfig.asaFrontendUrl))
-          else
+          else {
             sessionStoreService.fetchAgentSession.flatMap {
               case Some(agentSession) =>
                 // Consider the auth email as verified for email verification purposes (APB-7317)
-                val agentSessionPlusAuth =
+                val agentSessionFixed =
                   agentSession.copy(verifiedEmails = agentSession.verifiedEmails ++ maybeAuthEmail.toSet)
-                if (checkForEmailVerification && agentSessionPlusAuth.emailNeedsVerifying) {
-                  // email needs verifying
-                  Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail))
-                } else {
-                  // happy path
-                  body(credentials, agentSession)
+                def maybeUpdateSession(): Future[Unit] = {
+                  val sessionNeedsUpdating = agentSessionFixed != agentSession
+                  if (sessionNeedsUpdating) sessionStoreService.cacheAgentSession(agentSessionFixed)
+                  else Future.successful(())
+                }
+                maybeUpdateSession().flatMap { _ =>
+                  if (checkForEmailVerification && agentSessionFixed.emailNeedsVerifying) {
+                    // email needs verifying
+                    Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail))
+                  } else {
+                    // happy path
+                    body(credentials, agentSessionFixed)
+                  }
                 }
               case None =>
                 routesIfExistingApplication(s"${appConfig.agentOverseasFrontendUrl}/create-account")
                   .map(Redirect)
             }
+          }
 
         case None ~ _ ~ _ => throw UnsupportedCredentialRole("User has no credentials")
       }

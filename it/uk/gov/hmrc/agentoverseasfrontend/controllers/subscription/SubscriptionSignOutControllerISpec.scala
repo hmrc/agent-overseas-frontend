@@ -1,14 +1,13 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import org.mongodb.scala.model.Filters
-
-import java.net.URLEncoder
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
+import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SubscriptionSignOutControllerISpec extends BaseISpec {
@@ -82,8 +81,7 @@ class SubscriptionSignOutControllerISpec extends BaseISpec {
   }
 
 
-  private def findByAuthProviderId(authProviderId: String): Option[SessionDetails] = {
-    sessionDetailsRepo.collection.find(Filters.equal("authProviderId",authProviderId)).toFuture().map(results => results.headOption).futureValue
-  }
+  private def findByAuthProviderId(authProviderId: String): Option[SessionDetails] =
+    sessionDetailsRepo.collection.find(Filters.equal("authProviderId",authProviderId)).toFuture().map(_.headOption).futureValue
 
 }
