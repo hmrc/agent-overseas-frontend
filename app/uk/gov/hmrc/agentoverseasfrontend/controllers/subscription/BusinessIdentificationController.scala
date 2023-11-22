@@ -81,7 +81,8 @@ class BusinessIdentificationController @Inject()(
 
   def submitCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
-      businessAddressCheckForm.bindFromRequest
+      businessAddressCheckForm
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             val countryCode = agencyDetails.agencyAddress.countryCode
@@ -144,7 +145,8 @@ class BusinessIdentificationController @Inject()(
 
   def submitCheckBusinessEmail: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
-      businessEmailCheckForm.bindFromRequest
+      businessEmailCheckForm
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             Future.successful(Ok(checkBusinessEmailView(formWithErrors, agencyDetails.agencyEmail)))
@@ -192,7 +194,8 @@ class BusinessIdentificationController @Inject()(
 
   def submitCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
-      businessNameCheckForm.bindFromRequest
+      businessNameCheckForm
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             Future.successful(Ok(checkBusinessNameView(formWithErrors, agencyDetails.agencyName)))

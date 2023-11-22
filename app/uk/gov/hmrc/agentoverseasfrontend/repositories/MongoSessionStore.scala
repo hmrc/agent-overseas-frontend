@@ -33,7 +33,7 @@ trait MongoSessionStore[T] extends Logging {
 
   def get(implicit reads: Reads[T], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Option[T]]] =
     getSessionId match {
-      case Some(sessionId) ⇒
+      case Some(sessionId) =>
         cacheRepository
           .findById(sessionId)
           .map {
@@ -52,7 +52,7 @@ trait MongoSessionStore[T] extends Logging {
   def store(
     newSession: T)(implicit writes: Writes[T], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     getSessionId match {
-      case Some(sessionId) ⇒
+      case Some(sessionId) =>
         cacheRepository
           .put(sessionId)(DataKey[T](sessionName), newSession)
           .map(_ => Right(()))
@@ -64,7 +64,7 @@ trait MongoSessionStore[T] extends Logging {
 
   def delete()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     getSessionId match {
-      case Some(sessionId) ⇒
+      case Some(sessionId) =>
         cacheRepository
           .delete(sessionId)(DataKey[T](sessionName))
           .map(_ => Right(()))

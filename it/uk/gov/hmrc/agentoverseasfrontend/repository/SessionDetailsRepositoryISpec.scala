@@ -32,7 +32,7 @@ class SessionDetailsRepositoryISpec extends AnyWordSpecLike
       result.futureValue should not be empty
 
       val mappingArnResult = repo.collection.find(Filters.equal("id", result.futureValue)).toFuture().futureValue.head
-      mappingArnResult should have('id (result.futureValue), 'authProviderId (authProviderId))
+      mappingArnResult should have(Symbol("id") (result.futureValue), Symbol("authProviderId") (authProviderId))
       mappingArnResult.id.size shouldBe 32
     }
 

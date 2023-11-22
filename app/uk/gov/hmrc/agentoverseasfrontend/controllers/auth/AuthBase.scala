@@ -60,14 +60,14 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
     } yield Arn(identifier.value)
 
   protected def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Result] = {
-    case _: NoActiveSession ⇒
+    case _: NoActiveSession =>
       Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}&origin=$appName")
 
-    case _: InsufficientEnrolments ⇒
+    case _: InsufficientEnrolments =>
       logger.warn(s"Logged in user does not have required enrolments")
       Forbidden
 
-    case _: UnsupportedAuthProvider ⇒
+    case _: UnsupportedAuthProvider =>
       logger.warn(s"user logged in with unsupported auth provider")
       Forbidden
 

@@ -31,7 +31,7 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
     }
 
     def testNextStepPage(request: FakeRequest[AnyContentAsEmpty.type]) = {
-      givenAcceptedApplicationResponse
+      givenAcceptedApplicationResponse()
       val result = controller.nextStep(request)
       status(result) shouldBe 200
 

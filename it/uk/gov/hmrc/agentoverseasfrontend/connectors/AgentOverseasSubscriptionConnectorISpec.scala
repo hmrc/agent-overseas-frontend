@@ -21,28 +21,28 @@ class AgentOverseasSubscriptionConnectorISpec extends BaseISpec with AgentSubscr
 
     "return appropriate exception" when {
       "receiving a 401 Unauthorized response (bearer token expired/invalid)" in {
-        givenSubscriptionFailedUnauthorized
+        givenSubscriptionFailedUnauthorized()
 
         val e = connector.overseasSubscription.failed.futureValue
         e shouldBe a[UpstreamErrorResponse]
       }
 
       "receiving a 403 Forbidden response (user is not Agent or application not in 'accepted' status)" in {
-        givenSubscriptionFailedForbidden
+        givenSubscriptionFailedForbidden()
 
         val e = connector.overseasSubscription.failed.futureValue
         e shouldBe a[UpstreamErrorResponse]
       }
 
       "receiving a 503 response (service is unavailable)" in {
-        givenSubscriptionFailedUnavailable
+        givenSubscriptionFailedUnavailable()
 
         val e = connector.overseasSubscription.failed.futureValue
         e shouldBe a[UpstreamErrorResponse]
       }
 
       "receiving a 500 response (internal server error)" in {
-        givenSubscriptionFailedServerError
+        givenSubscriptionFailedServerError()
 
         val e = connector.overseasSubscription.failed.futureValue
         e shouldBe a[UpstreamErrorResponse]

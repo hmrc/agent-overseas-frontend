@@ -75,25 +75,25 @@ class AgentOverseasApplicationConnectorISpec
 
   "allApplications" should {
     "return applications for an authProviderId" in {
-      givenAcceptedApplicationResponse
+      givenAcceptedApplicationResponse()
 
       connector.allApplications.futureValue shouldBe List(application)
     }
 
     "return empty result for an authProviderId" in {
-      givenApplicationEmptyResponse
+      givenApplicationEmptyResponse()
 
       connector.allApplications.futureValue shouldBe List.empty
     }
 
     "return exception if the service is unavailable" in {
-      givenApplicationUnavailable
+      givenApplicationUnavailable()
       val e = connector.allApplications.failed.futureValue
       e shouldBe a[Exception]
     }
 
     "return exception if the service respond with internal server error" in {
-      givenApplicationServerError
+      givenApplicationServerError()
       val e = connector.allApplications.failed.futureValue
       e shouldBe a[Exception]
     }

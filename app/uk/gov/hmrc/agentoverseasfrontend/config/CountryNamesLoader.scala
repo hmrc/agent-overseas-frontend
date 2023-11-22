@@ -31,7 +31,7 @@ class CountryNamesLoader @Inject()(appConfig: AppConfig) {
 
       Source
         .fromInputStream(getClass.getResourceAsStream(appConfig.countryListLocation), "utf-8")
-        .getLines
+        .getLines()
         .drop(1)
         .foldLeft(Map.empty[String, String]) { (acc, row) =>
           val Array(code, name) = row.split(",", 2)

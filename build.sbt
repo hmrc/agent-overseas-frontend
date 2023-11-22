@@ -6,11 +6,11 @@ lazy val root = Project("agent-overseas-frontend", file("."))
     name := "agent-overseas-frontend",
     organization := "uk.gov.hmrc",
     majorVersion := 1,
-    scalaVersion := "2.12.15",
+    scalaVersion := "2.13.10",
     scalacOptions ++= Seq(
       "-Xfatal-warnings",
+      "-Wconf:msg=match may not be exhaustive:is",
       "-Xlint:-missing-interpolator,_",
-      "-Yno-adapted-args",
       "-deprecation",
       "-feature",
       "-unchecked",
@@ -32,5 +32,9 @@ lazy val root = Project("agent-overseas-frontend", file("."))
     Defaults.itSettings,
     IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
     IntegrationTest / parallelExecution := false
+  )
+  .settings(
+    //fix for scoverage compile errors for scala 2.13.10
+    libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
   )
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
