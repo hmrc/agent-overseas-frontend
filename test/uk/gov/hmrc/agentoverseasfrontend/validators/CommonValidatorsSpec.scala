@@ -22,7 +22,6 @@ import org.scalatest.{Assertion, EitherValues, OptionValues}
 import play.api.data.{FormError, Mapping}
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
 
-import scala.collection.immutable.Stream
 import scala.util.Random
 
 class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValues with EitherValues {
@@ -811,7 +810,7 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
     }
 
     "return country code if the value is present" in {
-      bind("IE").right.value shouldBe "IE"
+      bind("IE") shouldBe Right("IE")
     }
   }
 
@@ -820,6 +819,6 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
       val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
       chars charAt Random.nextInt(chars.length)
     }
-    Stream.continually(nextAlphaNum).take(limit).mkString
+    LazyList.continually(nextAlphaNum).take(limit).mkString
   }
 }

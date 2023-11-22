@@ -151,7 +151,8 @@ class FileUploadController @Inject()(
 
   def submitSuccessfulFileUploadedForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { implicit agentSession =>
-      SuccessfulFileUploadConfirmationForm.form.bindFromRequest
+      SuccessfulFileUploadConfirmationForm.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             val fileType = formWithErrors.data("fileType")

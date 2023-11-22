@@ -79,7 +79,8 @@ class ApplicationController @Inject()(
 
   def submitContactDetails: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
-      ContactDetailsForm.form.bindFromRequest
+      ContactDetailsForm.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -109,7 +110,8 @@ class ApplicationController @Inject()(
 
   def submitTradingName: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      TradingNameForm.form.bindFromRequest
+      TradingNameForm.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -141,7 +143,8 @@ class ApplicationController @Inject()(
 
   def submitRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      registeredWithHmrcForm.bindFromRequest
+      registeredWithHmrcForm
+        .bindFromRequest()
         .fold(
           formWithErrors => Ok(registeredWithHmrcView(formWithErrors)),
           validFormValue => {
@@ -185,7 +188,8 @@ class ApplicationController @Inject()(
 
   def submitAgentCodes: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      AgentCodesForm.form.bindFromRequest
+      AgentCodesForm.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -221,7 +225,8 @@ class ApplicationController @Inject()(
 
   def submitUkTaxRegistration: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      registeredForUkTaxForm.bindFromRequest
+      registeredForUkTaxForm
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -273,7 +278,8 @@ class ApplicationController @Inject()(
 
   def submitPersonalDetails: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
-      PersonalDetailsForm.form.bindFromRequest
+      PersonalDetailsForm.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -304,7 +310,8 @@ class ApplicationController @Inject()(
 
   def submitCompanyRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      CompanyRegistrationNumberForm.form.bindFromRequest
+      CompanyRegistrationNumberForm.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             if (agentSession.changingAnswers) {
@@ -345,7 +352,8 @@ class ApplicationController @Inject()(
 
   def submitCheckYourAnswers: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      CheckYourAnswers.form.bindFromRequest
+      CheckYourAnswers.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             BadRequest(

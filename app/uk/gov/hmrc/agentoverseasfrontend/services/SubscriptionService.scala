@@ -17,9 +17,9 @@
 package uk.gov.hmrc.agentoverseasfrontend.services
 
 import java.time.{LocalDateTime, ZoneOffset}
-
 import cats.data.OptionT
 import cats.implicits._
+
 import javax.inject.{Inject, Singleton}
 import play.api.Logging
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.{FailureToSubscribe, OverseasApp
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.{AlreadySubscribed, NoAgencyInSession, NoApplications, WrongApplicationStatus}
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
 import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -62,7 +62,7 @@ class SubscriptionService @Inject()(
     subscriptionConnector.overseasSubscription
       .map(arn => Right(arn))
       .recover {
-        case ex: Upstream4xxResponse if ex.upstreamResponseCode == 409 =>
+        case ex: UpstreamErrorResponse if ex.statusCode == 409 =>
           logger.info("The user is already subscribed", ex)
           Left(AlreadySubscribed)
       }

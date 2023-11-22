@@ -135,7 +135,8 @@ class AntiMoneyLaunderingController @Inject()(
 
   def submitAntiMoneyLaundering: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
-      AmlsDetailsForm.form.bindFromRequest
+      AmlsDetailsForm.form
+        .bindFromRequest()
         .fold(
           formWithErrors => {
             sessionStoreService.fetchAgentSession.map {

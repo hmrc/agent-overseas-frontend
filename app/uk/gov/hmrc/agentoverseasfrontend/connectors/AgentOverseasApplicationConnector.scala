@@ -31,7 +31,6 @@ import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.HttpErrorFunctions._
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HttpErrorFunctions._
 
 @Singleton
 class AgentOverseasApplicationConnector @Inject()(
