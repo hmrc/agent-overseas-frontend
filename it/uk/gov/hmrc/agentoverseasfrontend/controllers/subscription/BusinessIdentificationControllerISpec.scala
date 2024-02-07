@@ -98,6 +98,16 @@ class BusinessIdentificationControllerISpec extends BaseISpec with AgentOverseas
 
     }
 
+    "redirect to next-steps if Registered with unclean credential" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      givenRegisteredApplicationResponse()
+
+      val result: Future[Result] = controller.showCheckAnswers(request)
+      status(result) shouldBe 303
+
+      header(LOCATION, result).get shouldBe "/agent-services/apply-from-outside-uk/create-account/next-step"
+    }
+
     "attempt subscribeAndEnrol if Complete then redirect to /agent-services-account" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForHMRCASAGENT)
       givenCompleteApplicationResponse()
