@@ -25,11 +25,10 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
+trait AuthBase extends AuthorisedFunctions with Logging {
   val authConnector: AuthConnector
   val env: Environment
   val config: Configuration

@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.http.{JsValidationException, NotFoundException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.bootstrap.config.{AuthRedirects, HttpAuditEvent}
+import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +42,7 @@ class ErrorHandler @Inject()(
   implicit val config: Configuration,
   appConfig: AppConfig,
   ec: ExecutionContext)
-    extends FrontendErrorHandler with AuthRedirects with ErrorAuditing {
+    extends FrontendErrorHandler with ErrorAuditing {
 
   val appName: String = appConfig.appName
   val logger = Logger.of(appName)

@@ -1,12 +1,13 @@
 import CodeCoverageSettings.scoverageSettings
-import uk.gov.hmrc.SbtAutoBuildPlugin
+import uk.gov.hmrc.{DefaultBuildSettings, SbtAutoBuildPlugin}
 
-lazy val root = Project("agent-overseas-frontend", file("."))
+ThisBuild / majorVersion := 1
+ThisBuild / scalaVersion := "2.13.12"
+
+lazy val root = (project in file("."))
   .settings(
     name := "agent-overseas-frontend",
     organization := "uk.gov.hmrc",
-    majorVersion := 1,
-    scalaVersion := "2.13.10",
     scalacOptions ++= Seq(
       "-Xfatal-warnings",
       "-Wconf:msg=match may not be exhaustive:is",
@@ -26,15 +27,14 @@ lazy val root = Project("agent-overseas-frontend", file("."))
     Compile / scalafmtOnCompile := true,
     Test / scalafmtOnCompile := true
   )
-  .configs(IntegrationTest)
-  .settings(
-    IntegrationTest / Keys.fork := true,
-    Defaults.itSettings,
-    IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
-    IntegrationTest / parallelExecution := false
-  )
-  .settings(
-    //fix for scoverage compile errors for scala 2.13.10
-    libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
-  )
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(root % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(libraryDependencies ++= AppDependencies.test)
+  .settings(
+    Compile / scalafmtOnCompile := true,
+    Test / scalafmtOnCompile := true
+  )
