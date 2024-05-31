@@ -16,38 +16,29 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
-import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
-
-import javax.inject.{Inject, Singleton}
 import play.api.Logging
-import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.{VerificationStatusResponse, VerifyEmailRequest, VerifyEmailResponse}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailVerificationConnector @Inject()(http: HttpClient, metrics: Metrics)(implicit val appConfig: AppConfig)
-    extends HttpAPIMonitor with Logging {
-
-  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
+class EmailVerificationConnector @Inject()(http: HttpClient)(implicit val appConfig: AppConfig) extends Logging {
 
   def verifyEmail(request: VerifyEmailRequest)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext): Future[Option[VerifyEmailResponse]] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verify-email"
 
-    monitor(s"ConsumedAPI-email-verify-POST") {
-      http.POST[VerifyEmailRequest, HttpResponse](url, request).map { response =>
-        response.status match {
-          case 201 => Some(response.json.as[VerifyEmailResponse])
-          case status =>
-            logger.error(s"verifyEmail error for $request; HTTP status: $status, message: $response")
-            None
-        }
+    http.POST[VerifyEmailRequest, HttpResponse](url, request).map { response =>
+      response.status match {
+        case 201 => Some(response.json.as[VerifyEmailResponse])
+        case status =>
+          logger.error(s"verifyEmail error for $request; HTTP status: $status, message: $response")
+          None
       }
     }
   }
@@ -56,15 +47,13 @@ class EmailVerificationConnector @Inject()(http: HttpClient, metrics: Metrics)(i
     credId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VerificationStatusResponse]] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId"
 
-    monitor(s"ConsumedAPI-email-verification-status-GET") {
-      http.GET[HttpResponse](url).map { response =>
-        response.status match {
-          case 200 => Some(response.json.as[VerificationStatusResponse])
-          case 404 => Some(VerificationStatusResponse(List.empty))
-          case status =>
-            logger.error(s"email verification status error for $credId; HTTP status: $status, message: $response")
-            None
-        }
+    http.GET[HttpResponse](url).map { response =>
+      response.status match {
+        case 200 => Some(response.json.as[VerificationStatusResponse])
+        case 404 => Some(VerificationStatusResponse(List.empty))
+        case status =>
+          logger.error(s"email verification status error for $credId; HTTP status: $status, message: $response")
+          None
       }
     }
   }

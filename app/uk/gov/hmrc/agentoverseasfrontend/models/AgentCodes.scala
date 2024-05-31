@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class AgentCodes(selfAssessment: Option[SaAgentCode], corporationTax: Option[CtAgentCode]) {
   def hasOneOrMoreCodes: Boolean = this match {
@@ -28,5 +28,5 @@ case class AgentCodes(selfAssessment: Option[SaAgentCode], corporationTax: Optio
 }
 
 object AgentCodes {
-  implicit val format = Json.format[AgentCodes]
+  implicit val format: OFormat[AgentCodes] = Json.format[AgentCodes]
 }

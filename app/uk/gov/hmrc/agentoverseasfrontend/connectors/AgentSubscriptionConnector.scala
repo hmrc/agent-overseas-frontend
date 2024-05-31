@@ -16,16 +16,13 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
-import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HttpClient, _}
+
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 case class OverseasSubscriptionResponse(arn: Arn)
@@ -35,16 +32,11 @@ object OverseasSubscriptionResponse {
 }
 
 @Singleton
-class AgentSubscriptionConnector @Inject()(http: HttpClient, metrics: Metrics)(implicit val appConfig: AppConfig)
-    extends HttpAPIMonitor {
-
-  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
+class AgentSubscriptionConnector @Inject()(http: HttpClient)(implicit val appConfig: AppConfig) {
 
   def overseasSubscription(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Arn] = {
     val url = s"${appConfig.agentSubscriptionBaseUrl}/agent-subscription/overseas-subscription"
 
-    monitor(s"ConsumedAPI-agent-subscription-overseas-subscription-PUT") {
-      http.PUT[String, OverseasSubscriptionResponse](url, "").map(_.arn)
-    }
+    http.PUT[String, OverseasSubscriptionResponse](url, "").map(_.arn)
   }
 }

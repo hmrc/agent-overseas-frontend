@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import java.util.UUID
 import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.agentoverseasfrontend.formats.MongoJavaTimeFormats
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
@@ -36,6 +36,6 @@ object SessionDetails {
     SessionDetails(id, authProviderId)
   }
 
-  implicit val localDateTimeFormats: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+  implicit val localDateTimeFormats: Format[LocalDateTime] = MongoJavaTimeFormats.localDateTimeFormat
   implicit val format: OFormat[SessionDetails] = Json.format[SessionDetails]
 }

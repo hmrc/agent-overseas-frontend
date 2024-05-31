@@ -16,22 +16,17 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
-import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpscanConnector @Inject()(appConfig: AppConfig, httpClient: HttpClient, metrics: Metrics) extends HttpAPIMonitor {
-
-  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
+class UpscanConnector @Inject()(appConfig: AppConfig, httpClient: HttpClient) {
 
   val upscanUrl = s"${appConfig.upscanBaseUrl}/upscan/initiate"
 
@@ -48,10 +43,8 @@ class UpscanConnector @Inject()(appConfig: AppConfig, httpClient: HttpClient, me
     """.stripMargin)
 
   def initiate()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UpscanInitiate] =
-    monitor("ConsumedAPI-upscan-initiate-POST") {
-      httpClient
-        .POST[JsValue, JsValue](upscanUrl, payload, Seq("content-Type" -> "application/json"))
-        .map(_.as[UpscanInitiate])
+    httpClient
+      .POST[JsValue, JsValue](upscanUrl, payload, Seq("content-Type" -> "application/json"))
+      .map(_.as[UpscanInitiate])
 
-    }
 }

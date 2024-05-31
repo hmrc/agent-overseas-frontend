@@ -1,7 +1,7 @@
 $govuk-assets-path: "/agent-services/apply-from-outside-uk/assets/lib/govuk-frontend/govuk/assets/";
 $hmrc-assets-path: "/agent-services/apply-from-outside-uk/assets/lib/hmrc-frontend/hmrc/";
 
-@import "lib/govuk-frontend/govuk/all";
+@import "lib/govuk-frontend/dist/govuk/all";
 @import "lib/hmrc-frontend/hmrc/all";
 @import 'partials/_accessibleAutocomplete';
 @import 'partials/_loading-please-wait';
