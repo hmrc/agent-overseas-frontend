@@ -25,25 +25,26 @@ sealed trait OverseasAgentIdentifier { val value: String }
 case class SaAgentCode(value: String) extends OverseasAgentIdentifier
 
 object SaAgentCode {
-  implicit val reads =
+  implicit val reads: SimpleObjectReads[SaAgentCode] =
     new SimpleObjectReads[SaAgentCode]("value", SaAgentCode.apply)
-  implicit val writes = new SimpleObjectWrites[SaAgentCode](_.value)
+  implicit val writes: SimpleObjectWrites[SaAgentCode] = new SimpleObjectWrites[SaAgentCode](_.value)
 }
 
 case class CtAgentCode(value: String) extends OverseasAgentIdentifier
 
 object CtAgentCode {
-  implicit val reads =
+  implicit val reads: SimpleObjectReads[CtAgentCode] =
     new SimpleObjectReads[CtAgentCode]("value", CtAgentCode.apply)
-  implicit val writes = new SimpleObjectWrites[CtAgentCode](_.value)
+  implicit val writes: SimpleObjectWrites[CtAgentCode] = new SimpleObjectWrites[CtAgentCode](_.value)
 }
 
 case class ApplicationReference(value: String) extends OverseasAgentIdentifier
 
 object ApplicationReference {
 
-  implicit val reads = new SimpleObjectReads[ApplicationReference]("value", ApplicationReference.apply)
-  implicit val writes = new SimpleObjectWrites[ApplicationReference](_.value)
+  implicit val reads: SimpleObjectReads[ApplicationReference] =
+    new SimpleObjectReads[ApplicationReference]("value", ApplicationReference.apply)
+  implicit val writes: SimpleObjectWrites[ApplicationReference] = new SimpleObjectWrites[ApplicationReference](_.value)
 
   def create(uuid: UUID = UUID.randomUUID()): ApplicationReference = {
     val formatId = uuid.toString.replace("-", "").take(8)
@@ -54,21 +55,21 @@ object ApplicationReference {
 case class SafeId(value: String) extends OverseasAgentIdentifier
 
 object SafeId {
-  implicit val reads = new SimpleObjectReads[SafeId]("value", SafeId.apply)
-  implicit val writes = new SimpleObjectWrites[SafeId](_.value)
+  implicit val reads: SimpleObjectReads[SafeId] = new SimpleObjectReads[SafeId]("value", SafeId.apply)
+  implicit val writes: SimpleObjectWrites[SafeId] = new SimpleObjectWrites[SafeId](_.value)
 }
 
 case class Crn(value: String) extends OverseasAgentIdentifier
 
 object Crn {
-  implicit val reads = new SimpleObjectReads[Crn]("value", Crn.apply)
-  implicit val writes = new SimpleObjectWrites[Crn](_.value)
+  implicit val reads: SimpleObjectReads[Crn] = new SimpleObjectReads[Crn]("value", Crn.apply)
+  implicit val writes: SimpleObjectWrites[Crn] = new SimpleObjectWrites[Crn](_.value)
 }
 
 case class Trn(value: String) extends OverseasAgentIdentifier
 
 object Trn {
-  implicit val ordering = Ordering.by(unapply)
-  implicit val reads = new SimpleObjectReads[Trn]("value", Trn.apply)
-  implicit val writes = new SimpleObjectWrites[Trn](_.value)
+  implicit val ordering: Ordering[Trn] = Ordering.by(unapply)
+  implicit val reads: SimpleObjectReads[Trn] = new SimpleObjectReads[Trn]("value", Trn.apply)
+  implicit val writes: SimpleObjectWrites[Trn] = new SimpleObjectWrites[Trn](_.value)
 }

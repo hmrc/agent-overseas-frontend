@@ -16,29 +16,28 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
-import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
+
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpscanConnector @Inject()(appConfig: AppConfig, httpClient: HttpClient, metrics: Metrics) extends HttpAPIMonitor {
-
-  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
+class UpscanConnector @Inject() (appConfig: AppConfig, httpClient: HttpClient, val metrics: Metrics)(implicit
+  val ec: ExecutionContext
+) extends HttpAPIMonitor {
 
   val upscanUrl = s"${appConfig.upscanBaseUrl}/upscan/initiate"
 
   val callBackUrl =
     s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-callback"
 
-  val maxFileSize = 5000000 //5MB
+  val maxFileSize = 5000000 // 5MB
 
   val payload: JsValue = Json.parse(s"""{
                                        |"callbackUrl": "$callBackUrl",

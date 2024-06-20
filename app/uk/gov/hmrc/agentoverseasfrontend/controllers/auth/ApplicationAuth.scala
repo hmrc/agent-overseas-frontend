@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ApplicationAuth @Inject()(
+class ApplicationAuth @Inject() (
   val authConnector: AuthConnector,
   val sessionStoreService: MongoDBSessionStoreService,
   val applicationService: ApplicationService
@@ -54,9 +54,8 @@ class ApplicationAuth @Inject()(
       }
 
   def withCredsAndEnrollingAgent(checkForEmailVerification: Boolean)(
-    body: (Credentials, AgentSession) => Future[Result])(
-    implicit hc: HeaderCarrier,
-    request: Request[_]): Future[Result] =
+    body: (Credentials, AgentSession) => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(credentials and allEnrolments and email) {
         case Some(credentials) ~ enrolments ~ maybeAuthEmail =>
@@ -93,10 +92,12 @@ class ApplicationAuth @Inject()(
       .recover(handleFailure(request))
 
   def withEnrollingAgent(
-    body: AgentSession => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    body: AgentSession => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     withCredsAndEnrollingAgent(checkForEmailVerification = false)((_, session) => body(session))
 
   def withEnrollingEmailVerifiedAgent(
-    body: AgentSession => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    body: AgentSession => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     withCredsAndEnrollingAgent(checkForEmailVerification = true)((_, session) => body(session))
 }

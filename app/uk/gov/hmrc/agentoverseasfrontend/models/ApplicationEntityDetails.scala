@@ -32,17 +32,17 @@ case class ApplicationEntityDetails(
   status: ApplicationStatus,
   tradingName: String,
   businessEmail: String,
-  maintainerReviewedOn: Option[LocalDateTime])
+  maintainerReviewedOn: Option[LocalDateTime]
+)
 
 object ApplicationEntityDetails {
-  implicit val reads: Reads[ApplicationEntityDetails] = {
-
+  implicit val reads: Reads[ApplicationEntityDetails] =
     ((__ \ "createdDate").read[LocalDateTime] and
       (__ \ "status").read[ApplicationStatus] and
       (__ \ "tradingDetails" \ "tradingName").read[String] and
       (__ \ "contactDetails" \ "businessEmail").read[String] and
       (__ \ "maintainerDetails")
         .readNullable[MaintainerDetails])((createdDate, status, name, email, maintainerDetails) =>
-      ApplicationEntityDetails(createdDate, status, name, email, maintainerDetails.map(_.reviewedDate)))
-  }
+      ApplicationEntityDetails(createdDate, status, name, email, maintainerDetails.map(_.reviewedDate))
+    )
 }

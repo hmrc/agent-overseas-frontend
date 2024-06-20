@@ -25,11 +25,10 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
+trait AuthBase extends AuthorisedFunctions with Logging {
   val authConnector: AuthConnector
   val env: Environment
   val config: Configuration
@@ -37,13 +36,15 @@ trait AuthBase extends AuthRedirects with AuthorisedFunctions with Logging {
   implicit val ec: ExecutionContext
 
   def withBasicAuth(
-    block: Request[_] => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    block: Request[_] => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway)) {
       block(request)
     }.recover(handleFailure(request))
 
   def withBasicAuthAndAgentAffinity(
-    block: Request[_] => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    block: Request[_] => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
       block(request)
     }.recover(handleFailure(request))

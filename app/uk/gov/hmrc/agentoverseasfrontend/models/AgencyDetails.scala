@@ -24,7 +24,8 @@ case class AgencyDetails(
   agencyName: String,
   agencyEmail: String,
   agencyAddress: OverseasAddress,
-  verifiedEmails: Set[String]) {
+  verifiedEmails: Set[String]
+) {
   def isEmailVerified(email: String): Boolean = verifiedEmails.exists(compareEmail(email, _))
   def isEmailVerified: Boolean = isEmailVerified(agencyEmail)
 }
@@ -46,6 +47,8 @@ object AgencyDetails {
       agencyName = overseasApplication.tradingDetails.tradingName,
       agencyEmail = overseasApplication.contactDetails.businessEmail,
       agencyAddress = overseasApplication.tradingDetails.tradingAddress,
-      verifiedEmails = Set(overseasApplication.contactDetails.businessEmail) // When creating AgencyDetails from an overseas application we assume the email has already been verified.
+      verifiedEmails = Set(
+        overseasApplication.contactDetails.businessEmail
+      ) // When creating AgencyDetails from an overseas application we assume the email has already been verified.
     )
 }

@@ -26,5 +26,6 @@ object UpdateTrnForm {
     mapping(
       "original" -> nonEmptyText,
       "updated"  -> optional(taxRegistrationNumber)
-    )(UpdateTrn.apply)(UpdateTrn.unapply))
+    )(UpdateTrn.apply)(UpdateTrn.unapply)
+  )
 }

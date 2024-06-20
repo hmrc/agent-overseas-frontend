@@ -31,7 +31,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubscriptionEmailVerificationController @Inject()(
+class SubscriptionEmailVerificationController @Inject() (
   env: Environment,
   authAction: SubscriptionAuth,
   val sessionStoreService: MongoDBSessionStoreService,
@@ -52,16 +52,16 @@ class SubscriptionEmailVerificationController @Inject()(
     for {
       mAgencyDetails <- sessionStoreService.fetchAgencyDetails
       agencyDetails = mAgencyDetails.getOrElse(
-        throw new IllegalStateException("Email verification: no agency details found in session"))
+                        throw new IllegalStateException("Email verification: no agency details found in session")
+                      )
       creds <- authAction.getCreds
-    } yield {
-      (agencyDetails, creds.providerId)
-    }
+    } yield (agencyDetails, creds.providerId)
 
   override def getEmailToVerify(session: AgencyDetails): String = session.agencyEmail
   override def isAlreadyVerified(session: AgencyDetails, email: String): Boolean = session.isEmailVerified(email)
-  override def markEmailAsVerified(session: AgencyDetails, email: String)(
-    implicit hc: HeaderCarrier): Future[AgencyDetails] = {
+  override def markEmailAsVerified(session: AgencyDetails, email: String)(implicit
+    hc: HeaderCarrier
+  ): Future[AgencyDetails] = {
     val newAgencyDetails = session.copy(verifiedEmails = session.verifiedEmails + email)
     sessionStoreService.cacheAgencyDetails(newAgencyDetails).map(_ => newAgencyDetails)
   }

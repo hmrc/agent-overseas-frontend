@@ -41,23 +41,23 @@ trait MongoSessionStore[T] extends Logging {
             case _ =>
               Right(None)
           }
-          .recover {
-            case e: Exception =>
-              Left(e.getMessage)
+          .recover { case e: Exception =>
+            Left(e.getMessage)
           }
       case None =>
         Future successful Right(None)
     }
 
   def store(
-    newSession: T)(implicit writes: Writes[T], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
+    newSession: T
+  )(implicit writes: Writes[T], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
     getSessionId match {
       case Some(sessionId) =>
         cacheRepository
           .put(sessionId)(DataKey[T](sessionName), newSession)
           .map(_ => Right(()))
-          .recover {
-            case e: Exception => Left(e.getMessage)
+          .recover { case e: Exception =>
+            Left(e.getMessage)
           }
       case None => Future successful Left("Could not store session as no session Id found.")
     }

@@ -34,7 +34,7 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessIdentificationController @Inject()(
+class BusinessIdentificationController @Inject() (
   authAction: SubscriptionAuth,
   countryNamesLoader: CountryNamesLoader,
   subscriptionService: SubscriptionService,
@@ -61,7 +61,8 @@ class BusinessIdentificationController @Inject()(
       val countryCode = agencyDetails.agencyAddress.countryCode
       val countryName = countries.getOrElse(
         countryCode,
-        throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown"))
+        throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
+      )
 
       Future.successful(Ok(checkAnswersView(agencyDetails, countryName)))
     }
@@ -75,7 +76,8 @@ class BusinessIdentificationController @Inject()(
         throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
       )
       Future.successful(
-        Ok(checkBusinessAddressView(businessAddressCheckForm, agencyDetails.agencyAddress, countryName)))
+        Ok(checkBusinessAddressView(businessAddressCheckForm, agencyDetails.agencyAddress, countryName))
+      )
     }
   }
 
@@ -109,7 +111,10 @@ class BusinessIdentificationController @Inject()(
         Ok(
           updateBusinessAddressView(
             updateBusinessAddressForm(validCountryCodes).fill(BusinessAddressForm(agencyDetails.agencyAddress)),
-            countries)))
+            countries
+          )
+        )
+      )
     }
   }
 
@@ -148,9 +153,7 @@ class BusinessIdentificationController @Inject()(
       businessEmailCheckForm
         .bindFromRequest()
         .fold(
-          formWithErrors => {
-            Future.successful(Ok(checkBusinessEmailView(formWithErrors, agencyDetails.agencyEmail)))
-          },
+          formWithErrors => Future.successful(Ok(checkBusinessEmailView(formWithErrors, agencyDetails.agencyEmail))),
           validForm => {
             val useCurrentEmail = validForm.value
             if (useCurrentEmail)
@@ -165,7 +168,8 @@ class BusinessIdentificationController @Inject()(
   def showUpdateBusinessEmailForm: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
       Future.successful(
-        Ok(updateBusinessEmailView(updateBusinessEmailForm.fill(BusinessEmailForm(agencyDetails.agencyEmail)))))
+        Ok(updateBusinessEmailView(updateBusinessEmailForm.fill(BusinessEmailForm(agencyDetails.agencyEmail))))
+      )
     }
   }
 
@@ -197,9 +201,7 @@ class BusinessIdentificationController @Inject()(
       businessNameCheckForm
         .bindFromRequest()
         .fold(
-          formWithErrors => {
-            Future.successful(Ok(checkBusinessNameView(formWithErrors, agencyDetails.agencyName)))
-          },
+          formWithErrors => Future.successful(Ok(checkBusinessNameView(formWithErrors, agencyDetails.agencyName))),
           validForm => {
             val useCurrentName = validForm.value
             if (useCurrentName)
@@ -214,7 +216,8 @@ class BusinessIdentificationController @Inject()(
   def showUpdateBusinessNameForm: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       Future.successful(
-        Ok(updateBusinessNameView(updateBusinessNameForm.fill(BusinessNameForm(agencyDetails.agencyName)))))
+        Ok(updateBusinessNameView(updateBusinessNameForm.fill(BusinessNameForm(agencyDetails.agencyName))))
+      )
     }
   }
 
@@ -253,7 +256,8 @@ object BusinessIdentificationController {
         "addressLine3" -> addressLine34(lineNumber = 3),
         "addressLine4" -> addressLine34(lineNumber = 4),
         "countryCode"  -> countryCode(validCountryCodes)
-      )(BusinessAddressForm.apply)(BusinessAddressForm.unapply))
+      )(BusinessAddressForm.apply)(BusinessAddressForm.unapply)
+    )
 
   val updateBusinessEmailForm: Form[BusinessEmailForm] = Form[BusinessEmailForm](
     mapping(

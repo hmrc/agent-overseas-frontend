@@ -31,12 +31,13 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.application.timed_out
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ApplicationSignOutController @Inject()(
+class ApplicationSignOutController @Inject() (
   authAction: ApplicationAuth,
   sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
-  timedOutView: timed_out)(implicit ec: ExecutionContext, appConfig: AppConfig, val env: Environment)
+  timedOutView: timed_out
+)(implicit ec: ExecutionContext, appConfig: AppConfig, val env: Environment)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with I18nSupport {
 
   import authAction.withBasicAuth
@@ -47,7 +48,9 @@ class ApplicationSignOutController @Inject()(
 
   def signOutWithContinueUrl: Action[AnyContent] = Action {
     val continueUrl = s"${appConfig.agentOverseasFrontendUrl}"
-    SeeOther(CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(continueUrl))).withNewSession
+    SeeOther(
+      CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(continueUrl))
+    ).withNewSession
   }
 
   def signOutToStart: Action[AnyContent] = Action {

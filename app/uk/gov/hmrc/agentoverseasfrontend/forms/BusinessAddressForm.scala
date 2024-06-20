@@ -23,7 +23,8 @@ case class BusinessAddressForm(
   addressLine2: String,
   addressLine3: Option[String] = None,
   addressLine4: Option[String] = None,
-  countryCode: String)
+  countryCode: String
+)
 
 object BusinessAddressForm {
   def apply(businessAddress: OverseasAddress): BusinessAddressForm =

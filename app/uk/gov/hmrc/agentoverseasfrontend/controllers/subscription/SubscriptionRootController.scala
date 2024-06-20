@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubscriptionRootController @Inject()(
+class SubscriptionRootController @Inject() (
   override val messagesApi: MessagesApi,
   service: SubscriptionService,
   authAction: SubscriptionAuth,
@@ -37,10 +37,8 @@ class SubscriptionRootController @Inject()(
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   createNewAccountView: create_new_account,
-  cannotCheckStatusView: cannot_check_status)(
-  implicit appConfig: AppConfig,
-  ec: ExecutionContext,
-  configuration: Configuration)
+  cannotCheckStatusView: cannot_check_status
+)(implicit appConfig: AppConfig, ec: ExecutionContext, configuration: Configuration)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) {
 
   import authAction.withBasicAgentAuth

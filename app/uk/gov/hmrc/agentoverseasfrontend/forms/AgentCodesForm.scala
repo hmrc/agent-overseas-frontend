@@ -31,19 +31,20 @@ object AgentCodesForm {
         "self-assessment"          -> mandatoryIfTrue("self-assessment-checkbox", saAgentCode),
         "corporation-tax-checkbox" -> boolean,
         "corporation-tax"          -> mandatoryIfTrue("corporation-tax-checkbox", ctAgentCode)
-      )(
-        (hasSa, sa, hasCt, ct) =>
-          AgentCodes(
-            sa.collect { case x if hasSa => SaAgentCode(x) },
-            ct.collect { case x if hasCt => CtAgentCode(x) }
-        ))(
-        (codes: AgentCodes) =>
-          Some(
-            (
-              codes.selfAssessment.isDefined,
-              codes.selfAssessment.map(_.value),
-              codes.corporationTax.isDefined,
-              codes.corporationTax.map(_.value)
-            )))
+      )((hasSa, sa, hasCt, ct) =>
+        AgentCodes(
+          sa.collect { case x if hasSa => SaAgentCode(x) },
+          ct.collect { case x if hasCt => CtAgentCode(x) }
+        )
+      )((codes: AgentCodes) =>
+        Some(
+          (
+            codes.selfAssessment.isDefined,
+            codes.selfAssessment.map(_.value),
+            codes.corporationTax.isDefined,
+            codes.corporationTax.map(_.value)
+          )
+        )
+      )
     )
 }

@@ -23,7 +23,8 @@ case class ContactDetails(
   lastName: String,
   jobTitle: String,
   businessTelephone: String,
-  businessEmail: String)
+  businessEmail: String
+)
 
 object ContactDetails {
   implicit val contactDetailsFormat: Format[ContactDetails] =

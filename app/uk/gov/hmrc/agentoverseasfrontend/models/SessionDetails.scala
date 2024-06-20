@@ -16,17 +16,17 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import java.util.UUID
-import play.api.libs.json.{Format, Json, OFormat}
+import play.api.libs.json._
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.util.UUID
 
 case class SessionDetails(
   id: SessionDetailsId,
   authProviderId: String,
-  createdDate: LocalDateTime = Instant.now().atZone(ZoneOffset.UTC).toLocalDateTime)
+  createdDate: LocalDateTime = Instant.now().atZone(ZoneOffset.UTC).toLocalDateTime
+)
 
 object SessionDetails {
   type SessionDetailsId = String
@@ -36,6 +36,19 @@ object SessionDetails {
     SessionDetails(id, authProviderId)
   }
 
-  implicit val localDateTimeFormats: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+  final val localDateTimeReads: Reads[LocalDateTime] =
+    Reads
+      .at[String](__ \ "$date" \ "$numberLong")
+      .map(dateTime => Instant.ofEpochMilli(dateTime.toLong).atZone(ZoneOffset.UTC).toLocalDateTime)
+
+  final val localDateTimeWrites: Writes[LocalDateTime] =
+    Writes
+      .at[String](__ \ "$date" \ "$numberLong")
+      .contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
+
+  final val localDateTimeFormat: Format[LocalDateTime] =
+    Format(localDateTimeReads, localDateTimeWrites)
+
+  implicit val localDateTimeFormats: Format[LocalDateTime] = localDateTimeFormat
   implicit val format: OFormat[SessionDetails] = Json.format[SessionDetails]
 }

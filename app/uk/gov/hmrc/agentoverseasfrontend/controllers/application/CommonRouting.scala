@@ -63,13 +63,13 @@ trait CommonRouting {
     }
 
   def routesIfExistingApplication(
-    subscriptionRootPath: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Call] = {
+    subscriptionRootPath: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Call] = {
     def routing: Future[StatusRouting] =
       applicationService.getCurrentApplication.map {
-        case Some(application) if application.status == Rejected || application.status == Pending => {
+        case Some(application) if application.status == Rejected || application.status == Pending =>
           val initialiseSession = application.status == Rejected
           StatusRouting(routes.ApplicationRootController.applicationStatus, initialiseSession)
-        }
         case Some(application)
             if Set(Accepted, AttemptingRegistration, Registered, Complete)
               .contains(application.status) =>
@@ -81,8 +81,8 @@ trait CommonRouting {
     for {
       proceed <- routing
       _ <- if (proceed.initialiseAgentSession)
-            sessionStoreService.cacheAgentSession(AgentSession.empty)
-          else Future.successful(())
+             sessionStoreService.cacheAgentSession(AgentSession.empty)
+           else Future.successful(())
     } yield proceed.proceedTo
   }
 

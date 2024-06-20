@@ -22,7 +22,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class CountryNamesLoader @Inject()(appConfig: AppConfig) {
+class CountryNamesLoader @Inject() (appConfig: AppConfig) {
 
   def load: Map[String, String] =
     Try {

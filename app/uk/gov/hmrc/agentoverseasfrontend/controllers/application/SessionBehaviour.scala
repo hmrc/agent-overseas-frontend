@@ -31,8 +31,9 @@ trait SessionBehaviour extends CommonRouting {
   val showCheckYourAnswersUrl: String =
     routes.ApplicationController.showCheckYourAnswers.url
 
-  def updateSessionAndRedirect(agentSession: AgentSession)(redirectTo: String)(
-    implicit hc: HeaderCarrier): Future[Result] =
+  def updateSessionAndRedirect(
+    agentSession: AgentSession
+  )(redirectTo: String)(implicit hc: HeaderCarrier): Future[Result] =
     sessionStoreService
       .cacheAgentSession(agentSession)
       .map(_ => Redirect(redirectTo))

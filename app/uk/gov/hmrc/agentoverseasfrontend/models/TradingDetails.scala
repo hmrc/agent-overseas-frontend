@@ -28,7 +28,8 @@ case class TradingDetails(
   saAgentCode: Option[SaAgentCode],
   ctAgentCode: Option[CtAgentCode],
   companyRegistrationNumber: Option[Crn],
-  taxRegistrationNumbers: Option[SortedSet[Trn]])
+  taxRegistrationNumbers: Option[SortedSet[Trn]]
+)
 
 object TradingDetails {
   implicit val format: OFormat[TradingDetails] = Json.format

@@ -34,12 +34,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubscriptionService @Inject()(
+class SubscriptionService @Inject() (
   applicationConnector: AgentOverseasApplicationConnector,
   subscriptionConnector: AgentSubscriptionConnector,
   repository: SessionDetailsRepository,
-  sessionStoreService: MongoDBSessionStoreService)
-    extends Logging {
+  sessionStoreService: MongoDBSessionStoreService
+) extends Logging {
 
   implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
@@ -56,9 +56,10 @@ class SubscriptionService @Inject()(
         case Left(failure) => Future.successful(Left(failure))
       }
 
-  private def updateOverseasSubscription(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Either[FailureToSubscribe, Arn]] =
+  private def updateOverseasSubscription(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[FailureToSubscribe, Arn]] =
     subscriptionConnector.overseasSubscription
       .map(arn => Right(arn))
       .recover {
@@ -70,9 +71,10 @@ class SubscriptionService @Inject()(
   private def mostRecentApplicationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     mostRecentApplication.map(_.map(_.status))
 
-  private def updateAgencyDetailsOnApp()(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Either[FailureToSubscribe, Unit]] =
+  private def updateAgencyDetailsOnApp()(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Either[FailureToSubscribe, Unit]] =
     sessionStoreService.fetchAgencyDetails.flatMap {
       case Some(agency) => applicationConnector.updateApplicationWithAgencyDetails(agency).map(_ => Right(()))
       case None         => Future.successful(Left(NoAgencyInSession))
@@ -90,7 +92,8 @@ class SubscriptionService @Inject()(
     repository.create(authProviderId)
 
   def updateAuthProviderId(
-    sessionId: SessionDetailsId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    sessionId: SessionDetailsId
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     (for {
       oldAuthId <- OptionT(repository.findAuthProviderId(sessionId))
       _         <- OptionT.liftF(applicationConnector.updateAuthId(oldAuthId))

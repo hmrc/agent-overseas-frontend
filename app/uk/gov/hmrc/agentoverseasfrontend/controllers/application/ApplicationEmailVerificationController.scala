@@ -31,7 +31,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ApplicationEmailVerificationController @Inject()(
+class ApplicationEmailVerificationController @Inject() (
   env: Environment,
   authAction: ApplicationAuth,
   val sessionStoreService: MongoDBSessionStoreService,
@@ -52,9 +52,8 @@ class ApplicationEmailVerificationController @Inject()(
     accessibilityStatementConfig.url.getOrElse("")
 
   override def getState(implicit hc: HeaderCarrier): Future[(AgentSession, String)] =
-    getCredsAndAgentSession.map {
-      case (creds, agentSession) =>
-        (agentSession, creds.providerId)
+    getCredsAndAgentSession.map { case (creds, agentSession) =>
+      (agentSession, creds.providerId)
     }
 
   override def getEmailToVerify(session: AgentSession): String = session.contactDetails.map(_.businessEmail).getOrElse {
@@ -63,8 +62,9 @@ class ApplicationEmailVerificationController @Inject()(
 
   override def isAlreadyVerified(session: AgentSession, email: String): Boolean = !session.emailNeedsVerifying(email)
 
-  override def markEmailAsVerified(session: AgentSession, email: String)(
-    implicit hc: HeaderCarrier): Future[AgentSession] = {
+  override def markEmailAsVerified(session: AgentSession, email: String)(implicit
+    hc: HeaderCarrier
+  ): Future[AgentSession] = {
     val newAgentSession = session.copy(verifiedEmails = session.verifiedEmails + email)
     sessionStoreService.cacheAgentSession(newAgentSession).map(_ => newAgentSession)
   }

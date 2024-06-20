@@ -45,24 +45,21 @@ abstract class GenericEmailVerificationController[S](
   State methods
    */
 
-  /**
-    * Returns the session state and the credId of the current logged in user.
+  /** Returns the session state and the credId of the current logged in user.
     */
   def getState(implicit hc: HeaderCarrier): Future[(S, String)]
 
-  /**
-    * Extract the email to be verified from the current session state.
+  /** Extract the email to be verified from the current session state.
     */
   def getEmailToVerify(session: S): String
 
-  /**
-    * Check whether the email has already been marked as verified in the current session state.
+  /** Check whether the email has already been marked as verified in the current session state.
     */
   def isAlreadyVerified(session: S, email: String): Boolean
 
-  /**
-    * An effectful call to mark the email as being verified in our session. Should return the new session state.
-    * This function is expected to be idempotent (marking the same email as verified twice should not lead to unexpected results)
+  /** An effectful call to mark the email as being verified in our session. Should return the new session state. This
+    * function is expected to be idempotent (marking the same email as verified twice should not lead to unexpected
+    * results)
     */
   def markEmailAsVerified(session: S, email: String)(implicit hc: HeaderCarrier): Future[S]
 
@@ -70,79 +67,76 @@ abstract class GenericEmailVerificationController[S](
   Continuation URLs
    */
 
-  /**
-    * @return The Call that will hit the main method in this controller
+  /** @return
+    *   The Call that will hit the main method in this controller
     */
   def selfRoute: Call
 
-  /**
-    * User will be sent here if their email is confirmed verified (or was already verified)
+  /** User will be sent here if their email is confirmed verified (or was already verified)
     */
   def redirectUrlIfVerified(session: S): Call
 
-  /**
-    * User will be sent here if their email is locked out due to too many failed verifications
+  /** User will be sent here if their email is locked out due to too many failed verifications
     */
   def redirectUrlIfLocked(session: S): Call
 
-  /**
-    * User will be sent here in case of unexpected errors during verification
+  /** User will be sent here in case of unexpected errors during verification
     */
   def redirectUrlIfError(session: S): Call
 
-  /**
-    * The URL for the back link displayed on the verification page
+  /** The URL for the back link displayed on the verification page
     */
   def backLinkUrl(session: S): Option[Call]
 
-  /**
-    * User may be sent here if they need to re-enter their email
+  /** User may be sent here if they need to re-enter their email
     */
   def enterEmailUrl(session: S): Call
 
   def verifyEmail: Action[AnyContent] = Action.async { implicit request =>
-    getState.flatMap {
-      case (session, credId) =>
-        val emailToVerify = getEmailToVerify(session)
-        if (isAlreadyVerified(session, emailToVerify) || !emailVerificationEnabled) {
-          markEmailAsVerified(session, emailToVerify).map { updatedSession =>
-            Redirect(redirectUrlIfVerified(updatedSession))
-          }
-        } else {
-          // Check the status of the email with the email verification service
-          emailVerificationService.checkStatus(credId, emailToVerify).flatMap {
-            case EmailVerificationStatus.Verified =>
-              markEmailAsVerified(session, emailToVerify).map { updatedSession =>
-                Redirect(redirectUrlIfVerified(updatedSession))
-              }
-            // The email is not yet verified. Start the verification journey
-            case EmailVerificationStatus.Unverified =>
-              emailVerificationService
-                .verifyEmail(
-                  credId,
-                  Some(
-                    Email(
-                      address = emailToVerify,
-                      enterUrl = urlFor(enterEmailUrl(session))
-                    )),
-                  continueUrl = urlFor(selfRoute), // when the verification journey is done, this same method will be called again to verify that the email is indeed verified
-                  mBackUrl = backLinkUrl(session).map(urlFor(_)),
-                  accessibilityStatementUrl = accessibilityStatementUrl
-                )
-                .map {
-                  case Some(redirectUri) =>
-                    val url = if (useAbsoluteUrls) emailVerificationFrontendBaseUrl + redirectUri else redirectUri
-                    Redirect(url)
-                  case None => throw new RuntimeException("Could not start email verification journey")
-                }
-            // The email provided was locked out due to too many failed verification attempts
-            case EmailVerificationStatus.Locked =>
-              Future.successful(Redirect(redirectUrlIfLocked(session)))
-            // Any other error
-            case EmailVerificationStatus.Error =>
-              Future.successful(Redirect(redirectUrlIfError(session)))
-          }
+    getState.flatMap { case (session, credId) =>
+      val emailToVerify = getEmailToVerify(session)
+      if (isAlreadyVerified(session, emailToVerify) || !emailVerificationEnabled) {
+        markEmailAsVerified(session, emailToVerify).map { updatedSession =>
+          Redirect(redirectUrlIfVerified(updatedSession))
         }
+      } else {
+        // Check the status of the email with the email verification service
+        emailVerificationService.checkStatus(credId, emailToVerify).flatMap {
+          case EmailVerificationStatus.Verified =>
+            markEmailAsVerified(session, emailToVerify).map { updatedSession =>
+              Redirect(redirectUrlIfVerified(updatedSession))
+            }
+          // The email is not yet verified. Start the verification journey
+          case EmailVerificationStatus.Unverified =>
+            emailVerificationService
+              .verifyEmail(
+                credId,
+                Some(
+                  Email(
+                    address = emailToVerify,
+                    enterUrl = urlFor(enterEmailUrl(session))
+                  )
+                ),
+                continueUrl = urlFor(
+                  selfRoute
+                ), // when the verification journey is done, this same method will be called again to verify that the email is indeed verified
+                mBackUrl = backLinkUrl(session).map(urlFor(_)),
+                accessibilityStatementUrl = accessibilityStatementUrl
+              )
+              .map {
+                case Some(redirectUri) =>
+                  val url = if (useAbsoluteUrls) emailVerificationFrontendBaseUrl + redirectUri else redirectUri
+                  Redirect(url)
+                case None => throw new RuntimeException("Could not start email verification journey")
+              }
+          // The email provided was locked out due to too many failed verification attempts
+          case EmailVerificationStatus.Locked =>
+            Future.successful(Redirect(redirectUrlIfLocked(session)))
+          // Any other error
+          case EmailVerificationStatus.Error =>
+            Future.successful(Redirect(redirectUrlIfError(session)))
+        }
+      }
 
     }
   }

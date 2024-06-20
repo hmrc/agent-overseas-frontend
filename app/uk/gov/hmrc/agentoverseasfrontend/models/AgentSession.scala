@@ -40,7 +40,8 @@ case class AgentSession(
   fileType: Option[String] = None,
   changingAnswers: Boolean = false,
   hasTrnsChanged: Boolean = false,
-  verifiedEmails: Set[String] = Set.empty) {
+  verifiedEmails: Set[String] = Set.empty
+) {
 
   def emailNeedsVerifying(email: String): Boolean =
     !verifiedEmails.exists(compareEmail(email, _))
@@ -180,7 +181,9 @@ object AgentSession {
 
   object NoTaxRegistrationNumber {
     def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.hasTaxRegNumbers.getOrElse(true) == false) //interested in false so getOrElse(true) is the bad case
+      session.exists(
+        _.hasTaxRegNumbers.getOrElse(true) == false
+      ) // interested in false so getOrElse(true) is the bad case
   }
 
   object TaxRegistrationNumbersEmpty {

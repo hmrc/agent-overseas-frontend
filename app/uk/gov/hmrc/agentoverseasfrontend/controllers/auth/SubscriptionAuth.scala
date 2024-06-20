@@ -37,7 +37,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubscriptionAuth @Inject()(
+class SubscriptionAuth @Inject() (
   val authConnector: AuthConnector,
   val sessionStoreService: MongoDBSessionStoreService,
   val applicationService: ApplicationService,
@@ -52,21 +52,22 @@ class SubscriptionAuth @Inject()(
     }
 
   def withBasicAgentAuth(
-    block: SubscriptionRequest => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    block: SubscriptionRequest => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
-      .retrieve(allEnrolments and credentials) {
-        case enrolments ~ creds =>
-          creds match {
-            case Some(c) => block(SubscriptionRequest(c.providerId, enrolments.enrolments))
-            case None =>
-              logger.warn("credentials expected but not found for the logged in user")
-              Future.successful(Forbidden)
-          }
+      .retrieve(allEnrolments and credentials) { case enrolments ~ creds =>
+        creds match {
+          case Some(c) => block(SubscriptionRequest(c.providerId, enrolments.enrolments))
+          case None =>
+            logger.warn("credentials expected but not found for the logged in user")
+            Future.successful(Forbidden)
+        }
       }
       .recover(handleFailure(request))
 
   def withHmrcAsAgentAction(
-    block: Arn => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    block: Arn => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(Enrolment("HMRC-AS-AGENT") and AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(authorisedEnrolments) { enrolments =>
         getArn(enrolments) match {
@@ -79,70 +80,71 @@ class SubscriptionAuth @Inject()(
       .recover(handleFailure(request))
 
   def withSubscribingAgent(checkForEmailVerification: Boolean, generateNewDetailsIfNoSession: Boolean = false)(
-    block: AgencyDetails => Future[Result])(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
+    block: AgencyDetails => Future[Result]
+  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
-      .retrieve(allEnrolments and email) {
-        case enrolments ~ maybeAuthEmail =>
-          if (hasAgentEnrolment(enrolments)) {
-            Future.successful(Redirect(appConfig.asaFrontendUrl))
-          } else {
-            val hasCleanCreds = enrolments.enrolments.isEmpty
+      .retrieve(allEnrolments and email) { case enrolments ~ maybeAuthEmail =>
+        if (hasAgentEnrolment(enrolments)) {
+          Future.successful(Redirect(appConfig.asaFrontendUrl))
+        } else {
+          val hasCleanCreds = enrolments.enrolments.isEmpty
 
-            subscriptionService.mostRecentApplication.flatMap {
-              case Some(application) if application.status == Pending || application.status == Rejected =>
-                Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}/application-status"))
-              case Some(application) if application.status == ApplicationStatus.Accepted =>
-                if (hasCleanCreds) {
-                  // happy path
-                  sessionStoreService.fetchAgencyDetails
-                    .flatMap { maybeAgencyDetails =>
-                      // If there are no AgentDetails in session, create a new one derived from the agent's application data and store it in the session
-                      if (maybeAgencyDetails.isEmpty && generateNewDetailsIfNoSession) {
-                        val agencyDetails = AgencyDetails.fromOverseasApplication(application)
-                        sessionStoreService.cacheAgencyDetails(agencyDetails).map(_ => Some(agencyDetails))
-                      } else Future.successful(maybeAgencyDetails)
-                    }
-                    .flatMap {
-                      case Some(agencyDetails) =>
-                        // Consider the auth email as verified for email verification purposes (APB-7317)
-                        val agencyDetailsFixed =
-                          agencyDetails.copy(verifiedEmails = agencyDetails.verifiedEmails ++ maybeAuthEmail.toSet)
-                        def maybeUpdateSession(): Future[Unit] = {
-                          val sessionNeedsUpdating = agencyDetailsFixed != agencyDetails
-                          if (sessionNeedsUpdating) sessionStoreService.cacheAgencyDetails(agencyDetailsFixed)
-                          else Future.successful(())
+          subscriptionService.mostRecentApplication.flatMap {
+            case Some(application) if application.status == Pending || application.status == Rejected =>
+              Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}/application-status"))
+            case Some(application) if application.status == ApplicationStatus.Accepted =>
+              if (hasCleanCreds) {
+                // happy path
+                sessionStoreService.fetchAgencyDetails
+                  .flatMap { maybeAgencyDetails =>
+                    // If there are no AgentDetails in session, create a new one derived from the agent's application data and store it in the session
+                    if (maybeAgencyDetails.isEmpty && generateNewDetailsIfNoSession) {
+                      val agencyDetails = AgencyDetails.fromOverseasApplication(application)
+                      sessionStoreService.cacheAgencyDetails(agencyDetails).map(_ => Some(agencyDetails))
+                    } else Future.successful(maybeAgencyDetails)
+                  }
+                  .flatMap {
+                    case Some(agencyDetails) =>
+                      // Consider the auth email as verified for email verification purposes (APB-7317)
+                      val agencyDetailsFixed =
+                        agencyDetails.copy(verifiedEmails = agencyDetails.verifiedEmails ++ maybeAuthEmail.toSet)
+                      def maybeUpdateSession(): Future[Unit] = {
+                        val sessionNeedsUpdating = agencyDetailsFixed != agencyDetails
+                        if (sessionNeedsUpdating) sessionStoreService.cacheAgencyDetails(agencyDetailsFixed)
+                        else Future.successful(())
+                      }
+                      maybeUpdateSession().flatMap { _ =>
+                        if (checkForEmailVerification && !agencyDetailsFixed.isEmailVerified) {
+                          // email needs verifying
+                          Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
+                        } else {
+                          // happy path
+                          block(agencyDetailsFixed)
                         }
-                        maybeUpdateSession().flatMap { _ =>
-                          if (checkForEmailVerification && !agencyDetailsFixed.isEmailVerified) {
-                            // email needs verifying
-                            Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
-                          } else {
-                            // happy path
-                            block(agencyDetailsFixed)
-                          }
-                        }
-                      case None =>
-                        logger.warn(s"Missing agency details in session, redirecting back to /check-answers")
-                        Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-                    }
-                } else Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
-              case Some(application) if application.status == Registered || application.status == Complete =>
-                if (hasCleanCreds)
-                  subscriptionService.subscribe.flatMap {
-                    case Right(_) =>
-                      Future.successful(Redirect(subscription.routes.SubscriptionController.subscriptionComplete))
-                    case Left(_) =>
-                      Future.successful(Redirect(subscription.routes.SubscriptionController.alreadySubscribed))
-                  } else
-                  Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
-              case Some(application) if application.status == AttemptingRegistration =>
-                Future.successful(Redirect(subscription.routes.SubscriptionRootController.showApplicationIssue))
-              case None =>
-                Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}"))
-              case application =>
-                throw new RuntimeException(s"Could not proceed with application status ${application.map(_.status)}")
-            }
+                      }
+                    case None =>
+                      logger.warn(s"Missing agency details in session, redirecting back to /check-answers")
+                      Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+                  }
+              } else Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
+            case Some(application) if application.status == Registered || application.status == Complete =>
+              if (hasCleanCreds)
+                subscriptionService.subscribe.flatMap {
+                  case Right(_) =>
+                    Future.successful(Redirect(subscription.routes.SubscriptionController.subscriptionComplete))
+                  case Left(_) =>
+                    Future.successful(Redirect(subscription.routes.SubscriptionController.alreadySubscribed))
+                }
+              else
+                Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
+            case Some(application) if application.status == AttemptingRegistration =>
+              Future.successful(Redirect(subscription.routes.SubscriptionRootController.showApplicationIssue))
+            case None =>
+              Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}"))
+            case application =>
+              throw new RuntimeException(s"Could not proceed with application status ${application.map(_.status)}")
           }
+        }
       }
       .recover(handleFailure(request))
 

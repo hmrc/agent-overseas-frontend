@@ -34,7 +34,7 @@ import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class TaxRegController @Inject()(
+class TaxRegController @Inject() (
   val env: Environment,
   authAction: ApplicationAuth,
   sessionStoreService: MongoDBSessionStoreService,
@@ -46,7 +46,8 @@ class TaxRegController @Inject()(
   yourTrnsView: your_tax_registration_numbers,
   updateTrnView: update_tax_registration_number,
   removeTrnView: remove_tax_reg_number,
-  errorTemplateView: error_template)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
+  errorTemplateView: error_template
+)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport with Logging {
 
@@ -85,7 +86,8 @@ class TaxRegController @Inject()(
                     taxRegistrationNumbers = validForm.value.flatMap(taxId => Some(SortedSet(taxId))),
                     hasTrnsChanged = validForm.value.isDefined
                   ),
-                  routes.TaxRegController.showYourTaxRegNumbersForm.url)
+                  routes.TaxRegController.showYourTaxRegNumbersForm.url
+                )
               } else {
                 (
                   agentSession.copy(
@@ -94,7 +96,8 @@ class TaxRegController @Inject()(
                     trnUploadStatus = None,
                     hasTrnsChanged = false
                   ),
-                  routes.TaxRegController.showMoreInformationNeeded.url)
+                  routes.TaxRegController.showMoreInformationNeeded.url
+                )
               }
 
             updateSession(updatedSession)(redirectLink)
@@ -132,7 +135,9 @@ class TaxRegController @Inject()(
                   taxRegistrationNumbers = Some(trns),
                   hasTaxRegNumbers = Some(true),
                   changingAnswers = false,
-                  hasTrnsChanged = true))(routes.TaxRegController.showYourTaxRegNumbersForm.url)
+                  hasTrnsChanged = true
+                )
+            )(routes.TaxRegController.showYourTaxRegNumbersForm.url)
           }
         )
     }
@@ -148,8 +153,10 @@ class TaxRegController @Inject()(
           Some(
             routes.TaxRegController
               .showUpdateTaxRegNumber(
-                trns.headOption.getOrElse(throw new RuntimeException("no tax registration numbers in session")).value)
-              .url)
+                trns.headOption.getOrElse(throw new RuntimeException("no tax registration numbers in session")).value
+              )
+              .url
+          )
         else None
       Ok(yourTrnsView(DoYouWantToAddAnotherTrnForm.form, trns.map(_.value), backLink))
     }
@@ -169,20 +176,21 @@ class TaxRegController @Inject()(
               Ok(yourTrnsView(formWithErrors, trns.map(_.value)))
             }
           },
-          validForm => {
+          validForm =>
             validForm.value match {
               case Some(true) =>
                 Redirect(routes.TaxRegController.showAddTaxRegNoForm.url)
               case _ =>
                 if (agentSession.hasTrnsChanged) {
                   updateSession(agentSession.copy(trnUploadStatus = None, hasTrnsChanged = false))(
-                    routes.FileUploadController.showTrnUploadForm.url)
+                    routes.FileUploadController.showTrnUploadForm.url
+                  )
                 } else {
                   updateSession(agentSession.copy(hasTrnsChanged = false))(
-                    routes.ApplicationController.showCheckYourAnswers.url)
+                    routes.ApplicationController.showCheckYourAnswers.url
+                  )
                 }
             }
-          }
         )
     }
   }
@@ -200,7 +208,8 @@ class TaxRegController @Inject()(
         .fold(
           formWithErrors => {
             logger.warn(
-              s"error during updating tax registration number ${formWithErrors.errors.map(_.message).mkString(",")}")
+              s"error during updating tax registration number ${formWithErrors.errors.map(_.message).mkString(",")}"
+            )
             Ok(updateTrnView(formWithErrors))
           },
           validForm =>
@@ -209,13 +218,14 @@ class TaxRegController @Inject()(
                 val updatedSet = agentSession.taxRegistrationNumbers
                   .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(validForm.original) + Trn(updatedTrn))
 
-                updateSession(agentSession
-                  .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true))(
-                  routes.TaxRegController.showYourTaxRegNumbersForm.url)
+                updateSession(
+                  agentSession
+                    .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true)
+                )(routes.TaxRegController.showYourTaxRegNumbersForm.url)
 
               case None =>
                 Ok(updateTrnView(UpdateTrnForm.form.fill(validForm.copy(updated = Some(validForm.original)))))
-          }
+            }
         )
     }
   }
@@ -235,7 +245,7 @@ class TaxRegController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors => Ok(removeTrnView(formWithErrors, trn)),
-          validForm => {
+          validForm =>
             if (validForm.value) {
               val updatedSet = agentSession.taxRegistrationNumbers
                 .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(trn))
@@ -247,7 +257,8 @@ class TaxRegController @Inject()(
                       taxRegistrationNumbers = None,
                       trnUploadStatus = None,
                       changingAnswers = false,
-                      hasTrnsChanged = true)
+                      hasTrnsChanged = true
+                    )
                 else
                   agentSession
                     .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true)
@@ -260,7 +271,6 @@ class TaxRegController @Inject()(
             } else {
               Redirect(routes.TaxRegController.showYourTaxRegNumbersForm)
             }
-          }
         )
     }
   }

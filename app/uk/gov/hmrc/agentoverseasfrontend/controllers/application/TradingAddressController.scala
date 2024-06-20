@@ -31,7 +31,7 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.application.main_business_ad
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class TradingAddressController @Inject()(
+class TradingAddressController @Inject() (
   val env: Environment,
   sessionStoreService: MongoDBSessionStoreService,
   applicationService: ApplicationService,
@@ -39,7 +39,8 @@ class TradingAddressController @Inject()(
   countryNamesLoader: CountryNamesLoader,
   authAction: ApplicationAuth,
   cc: MessagesControllerComponents,
-  mainBusinessAddressView: main_business_address)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
+  mainBusinessAddressView: main_business_address
+)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
@@ -57,7 +58,9 @@ class TradingAddressController @Inject()(
           mainBusinessAddressView(
             agentSession.overseasAddress.fold(form)(form.fill),
             countries,
-            Some(showCheckYourAnswersUrl)))
+            Some(showCheckYourAnswersUrl)
+          )
+        )
       } else {
         Ok(mainBusinessAddressView(agentSession.overseasAddress.fold(form)(form.fill), countries))
       }
@@ -70,16 +73,16 @@ class TradingAddressController @Inject()(
         .mainBusinessAddressForm(validCountryCodes)
         .bindFromRequest()
         .fold(
-          formWithErrors => {
+          formWithErrors =>
             if (agentSession.changingAnswers) {
               Ok(mainBusinessAddressView(formWithErrors, countries, Some(showCheckYourAnswersUrl)))
             } else {
               Ok(mainBusinessAddressView(formWithErrors, countries))
-            }
-          },
+            },
           validForm =>
             updateSession(agentSession.copy(overseasAddress = Some(validForm)))(
-              routes.FileUploadController.showTradingAddressUploadForm.url)
+              routes.FileUploadController.showTradingAddressUploadForm.url
+            )
         )
     }
   }

@@ -25,8 +25,9 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AgentOverseasBaseController @Inject()(
+class AgentOverseasBaseController @Inject() (
   val sessionStoreService: MongoDBSessionStoreService,
   val applicationService: ApplicationService,
-  override val controllerComponents: MessagesControllerComponents)(implicit val ec: ExecutionContext)
+  override val controllerComponents: MessagesControllerComponents
+)(implicit val ec: ExecutionContext)
     extends FrontendController(controllerComponents) with SessionBehaviour with I18nSupport {}

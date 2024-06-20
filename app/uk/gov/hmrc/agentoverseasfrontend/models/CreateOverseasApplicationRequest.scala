@@ -42,27 +42,26 @@ object CreateOverseasApplicationRequest {
       businessAddress       <- agentSession.overseasAddress
       isHmrcAgentRegistered <- agentSession.registeredWithHmrc
       tradingAddressFileRef <- agentSession.tradingAddressUploadStatus.map(_.reference)
-    } yield
-      CreateOverseasApplicationRequest(
-        amlsRequired,
-        agentSession.amlsDetails,
-        contactDetails,
-        TradingDetails(
-          tradingName,
-          businessAddress,
-          agentSession.registeredForUkTax,
-          isHmrcAgentRegistered,
-          agentSession.agentCodes.flatMap(_.selfAssessment),
-          agentSession.agentCodes.flatMap(_.corporationTax),
-          agentSession.companyRegistrationNumber.flatMap(_.registrationNumber),
-          agentSession.taxRegistrationNumbers
-        ),
-        PersonalDetails(
-          agentSession.personalDetails.flatMap(_.saUtr.map(u => Utr(u.toString()))),
-          agentSession.personalDetails.flatMap(_.nino)
-        ),
-        agentSession.amlsUploadStatus.map(_.reference),
-        tradingAddressFileRef,
-        agentSession.trnUploadStatus.map(_.reference)
-      )).getOrElse(throw new Exception("Could not create application request from agent session"))
+    } yield CreateOverseasApplicationRequest(
+      amlsRequired,
+      agentSession.amlsDetails,
+      contactDetails,
+      TradingDetails(
+        tradingName,
+        businessAddress,
+        agentSession.registeredForUkTax,
+        isHmrcAgentRegistered,
+        agentSession.agentCodes.flatMap(_.selfAssessment),
+        agentSession.agentCodes.flatMap(_.corporationTax),
+        agentSession.companyRegistrationNumber.flatMap(_.registrationNumber),
+        agentSession.taxRegistrationNumbers
+      ),
+      PersonalDetails(
+        agentSession.personalDetails.flatMap(_.saUtr.map(u => Utr(u.toString()))),
+        agentSession.personalDetails.flatMap(_.nino)
+      ),
+      agentSession.amlsUploadStatus.map(_.reference),
+      tradingAddressFileRef,
+      agentSession.trnUploadStatus.map(_.reference)
+    )).getOrElse(throw new Exception("Could not create application request from agent session"))
 }

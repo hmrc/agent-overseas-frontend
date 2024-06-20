@@ -31,5 +31,6 @@ object MainBusinessAddressForm {
         "addressLine3" -> addressLine34(lineNumber = 3),
         "addressLine4" -> addressLine34(lineNumber = 4),
         "countryCode"  -> countryCode(validCountryCodes)
-      )(OverseasAddress.apply)(OverseasAddress.unapply))
+      )(OverseasAddress.apply)(OverseasAddress.unapply)
+    )
 }

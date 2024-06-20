@@ -51,8 +51,7 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
       }
 
       "it has fewer than 10 digits" in {
-        bind("200000") should matchPattern {
-          case Left(List(FormError("testKey", List("error.sautr.invalid"), _))) =>
+        bind("200000") should matchPattern { case Left(List(FormError("testKey", List("error.sautr.invalid"), _))) =>
         }
 
         bind("20000000 0") should matchPattern {
@@ -97,7 +96,8 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
       "input has length more than 132 characters" in {
         bind(s"${Random.alphanumeric.take(132).mkString}@example.com").left.value should contain only FormError(
           "testKey",
-          "error.email.maxlength")
+          "error.email.maxlength"
+        )
       }
 
       "input is only whitespace" in {
@@ -193,13 +193,11 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
     def bind(fieldValue: String) = mapping.bind(Map("testKey" -> fieldValue))
 
     def shouldRejectFieldValueAsInvalid(fieldValue: String): Assertion =
-      bind(fieldValue) should matchPattern {
-        case Left(List(FormError("testKey", List(invalidErrorMessage), _))) =>
+      bind(fieldValue) should matchPattern { case Left(List(FormError("testKey", List(invalidErrorMessage), _))) =>
       }
 
     def shouldRejectFieldValueAsTooLong(fieldValue: String): Assertion =
-      bind(fieldValue) should matchPattern {
-        case Left(List(FormError("testKey", List(maxLengthErrorMessage), _))) =>
+      bind(fieldValue) should matchPattern { case Left(List(FormError("testKey", List(maxLengthErrorMessage), _))) =>
       }
 
     def shouldAcceptFieldValue(fieldValue: String): Assertion =
@@ -253,13 +251,11 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
     def bind(fieldValue: String) = mapping.bind(Map("testKey" -> fieldValue))
 
     def shouldRejectFieldValueAsInvalid(fieldValue: String): Assertion =
-      bind(fieldValue) should matchPattern {
-        case Left(List(FormError("testKey", List("error.jobTitle.invalid"), _))) =>
+      bind(fieldValue) should matchPattern { case Left(List(FormError("testKey", List("error.jobTitle.invalid"), _))) =>
       }
 
     def shouldRejectFieldValueAsIncorrectLength(fieldValue: String): Assertion =
-      bind(fieldValue) should matchPattern {
-        case Left(List(FormError("testKey", List("error.jobTitle.length"), _))) =>
+      bind(fieldValue) should matchPattern { case Left(List(FormError("testKey", List("error.jobTitle.length"), _))) =>
       }
 
     def shouldAcceptFieldValue(fieldValue: String): Assertion =
@@ -406,20 +402,17 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
 
     s"give error.$codeType.maxlength error" when {
       "it has more than 6 characters" in {
-        bind("SA20000000000") should matchPattern {
-          case Left(List(FormError("testKey", List(maxLengthMessage), _))) =>
+        bind("SA20000000000") should matchPattern { case Left(List(FormError("testKey", List(maxLengthMessage), _))) =>
         }
       }
 
       "it has fewer than 6 characters" in {
-        bind("SA200") should matchPattern {
-          case Left(List(FormError("testKey", List(maxLengthMessage), _))) =>
+        bind("SA200") should matchPattern { case Left(List(FormError("testKey", List(maxLengthMessage), _))) =>
         }
       }
 
       "it has no-alphanumeric characters" in {
-        bind("SA**12222") should matchPattern {
-          case Left(List(FormError("testKey", List(invalidMessage), _))) =>
+        bind("SA**12222") should matchPattern { case Left(List(FormError("testKey", List(invalidMessage), _))) =>
         }
       }
     }
@@ -481,7 +474,8 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
     "return validation error if the field length is more than 100 chars" in {
       bind(randomString(101)).left.value should contain only FormError(
         "testKey",
-        "error.moneyLaunderingCompliance.amlsbody.maxlength")
+        "error.moneyLaunderingCompliance.amlsbody.maxlength"
+      )
     }
 
     "return validation error if the field is invalid " in {
@@ -539,15 +533,12 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
 
     s"give error.crn.invalid error" when {
       "it has invalid characters" in {
-        bind("BAD*CRN") should matchPattern {
-          case Left(List(FormError("testKey", List("error.crn.invalid"), _))) =>
+        bind("BAD*CRN") should matchPattern { case Left(List(FormError("testKey", List("error.crn.invalid"), _))) =>
         }
-        bind("BAD:CRN") should matchPattern {
-          case Left(List(FormError("testKey", List("error.crn.invalid"), _))) =>
+        bind("BAD:CRN") should matchPattern { case Left(List(FormError("testKey", List("error.crn.invalid"), _))) =>
         }
 
-        bind("BAD#CRN") should matchPattern {
-          case Left(List(FormError("testKey", List("error.crn.invalid"), _))) =>
+        bind("BAD#CRN") should matchPattern { case Left(List(FormError("testKey", List("error.crn.invalid"), _))) =>
         }
       }
 
@@ -582,15 +573,12 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
 
     s"give error.trn.invalid error" when {
       "it has no-alphanumeric characters" in {
-        bind("VAT*$") should matchPattern {
-          case Left(List(FormError("testKey", List("error.trn.invalid"), _))) =>
+        bind("VAT*$") should matchPattern { case Left(List(FormError("testKey", List("error.trn.invalid"), _))) =>
         }
-        bind("VAT**12") should matchPattern {
-          case Left(List(FormError("testKey", List("error.trn.invalid"), _))) =>
+        bind("VAT**12") should matchPattern { case Left(List(FormError("testKey", List("error.trn.invalid"), _))) =>
         }
 
-        bind("VAT**12222") should matchPattern {
-          case Left(List(FormError("testKey", List("error.trn.invalid"), _))) =>
+        bind("VAT**12222") should matchPattern { case Left(List(FormError("testKey", List("error.trn.invalid"), _))) =>
         }
       }
     }
@@ -618,13 +606,11 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
 
     s"give error.telephone.invalid error" when {
       "it has no-alphanumeric characters" in {
-        bind("VAT$") should matchPattern {
-          case Left(List(FormError("testKey", List("error.telephone.invalid"), _))) =>
+        bind("VAT$") should matchPattern { case Left(List(FormError("testKey", List("error.telephone.invalid"), _))) =>
         }
       }
       "it has letters in small case" in {
-        bind("var") should matchPattern {
-          case Left(List(FormError("testKey", List("error.telephone.invalid"), _))) =>
+        bind("var") should matchPattern { case Left(List(FormError("testKey", List("error.telephone.invalid"), _))) =>
         }
       }
     }
@@ -737,13 +723,13 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
     def bind(fieldValue: String) = addressLine1Mapping.bind(Map("testKey" -> fieldValue))
 
     def shouldRejectFieldValueAsInvalid(fieldValue: String) =
-      bind(fieldValue) should matchPattern {
-        case Left(List(FormError("testKey", List(`invalidError`), _))) =>
+      bind(fieldValue) should matchPattern { case Left(List(FormError("testKey", List(`invalidError`), _))) =>
       }
 
     def shouldRejectFieldValueAsTooLong(fieldValue: String) =
       bind(fieldValue) shouldBe Left(
-        List(FormError("testKey", List(s"error.addressline.$lineNumber.maxlength"), List(35))))
+        List(FormError("testKey", List(s"error.addressline.$lineNumber.maxlength"), List(35)))
+      )
 
     def shouldAcceptFieldValue(fieldValue: String) =
       if (fieldValue.isEmpty) bind(fieldValue) shouldBe Right(None)
@@ -792,7 +778,9 @@ class CommonValidatorsSpec extends AnyWordSpecLike with Matchers with OptionValu
       bind(tooLongAndNonMatchingLine) shouldBe Left(
         List(
           FormError("testKey", s"error.addressline.$lineNumber.maxlength", Seq(35)),
-          FormError("testKey", s"error.addressline.$lineNumber.invalid", Seq())))
+          FormError("testKey", s"error.addressline.$lineNumber.invalid", Seq())
+        )
+      )
     }
   }
 

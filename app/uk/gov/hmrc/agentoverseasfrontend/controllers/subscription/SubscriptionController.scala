@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubscriptionController @Inject()(
+class SubscriptionController @Inject() (
   override val messagesApi: MessagesApi,
   authAction: SubscriptionAuth,
   subscriptionService: SubscriptionService,
@@ -40,9 +40,8 @@ class SubscriptionController @Inject()(
   subscriptionCompleteView: subscription_complete,
   alreadySubscribedView: already_subscribed,
   emailLockedView: cannot_verify_email_locked,
-  emailTechnicalErrorView: cannot_verify_email_technical)(
-  implicit override val ec: ExecutionContext,
-  appConfig: AppConfig)
+  emailTechnicalErrorView: cannot_verify_email_technical
+)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with Logging {
 
   import authAction.{config, withBasicAgentAuth, withHmrcAsAgentAction}
@@ -67,7 +66,8 @@ class SubscriptionController @Inject()(
                 Redirect(routes.SubscriptionController.alreadySubscribed)
               case Left(WrongApplicationStatus) =>
                 throw new IllegalStateException(
-                  "Can not proceed with application - can not subscribe with an application in this status")
+                  "Can not proceed with application - can not subscribe with an application in this status"
+                )
             }
         }
       } else {
@@ -87,7 +87,9 @@ class SubscriptionController @Inject()(
               appConfig.asaFrontendUrl,
               arn.value,
               agencyDetails.agencyName,
-              agencyDetails.agencyEmail))
+              agencyDetails.agencyEmail
+            )
+          )
         case None =>
           logger.warn("no agent session found on subscription complete page")
           SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")

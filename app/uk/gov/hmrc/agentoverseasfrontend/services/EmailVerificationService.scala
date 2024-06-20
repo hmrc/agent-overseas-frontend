@@ -26,33 +26,35 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailVerificationService @Inject()(emailVerificationConnector: EmailVerificationConnector) extends Logging {
+class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector) extends Logging {
 
   def verifyEmail(
     credId: String,
     mEmail: Option[Email],
     continueUrl: String,
     mBackUrl: Option[String],
-    accessibilityStatementUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] =
+    accessibilityStatementUrl: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] =
     for {
       mVerifyEmailResponse <- emailVerificationConnector.verifyEmail(
-                               VerifyEmailRequest(
-                                 credId = credId,
-                                 continueUrl = continueUrl,
-                                 origin = "HMRC Agent Services",
-                                 deskproServiceName = None,
-                                 accessibilityStatementUrl = accessibilityStatementUrl,
-                                 email = mEmail,
-                                 lang = None,
-                                 backUrl = mBackUrl,
-                                 pageTitle = None
-                               )
-                             )
+                                VerifyEmailRequest(
+                                  credId = credId,
+                                  continueUrl = continueUrl,
+                                  origin = "HMRC Agent Services",
+                                  deskproServiceName = None,
+                                  accessibilityStatementUrl = accessibilityStatementUrl,
+                                  email = mEmail,
+                                  lang = None,
+                                  backUrl = mBackUrl,
+                                  pageTitle = None
+                                )
+                              )
     } yield mVerifyEmailResponse.map(_.redirectUri)
 
-  def checkStatus(credId: String, email: String)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[EmailVerificationStatus] =
+  def checkStatus(credId: String, email: String)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[EmailVerificationStatus] =
     emailVerificationConnector.checkEmail(credId).map {
       case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.verified) =>
         EmailVerificationStatus.Verified
