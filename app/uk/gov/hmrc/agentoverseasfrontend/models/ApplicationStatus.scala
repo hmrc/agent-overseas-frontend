@@ -21,14 +21,14 @@ import play.api.libs.json._
 sealed trait ApplicationStatus extends Product with Serializable {
 
   val key: String =
-    this match { //status can only progress in acceding order indicated below
-      case ApplicationStatus.Pending  => "pending" //1
-      case ApplicationStatus.Rejected => "rejected" //2
-      case ApplicationStatus.Accepted => "accepted" //2
+    this match { // status can only progress in acceding order indicated below
+      case ApplicationStatus.Pending  => "pending" // 1
+      case ApplicationStatus.Rejected => "rejected" // 2
+      case ApplicationStatus.Accepted => "accepted" // 2
       case ApplicationStatus.AttemptingRegistration =>
-        "attempting_registration" //3
-      case ApplicationStatus.Registered => "registered" //4
-      case ApplicationStatus.Complete   => "complete" //5
+        "attempting_registration" // 3
+      case ApplicationStatus.Registered => "registered" // 4
+      case ApplicationStatus.Complete   => "complete" // 5
     }
 }
 

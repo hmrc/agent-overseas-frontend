@@ -29,9 +29,11 @@ object CompanyRegistrationNumberForm {
     Form[CompanyRegistrationNumber](
       mapping(
         "confirmRegistration" -> optional(boolean).verifying(
-          radioInputSelected("companyRegistrationNumber.error.no-radio.selected")),
+          radioInputSelected("companyRegistrationNumber.error.no-radio.selected")
+        ),
         "registrationNumber" -> mandatoryIfTrue("confirmRegistration", CommonValidators.companyRegistrationNumber)
       )((confirmRegistration, registrationNumber) =>
-        CompanyRegistrationNumber(confirmRegistration, registrationNumber.map(Crn.apply)))(crn =>
-        Some((crn.confirmRegistration, crn.registrationNumber.map(_.value)))))
+        CompanyRegistrationNumber(confirmRegistration, registrationNumber.map(Crn.apply))
+      )(crn => Some((crn.confirmRegistration, crn.registrationNumber.map(_.value))))
+    )
 }

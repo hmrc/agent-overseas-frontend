@@ -75,13 +75,17 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     "return showAntiMoneyLaunderingRegistration when AmlsRequired is not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(amlsRequired = None)
 
-      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
+      FakeRouting.lookupNextPage(
+        Some(agentSession)
+      ) shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
     }
 
     "return showAntiMoneyLaunderingForm when AmlsDetails are not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(amlsDetails = None)
 
-      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm
+      FakeRouting.lookupNextPage(
+        Some(agentSession)
+      ) shouldBe routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm
     }
 
     "return showAntiMoneyLaunderingRegistration when session not found" in {
@@ -109,7 +113,9 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     "return showMainBusinessAddressForm when Business Address is not found in session" in {
       val agentSession = detailsUpToRegisteredWithHmrc.copy(overseasAddress = None)
 
-      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.TradingAddressController.showMainBusinessAddressForm
+      FakeRouting.lookupNextPage(
+        Some(agentSession)
+      ) shouldBe routes.TradingAddressController.showMainBusinessAddressForm
     }
 
     "return showUploadForm(trading-address) when tradingAddressUploadStatus not found in session" in {
@@ -156,7 +162,9 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
         val agentSession = detailsUpToRegisteredWithHmrc
           .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(Yes), personalDetails = Some(personalDetails))
 
-        FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm
+        FakeRouting.lookupNextPage(
+          Some(agentSession)
+        ) shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm
       }
     }
 
@@ -165,7 +173,9 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
         val agentSession = detailsUpToRegisteredWithHmrc
           .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(No), personalDetails = None)
 
-        FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm
+        FakeRouting.lookupNextPage(
+          Some(agentSession)
+        ) shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm
       }
     }
   }
@@ -188,7 +198,8 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
       registeredWithHmrc = Some(No),
       registeredForUkTax = Some(No),
       personalDetails = None,
-      companyRegistrationNumber = Some(companyRegistrationNumber))
+      companyRegistrationNumber = Some(companyRegistrationNumber)
+    )
 
     FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.TaxRegController.showTaxRegistrationNumberForm
   }
@@ -250,7 +261,8 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
         registeredWithHmrc = Some(Yes),
         agentCodes = Some(AgentCodes(None, None)),
         registeredForUkTax = Some(Yes),
-        personalDetails = None)
+        personalDetails = None
+      )
 
       FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController.showPersonalDetailsForm
     }
@@ -261,9 +273,12 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
         agentCodes = Some(AgentCodes(None, None)),
         registeredForUkTax = Some(No),
         personalDetails = None,
-        companyRegistrationNumber = None)
+        companyRegistrationNumber = None
+      )
 
-      FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm
+      FakeRouting.lookupNextPage(
+        Some(agentSession)
+      ) shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm
     }
 
     "direct to the verify email stage when the email is not verified" in {
@@ -278,13 +293,15 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
       "the application status is pending" in {
         testRoutesForApplicationStatuses(
           List(applicationEntityDetails),
-          "/agent-services/apply-from-outside-uk/application-status")
+          "/agent-services/apply-from-outside-uk/application-status"
+        )
       }
 
       "the application status is rejected" in {
         testRoutesForApplicationStatuses(
           List(applicationEntityDetails.copy(status = Rejected)),
-          "/agent-services/apply-from-outside-uk/application-status")
+          "/agent-services/apply-from-outside-uk/application-status"
+        )
       }
     }
 
@@ -299,13 +316,15 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     "return /money-laundering-registration page" in {
       testRoutesForApplicationStatuses(
         List.empty,
-        "/agent-services/apply-from-outside-uk/money-laundering-registration")
+        "/agent-services/apply-from-outside-uk/money-laundering-registration"
+      )
     }
   }
 
   def testRoutesForApplicationStatuses(
     applications: List[ApplicationEntityDetails],
-    responseRoute: String): Assertion = {
+    responseRoute: String
+  ): Assertion = {
     when(FakeRouting.connector.getUserApplications).thenReturn(Future.successful(applications))
 
     FakeRouting.routesIfExistingApplication(subscriptionRootPath).futureValue.url shouldBe responseRoute

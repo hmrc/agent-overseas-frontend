@@ -32,7 +32,7 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.application.{application_not
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ApplicationRootController @Inject()(
+class ApplicationRootController @Inject() (
   val env: Environment,
   authAction: ApplicationAuth,
   sessionStoreService: MongoDBSessionStoreService,
@@ -40,7 +40,8 @@ class ApplicationRootController @Inject()(
   cc: MessagesControllerComponents,
   notAgentView: not_agent,
   applicationNotReadyView: application_not_ready,
-  statusRejectedView: status_rejected)(implicit appConfig: AppConfig, ec: ExecutionContext)
+  statusRejectedView: status_rejected
+)(implicit appConfig: AppConfig, ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with I18nSupport {
 
   import authAction.withBasicAuth
@@ -62,7 +63,8 @@ class ApplicationRootController @Inject()(
       applicationService.getCurrentApplication.map {
         case Some(application) if application.status == Pending =>
           val createdOnPrettifyDate: String = application.applicationCreationDate.format(
-            DateTimeFormatter.ofPattern("d MMMM YYYY").withZone(ZoneOffset.UTC))
+            DateTimeFormatter.ofPattern("d MMMM YYYY").withZone(ZoneOffset.UTC)
+          )
           val daysUntilReviewed: Int =
             daysUntilApplicationReviewed(application.applicationCreationDate)
           Ok(applicationNotReadyView(application.tradingName, createdOnPrettifyDate, daysUntilReviewed))

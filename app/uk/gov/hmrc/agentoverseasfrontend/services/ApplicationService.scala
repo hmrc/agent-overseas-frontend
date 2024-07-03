@@ -27,14 +27,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ApplicationService @Inject()(agentOverseasApplicationConnector: AgentOverseasApplicationConnector) {
+class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOverseasApplicationConnector) {
 
   implicit val orderingLocalDateTime: Ordering[LocalDateTime] =
     Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
-  def getCurrentApplication(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Option[ApplicationEntityDetails]] =
+  def getCurrentApplication(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[ApplicationEntityDetails]] =
     agentOverseasApplicationConnector.getUserApplications.map { e =>
       e.sortBy(_.applicationCreationDate).reverse.headOption
     }

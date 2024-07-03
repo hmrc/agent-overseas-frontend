@@ -29,7 +29,7 @@ import scala.concurrent.duration.SECONDS
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionDetailsRepository @Inject()(mongoComponent: MongoComponent)(implicit ec: ExecutionContext)
+class SessionDetailsRepository @Inject() (mongoComponent: MongoComponent)(implicit ec: ExecutionContext)
     extends PlayMongoRepository[SessionDetails](
       mongoComponent = mongoComponent,
       collectionName = "session-details",

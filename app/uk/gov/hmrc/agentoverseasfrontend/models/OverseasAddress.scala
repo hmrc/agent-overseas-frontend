@@ -23,7 +23,8 @@ case class OverseasAddress(
   addressLine2: String,
   addressLine3: Option[String],
   addressLine4: Option[String],
-  countryCode: String)
+  countryCode: String
+)
 
 object OverseasAddress {
   implicit val format: Format[OverseasAddress] = Json.format[OverseasAddress]

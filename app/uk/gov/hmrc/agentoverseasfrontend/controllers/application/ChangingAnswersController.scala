@@ -27,12 +27,13 @@ import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSe
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ChangingAnswersController @Inject()(
+class ChangingAnswersController @Inject() (
   authAction: ApplicationAuth,
   override val sessionStoreService: MongoDBSessionStoreService,
   override val applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
-  cc: MessagesControllerComponents)(implicit val env: Environment, override val ec: ExecutionContext)
+  cc: MessagesControllerComponents
+)(implicit val env: Environment, override val ec: ExecutionContext)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
     with I18nSupport {
 
@@ -49,35 +50,40 @@ class ChangingAnswersController @Inject()(
   def changeAmlsDetails: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
+        routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url
+      )
     }
   }
 
   def changeAmlsFile: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.FileUploadController.showAmlsUploadForm.url)
+        routes.FileUploadController.showAmlsUploadForm.url
+      )
     }
   }
 
   def changeContactDetails: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.ApplicationController.showContactDetailsForm.url)
+        routes.ApplicationController.showContactDetailsForm.url
+      )
     }
   }
 
   def changeTradingName: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.ApplicationController.showTradingNameForm.url)
+        routes.ApplicationController.showTradingNameForm.url
+      )
     }
   }
 
   def changeTradingAddress: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.TradingAddressController.showMainBusinessAddressForm.url)
+        routes.TradingAddressController.showMainBusinessAddressForm.url
+      )
     }
   }
 
@@ -85,56 +91,64 @@ class ChangingAnswersController @Inject()(
     Action.async { implicit request =>
       withEnrollingAgent { agentSession =>
         updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-          routes.FileUploadController.showTradingAddressUploadForm.url)
+          routes.FileUploadController.showTradingAddressUploadForm.url
+        )
       }
     }
 
   def changeRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.ApplicationController.showRegisteredWithHmrcForm.url)
+        routes.ApplicationController.showRegisteredWithHmrcForm.url
+      )
     }
   }
 
   def changeAgentCodes: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.ApplicationController.showAgentCodesForm.url)
+        routes.ApplicationController.showAgentCodesForm.url
+      )
     }
   }
 
   def changeRegisteredForUKTax: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.ApplicationController.showUkTaxRegistrationForm.url)
+        routes.ApplicationController.showUkTaxRegistrationForm.url
+      )
     }
   }
 
   def changePersonalDetails: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.ApplicationController.showPersonalDetailsForm.url)
+        routes.ApplicationController.showPersonalDetailsForm.url
+      )
     }
   }
 
   def changeCompanyRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.ApplicationController.showCompanyRegistrationNumberForm.url)
+        routes.ApplicationController.showCompanyRegistrationNumberForm.url
+      )
     }
   }
 
   def changeYourTaxRegistrationNumbers: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.TaxRegController.showYourTaxRegNumbersForm.url)
+        routes.TaxRegController.showYourTaxRegNumbersForm.url
+      )
     }
   }
 
   def changeYourTaxRegistrationNumbersFile: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-        routes.FileUploadController.showTrnUploadForm.url)
+        routes.FileUploadController.showTrnUploadForm.url
+      )
     }
   }
 }

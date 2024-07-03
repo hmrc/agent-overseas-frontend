@@ -25,7 +25,7 @@ import uk.gov.hmrc.mongo.cache.DataKey
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MongoDBSessionStoreService @Inject()(val sessionCache: SessionCacheRepository) {
+class MongoDBSessionStoreService @Inject() (val sessionCache: SessionCacheRepository) {
 
   final val agentSessionCache = new SessionCache[AgentSession] {
     override val sessionName: String = "agentSession"

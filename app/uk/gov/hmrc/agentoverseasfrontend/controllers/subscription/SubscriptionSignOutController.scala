@@ -32,7 +32,7 @@ import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubscriptionSignOutController @Inject()(
+class SubscriptionSignOutController @Inject() (
   override val messagesApi: MessagesApi,
   service: SubscriptionService,
   applicationService: ApplicationService,
@@ -40,10 +40,8 @@ class SubscriptionSignOutController @Inject()(
   authAction: SubscriptionAuth,
   sessionStoreService: MongoDBSessionStoreService,
   timedOutView: timed_out,
-  signedOutView: signed_out)(
-  implicit val appConfig: AppConfig,
-  override val ec: ExecutionContext,
-  config: Configuration)
+  signedOutView: signed_out
+)(implicit val appConfig: AppConfig, override val ec: ExecutionContext, config: Configuration)
     extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) {
 
   import authAction.withBasicAgentAuth
@@ -55,9 +53,8 @@ class SubscriptionSignOutController @Inject()(
           s"${appConfig.agentOverseasFrontendUrl}/create-account/return-from-gg-registration?sessionId=$idRef"
 
         SeeOther(
-          CallOps.addParamsToUrl(
-            appConfig.ggRegistrationFrontendSosRedirectPath,
-            "continue" -> Some(returnContinueUrl))).withNewSession
+          CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(returnContinueUrl))
+        ).withNewSession
       }
     }
   }

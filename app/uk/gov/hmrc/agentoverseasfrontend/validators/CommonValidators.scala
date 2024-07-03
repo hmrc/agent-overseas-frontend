@@ -85,7 +85,8 @@ object CommonValidators {
     optional(
       text
         .verifying(maxLength(MembershipNumberMaxLength, "error.membershipNumber.maxlength"))
-        .verifying(validateRegex(MembershipNumberRegex, "error.membershipNumber.invalid")))
+        .verifying(validateRegex(MembershipNumberRegex, "error.membershipNumber.invalid"))
+    )
 
   def businessTelephone: Mapping[String] =
     text verifying commonFormConstraint("telephone", TelephoneNumberRegex, TelephoneMaxLength)
@@ -127,7 +128,8 @@ object CommonValidators {
   private def agentCodeConstraint(
     codeType: String,
     regex: String = AgentCodeRegex,
-    maxLength: Int = AgentCodeMaxLength): Constraint[String] =
+    maxLength: Int = AgentCodeMaxLength
+  ): Constraint[String] =
     Constraint[String] { fieldValue: String =>
       val formattedCode = fieldValue.replace(" ", "")
 
@@ -249,7 +251,9 @@ object CommonValidators {
         desText(
           regex = AgencyAddressRegex,
           msgKeyRequired = s"error.addressline.$lineNumber.empty",
-          msgKeyInvalid = s"error.addressline.$lineNumber.invalid"))
+          msgKeyInvalid = s"error.addressline.$lineNumber.invalid"
+        )
+      )
 
   def addressLine34(lineNumber: Int): Mapping[Option[String]] =
     optional(
@@ -259,7 +263,10 @@ object CommonValidators {
           desText(
             regex = AgencyAddressRegex,
             msgKeyRequired = s"error.addressline.$lineNumber.empty",
-            msgKeyInvalid = s"error.addressline.$lineNumber.invalid")))
+            msgKeyInvalid = s"error.addressline.$lineNumber.invalid"
+          )
+        )
+    )
 
   def emailAddress: Mapping[String] =
     text
@@ -276,9 +283,11 @@ object CommonValidators {
             desText(
               AgencyNameRegex,
               msgKeyRequired = "error.business-name.empty",
-              msgKeyInvalid = "error.business-name.invalid")
+              msgKeyInvalid = "error.business-name.invalid"
+            )
           )
-        ))
+        )
+      )
 
   private[validators] def desText(regex: String, msgKeyRequired: String, msgKeyInvalid: String): Constraint[String] =
     Constraint[String] { fieldValue: String =>

@@ -47,7 +47,7 @@ trait AppConfig {
 }
 
 @Singleton
-class FrontendAppConfig @Inject()(servicesConfig: ServicesConfig, environment: Environment) extends AppConfig {
+class FrontendAppConfig @Inject() (servicesConfig: ServicesConfig, environment: Environment) extends AppConfig {
   override val appName: String = "agent-overseas-frontend"
   override val countryListLocation: String =
     servicesConfig.getString("country.list.location")

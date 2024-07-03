@@ -31,5 +31,7 @@ object TaxRegistrationNumberForm {
         "canProvideTaxRegNo" -> optional(boolean).verifying(radioInputSelected("taxRegNo.form.no-radio.selected")),
         "value"              -> mandatoryIfTrue("canProvideTaxRegNo", CommonValidators.taxRegistrationNumber)
       )((canProvideTaxRegNo, value) => TaxRegistrationNumber(canProvideTaxRegNo, value.map(Trn.apply)))(taxRegNo =>
-        Some((taxRegNo.canProvideTaxRegNo, taxRegNo.value.map(_.value)))))
+        Some((taxRegNo.canProvideTaxRegNo, taxRegNo.value.map(_.value)))
+      )
+    )
 }

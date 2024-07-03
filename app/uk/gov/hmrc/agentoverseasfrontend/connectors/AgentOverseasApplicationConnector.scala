@@ -16,30 +16,27 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
-import java.time.{LocalDateTime, ZoneOffset}
-
-import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
-import javax.inject.{Inject, Singleton}
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.agent.kenshoo.monitoring.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, _}
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
 import uk.gov.hmrc.http.HttpErrorFunctions._
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, _}
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
+
+import java.time.{LocalDateTime, ZoneOffset}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AgentOverseasApplicationConnector @Inject()(
+class AgentOverseasApplicationConnector @Inject() (
   appConfig: AppConfig,
   http: HttpClient,
-  metrics: Metrics
-) extends HttpAPIMonitor {
-
-  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
+  val metrics: Metrics
+)(implicit val ec: ExecutionContext)
+    extends HttpAPIMonitor {
 
   implicit val localDateTimeOrdering: Ordering[LocalDateTime] =
     Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
@@ -60,13 +57,15 @@ class AgentOverseasApplicationConnector @Inject()(
           case NOT_FOUND => List.empty
           case s =>
             throw new RuntimeException(
-              s"Could not retrieve overseas agent application status $urlGetAllApplications, status: $s")
+              s"Could not retrieve overseas agent application status $urlGetAllApplications, status: $s"
+            )
         }
       }
     }
 
   def createOverseasApplication(
-    request: CreateOverseasApplicationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+    request: CreateOverseasApplicationRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
     monitor("ConsumedAPI-Agent-Overseas-Application-application-POST") {
       http
@@ -82,7 +81,8 @@ class AgentOverseasApplicationConnector @Inject()(
   }
 
   def upscanPollStatus(
-    reference: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FileUploadStatus] = {
+    reference: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FileUploadStatus] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-poll-status/$reference"
     monitor("ConsumedAPI-Agent-overseas-Application-upscan-poll-status-GET") {
       http
@@ -106,7 +106,8 @@ class AgentOverseasApplicationConnector @Inject()(
   }
 
   def updateApplicationWithAgencyDetails(
-    agencyDetails: AgencyDetails)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Unit] = {
+    agencyDetails: AgencyDetails
+  )(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
 
     monitor(s"ConsumedAPI-agent-overseas-application-application-PUT") {
@@ -139,7 +140,8 @@ class AgentOverseasApplicationConnector @Inject()(
           response.status match {
             case NOT_FOUND =>
               throw new NotFoundException(
-                s"createOverseasApplication not found for authId: $oldAuthId, Http Status: ${response.status}")
+                s"createOverseasApplication not found for authId: $oldAuthId, Http Status: ${response.status}"
+              )
             case status if is4xx(status) || is5xx(status) =>
               throw UpstreamErrorResponse(s"createOverseasApplication Error for authId: $oldAuthId", response.status)
             case _ => ()

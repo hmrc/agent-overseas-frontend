@@ -24,7 +24,7 @@ case class UpscanInitiate(reference: String, uploadRequest: UploadRequest)
 case class UploadRequest(href: String, fields: Map[String, String])
 
 object UploadRequest {
-  implicit val writes = new Writes[UploadRequest] {
+  implicit val writes: Writes[UploadRequest] = new Writes[UploadRequest] {
     def writes(uploadRequest: UploadRequest): JsObject = Json.obj(
       "href"   -> uploadRequest.href,
       "fields" -> uploadRequest.fields
@@ -35,7 +35,7 @@ object UploadRequest {
 }
 
 object UpscanInitiate {
-  implicit val writes = new Writes[UpscanInitiate] {
+  implicit val writes: Writes[UpscanInitiate] = new Writes[UpscanInitiate] {
     def writes(upscan: UpscanInitiate): JsObject = Json.obj(
       "reference"     -> upscan.reference,
       "uploadRequest" -> upscan.uploadRequest

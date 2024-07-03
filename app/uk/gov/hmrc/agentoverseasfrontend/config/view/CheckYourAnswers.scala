@@ -33,7 +33,8 @@ case class AnswerRow(
   answerLines: Seq[String],
   changeLink: Option[Call],
   buttonText: Option[String],
-  visuallyHiddenText: Option[String])
+  visuallyHiddenText: Option[String]
+)
 
 object AnswerRow {
   def apply(
@@ -41,7 +42,8 @@ object AnswerRow {
     question: String,
     answerLines: Seq[String],
     changeLink: Option[Call] = None,
-    visuallyHiddenText: Option[String] = None)(implicit messages: Messages): AnswerRow =
+    visuallyHiddenText: Option[String] = None
+  )(implicit messages: Messages): AnswerRow =
     AnswerRow(id, question, answerLines, changeLink, Some(Messages("checkAnswers.change.button")), visuallyHiddenText)
 }
 
@@ -50,13 +52,13 @@ case class CheckYourAnswers(
   contactDetails: AnswerBlock,
   businessDetails: AnswerBlock,
   otherBusinessDetails: AnswerBlock,
-  backLink: String)
+  backLink: String
+)
 
 case class CheckYourAnswersConfirmation(confirmed: Boolean)
 
-/**
-  * Configuration object to support rendering of check_your_answers template
-  * Page contains a small form where the user must a agree by selecting a checkbox
+/** Configuration object to support rendering of check_your_answers template Page contains a small form where the user
+  * must a agree by selecting a checkbox
   */
 object CheckYourAnswers {
 
@@ -191,8 +193,9 @@ object CheckYourAnswers {
       )
     }
 
-  private def makeOverseasAddressGroup(session: AgentSession, countryName: String)(
-    implicit messages: Messages): Option[AnswerGroup] =
+  private def makeOverseasAddressGroup(session: AgentSession, countryName: String)(implicit
+    messages: Messages
+  ): Option[AnswerGroup] =
     session.overseasAddress.map { address =>
       AnswerGroup(
         List(
@@ -204,15 +207,17 @@ object CheckYourAnswers {
               Some(address.addressLine2),
               address.addressLine3,
               address.addressLine4,
-              Some(countryName)).flatten,
+              Some(countryName)
+            ).flatten,
             changeLink = Some(routes.ChangingAnswersController.changeTradingAddress)
           )
         )
       )
     }
 
-  private def makeTradingAddressFileUploadGroup(session: AgentSession)(
-    implicit messages: Messages): Option[AnswerGroup] =
+  private def makeTradingAddressFileUploadGroup(
+    session: AgentSession
+  )(implicit messages: Messages): Option[AnswerGroup] =
     session.tradingAddressUploadStatus.flatMap(_.fileName).map { fileName =>
       AnswerGroup(
         List(
@@ -268,7 +273,8 @@ object CheckYourAnswers {
               question = Messages("checkAnswers.agentCode.title"),
               answerLines = List(Messages("checkAnswers.agentCode.empty")),
               Some(routes.ChangingAnswersController.changeAgentCodes)
-            ))
+            )
+          )
         }
       case No => List.empty
     }
@@ -348,8 +354,9 @@ object CheckYourAnswers {
 
     }
 
-  private def makeTaxRegistrationNumbersFileUploadGroup(session: AgentSession)(
-    implicit messages: Messages): Option[AnswerGroup] =
+  private def makeTaxRegistrationNumbersFileUploadGroup(
+    session: AgentSession
+  )(implicit messages: Messages): Option[AnswerGroup] =
     if (session.taxRegistrationNumbers.fold(false)(_.nonEmpty)) {
 
       session.trnUploadStatus.flatMap(_.fileName).map { fileName =>

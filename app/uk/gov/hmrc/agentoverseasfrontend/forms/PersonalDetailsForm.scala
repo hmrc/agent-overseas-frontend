@@ -28,11 +28,12 @@ object PersonalDetailsForm {
   val form: Form[PersonalDetailsChoice] = Form(
     mapping(
       "personalDetailsChoice" -> optional(text).verifying(
-        radioInputSelected("error.personalDetails.no-radio.selected")),
+        radioInputSelected("error.personalDetails.no-radio.selected")
+      ),
       "nino"  -> mandatoryIfEqual("personalDetailsChoice", "nino", nino),
       "saUtr" -> mandatoryIfEqual("personalDetailsChoice", "saUtr", saUtr)
     )((choice, nino, saUtr) =>
-      PersonalDetailsChoice(choice.map(RadioOption.apply), nino.map(Nino.apply), saUtr.map(SaUtr.apply)))(details =>
-      Some((details.choice.map(_.value), details.nino.map(_.value), details.saUtr.map(_.value))))
+      PersonalDetailsChoice(choice.map(RadioOption.apply), nino.map(Nino.apply), saUtr.map(SaUtr.apply))
+    )(details => Some((details.choice.map(_.value), details.nino.map(_.value), details.saUtr.map(_.value))))
   )
 }

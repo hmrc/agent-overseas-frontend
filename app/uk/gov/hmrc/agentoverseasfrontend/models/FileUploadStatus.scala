@@ -28,7 +28,8 @@ case class FileUploadStatus(
   reference: String,
   fileStatus: String,
   fileName: Option[String],
-  failureDetails: Option[FailureDetails] = None)
+  failureDetails: Option[FailureDetails] = None
+)
 
 object FileUploadStatus {
   implicit val format: OFormat[FileUploadStatus] = Json.format[FileUploadStatus]
