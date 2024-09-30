@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, toInvariantFunctorOps, unlift}
+import play.api.libs.json.{Format, JsString, Json, OFormat, __}
+import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
+import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
+import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 import scala.collection.immutable.SortedSet
-import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 
 case class AgentSession(
   amlsRequired: Option[Boolean] = None,
@@ -88,6 +92,51 @@ case class AgentSession(
 object AgentSession {
 
   def empty: AgentSession = AgentSession()
+
+  def agentSessionDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[AgentSession] =
+    (
+      (__ \ "amlsRequired").formatNullable[Boolean] and
+        (__ \ "amlsDetails").formatNullable[AmlsDetails](AmlsDetails.amlsDetailsDatabaseFormat) and
+        (__ \ "contactDetails").formatNullable[ContactDetails](ContactDetails.contactDetailsDatabaseFormat) and
+        (__ \ "tradingName").formatNullable[String](stringFormatFallback(stringEncrypterDecrypter)) and
+        (__ \ "overseasAddress").formatNullable[OverseasAddress](OverseasAddress.overseasAddressDatabaseFormat) and
+        (__ \ "registeredWithHmrc").formatNullable[YesNo] and
+        (__ \ "agentCodes").formatNullable[AgentCodes](AgentCodes.agentCodesDatabaseFormat) and
+        (__ \ "registeredForUkTax").formatNullable[YesNo] and
+        (__ \ "personalDetails").formatNullable[PersonalDetailsChoice](
+          PersonalDetailsChoice.personalDetailsChoiceDatabaseFormat
+        ) and
+        (__ \ "companyRegistrationNumber").formatNullable[CompanyRegistrationNumber](
+          CompanyRegistrationNumber.companyRegistrationNumberDatabaseFormat
+        ) and
+        (__ \ "hasTaxRegNumbers").formatNullable[Boolean] and
+        (__ \ "taxRegistrationNumbers")
+          .formatNullable[SortedSet[Trn]]
+          .bimap[Option[SortedSet[Trn]]](
+            _.map { trnSet =>
+              trnSet.map { trn =>
+                Trn(stringFormatFallback(stringEncrypterDecrypter).reads(JsString(trn.value)).getOrElse(trn.value))
+              }
+            },
+            _.map { trnSet =>
+              trnSet.map { trn =>
+                Trn(stringFormatFallback(stringEncrypterDecrypter).writes(trn.value).as[String])
+              }
+            }
+          ) and
+        (__ \ "tradingAddressUploadStatus").formatNullable[FileUploadStatus] and
+        (__ \ "amlsUploadStatus").formatNullable[FileUploadStatus] and
+        (__ \ "trnUploadStatus").formatNullable[FileUploadStatus] and
+        (__ \ "fileType").formatNullable[String] and
+        (__ \ "changingAnswers").format[Boolean] and
+        (__ \ "hasTrnsChanged").format[Boolean] and
+        (__ \ "verifiedEmails")
+          .format[Set[String]]
+          .inmap[Set[String]](
+            _.map(email => stringFormatFallback(stringEncrypterDecrypter).reads(JsString(email)).getOrElse(email)),
+            _.map(email => stringFormatFallback(stringEncrypterDecrypter).writes(email).as[String])
+          )
+    )(AgentSession.apply, unlift(AgentSession.unapply))
 
   implicit val format: OFormat[AgentSession] = Json.format[AgentSession]
 

@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TestSessionStoreService extends MongoDBSessionStoreService(null) {
+class TestSessionStoreService extends MongoDBSessionStoreService(null)(null) {
 
   class Session(var agentSession: Option[AgentSession] = None, var agencyDetails: Option[AgencyDetails] = None)
 

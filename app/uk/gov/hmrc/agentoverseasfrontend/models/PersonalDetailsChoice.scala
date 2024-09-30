@@ -16,8 +16,12 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
+import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
+import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.domain.{Nino, SaUtr}
 import uk.gov.hmrc.http.BadRequestException
 
@@ -60,6 +64,28 @@ object PersonalDetailsChoice {
 
     PersonalDetailsChoice(Some(RadioOption(choice)), nino, saUtr)
   }
+
+  def personalDetailsChoiceDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[PersonalDetailsChoice] =
+    (
+      (__ \ "choice")
+        .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+        .bimap[Option[RadioOption]](
+          _.map(RadioOption(_)),
+          _.map(_.value)
+        ) and
+        (__ \ "nino")
+          .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+          .bimap[Option[Nino]](
+            _.map(Nino(_)),
+            _.map(_.value)
+          ) and
+        (__ \ "saUtr")
+          .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+          .bimap[Option[SaUtr]](
+            _.map(SaUtr(_)),
+            _.map(_.value)
+          )
+    )(PersonalDetailsChoice.apply, unlift(PersonalDetailsChoice.unapply))
 
   implicit val personalDetailsFormat: OFormat[PersonalDetailsChoice] = Json.format[PersonalDetailsChoice]
 }

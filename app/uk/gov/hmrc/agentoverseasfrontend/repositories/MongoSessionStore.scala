@@ -61,13 +61,4 @@ trait MongoSessionStore[T] extends Logging {
           }
       case None => Future successful Left("Could not store session as no session Id found.")
     }
-
-  def delete()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
-    getSessionId match {
-      case Some(sessionId) =>
-        cacheRepository
-          .delete(sessionId)(DataKey[T](sessionName))
-          .map(_ => Right(()))
-      case None => Future successful Left("Could not delete as no session Id found.")
-    }
 }

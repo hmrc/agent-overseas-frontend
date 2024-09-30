@@ -13,7 +13,9 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"     %% "hmrc-mongo-play-30"            % mongoVer,
     "uk.gov.hmrc"           %% "play-conditional-form-mapping-play-30" % "2.0.0",
     "org.typelevel"         %% "cats-core"                     % "2.12.0",
-    "com.github.tototoshi"  %% "scala-csv"                     % "1.3.10"
+    "com.github.tototoshi"  %% "scala-csv"                     % "1.3.10",
+    "uk.gov.hmrc"           %% "crypto-json-play-30"           % "8.1.0"
+
   )
 
   lazy val test: Seq[ModuleID] = Seq(

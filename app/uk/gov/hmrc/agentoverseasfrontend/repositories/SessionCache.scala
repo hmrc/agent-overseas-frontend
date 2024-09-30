@@ -33,20 +33,6 @@ trait SessionCache[T] extends MongoSessionStore[T] with Logging {
         Future.failed(new RuntimeException(error))
     }
 
-  def fetchAndClear(implicit hc: HeaderCarrier, reads: Reads[T], ec: ExecutionContext): Future[Option[T]] = {
-    val result = for {
-      cache <- get
-      _     <- delete()
-    } yield cache
-
-    result.flatMap {
-      case Right(input) => input
-      case Left(error) =>
-        logger.warn(error)
-        Future.failed(new RuntimeException(error))
-    }
-  }
-
   def save(input: T)(implicit hc: HeaderCarrier, writes: Writes[T], ec: ExecutionContext): Future[T] =
     store(input).flatMap {
       case Right(_) => input
@@ -54,12 +40,4 @@ trait SessionCache[T] extends MongoSessionStore[T] with Logging {
         logger.warn(error)
         Future.failed(new RuntimeException(error))
     }
-
-  def hardGet(implicit hc: HeaderCarrier, reads: Reads[T], ec: ExecutionContext): Future[T] =
-    fetch.map {
-      case Some(entry) => entry
-      case None =>
-        throw new IllegalStateException("Cached session state expected but not found")
-    }
-
 }
