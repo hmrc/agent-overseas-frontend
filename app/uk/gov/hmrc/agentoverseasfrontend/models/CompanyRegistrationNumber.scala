@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json._
-import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
@@ -31,7 +30,7 @@ object CompanyRegistrationNumber {
     (
       (__ \ "confirmRegistration").formatNullable[Boolean] and
         (__ \ "registrationNumber")
-          .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+          .formatNullable[String](stringEncrypterDecrypter)
           .bimap[Option[Crn]](
             _.map(Crn(_)),
             _.map(_.value)

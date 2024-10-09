@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentoverseasfrontend.utils
+package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.Logging
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.JsString
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.json.JsonEncryption.{stringDecrypter, stringEncrypter}
 
-import scala.util.Try
+object EncryptDecryptModelHelper {
+  def decryptString(value: String)(implicit crypto: Encrypter with Decrypter): String =
+    stringDecrypter.reads(JsString(value)).getOrElse(value)
 
-object StringFormatFallbackSetup extends Logging {
-
-  def stringFormatFallback(format: Format[String]): Format[String] =
-    Format(
-      json =>
-        Try(format.reads(json)).recover { case e: Throwable =>
-          logger.warn(s"[StringFormatFallbackSetup][stringFormatFallback] failed to decrypt string: ${e.getMessage}")
-          Json.fromJson[String](json)
-        }.get,
-      (value: String) => format.writes(value)
-    )
+  def encryptString(value: String)(implicit crypto: Encrypter with Decrypter): String =
+    stringEncrypter.writes(value).as[String]
 }
