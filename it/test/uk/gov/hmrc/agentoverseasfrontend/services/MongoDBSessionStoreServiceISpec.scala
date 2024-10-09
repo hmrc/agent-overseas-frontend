@@ -263,46 +263,6 @@ class MongoDBSessionStoreServiceISpec extends BaseISpec with CleanMongoCollectio
 
           await(mongoDBSessionStoreService.fetchAgentSession) shouldBe Some(agentSession)
         }
-
-        "is fully unencrypted has been stored" in {
-          val data: JsObject = Json.obj(
-            "agentSession" -> Json.toJson(agentSession)
-          )
-
-          val cacheItem: CacheItem = CacheItem(id, data, instant, instant)
-
-          await(sessionCacheRepository.collection.insertOne(cacheItem).toFuture())
-
-          await(sessionCacheRepository.collection.find().toFuture()).size shouldBe 1
-
-          await(mongoDBSessionStoreService.fetchAgentSession) shouldBe Some(agentSession)
-        }
-
-        "is partly unencrypted has been stored" in {
-          val data: JsObject = Json.obj(
-            "agentSession" -> Json.toJson(
-              agentSession.copy(
-                tradingName = Some("Z+iOkv9G6WgDSbMa8NJmQw=="),
-                companyRegistrationNumber = Some(
-                  CompanyRegistrationNumber(
-                    confirmRegistration = Some(true),
-                    registrationNumber = Some(Crn("km29BO1yO9WEzbdgSBWYsw=="))
-                  )
-                ),
-                taxRegistrationNumbers = Some(SortedSet(Trn("+ru2C4N2+TbbgbVv2Dm/fw=="), Trn("456"))),
-                verifiedEmails = Set("test1@email.com", "AoPArn7lAeyxnU4FgzuKsg==")
-              )
-            )
-          )
-
-          val cacheItem: CacheItem = CacheItem(id, data, instant, instant)
-
-          await(sessionCacheRepository.collection.insertOne(cacheItem).toFuture())
-
-          await(sessionCacheRepository.collection.find().toFuture()).size shouldBe 1
-
-          await(mongoDBSessionStoreService.fetchAgentSession) shouldBe Some(agentSession)
-        }
       }
 
       "return None when no agent session data has been stored" in {
@@ -360,40 +320,6 @@ class MongoDBSessionStoreServiceISpec extends BaseISpec with CleanMongoCollectio
           await(mongoDBSessionStoreService.fetchAgencyDetails) shouldBe Some(
             agencyDetails.copy(verifiedEmails = Set.empty)
           )
-        }
-
-        "has fully unencrypted agency details data stored" in {
-          val data: JsObject = Json.obj(
-            "agencyDetails" -> Json.toJson(agencyDetails)
-          )
-
-          val cacheItem: CacheItem = CacheItem(id, data, instant, instant)
-
-          await(sessionCacheRepository.collection.insertOne(cacheItem).toFuture())
-
-          await(sessionCacheRepository.collection.find().toFuture()).size shouldBe 1
-
-          await(mongoDBSessionStoreService.fetchAgencyDetails) shouldBe Some(agencyDetails)
-        }
-
-        "has partly unencrypted agency details data stored" in {
-          val data: JsObject = Json.obj(
-            "agencyDetails" -> Json.toJson(
-              agencyDetails.copy(
-                agencyName = "cM/pRW+JWqdxCrUAtWI9lQ==",
-                agencyEmail = "pyQiWrGMLEI1SSgmA6Sl2A==",
-                verifiedEmails = Set("test4@email.com", "0OI3bNscW/gedAar4zwBhA==", "OVm22wBmGbDGClzqzgyA7w==")
-              )
-            )
-          )
-
-          val cacheItem: CacheItem = CacheItem(id, data, instant, instant)
-
-          await(sessionCacheRepository.collection.insertOne(cacheItem).toFuture())
-
-          await(sessionCacheRepository.collection.find().toFuture()).size shouldBe 1
-
-          await(mongoDBSessionStoreService.fetchAgencyDetails) shouldBe Some(agencyDetails)
         }
       }
 

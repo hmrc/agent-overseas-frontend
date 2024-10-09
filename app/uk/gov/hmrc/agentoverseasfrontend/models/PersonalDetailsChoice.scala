@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
-import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.domain.{Nino, SaUtr}
@@ -68,19 +67,19 @@ object PersonalDetailsChoice {
   def personalDetailsChoiceDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[PersonalDetailsChoice] =
     (
       (__ \ "choice")
-        .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+        .formatNullable[String](stringEncrypterDecrypter)
         .bimap[Option[RadioOption]](
           _.map(RadioOption(_)),
           _.map(_.value)
         ) and
         (__ \ "nino")
-          .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+          .formatNullable[String](stringEncrypterDecrypter)
           .bimap[Option[Nino]](
             _.map(Nino(_)),
             _.map(_.value)
           ) and
         (__ \ "saUtr")
-          .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+          .formatNullable[String](stringEncrypterDecrypter)
           .bimap[Option[SaUtr]](
             _.map(SaUtr(_)),
             _.map(_.value)

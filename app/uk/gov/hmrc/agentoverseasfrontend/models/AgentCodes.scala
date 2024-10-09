@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{Format, Json, OFormat, __}
-import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
@@ -35,13 +34,13 @@ object AgentCodes {
   def agentCodesDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[AgentCodes] =
     (
       (__ \ "selfAssessment")
-        .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+        .formatNullable[String](stringEncrypterDecrypter)
         .bimap[Option[SaAgentCode]](
           _.map(SaAgentCode(_)),
           _.map(_.value)
         ) and
         (__ \ "corporationTax")
-          .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+          .formatNullable[String](stringEncrypterDecrypter)
           .bimap[Option[CtAgentCode]](
             _.map(CtAgentCode(_)),
             _.map(_.value)
