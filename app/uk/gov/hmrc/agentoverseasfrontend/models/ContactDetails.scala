@@ -16,7 +16,11 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.json.{Format, Json, __}
+import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
+import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 case class ContactDetails(
   firstName: String,
@@ -27,6 +31,15 @@ case class ContactDetails(
 )
 
 object ContactDetails {
+  def contactDetailsDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[ContactDetails] =
+    (
+      (__ \ "firstName").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
+        (__ \ "lastName").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
+        (__ \ "jobTitle").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
+        (__ \ "businessTelephone").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
+        (__ \ "businessEmail").format[String](stringFormatFallback(stringEncrypterDecrypter))
+    )(ContactDetails.apply, unlift(ContactDetails.unapply))
+
   implicit val contactDetailsFormat: Format[ContactDetails] =
     Json.format[ContactDetails]
 }

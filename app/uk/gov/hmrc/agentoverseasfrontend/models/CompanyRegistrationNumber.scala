@@ -16,11 +16,28 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json._
+import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
+import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 case class CompanyRegistrationNumber(confirmRegistration: Option[Boolean], registrationNumber: Option[Crn] = None)
 
 object CompanyRegistrationNumber {
+  def companyRegistrationNumberDatabaseFormat(implicit
+    crypto: Encrypter with Decrypter
+  ): Format[CompanyRegistrationNumber] =
+    (
+      (__ \ "confirmRegistration").formatNullable[Boolean] and
+        (__ \ "registrationNumber")
+          .formatNullable[String](stringFormatFallback(stringEncrypterDecrypter))
+          .bimap[Option[Crn]](
+            _.map(Crn(_)),
+            _.map(_.value)
+          )
+    )(CompanyRegistrationNumber.apply, unlift(CompanyRegistrationNumber.unapply))
+
   implicit val format: Format[CompanyRegistrationNumber] =
     Json.format[CompanyRegistrationNumber]
 }

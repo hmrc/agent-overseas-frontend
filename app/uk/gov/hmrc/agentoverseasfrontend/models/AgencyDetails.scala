@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.{toFunctionalBuilderOps, toInvariantFunctorOps, unlift}
 import play.api.libs.json._
+import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
+import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 case class AgencyDetails(
   agencyName: String,
@@ -41,6 +44,22 @@ object AgencyDetails {
   )(AgencyDetails.apply _)
   val writes: Writes[AgencyDetails] = Json.writes[AgencyDetails]
   implicit val formats: Format[AgencyDetails] = Format(reads, writes)
+
+  def agencyDetailsDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[AgencyDetails] =
+    (
+      (__ \ "agencyName")
+        .format[String](stringFormatFallback(stringEncrypterDecrypter)) and
+        (__ \ "agencyEmail")
+          .format[String](stringFormatFallback(stringEncrypterDecrypter)) and
+        (__ \ "agencyAddress")
+          .format[OverseasAddress](OverseasAddress.overseasAddressDatabaseFormat) and
+        (__ \ "verifiedEmails")
+          .formatWithDefault[Set[String]](Set.empty)
+          .inmap[Set[String]](
+            _.map(email => stringFormatFallback(stringEncrypterDecrypter).reads(JsString(email)).getOrElse(email)),
+            _.map(email => stringFormatFallback(stringEncrypterDecrypter).writes(email).as[String])
+          )
+    )(AgencyDetails.apply, unlift(AgencyDetails.unapply))
 
   def fromOverseasApplication(overseasApplication: OverseasApplication): AgencyDetails =
     AgencyDetails(

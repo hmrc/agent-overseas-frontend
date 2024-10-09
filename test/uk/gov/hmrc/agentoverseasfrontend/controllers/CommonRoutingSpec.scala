@@ -22,19 +22,18 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{Assertion, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Accepted, AttemptingRegistration, Complete, Registered, Rejected}
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
-import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
 import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
-import uk.gov.hmrc.mongo.cache.{CacheItem, DataKey}
 
-import java.time.{Instant, LocalDateTime}
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -334,13 +333,9 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
 
 object FakeRouting extends CommonRouting with MockitoSugar {
   val connector: AgentOverseasApplicationConnector = mock[AgentOverseasApplicationConnector]
-  protected val mockSessionCacheRepository: SessionCacheRepository = mock[SessionCacheRepository]
 
-  val cacheItem: CacheItem = CacheItem("id", Json.obj(), Instant.now, Instant.now)
+  private val app: Application = new GuiceApplicationBuilder().build()
 
-  when(mockSessionCacheRepository.put("sessionId123456")(DataKey[AgentSession]("agentSession"), AgentSession.empty))
-    .thenReturn(Future.successful(cacheItem))
-
-  override val sessionStoreService = new MongoDBSessionStoreService(mockSessionCacheRepository)
-  override val applicationService = new ApplicationService(connector)
+  override val sessionStoreService: MongoDBSessionStoreService = app.injector.instanceOf[MongoDBSessionStoreService]
+  override val applicationService: ApplicationService = new ApplicationService(connector)
 }

@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
-import javax.inject.{Inject, Singleton}
+import play.api.libs.json.Format
 import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, AgentSession}
 import uk.gov.hmrc.agentoverseasfrontend.repositories.{SessionCache, SessionCacheRepository}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.cache.DataKey
 
+import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MongoDBSessionStoreService @Inject() (val sessionCache: SessionCacheRepository) {
+class MongoDBSessionStoreService @Inject() (val sessionCache: SessionCacheRepository)(implicit
+  @Named("aes") crypto: Encrypter with Decrypter
+) {
 
   final val agentSessionCache = new SessionCache[AgentSession] {
     override val sessionName: String = "agentSession"
@@ -36,6 +40,9 @@ class MongoDBSessionStoreService @Inject() (val sessionCache: SessionCacheReposi
     override val sessionName: String = "agencyDetails"
     override val cacheRepository: SessionCacheRepository = sessionCache
   }
+
+  implicit val agencyDetailsFormat: Format[AgencyDetails] = AgencyDetails.agencyDetailsDatabaseFormat
+  implicit val agentSessionFormat: Format[AgentSession] = AgentSession.agentSessionDatabaseFormat
 
   def fetchAgentSession(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[AgentSession]] =
     agentSessionCache.fetch
