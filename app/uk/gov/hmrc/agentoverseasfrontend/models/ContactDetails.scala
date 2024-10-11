@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{Format, Json, __}
-import uk.gov.hmrc.agentoverseasfrontend.utils.StringFormatFallbackSetup.stringFormatFallback
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
@@ -33,11 +32,11 @@ case class ContactDetails(
 object ContactDetails {
   def contactDetailsDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[ContactDetails] =
     (
-      (__ \ "firstName").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
-        (__ \ "lastName").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
-        (__ \ "jobTitle").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
-        (__ \ "businessTelephone").format[String](stringFormatFallback(stringEncrypterDecrypter)) and
-        (__ \ "businessEmail").format[String](stringFormatFallback(stringEncrypterDecrypter))
+      (__ \ "firstName").format[String](stringEncrypterDecrypter) and
+        (__ \ "lastName").format[String](stringEncrypterDecrypter) and
+        (__ \ "jobTitle").format[String](stringEncrypterDecrypter) and
+        (__ \ "businessTelephone").format[String](stringEncrypterDecrypter) and
+        (__ \ "businessEmail").format[String](stringEncrypterDecrypter)
     )(ContactDetails.apply, unlift(ContactDetails.unapply))
 
   implicit val contactDetailsFormat: Format[ContactDetails] =
