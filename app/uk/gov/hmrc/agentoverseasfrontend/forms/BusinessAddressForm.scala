@@ -27,12 +27,11 @@ case class BusinessAddressForm(
 )
 
 object BusinessAddressForm {
-  def apply(businessAddress: OverseasAddress): BusinessAddressForm =
-    BusinessAddressForm(
-      businessAddress.addressLine1,
-      businessAddress.addressLine2,
-      businessAddress.addressLine3,
-      businessAddress.addressLine4,
-      businessAddress.countryCode
-    )
+  def apply(businessAddress: OverseasAddress): BusinessAddressForm = BusinessAddressForm(
+    businessAddress.addressLine1,
+    businessAddress.addressLine2,
+    businessAddress.addressLine3,
+    businessAddress.addressLine4,
+    businessAddress.countryCode
+  )
 }

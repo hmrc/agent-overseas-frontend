@@ -16,55 +16,81 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.unlift
 import play.api.libs.json._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
-import uk.gov.hmrc.domain.{Nino, SaUtr}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.BadRequestException
 
-case class PersonalDetailsChoice(choice: Option[RadioOption], nino: Option[Nino], saUtr: Option[SaUtr])
+case class PersonalDetailsChoice(
+  choice: Option[RadioOption],
+  nino: Option[Nino],
+  saUtr: Option[SaUtr]
+)
 
 object PersonalDetailsChoice {
+
   sealed trait RadioOption { val value: String }
 
   object RadioOption {
-    case object NinoChoice extends RadioOption { val value = "nino" }
-    case object SaUtrChoice extends RadioOption { val value = "saUtr" }
 
-    def apply(str: String): RadioOption = str.trim match {
-      case NinoChoice.value  => NinoChoice
-      case SaUtrChoice.value => SaUtrChoice
-      case _                 => throw new BadRequestException("Strange form input value")
-    }
+    case object NinoChoice
+    extends RadioOption { val value = "nino" }
+    case object SaUtrChoice
+    extends RadioOption { val value = "saUtr" }
+
+    def apply(str: String): RadioOption =
+      str.trim match {
+        case NinoChoice.value => NinoChoice
+        case SaUtrChoice.value => SaUtrChoice
+        case _ => throw new BadRequestException("Strange form input value")
+      }
 
     def unapply(answer: RadioOption): Option[String] = Some(answer.value)
 
-    implicit val format: Format[RadioOption] = new Format[RadioOption] {
+    implicit val format: Format[RadioOption] =
+      new Format[RadioOption] {
 
-      override def reads(json: JsValue): JsResult[RadioOption] =
-        json match {
-          case JsString(NinoChoice.value)  => JsSuccess(NinoChoice)
-          case JsString(SaUtrChoice.value) => JsSuccess(SaUtrChoice)
-          case invalid                     => JsError(s"Invalid RadioOption value found: $invalid")
-        }
+        override def reads(json: JsValue): JsResult[RadioOption] =
+          json match {
+            case JsString(NinoChoice.value) => JsSuccess(NinoChoice)
+            case JsString(SaUtrChoice.value) => JsSuccess(SaUtrChoice)
+            case invalid => JsError(s"Invalid RadioOption value found: $invalid")
+          }
 
-      override def writes(o: RadioOption): JsValue = JsString(o.value)
-    }
+        override def writes(o: RadioOption): JsValue = JsString(o.value)
+      }
+
   }
 
-  def apply(choice: String, ninoOpt: Option[String], saUtrOpt: Option[String]): PersonalDetailsChoice = {
+  def apply(
+    choice: String,
+    ninoOpt: Option[String],
+    saUtrOpt: Option[String]
+  ): PersonalDetailsChoice = {
 
-    val (nino, saUtr) = RadioOption(choice) match {
-      case RadioOption.NinoChoice  => (ninoOpt.map(Nino), None)
-      case RadioOption.SaUtrChoice => (None, saUtrOpt.map(SaUtr))
-    }
+    val (nino, saUtr) =
+      RadioOption(choice) match {
+        case RadioOption.NinoChoice => (ninoOpt.map(Nino), None)
+        case RadioOption.SaUtrChoice => (None, saUtrOpt.map(SaUtr))
+      }
 
-    PersonalDetailsChoice(Some(RadioOption(choice)), nino, saUtr)
+    PersonalDetailsChoice(
+      Some(RadioOption(choice)),
+      nino,
+      saUtr
+    )
   }
 
-  def personalDetailsChoiceDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[PersonalDetailsChoice] =
+  def personalDetailsChoiceDatabaseFormat(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): Format[PersonalDetailsChoice] =
     (
       (__ \ "choice")
         .formatNullable[String](stringEncrypterDecrypter)
@@ -87,4 +113,5 @@ object PersonalDetailsChoice {
     )(PersonalDetailsChoice.apply, unlift(PersonalDetailsChoice.unapply))
 
   implicit val personalDetailsFormat: OFormat[PersonalDetailsChoice] = Json.format[PersonalDetailsChoice]
+
 }

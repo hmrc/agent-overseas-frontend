@@ -18,19 +18,29 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.time.{Clock, LocalDate, LocalDateTime, ZoneOffset}
+import java.time.Clock
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 import javax.inject.Inject
 import play.api.Environment
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Pending, Rejected}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
-import uk.gov.hmrc.agentoverseasfrontend.views.html.application.{application_not_ready, not_agent, status_rejected}
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Pending
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.views.html.application.application_not_ready
+import uk.gov.hmrc.agentoverseasfrontend.views.html.application.not_agent
+import uk.gov.hmrc.agentoverseasfrontend.views.html.application.status_rejected
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class ApplicationRootController @Inject() (
   val env: Environment,
@@ -41,8 +51,16 @@ class ApplicationRootController @Inject() (
   notAgentView: not_agent,
   applicationNotReadyView: application_not_ready,
   statusRejectedView: status_rejected
-)(implicit appConfig: AppConfig, ec: ExecutionContext)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with I18nSupport {
+)(implicit
+  appConfig: AppConfig,
+  ec: ExecutionContext
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with I18nSupport {
 
   import authAction.withBasicAuth
 
@@ -65,23 +83,29 @@ class ApplicationRootController @Inject() (
           val createdOnPrettifyDate: String = application.applicationCreationDate.format(
             DateTimeFormatter.ofPattern("d MMMM YYYY").withZone(ZoneOffset.UTC)
           )
-          val daysUntilReviewed: Int =
-            daysUntilApplicationReviewed(application.applicationCreationDate)
-          Ok(applicationNotReadyView(application.tradingName, createdOnPrettifyDate, daysUntilReviewed))
-        case Some(application) if application.status == Rejected =>
-          Ok(statusRejectedView(application))
-        case Some(_) =>
-          SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+          val daysUntilReviewed: Int = daysUntilApplicationReviewed(application.applicationCreationDate)
+          Ok(applicationNotReadyView(
+            application.tradingName,
+            createdOnPrettifyDate,
+            daysUntilReviewed
+          ))
+        case Some(application) if application.status == Rejected => Ok(statusRejectedView(application))
+        case Some(_) => SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")
         case None => Redirect(routes.ApplicationRootController.root)
       }
     }
   }
 
   private def daysUntilApplicationReviewed(applicationCreationDate: LocalDateTime): Int = {
-    val daysUntilAppReviewed = LocalDate
-      .now(Clock.systemUTC)
-      .until(applicationCreationDate.plusDays(appConfig.maintainerApplicationReviewDays), ChronoUnit.DAYS)
-      .toInt
-    if (daysUntilAppReviewed > 0) daysUntilAppReviewed else 0
+    val daysUntilAppReviewed =
+      LocalDate
+        .now(Clock.systemUTC)
+        .until(applicationCreationDate.plusDays(appConfig.maintainerApplicationReviewDays), ChronoUnit.DAYS)
+        .toInt
+    if (daysUntilAppReviewed > 0)
+      daysUntilAppReviewed
+    else
+      0
   }
+
 }

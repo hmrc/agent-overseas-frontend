@@ -17,54 +17,70 @@
 package uk.gov.hmrc.agentoverseasfrontend.services
 
 import play.api.libs.json.Format
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, AgentSession}
-import uk.gov.hmrc.agentoverseasfrontend.repositories.{SessionCache, SessionCacheRepository}
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCache
+import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.mongo.cache.DataKey
 
-import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class MongoDBSessionStoreService @Inject() (val sessionCache: SessionCacheRepository)(implicit
-  @Named("aes") crypto: Encrypter with Decrypter
+  @Named("aes") crypto: Encrypter
+    with Decrypter
 ) {
 
-  final val agentSessionCache = new SessionCache[AgentSession] {
-    override val sessionName: String = "agentSession"
-    override val cacheRepository: SessionCacheRepository = sessionCache
-  }
+  final val agentSessionCache =
+    new SessionCache[AgentSession] {
+      override val sessionName: String = "agentSession"
+      override val cacheRepository: SessionCacheRepository = sessionCache
+    }
 
-  final val agencyDetailsCache = new SessionCache[AgencyDetails] {
-    override val sessionName: String = "agencyDetails"
-    override val cacheRepository: SessionCacheRepository = sessionCache
-  }
+  final val agencyDetailsCache =
+    new SessionCache[AgencyDetails] {
+      override val sessionName: String = "agencyDetails"
+      override val cacheRepository: SessionCacheRepository = sessionCache
+    }
 
   implicit val agencyDetailsFormat: Format[AgencyDetails] = AgencyDetails.agencyDetailsDatabaseFormat
   implicit val agentSessionFormat: Format[AgentSession] = AgentSession.agentSessionDatabaseFormat
 
-  def fetchAgentSession(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[AgentSession]] =
-    agentSessionCache.fetch
+  def fetchAgentSession(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[AgentSession]] = agentSessionCache.fetch
 
-  def cacheAgentSession(agentSession: AgentSession)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
-    agentSessionCache.save(agentSession.sanitize).map(_ => ())
+  def cacheAgentSession(agentSession: AgentSession)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Unit] = agentSessionCache.save(agentSession.sanitize).map(_ => ())
 
-  def removeAgentSession(implicit hc: HeaderCarrier): Future[Unit] =
-    hc.sessionId
-      .map(_.value)
-      .map(id => sessionCache.delete(id)(DataKey[AgentSession]("agentSession")))
-      .getOrElse(Future.successful(()))
+  def removeAgentSession(implicit hc: HeaderCarrier): Future[Unit] = hc.sessionId
+    .map(_.value)
+    .map(id => sessionCache.delete(id)(DataKey[AgentSession]("agentSession")))
+    .getOrElse(Future.successful(()))
 
-  def fetchAgencyDetails(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[AgencyDetails]] =
-    agencyDetailsCache.fetch
+  def fetchAgencyDetails(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[AgencyDetails]] = agencyDetailsCache.fetch
 
-  def cacheAgencyDetails(agencyDetails: AgencyDetails)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
-    agencyDetailsCache.save(agencyDetails).map(_ => ())
+  def cacheAgencyDetails(agencyDetails: AgencyDetails)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Unit] = agencyDetailsCache.save(agencyDetails).map(_ => ())
 
-  def remove()(implicit hc: HeaderCarrier): Future[Unit] =
-    hc.sessionId
-      .map(_.value)
-      .map(id => sessionCache.delete(id)(DataKey[AgencyDetails]("agencyDetails")))
-      .getOrElse(Future.successful(()))
+  def remove()(implicit hc: HeaderCarrier): Future[Unit] = hc.sessionId
+    .map(_.value)
+    .map(id => sessionCache.delete(id)(DataKey[AgencyDetails]("agencyDetails")))
+    .getOrElse(Future.successful(()))
+
 }

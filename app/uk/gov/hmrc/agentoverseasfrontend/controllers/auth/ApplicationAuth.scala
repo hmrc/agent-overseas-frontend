@@ -16,88 +16,113 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{Request, Result}
-import play.api.{Configuration, Environment}
+import play.api.mvc.Request
+import play.api.mvc.Result
+import play.api.Configuration
+import play.api.Environment
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
+import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials, email}
-import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.credentials
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.email
+import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class ApplicationAuth @Inject() (
   val authConnector: AuthConnector,
   val sessionStoreService: MongoDBSessionStoreService,
   val applicationService: ApplicationService
-)(implicit val env: Environment, val config: Configuration, val appConfig: AppConfig, val ec: ExecutionContext)
-    extends AuthBase with CommonRouting {
+)(implicit
+  val env: Environment,
+  val config: Configuration,
+  val appConfig: AppConfig,
+  val ec: ExecutionContext
+)
+extends AuthBase
+with CommonRouting {
 
   def getCredsAndAgentSession(implicit hc: HeaderCarrier): Future[(Credentials, AgentSession)] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(credentials and allEnrolments) {
         case Some(credentials) ~ enrolments =>
           sessionStoreService.fetchAgentSession.flatMap {
-            case Some(agentSession) =>
-              Future.successful((credentials, agentSession))
-            case None =>
-              throw new IllegalStateException("Agent session not found")
+            case Some(agentSession) => Future.successful((credentials, agentSession))
+            case None => throw new IllegalStateException("Agent session not found")
           }
         case None ~ _ => throw UnsupportedCredentialRole("User has no credentials")
       }
 
   def withCredsAndEnrollingAgent(checkForEmailVerification: Boolean)(
-    body: (Credentials, AgentSession) => Future[Result]
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
-    authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
-      .retrieve(credentials and allEnrolments and email) {
-        case Some(credentials) ~ enrolments ~ maybeAuthEmail =>
-          if (hasAgentEnrolment(enrolments))
-            Future.successful(Redirect(appConfig.asaFrontendUrl))
-          else {
-            sessionStoreService.fetchAgentSession.flatMap {
-              case Some(agentSession) =>
-                // Consider the auth email as verified for email verification purposes (APB-7317)
-                val agentSessionFixed =
-                  agentSession.copy(verifiedEmails = agentSession.verifiedEmails ++ maybeAuthEmail.toSet)
-                def maybeUpdateSession(): Future[Unit] = {
-                  val sessionNeedsUpdating = agentSessionFixed != agentSession
-                  if (sessionNeedsUpdating) sessionStoreService.cacheAgentSession(agentSessionFixed)
-                  else Future.successful(())
+    body: (
+      Credentials,
+      AgentSession
+    ) => Future[Result]
+  )(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
+    .retrieve(credentials and allEnrolments and email) {
+      case Some(credentials) ~ enrolments ~ maybeAuthEmail =>
+        if (hasAgentEnrolment(enrolments))
+          Future.successful(Redirect(appConfig.asaFrontendUrl))
+        else {
+          sessionStoreService.fetchAgentSession.flatMap {
+            case Some(agentSession) =>
+              // Consider the auth email as verified for email verification purposes (APB-7317)
+              val agentSessionFixed = agentSession.copy(verifiedEmails = agentSession.verifiedEmails ++ maybeAuthEmail.toSet)
+              def maybeUpdateSession(): Future[Unit] = {
+                val sessionNeedsUpdating = agentSessionFixed != agentSession
+                if (sessionNeedsUpdating)
+                  sessionStoreService.cacheAgentSession(agentSessionFixed)
+                else
+                  Future.successful(())
+              }
+              maybeUpdateSession().flatMap { _ =>
+                if (checkForEmailVerification && agentSessionFixed.emailNeedsVerifying) {
+                  // email needs verifying
+                  Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail))
                 }
-                maybeUpdateSession().flatMap { _ =>
-                  if (checkForEmailVerification && agentSessionFixed.emailNeedsVerifying) {
-                    // email needs verifying
-                    Future.successful(Redirect(routes.ApplicationEmailVerificationController.verifyEmail))
-                  } else {
-                    // happy path
-                    body(credentials, agentSessionFixed)
-                  }
+                else {
+                  // happy path
+                  body(credentials, agentSessionFixed)
                 }
-              case None =>
-                routesIfExistingApplication(s"${appConfig.agentOverseasFrontendUrl}/create-account")
-                  .map(Redirect)
-            }
+              }
+            case None =>
+              routesIfExistingApplication(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+                .map(Redirect)
           }
+        }
 
-        case None ~ _ ~ _ => throw UnsupportedCredentialRole("User has no credentials")
-      }
-      .recover(handleFailure(request))
+      case None ~ _ ~ _ => throw UnsupportedCredentialRole("User has no credentials")
+    }
+    .recover(handleFailure(request))
 
   def withEnrollingAgent(
     body: AgentSession => Future[Result]
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
-    withCredsAndEnrollingAgent(checkForEmailVerification = false)((_, session) => body(session))
+  )(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = false)((_, session) => body(session))
 
   def withEnrollingEmailVerifiedAgent(
     body: AgentSession => Future[Result]
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
-    withCredsAndEnrollingAgent(checkForEmailVerification = true)((_, session) => body(session))
+  )(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = true)((_, session) => body(session))
+
 }

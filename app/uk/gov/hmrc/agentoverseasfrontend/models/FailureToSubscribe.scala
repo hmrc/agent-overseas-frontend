@@ -19,8 +19,14 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 sealed trait FailureToSubscribe
 
 object FailureToSubscribe {
-  case object NoAgencyInSession extends FailureToSubscribe
-  case object NoApplications extends FailureToSubscribe
-  case object WrongApplicationStatus extends FailureToSubscribe
-  case object AlreadySubscribed extends FailureToSubscribe
+
+  case object NoAgencyInSession
+  extends FailureToSubscribe
+  case object NoApplications
+  extends FailureToSubscribe
+  case object WrongApplicationStatus
+  extends FailureToSubscribe
+  case object AlreadySubscribed
+  extends FailureToSubscribe
+
 }

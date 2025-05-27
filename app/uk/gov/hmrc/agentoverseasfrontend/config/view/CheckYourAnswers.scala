@@ -17,13 +17,21 @@
 package uk.gov.hmrc.agentoverseasfrontend.config.view
 
 import play.api.data.Form
-import play.api.data.Forms.{boolean, default, mapping}
+import play.api.data.Forms.boolean
+import play.api.data.Forms.default
+import play.api.data.Forms.mapping
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, No, Yes, YesNo}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.No
+import uk.gov.hmrc.agentoverseasfrontend.models.Yes
+import uk.gov.hmrc.agentoverseasfrontend.models.YesNo
 
-case class AnswerBlock(heading: String, answerGroups: Seq[AnswerGroup])
+case class AnswerBlock(
+  heading: String,
+  answerGroups: Seq[AnswerGroup]
+)
 
 case class AnswerGroup(answerRows: Seq[AnswerRow])
 
@@ -43,8 +51,14 @@ object AnswerRow {
     answerLines: Seq[String],
     changeLink: Option[Call] = None,
     visuallyHiddenText: Option[String] = None
-  )(implicit messages: Messages): AnswerRow =
-    AnswerRow(id, question, answerLines, changeLink, Some(Messages("checkAnswers.change.button")), visuallyHiddenText)
+  )(implicit messages: Messages): AnswerRow = AnswerRow(
+    id,
+    question,
+    answerLines,
+    changeLink,
+    Some(Messages("checkAnswers.change.button")),
+    visuallyHiddenText
+  )
 }
 
 case class CheckYourAnswers(
@@ -57,56 +71,62 @@ case class CheckYourAnswers(
 
 case class CheckYourAnswersConfirmation(confirmed: Boolean)
 
-/** Configuration object to support rendering of check_your_answers template Page contains a small form where the user
-  * must a agree by selecting a checkbox
+/** Configuration object to support rendering of check_your_answers template Page contains a small form where the user must a agree by selecting a checkbox
   */
 object CheckYourAnswers {
 
-  def form(implicit messages: Messages): Form[CheckYourAnswersConfirmation] =
-    Form[CheckYourAnswersConfirmation](
-      mapping(
-        "confirmed" -> default(boolean, false)
-          .verifying(Messages("checkAnswers.confirm.error"), _ == true)
-      )(CheckYourAnswersConfirmation.apply)(CheckYourAnswersConfirmation.unapply)
-    )
+  def form(implicit messages: Messages): Form[CheckYourAnswersConfirmation] = Form[CheckYourAnswersConfirmation](
+    mapping(
+      "confirmed" -> default(boolean, false)
+        .verifying(Messages("checkAnswers.confirm.error"), _ == true)
+    )(CheckYourAnswersConfirmation.apply)(CheckYourAnswersConfirmation.unapply)
+  )
 
-  def apply(agentSession: AgentSession, countryName: String)(implicit messages: Messages): CheckYourAnswers =
-    CheckYourAnswers(
-      amlsDetails = AnswerBlock(
-        heading = Messages("checkAnswers.amlsDetails.title"),
-        answerGroups = List(
+  def apply(
+    agentSession: AgentSession,
+    countryName: String
+  )(implicit messages: Messages): CheckYourAnswers = CheckYourAnswers(
+    amlsDetails = AnswerBlock(
+      heading = Messages("checkAnswers.amlsDetails.title"),
+      answerGroups =
+        List(
           makeAmlsRequiredGroup(agentSession),
           makeAmlsDetailsGroup(agentSession),
           makeAmlsFileUploadGroup(agentSession)
         ).flatten
-      ),
-      contactDetails = AnswerBlock(
-        heading = Messages("checkAnswers.contactDetails.title"),
-        answerGroups = List(
+    ),
+    contactDetails = AnswerBlock(
+      heading = Messages("checkAnswers.contactDetails.title"),
+      answerGroups =
+        List(
           makeContactDetailsGroup(agentSession)
         ).flatten
-      ),
-      businessDetails = AnswerBlock(
-        heading = Messages("checkAnswers.BusinessDetails.title"),
-        answerGroups = List(
+    ),
+    businessDetails = AnswerBlock(
+      heading = Messages("checkAnswers.BusinessDetails.title"),
+      answerGroups =
+        List(
           makeTradingNameGroup(agentSession),
           makeOverseasAddressGroup(agentSession, countryName),
           makeTradingAddressFileUploadGroup(agentSession)
         ).flatten
-      ),
-      otherBusinessDetails = AnswerBlock(
-        heading = Messages("checkAnswers.OtherBusinessDetails.title"),
-        answerGroups = List(
+    ),
+    otherBusinessDetails = AnswerBlock(
+      heading = Messages("checkAnswers.OtherBusinessDetails.title"),
+      answerGroups =
+        List(
           makeRegistrationDataGroup(agentSession),
           makeTaxRegistrationNumbersFileUploadGroup(agentSession)
         ).flatten
-      ),
-      backLink = if (agentSession.taxRegistrationNumbers.exists(_.nonEmpty)) {
+    ),
+    backLink =
+      if (agentSession.taxRegistrationNumbers.exists(_.nonEmpty)) {
         routes.FileUploadController.showSuccessfulUploadedForm.url
-      } else {
+      }
+      else {
         routes.TaxRegController.showTaxRegistrationNumberForm.url
       }
-    )
+  )
 
   private def makeAmlsRequiredGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = {
 
@@ -125,127 +145,131 @@ object CheckYourAnswers {
     )
   }
 
-  private def makeAmlsDetailsGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] =
-    session.amlsDetails.map { details =>
-      AnswerGroup(
-        List(
-          AnswerRow(
-            id = "amls-details-supervisory-body",
-            question = Messages("checkAnswers.amlsDetails.supervisoryBody"),
-            answerLines = List(details.supervisoryBody),
-            changeLink = Some(routes.ChangingAnswersController.changeAmlsDetails)
-          ),
-          AnswerRow(
-            id = "amls-details",
-            question = Messages("checkAnswers.amlsDetails.membershipNumber"),
-            answerLines = List(details.membershipNumber).flatten
-          )
+  private def makeAmlsDetailsGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.amlsDetails.map { details =>
+    AnswerGroup(
+      List(
+        AnswerRow(
+          id = "amls-details-supervisory-body",
+          question = Messages("checkAnswers.amlsDetails.supervisoryBody"),
+          answerLines = List(details.supervisoryBody),
+          changeLink = Some(routes.ChangingAnswersController.changeAmlsDetails)
+        ),
+        AnswerRow(
+          id = "amls-details",
+          question = Messages("checkAnswers.amlsDetails.membershipNumber"),
+          answerLines = List(details.membershipNumber).flatten
         )
       )
-    }
+    )
+  }
 
   private def formatFileName(fileName: String): String =
     if (fileName.length > 20)
       s"${fileName.take(10)}...${fileName.takeRight(10)}"
-    else fileName
+    else
+      fileName
 
-  private def makeAmlsFileUploadGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] =
-    session.amlsUploadStatus.flatMap(_.fileName).map { fileName =>
-      AnswerGroup(
-        List(
-          AnswerRow(
-            id = "amlsFileName",
-            question = Messages("checkAnswers.amlsFile.title"),
-            answerLines = List(formatFileName(fileName)),
-            changeLink = Some(routes.ChangingAnswersController.changeTradingAddressFile)
-          )
+  private def makeAmlsFileUploadGroup(
+    session: AgentSession
+  )(implicit messages: Messages): Option[AnswerGroup] = session.amlsUploadStatus.flatMap(_.fileName).map { fileName =>
+    AnswerGroup(
+      List(
+        AnswerRow(
+          id = "amlsFileName",
+          question = Messages("checkAnswers.amlsFile.title"),
+          answerLines = List(formatFileName(fileName)),
+          changeLink = Some(routes.ChangingAnswersController.changeTradingAddressFile)
         )
       )
-    }
+    )
+  }
 
-  private def makeContactDetailsGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] =
-    session.contactDetails.map { details =>
-      AnswerGroup(
-        List(
-          AnswerRow(
-            id = "name",
-            question = Messages("checkAnswers.contactDetails.name"),
-            answerLines = List(s"${details.firstName} ${details.lastName}"),
-            changeLink = Some(routes.ChangingAnswersController.changeContactDetails),
-            visuallyHiddenText = Some(Messages("checkAnswers.contactDetails.visuallyHiddenText"))
-          ),
-          AnswerRow(
-            id = "jobTitle",
-            question = Messages("checkAnswers.contactDetails.jobTitle"),
-            answerLines = List(details.jobTitle)
-          ),
-          AnswerRow(
-            id = "businessTelephone",
-            question = Messages("checkAnswers.contactDetails.businessTelephone"),
-            answerLines = List(details.businessTelephone)
-          ),
-          AnswerRow(
-            id = "businessEmail",
-            question = Messages("checkAnswers.contactDetails.businessEmail"),
-            answerLines = List(details.businessEmail)
-          )
+  private def makeContactDetailsGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.contactDetails.map { details =>
+    AnswerGroup(
+      List(
+        AnswerRow(
+          id = "name",
+          question = Messages("checkAnswers.contactDetails.name"),
+          answerLines = List(s"${details.firstName} ${details.lastName}"),
+          changeLink = Some(routes.ChangingAnswersController.changeContactDetails),
+          visuallyHiddenText = Some(Messages("checkAnswers.contactDetails.visuallyHiddenText"))
+        ),
+        AnswerRow(
+          id = "jobTitle",
+          question = Messages("checkAnswers.contactDetails.jobTitle"),
+          answerLines = List(details.jobTitle)
+        ),
+        AnswerRow(
+          id = "businessTelephone",
+          question = Messages("checkAnswers.contactDetails.businessTelephone"),
+          answerLines = List(details.businessTelephone)
+        ),
+        AnswerRow(
+          id = "businessEmail",
+          question = Messages("checkAnswers.contactDetails.businessEmail"),
+          answerLines = List(details.businessEmail)
         )
       )
-    }
+    )
+  }
 
-  private def makeOverseasAddressGroup(session: AgentSession, countryName: String)(implicit
+  private def makeOverseasAddressGroup(
+    session: AgentSession,
+    countryName: String
+  )(implicit
     messages: Messages
-  ): Option[AnswerGroup] =
-    session.overseasAddress.map { address =>
-      AnswerGroup(
-        List(
-          AnswerRow(
-            id = "mainBusinessAddressTitle",
-            question = Messages("checkAnswers.mainBusinessAddress.title"),
-            answerLines = List(
+  ): Option[AnswerGroup] = session.overseasAddress.map { address =>
+    AnswerGroup(
+      List(
+        AnswerRow(
+          id = "mainBusinessAddressTitle",
+          question = Messages("checkAnswers.mainBusinessAddress.title"),
+          answerLines =
+            List(
               Some(address.addressLine1),
               Some(address.addressLine2),
               address.addressLine3,
               address.addressLine4,
               Some(countryName)
             ).flatten,
-            changeLink = Some(routes.ChangingAnswersController.changeTradingAddress)
-          )
+          changeLink = Some(routes.ChangingAnswersController.changeTradingAddress)
         )
       )
-    }
+    )
+  }
 
   private def makeTradingAddressFileUploadGroup(
     session: AgentSession
-  )(implicit messages: Messages): Option[AnswerGroup] =
-    session.tradingAddressUploadStatus.flatMap(_.fileName).map { fileName =>
-      AnswerGroup(
-        List(
-          AnswerRow(
-            id = "tradingAddressFileName",
-            question = Messages("checkAnswers.tradingAddressFile.title"),
-            answerLines = List(formatFileName(fileName)),
-            Some(routes.ChangingAnswersController.changeTradingAddressFile)
-          )
+  )(implicit messages: Messages): Option[AnswerGroup] = session.tradingAddressUploadStatus.flatMap(_.fileName).map { fileName =>
+    AnswerGroup(
+      List(
+        AnswerRow(
+          id = "tradingAddressFileName",
+          question = Messages("checkAnswers.tradingAddressFile.title"),
+          answerLines = List(formatFileName(fileName)),
+          Some(routes.ChangingAnswersController.changeTradingAddressFile)
         )
       )
-    }
+    )
+  }
 
-  private def makeTradingNameGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] =
-    session.tradingName.map { name =>
-      AnswerGroup(
-        List(
-          AnswerRow(
-            id = "tradingName",
-            question = Messages("checkAnswers.tradingName.title"),
-            answerLines = List(name),
-            changeLink = Some(routes.ChangingAnswersController.changeTradingName)
-          )
+  private def makeTradingNameGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.tradingName.map { name =>
+    AnswerGroup(
+      List(
+        AnswerRow(
+          id = "tradingName",
+          question = Messages("checkAnswers.tradingName.title"),
+          answerLines = List(name),
+          changeLink = Some(routes.ChangingAnswersController.changeTradingName)
         )
       )
-    }
+    )
+  }
 
-  def getAgentCodeRows(isRegistered: YesNo, session: AgentSession)(implicit messages: Messages): Seq[AnswerRow] =
+  def getAgentCodeRows(
+    isRegistered: YesNo,
+    session: AgentSession
+  )(implicit messages: Messages): Seq[AnswerRow] =
     isRegistered match {
       case Yes =>
         if (session.agentCodes.exists(_.hasOneOrMoreCodes)) {
@@ -266,7 +290,8 @@ object CheckYourAnswers {
             )
           }
           List(maybeSaRow, maybeCtRow).flatten
-        } else {
+        }
+        else {
           List(
             AnswerRow(
               id = "agentCodeEmpty",
@@ -289,55 +314,58 @@ object CheckYourAnswers {
           changeLink = Some(routes.ChangingAnswersController.changeRegisteredForUKTax)
         )
       )
-      val personalDetails = if (isRegisteredForUKTax == Yes) {
-        val maybeNinoRow = session.personalDetails.flatMap(_.nino).map { nino =>
-          AnswerRow(
-            id = "nino",
-            question = Messages("checkAnswers.personalDetails.nino.title"),
-            answerLines = List(nino.nino),
-            changeLink = Some(routes.ChangingAnswersController.changePersonalDetails)
-          )
+      val personalDetails =
+        if (isRegisteredForUKTax == Yes) {
+          val maybeNinoRow = session.personalDetails.flatMap(_.nino).map { nino =>
+            AnswerRow(
+              id = "nino",
+              question = Messages("checkAnswers.personalDetails.nino.title"),
+              answerLines = List(nino.nino),
+              changeLink = Some(routes.ChangingAnswersController.changePersonalDetails)
+            )
+          }
+          val maybeSaUtrRow = session.personalDetails.flatMap(_.saUtr).map { saUtr =>
+            AnswerRow(
+              id = "saUtr",
+              question = Messages("checkAnswers.personalDetails.saUtr.title"),
+              answerLines = List(saUtr.utr)
+            )
+          }
+          List(maybeNinoRow, maybeSaUtrRow).flatten
         }
-        val maybeSaUtrRow = session.personalDetails.flatMap(_.saUtr).map { saUtr =>
-          AnswerRow(
-            id = "saUtr",
-            question = Messages("checkAnswers.personalDetails.saUtr.title"),
-            answerLines = List(saUtr.utr)
-          )
+        else {
+          List.empty
         }
-        List(maybeNinoRow, maybeSaUtrRow).flatten
-      } else {
-        List.empty
-      }
       rows ++ personalDetails
     }
 
-  private def makeRegistrationDataGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] =
-    session.registeredWithHmrc.map { isRegistered: YesNo =>
+  private def makeRegistrationDataGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.registeredWithHmrc.map {
+    isRegistered: YesNo =>
       val agentCodeRows = getAgentCodeRows(isRegistered, session)
 
       val ukRegistrationRows = getUkRegistrationRows(session)
 
-      val regCompanyNoRows = session.companyRegistrationNumber
-        .map(_.registrationNumber)
-        .map { crn =>
-          AnswerRow(
-            id = "companyRegNo",
-            question = Messages("checkAnswers.companyRegistrationNumber.title"),
-            answerLines = List(crn.fold(Messages("checkAnswers.companyRegistrationNumber.empty"))(_.value)),
-            changeLink = Some(routes.ChangingAnswersController.changeCompanyRegistrationNumber)
-          )
-        }
-        .toList
+      val regCompanyNoRows =
+        session.companyRegistrationNumber
+          .map(_.registrationNumber)
+          .map { crn =>
+            AnswerRow(
+              id = "companyRegNo",
+              question = Messages("checkAnswers.companyRegistrationNumber.title"),
+              answerLines = List(crn.fold(Messages("checkAnswers.companyRegistrationNumber.empty"))(_.value)),
+              changeLink = Some(routes.ChangingAnswersController.changeCompanyRegistrationNumber)
+            )
+          }
+          .toList
 
       val regTaxNoRows = AnswerRow(
         id = "taxRegistrationNumbersTitle",
         question = Messages("checkAnswers.taxRegistrationNumbers.title"),
-        answerLines = session.taxRegistrationNumbers match {
-          case Some(taxNumbers) if taxNumbers.nonEmpty =>
-            taxNumbers.toList.map(_.value)
-          case _ => List(Messages("checkAnswers.taxRegistrationNumbers.empty"))
-        },
+        answerLines =
+          session.taxRegistrationNumbers match {
+            case Some(taxNumbers) if taxNumbers.nonEmpty => taxNumbers.toList.map(_.value)
+            case _ => List(Messages("checkAnswers.taxRegistrationNumbers.empty"))
+          },
         changeLink = Some(routes.ChangingAnswersController.changeYourTaxRegistrationNumbers)
       )
 
@@ -352,7 +380,7 @@ object CheckYourAnswers {
         ) ++ agentCodeRows ++ ukRegistrationRows ++ regCompanyNoRows :+ regTaxNoRows
       )
 
-    }
+  }
 
   private def makeTaxRegistrationNumbersFileUploadGroup(
     session: AgentSession
@@ -371,7 +399,8 @@ object CheckYourAnswers {
           )
         )
       }
-    } else {
+    }
+    else {
       None
     }
 

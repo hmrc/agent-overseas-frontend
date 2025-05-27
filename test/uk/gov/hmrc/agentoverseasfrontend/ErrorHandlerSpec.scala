@@ -21,7 +21,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.{Lang, MessagesApi}
+import play.api.i18n.Lang
+import play.api.i18n.MessagesApi
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Result
 import play.api.test.FakeRequest
@@ -33,15 +34,18 @@ import uk.gov.hmrc.agentoverseasfrontend.support.LogCapturing
 import scala.concurrent.Future
 
 class ErrorHandlerSpec
-    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfterEach with LogCapturing
-    with ScalaFutures {
+extends PlaySpec
+with MockitoSugar
+with GuiceOneAppPerSuite
+with BeforeAndAfterEach
+with LogCapturing
+with ScalaFutures {
 
   val handler: ErrorHandler = app.injector.instanceOf[ErrorHandler]
   val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   implicit val lang: Lang = Lang("en")
 
-  protected def appBuilder: GuiceApplicationBuilder =
-    new GuiceApplicationBuilder().configure("auditing.enabled" -> false)
+  protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder().configure("auditing.enabled" -> false)
 
   "ErrorHandler should show the error page with log" when {
     "a server error occurs of type BadGateway" in {
@@ -50,7 +54,12 @@ class ErrorHandlerSpec
 
         status(result) mustBe OK
         contentType(result) mustBe Some(HTML)
-        checkIncludesMessages(result, "global.error.500.title", "global.error.500.heading", "global.error.500.message")
+        checkIncludesMessages(
+          result,
+          "global.error.500.title",
+          "global.error.500.heading",
+          "global.error.500.message"
+        )
 
         logEvents.count(_.getMessage.contains(s"uk.gov.hmrc.http.BadGatewayException: some error")) mustBe 1
       }
@@ -59,11 +68,20 @@ class ErrorHandlerSpec
 
   "a client error (400) occurs with log" in {
     withCaptureOfLoggingFrom(handler.logger) { logEvents =>
-      val result = handler.onClientError(FakeRequest(), BAD_REQUEST, "some error")
+      val result = handler.onClientError(
+        FakeRequest(),
+        BAD_REQUEST,
+        "some error"
+      )
 
       status(result) mustBe BAD_REQUEST
       contentType(result) mustBe Some(HTML)
-      checkIncludesMessages(result, "global.error.400.title", "global.error.400.heading", "global.error.400.message")
+      checkIncludesMessages(
+        result,
+        "global.error.400.title",
+        "global.error.400.heading",
+        "global.error.400.message"
+      )
 
       logEvents.count(_.getMessage.contains(s"onClientError some error")) mustBe 1
     }
@@ -71,20 +89,31 @@ class ErrorHandlerSpec
 
   "a client error (404) occurs with log" in {
     withCaptureOfLoggingFrom(handler.logger) { logEvents =>
-      val result = handler.onClientError(FakeRequest(), NOT_FOUND, "some error")
+      val result = handler.onClientError(
+        FakeRequest(),
+        NOT_FOUND,
+        "some error"
+      )
 
       status(result) mustBe NOT_FOUND
       contentType(result) mustBe Some(HTML)
-      checkIncludesMessages(result, "global.error.404.title", "global.error.404.heading", "global.error.404.message")
+      checkIncludesMessages(
+        result,
+        "global.error.404.title",
+        "global.error.404.heading",
+        "global.error.404.message"
+      )
 
       logEvents.count(_.getMessage.contains(s"onClientError some error")) mustBe 1
     }
   }
 
-  private def checkIncludesMessages(result: Future[Result], messageKeys: String*): Unit =
-    messageKeys.foreach { messageKey =>
-      messagesApi.isDefinedAt(messageKey) mustBe true
-      contentAsString(result) must include(HtmlFormat.escape(messagesApi(messageKey)).toString)
-    }
+  private def checkIncludesMessages(
+    result: Future[Result],
+    messageKeys: String*
+  ): Unit = messageKeys.foreach { messageKey =>
+    messagesApi.isDefinedAt(messageKey) mustBe true
+    contentAsString(result) must include(HtmlFormat.escape(messagesApi(messageKey)).toString)
+  }
 
 }

@@ -23,7 +23,9 @@ import uk.gov.hmrc.http._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AgentOverseasSubscriptionConnectorISpec extends BaseISpec with AgentSubscriptionStubs {
+class AgentOverseasSubscriptionConnectorISpec
+extends BaseISpec
+with AgentSubscriptionStubs {
 
   implicit val hc = HeaderCarrier()
 
@@ -65,4 +67,5 @@ class AgentOverseasSubscriptionConnectorISpec extends BaseISpec with AgentSubscr
       }
     }
   }
+
 }

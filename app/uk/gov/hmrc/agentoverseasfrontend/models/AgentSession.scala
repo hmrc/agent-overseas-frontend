@@ -16,12 +16,19 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, toInvariantFunctorOps, unlift}
-import play.api.libs.json.{Format, Json, OFormat, __}
-import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.{decryptString, encryptString}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.toInvariantFunctorOps
+import play.api.libs.functional.syntax.unlift
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import play.api.libs.json.__
+import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.decryptString
+import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.encryptString
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
 
 import scala.collection.immutable.SortedSet
 
@@ -47,23 +54,26 @@ case class AgentSession(
   verifiedEmails: Set[String] = Set.empty
 ) {
 
-  def emailNeedsVerifying(email: String): Boolean =
-    !verifiedEmails.exists(compareEmail(email, _))
+  def emailNeedsVerifying(email: String): Boolean = !verifiedEmails.exists(compareEmail(email, _))
 
   def emailNeedsVerifying: Boolean = contactDetails.exists(details => emailNeedsVerifying(details.businessEmail))
 
   def sanitize: AgentSession = {
     val agentCodes =
-      if (this.registeredWithHmrc.contains(Yes)) this.agentCodes else None
+      if (this.registeredWithHmrc.contains(Yes))
+        this.agentCodes
+      else
+        None
 
     val registeredForUkTax = this.registeredForUkTax
 
     val personalDetails =
-      if (registeredForUkTax.contains(Yes)) this.personalDetails else None
-    val companyRegistrationNumber =
-      registeredForUkTax.flatMap(_ => this.companyRegistrationNumber)
-    val taxRegistrationNumbers =
-      registeredForUkTax.flatMap(_ => this.taxRegistrationNumbers)
+      if (registeredForUkTax.contains(Yes))
+        this.personalDetails
+      else
+        None
+    val companyRegistrationNumber = registeredForUkTax.flatMap(_ => this.companyRegistrationNumber)
+    val taxRegistrationNumbers = registeredForUkTax.flatMap(_ => this.taxRegistrationNumbers)
 
     AgentSession(
       this.amlsRequired,
@@ -87,13 +97,17 @@ case class AgentSession(
       this.verifiedEmails
     )
   }
+
 }
 
 object AgentSession {
 
   def empty: AgentSession = AgentSession()
 
-  def agentSessionDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[AgentSession] =
+  def agentSessionDatabaseFormat(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): Format[AgentSession] =
     (
       (__ \ "amlsRequired").formatNullable[Boolean] and
         (__ \ "amlsDetails").formatNullable[AmlsDetails](AmlsDetails.amlsDetailsDatabaseFormat) and
@@ -133,112 +147,93 @@ object AgentSession {
   implicit val format: OFormat[AgentSession] = Json.format[AgentSession]
 
   object MissingAmlsRequired {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.amlsRequired.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.amlsRequired.isEmpty)
   }
 
   object MissingAmlsDetails {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.amlsRequired.contains(true)) && session.exists(_.amlsDetails.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.amlsRequired.contains(true)) && session.exists(_.amlsDetails.isEmpty)
   }
 
   object MissingAmlsUploadStatus {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.amlsRequired.contains(true)) && session.exists(_.amlsUploadStatus.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.amlsRequired.contains(true)) && session.exists(_.amlsUploadStatus.isEmpty)
   }
 
   object MissingContactDetails {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.contactDetails.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.contactDetails.isEmpty)
   }
 
   object MissingTradingName {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.tradingName.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.tradingName.isEmpty)
   }
 
   object MissingTradingAddress {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.overseasAddress.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.overseasAddress.isEmpty)
   }
 
   object MissingTradingAddressUploadStatus {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.tradingAddressUploadStatus.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.tradingAddressUploadStatus.isEmpty)
   }
 
   object MissingRegisteredWithHmrc {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.registeredWithHmrc.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.registeredWithHmrc.isEmpty)
   }
 
   object IsRegisteredWithHmrc {
-    def unapply(session: Option[AgentSession]): Option[YesNo] =
-      session.flatMap(_.registeredWithHmrc)
+    def unapply(session: Option[AgentSession]): Option[YesNo] = session.flatMap(_.registeredWithHmrc)
   }
 
   object MissingAgentCodes {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.agentCodes.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.agentCodes.isEmpty)
   }
 
   object HasAnsweredAgentCodes {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.flatMap(_.agentCodes).isDefined
+    def unapply(session: Option[AgentSession]): Boolean = session.flatMap(_.agentCodes).isDefined
   }
 
   object MissingRegisteredForUkTax {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.registeredForUkTax.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.registeredForUkTax.isEmpty)
   }
 
   object IsRegisteredForUkTax {
-    def unapply(session: Option[AgentSession]): Option[YesNo] =
-      session.flatMap(_.registeredForUkTax)
+    def unapply(session: Option[AgentSession]): Option[YesNo] = session.flatMap(_.registeredForUkTax)
   }
 
   object MissingPersonalDetails {
     def unapply(session: Option[AgentSession]): Boolean =
       session.flatMap(_.registeredForUkTax) match {
         case Some(No) => false
-        case _        => session.exists(_.personalDetails.isEmpty)
+        case _ => session.exists(_.personalDetails.isEmpty)
       }
   }
 
   object MissingCompanyRegistrationNumber {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.companyRegistrationNumber.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.companyRegistrationNumber.isEmpty)
   }
 
   object MissingHasTaxRegistrationNumber {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.hasTaxRegNumbers.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.hasTaxRegNumbers.isEmpty)
   }
 
   object HasTaxRegistrationNumber {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.hasTaxRegNumbers.getOrElse(false))
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.hasTaxRegNumbers.getOrElse(false))
   }
 
   object NoTaxRegistrationNumber {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(
-        _.hasTaxRegNumbers.getOrElse(true) == false
-      ) // interested in false so getOrElse(true) is the bad case
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(
+      _.hasTaxRegNumbers.getOrElse(true) == false
+    ) // interested in false so getOrElse(true) is the bad case
   }
 
   object TaxRegistrationNumbersEmpty {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.taxRegistrationNumbers.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.taxRegistrationNumbers.isEmpty)
   }
 
   object MissingTaxRegFile {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.trnUploadStatus.isEmpty)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.trnUploadStatus.isEmpty)
   }
 
   object EmailUnverified {
-    def unapply(session: Option[AgentSession]): Boolean =
-      session.exists(_.emailNeedsVerifying)
+    def unapply(session: Option[AgentSession]): Boolean = session.exists(_.emailNeedsVerifying)
   }
+
 }

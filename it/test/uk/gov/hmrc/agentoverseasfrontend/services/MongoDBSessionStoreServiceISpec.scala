@@ -16,16 +16,24 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
-import play.api.libs.json.{JsObject, JsString, JsValue, Json, __}
+import play.api.libs.json.JsObject
+import play.api.libs.json.JsString
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.json.__
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
-import uk.gov.hmrc.domain.{Nino, SaUtr}
-import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
+import uk.gov.hmrc.crypto.SymmetricCryptoFactory
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.domain.SaUtr
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.SessionId
 import uk.gov.hmrc.mongo.CurrentTimestampSupport
 import uk.gov.hmrc.mongo.cache.CacheItem
 import uk.gov.hmrc.mongo.test.CleanMongoCollectionSupport
@@ -34,21 +42,26 @@ import java.time.Instant
 import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class MongoDBSessionStoreServiceISpec extends BaseISpec with CleanMongoCollectionSupport {
+class MongoDBSessionStoreServiceISpec
+extends BaseISpec
+with CleanMongoCollectionSupport {
 
-  private implicit val crypto: Encrypter with Decrypter = SymmetricCryptoFactory.aesCrypto(
+  private implicit val crypto: Encrypter
+    with Decrypter = SymmetricCryptoFactory.aesCrypto(
     "znbxS3YXv6TsIzb8OyeF7DlpXtl95Myvec+Hy8JHzO4="
   )
 
   private implicit lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
-  private val sessionCacheRepository: SessionCacheRepository = new SessionCacheRepository(
-    mongo = mongoComponent,
-    timestampSupport = new CurrentTimestampSupport()
-  )
-  private val mongoDBSessionStoreService: MongoDBSessionStoreService = new MongoDBSessionStoreService(
-    sessionCache = sessionCacheRepository
-  )
+  private val sessionCacheRepository: SessionCacheRepository =
+    new SessionCacheRepository(
+      mongo = mongoComponent,
+      timestampSupport = new CurrentTimestampSupport()
+    )
+  private val mongoDBSessionStoreService: MongoDBSessionStoreService =
+    new MongoDBSessionStoreService(
+      sessionCache = sessionCacheRepository
+    )
 
   private val id: String = "sessionId123456"
   private val instant: Instant = Instant.now()
@@ -111,7 +124,11 @@ class MongoDBSessionStoreServiceISpec extends BaseISpec with CleanMongoCollectio
     agencyName = "agencyName",
     agencyEmail = "test3@email.com",
     agencyAddress = overseasAddress,
-    verifiedEmails = Set("test4@email.com", "test5@email.com", "test6@email.com")
+    verifiedEmails = Set(
+      "test4@email.com",
+      "test5@email.com",
+      "test6@email.com"
+    )
   )
 
   private val agentSessionJson: JsValue = Json.parse(
@@ -311,7 +328,12 @@ class MongoDBSessionStoreServiceISpec extends BaseISpec with CleanMongoCollectio
               .get
           )
 
-          val cacheItem: CacheItem = CacheItem(id, data, instant, instant)
+          val cacheItem: CacheItem = CacheItem(
+            id,
+            data,
+            instant,
+            instant
+          )
 
           await(sessionCacheRepository.collection.insertOne(cacheItem).toFuture())
 
@@ -376,4 +398,5 @@ class MongoDBSessionStoreServiceISpec extends BaseISpec with CleanMongoCollectio
       }
     }
   }
+
 }

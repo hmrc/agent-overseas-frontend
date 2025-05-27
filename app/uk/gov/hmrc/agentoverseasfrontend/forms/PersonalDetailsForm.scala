@@ -17,11 +17,15 @@
 package uk.gov.hmrc.agentoverseasfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, _}
+import play.api.data.Forms.mapping
+import play.api.data.Forms._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
-import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators.{nino, radioInputSelected, saUtr}
-import uk.gov.hmrc.domain.{Nino, SaUtr}
+import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators.nino
+import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators.radioInputSelected
+import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators.saUtr
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.domain.SaUtr
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfEqual
 
 object PersonalDetailsForm {
@@ -30,10 +34,27 @@ object PersonalDetailsForm {
       "personalDetailsChoice" -> optional(text).verifying(
         radioInputSelected("error.personalDetails.no-radio.selected")
       ),
-      "nino"  -> mandatoryIfEqual("personalDetailsChoice", "nino", nino),
-      "saUtr" -> mandatoryIfEqual("personalDetailsChoice", "saUtr", saUtr)
-    )((choice, nino, saUtr) =>
-      PersonalDetailsChoice(choice.map(RadioOption.apply), nino.map(Nino.apply), saUtr.map(SaUtr.apply))
+      "nino" -> mandatoryIfEqual(
+        "personalDetailsChoice",
+        "nino",
+        nino
+      ),
+      "saUtr" -> mandatoryIfEqual(
+        "personalDetailsChoice",
+        "saUtr",
+        saUtr
+      )
+    )(
+      (
+        choice,
+        nino,
+        saUtr
+      ) =>
+        PersonalDetailsChoice(
+          choice.map(RadioOption.apply),
+          nino.map(Nino.apply),
+          saUtr.map(SaUtr.apply)
+        )
     )(details => Some((details.choice.map(_.value), details.nino.map(_.value), details.saUtr.map(_.value))))
   )
 }

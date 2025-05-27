@@ -27,14 +27,32 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
+class TradingAddressControllerISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
-  private val overseasAddress = OverseasAddress("line 1", "line 2", None, None, countryCode = "IE")
+  private val contactDetails = ContactDetails(
+    "test",
+    "last",
+    "senior agent",
+    "12345",
+    "test@email.com"
+  )
+  private val overseasAddress = OverseasAddress(
+    "line 1",
+    "line 2",
+    None,
+    None,
+    countryCode = "IE"
+  )
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
-  private val personalDetails = PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
+  private val personalDetails = PersonalDetailsChoice(
+    Some(RadioOption.NinoChoice),
+    Some(Nino("AB123456A")),
+    None
+  )
 
   private val agentSession = AgentSession(
     amlsDetails = Some(amlsDetails),
@@ -49,8 +67,7 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
 
   "GET /main-business-address" should {
     "display the trading address form" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
       val result = controller.showMainBusinessAddressForm(cleanCredsAgent(FakeRequest()))
 
@@ -80,7 +97,11 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
       sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("addressLine1" -> "line1", "addressLine2" -> "line2", "countryCode" -> "IE")
+        .withFormUrlEncodedBody(
+          "addressLine1" -> "line1",
+          "addressLine2" -> "line2",
+          "countryCode" -> "IE"
+        )
 
       val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
@@ -89,15 +110,24 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
 
       val tradingAddress = sessionStoreService.fetchAgentSession.futureValue.get.overseasAddress
 
-      tradingAddress shouldBe Some(OverseasAddress("line1", "line2", None, None, "IE"))
+      tradingAddress shouldBe Some(OverseasAddress(
+        "line1",
+        "line2",
+        None,
+        None,
+        "IE"
+      ))
     }
 
     "submit form and then redirect to check-your-answers page if user is changing answers" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("addressLine1" -> "line1", "addressLine2" -> "line2", "countryCode" -> "IE")
+        .withFormUrlEncodedBody(
+          "addressLine1" -> "line1",
+          "addressLine2" -> "line2",
+          "countryCode" -> "IE"
+        )
 
       val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
@@ -106,7 +136,13 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
 
       val session = sessionStoreService.fetchAgentSession.futureValue.get
 
-      session.overseasAddress shouldBe Some(OverseasAddress("line1", "line2", None, None, "IE"))
+      session.overseasAddress shouldBe Some(OverseasAddress(
+        "line1",
+        "line2",
+        None,
+        None,
+        "IE"
+      ))
 
       // should revert to normal state after amending is successful
       session.changingAnswers shouldBe false
@@ -114,11 +150,14 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
 
     "show validation errors when form data is incorrect" when {
       "address line 1 is blank" in {
-        sessionStoreService.currentSession.agentSession =
-          Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+        sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
         implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-          .withFormUrlEncodedBody("addressLine1" -> "", "addressLine2" -> "line2", "countryCode" -> "IE")
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "",
+            "addressLine2" -> "line2",
+            "countryCode" -> "IE"
+          )
 
         val result = controller.submitMainBusinessAddress(authenticatedRequest)
 
@@ -127,11 +166,14 @@ class TradingAddressControllerISpec extends BaseISpec with AgentOverseasApplicat
         result.futureValue should containMessages("error.addressline.1.empty")
       }
       "country code is GB" in {
-        sessionStoreService.currentSession.agentSession =
-          Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+        sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
         implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-          .withFormUrlEncodedBody("addressLine1" -> "Some address", "addressLine2" -> "line2", "countryCode" -> "GB")
+          .withFormUrlEncodedBody(
+            "addressLine1" -> "Some address",
+            "addressLine2" -> "line2",
+            "countryCode" -> "GB"
+          )
 
         val result = controller.submitMainBusinessAddress(authenticatedRequest)
 

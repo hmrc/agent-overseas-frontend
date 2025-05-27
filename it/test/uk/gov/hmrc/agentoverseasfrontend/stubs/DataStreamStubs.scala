@@ -19,10 +19,13 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.time.Millis
+import org.scalatest.time.Seconds
+import org.scalatest.time.Span
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 
-trait DataStreamStubs extends Eventually {
+trait DataStreamStubs
+extends Eventually {
   me: WireMockSupport =>
 
   override implicit val patienceConfig = PatienceConfig(scaled(Span(5, Seconds)), scaled(Span(500, Millis)))

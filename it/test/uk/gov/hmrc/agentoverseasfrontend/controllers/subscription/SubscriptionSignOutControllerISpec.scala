@@ -26,7 +26,9 @@ import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SubscriptionSignOutControllerISpec extends BaseISpec {
+class SubscriptionSignOutControllerISpec
+extends BaseISpec {
+
   lazy val controller = app.injector.instanceOf[SubscriptionSignOutController]
 
   "signOutWithContinueUrl" should {

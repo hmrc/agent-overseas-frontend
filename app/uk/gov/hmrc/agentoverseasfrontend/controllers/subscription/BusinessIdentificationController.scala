@@ -16,22 +16,31 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController._
-import uk.gov.hmrc.agentoverseasfrontend.forms.{BusinessAddressForm, BusinessEmailForm, BusinessNameForm}
+import uk.gov.hmrc.agentoverseasfrontend.forms.BusinessAddressForm
+import uk.gov.hmrc.agentoverseasfrontend.forms.BusinessEmailForm
+import uk.gov.hmrc.agentoverseasfrontend.forms.BusinessNameForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms._
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class BusinessIdentificationController @Inject() (
@@ -48,13 +57,22 @@ class BusinessIdentificationController @Inject() (
   updateBusinessNameView: update_business_name,
   checkBusinessEmailView: check_business_email,
   updateBusinessEmailView: update_business_email
-)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) {
+)(implicit
+  override val ec: ExecutionContext,
+  appConfig: AppConfig
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  mcc
+) {
 
   private lazy val countries = countryNamesLoader.load
   private lazy val validCountryCodes = countries.keys.toSet
 
-  import authAction.{config, withBasicAgentAuth, withSubscribingAgent}
+  import authAction.config
+  import authAction.withBasicAgentAuth
+  import authAction.withSubscribingAgent
 
   def showCheckAnswers: Action[AnyContent] = Action.async { implicit request =>
     withSubscribingAgent(checkForEmailVerification = true, generateNewDetailsIfNoSession = true) { agencyDetails =>
@@ -76,7 +94,11 @@ class BusinessIdentificationController @Inject() (
         throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
       )
       Future.successful(
-        Ok(checkBusinessAddressView(businessAddressCheckForm, agencyDetails.agencyAddress, countryName))
+        Ok(checkBusinessAddressView(
+          businessAddressCheckForm,
+          agencyDetails.agencyAddress,
+          countryName
+        ))
       )
     }
   }
@@ -92,7 +114,11 @@ class BusinessIdentificationController @Inject() (
               countryCode,
               throw new RuntimeException(s"The application's stored countryCode: `$countryCode` is unknown")
             )
-            Future.successful(Ok(checkBusinessAddressView(formWithErrors, agencyDetails.agencyAddress, countryName)))
+            Future.successful(Ok(checkBusinessAddressView(
+              formWithErrors,
+              agencyDetails.agencyAddress,
+              countryName
+            )))
           },
           validForm => {
             val useCurrentAddress = validForm.value
@@ -245,19 +271,20 @@ class BusinessIdentificationController @Inject() (
         .map(_ => Redirect(routes.BusinessIdentificationController.showCheckAnswers))
     }
   }
+
 }
 
 object BusinessIdentificationController {
-  def updateBusinessAddressForm(validCountryCodes: Set[String]): Form[BusinessAddressForm] =
-    Form[BusinessAddressForm](
-      mapping(
-        "addressLine1" -> addressLine12(lineNumber = 1),
-        "addressLine2" -> addressLine12(lineNumber = 2),
-        "addressLine3" -> addressLine34(lineNumber = 3),
-        "addressLine4" -> addressLine34(lineNumber = 4),
-        "countryCode"  -> countryCode(validCountryCodes)
-      )(BusinessAddressForm.apply)(BusinessAddressForm.unapply)
-    )
+
+  def updateBusinessAddressForm(validCountryCodes: Set[String]): Form[BusinessAddressForm] = Form[BusinessAddressForm](
+    mapping(
+      "addressLine1" -> addressLine12(lineNumber = 1),
+      "addressLine2" -> addressLine12(lineNumber = 2),
+      "addressLine3" -> addressLine34(lineNumber = 3),
+      "addressLine4" -> addressLine34(lineNumber = 4),
+      "countryCode" -> countryCode(validCountryCodes)
+    )(BusinessAddressForm.apply)(BusinessAddressForm.unapply)
+  )
 
   val updateBusinessEmailForm: Form[BusinessEmailForm] = Form[BusinessEmailForm](
     mapping(
@@ -270,4 +297,5 @@ object BusinessIdentificationController {
       "name" -> businessName
     )(BusinessNameForm.apply)(BusinessNameForm.unapply)
   )
+
 }

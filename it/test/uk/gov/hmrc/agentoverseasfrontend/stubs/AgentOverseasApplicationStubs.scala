@@ -19,22 +19,25 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, ApplicationStatus, CreateOverseasApplicationRequest}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
+import uk.gov.hmrc.agentoverseasfrontend.models.CreateOverseasApplicationRequest
 
 trait AgentOverseasApplicationStubs {
 
-  private val allStatuses =
-    ApplicationStatus.allStatuses.map(status => s"statusIdentifier=${status.key}").mkString("&")
+  private val allStatuses = ApplicationStatus.allStatuses.map(status => s"statusIdentifier=${status.key}").mkString("&")
 
-  def givenPostOverseasApplication(status: Int, requestBody: String = defaultRequestBody): StubMapping =
-    stubFor(
-      post(urlEqualTo(s"/agent-overseas-application/application"))
-        .withRequestBody(equalToJson(requestBody))
-        .willReturn(
-          aResponse()
-            .withStatus(status)
-        )
-    )
+  def givenPostOverseasApplication(
+    status: Int,
+    requestBody: String = defaultRequestBody
+  ): StubMapping = stubFor(
+    post(urlEqualTo(s"/agent-overseas-application/application"))
+      .withRequestBody(equalToJson(requestBody))
+      .willReturn(
+        aResponse()
+          .withStatus(status)
+      )
+  )
 
   private val defaultRequestBody =
     s"""|{
@@ -76,8 +79,7 @@ trait AgentOverseasApplicationStubs {
         |}
      """.stripMargin
 
-  val defaultCreateApplicationRequest: CreateOverseasApplicationRequest =
-    Json.parse(defaultRequestBody).as[CreateOverseasApplicationRequest]
+  val defaultCreateApplicationRequest: CreateOverseasApplicationRequest = Json.parse(defaultRequestBody).as[CreateOverseasApplicationRequest]
 
   def given200OverseasPendingApplication(
     appCreateDate: Option[String] = Some("2019-02-20T15:11:51.729")
@@ -118,7 +120,11 @@ trait AgentOverseasApplicationStubs {
   }
 
   def given200GetOverseasApplications(allRejected: Boolean): StubMapping = {
-    val requestBody = if (allRejected) StubsTestData.allRejected else StubsTestData.notAllRejected
+    val requestBody =
+      if (allRejected)
+        StubsTestData.allRejected
+      else
+        StubsTestData.notAllRejected
     stubFor(
       get(urlEqualTo(s"/agent-overseas-application/application?$allStatuses"))
         .willReturn(
@@ -129,183 +135,161 @@ trait AgentOverseasApplicationStubs {
     )
   }
 
-  def given404OverseasApplications(): StubMapping =
-    stubFor(
-      get(urlEqualTo(s"/agent-overseas-application/application?$allStatuses"))
-        .willReturn(
-          aResponse()
-            .withStatus(404)
-        )
-    )
-
-  def given500GetOverseasApplication(): StubMapping =
-    stubFor(
-      get(urlEqualTo(s"/agent-overseas-application/application?$allStatuses"))
-        .willReturn(
-          aResponse()
-            .withStatus(500)
-        )
-    )
-
-  def given200UpscanPollStatusReady(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/upscan-poll-status/reference"))
-        .willReturn(
-          aResponse().withBody("""{"reference":"reference","fileStatus":"READY","fileName":"some"}""").withStatus(200)
-        )
-    )
-
-  def given200UpscanPollStatusNotReady(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/upscan-poll-status/reference"))
-        .willReturn(aResponse().withBody("""{"reference":"reference","fileStatus":"NOT_READY"}""").withStatus(200))
-    )
-
-  def given500UpscanPollStatus(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/upscan-poll-status/reference"))
-        .willReturn(aResponse().withStatus(500))
-    )
-
-  def givenAcceptedApplicationResponse(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.applicationWithStatus())
-          .withStatus(200)
-      )
-    )
-
-  def givenAcceptedApplicationResponseWithUnverifiedEmail(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.applicationWithStatus())
-          .withStatus(200)
-      )
-    )
-
-  def givenPendingApplicationResponse(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.pendingApplication)
-          .withStatus(200)
-      )
-    )
-
-  def givenRegisteredApplicationResponse(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.applicationWithRegisteredStatus)
-          .withStatus(200)
-      )
-    )
-
-  def givenAttemptingRegistrationApplicationResponse(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.applicationWithStatus("attempting_registration"))
-          .withStatus(200)
-      )
-    )
-
-  def givenRejectedApplicationResponse(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.rejectedApplication)
-          .withStatus(200)
-      )
-    )
-
-  def givenCompleteApplicationResponse(arn: Option[String] = None): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.applicationWithCompleteStatus(arn.getOrElse("TARN0000001")))
-          .withStatus(200)
-      )
-    )
-
-  def givenApplicationMultiple(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        okJson(StubsTestData.notAllRejected)
-          .withStatus(200)
-      )
-    )
-
-  def givenApplicationEmptyResponse(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+  def given404OverseasApplications(): StubMapping = stubFor(
+    get(urlEqualTo(s"/agent-overseas-application/application?$allStatuses"))
+      .willReturn(
         aResponse()
           .withStatus(404)
       )
-    )
+  )
 
-  def givenApplicationUnavailable(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application"))
-        .willReturn(
-          aResponse()
-            .withStatus(503)
-        )
-    )
+  def given500GetOverseasApplication(): StubMapping = stubFor(
+    get(urlEqualTo(s"/agent-overseas-application/application?$allStatuses"))
+      .willReturn(
+        aResponse()
+          .withStatus(500)
+      )
+  )
 
-  def givenApplicationServerError(): StubMapping =
-    stubFor(
-      get(urlEqualTo("/agent-overseas-application/application"))
-        .willReturn(
-          aResponse()
-            .withStatus(500)
-        )
-    )
+  def given200UpscanPollStatusReady(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/upscan-poll-status/reference"))
+      .willReturn(
+        aResponse().withBody("""{"reference":"reference","fileStatus":"READY","fileName":"some"}""").withStatus(200)
+      )
+  )
 
-  def givenApplicationUpdateSuccessResponse(): StubMapping =
-    stubFor(
-      put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+  def given200UpscanPollStatusNotReady(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/upscan-poll-status/reference"))
+      .willReturn(aResponse().withBody("""{"reference":"reference","fileStatus":"NOT_READY"}""").withStatus(200))
+  )
+
+  def given500UpscanPollStatus(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/upscan-poll-status/reference"))
+      .willReturn(aResponse().withStatus(500))
+  )
+
+  def givenAcceptedApplicationResponse(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus())
+        .withStatus(200)
+    )
+  )
+
+  def givenAcceptedApplicationResponseWithUnverifiedEmail(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus())
+        .withStatus(200)
+    )
+  )
+
+  def givenPendingApplicationResponse(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.pendingApplication)
+        .withStatus(200)
+    )
+  )
+
+  def givenRegisteredApplicationResponse(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithRegisteredStatus)
+        .withStatus(200)
+    )
+  )
+
+  def givenAttemptingRegistrationApplicationResponse(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithStatus("attempting_registration"))
+        .withStatus(200)
+    )
+  )
+
+  def givenRejectedApplicationResponse(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.rejectedApplication)
+        .withStatus(200)
+    )
+  )
+
+  def givenCompleteApplicationResponse(arn: Option[String] = None): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.applicationWithCompleteStatus(arn.getOrElse("TARN0000001")))
+        .withStatus(200)
+    )
+  )
+
+  def givenApplicationMultiple(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      okJson(StubsTestData.notAllRejected)
+        .withStatus(200)
+    )
+  )
+
+  def givenApplicationEmptyResponse(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(404)
+    )
+  )
+
+  def givenApplicationUnavailable(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application"))
+      .willReturn(
+        aResponse()
+          .withStatus(503)
+      )
+  )
+
+  def givenApplicationServerError(): StubMapping = stubFor(
+    get(urlEqualTo("/agent-overseas-application/application"))
+      .willReturn(
+        aResponse()
+          .withStatus(500)
+      )
+  )
+
+  def givenApplicationUpdateSuccessResponse(): StubMapping = stubFor(
+    put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(204)
+    )
+  )
+
+  def givenApplicationUpdateNotFoundResponse(): StubMapping = stubFor(
+    put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(404)
+    )
+  )
+
+  def givenApplicationUpdateServerError(): StubMapping = stubFor(
+    put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+      aResponse()
+        .withStatus(500)
+    )
+  )
+
+  def givenUpdateAuthIdSuccessResponse(oldAuthId: String): StubMapping = stubFor(
+    put(urlEqualTo("/agent-overseas-application/application/auth-provider-id"))
+      .withRequestBody(equalToJson(s"""{"authId": "$oldAuthId"}"""))
+      .willReturn(
         aResponse()
           .withStatus(204)
       )
-    )
+  )
 
-  def givenApplicationUpdateNotFoundResponse(): StubMapping =
-    stubFor(
-      put(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        aResponse()
-          .withStatus(404)
-      )
+  def givenUpdateAuthIdNotFoundResponse(): StubMapping = stubFor(
+    put(urlEqualTo("/agent-overseas-application/application/auth-provider-id")).willReturn(
+      aResponse()
+        .withStatus(404)
     )
+  )
 
-  def givenApplicationUpdateServerError(): StubMapping =
-    stubFor(
-      put(urlEqualTo("/agent-overseas-application/application")).willReturn(
-        aResponse()
-          .withStatus(500)
-      )
+  def givenUpdateAuthIdServerError(): StubMapping = stubFor(
+    put(urlEqualTo("/agent-overseas-application/application/auth-provider-id")).willReturn(
+      aResponse()
+        .withStatus(500)
     )
-
-  def givenUpdateAuthIdSuccessResponse(oldAuthId: String): StubMapping =
-    stubFor(
-      put(urlEqualTo("/agent-overseas-application/application/auth-provider-id"))
-        .withRequestBody(equalToJson(s"""{"authId": "$oldAuthId"}"""))
-        .willReturn(
-          aResponse()
-            .withStatus(204)
-        )
-    )
-
-  def givenUpdateAuthIdNotFoundResponse(): StubMapping =
-    stubFor(
-      put(urlEqualTo("/agent-overseas-application/application/auth-provider-id")).willReturn(
-        aResponse()
-          .withStatus(404)
-      )
-    )
-
-  def givenUpdateAuthIdServerError(): StubMapping =
-    stubFor(
-      put(urlEqualTo("/agent-overseas-application/application/auth-provider-id")).willReturn(
-        aResponse()
-          .withStatus(500)
-      )
-    )
+  )
 
   def verifyApplicationUpdate(requestBody: AgencyDetails): Unit = {
     import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails.formats
@@ -317,6 +301,6 @@ trait AgentOverseasApplicationStubs {
     )
   }
 
-  def verifyUpdateAuthIdRequest(count: Int): Unit =
-    verify(count, putRequestedFor(urlEqualTo("/agent-overseas-application/application/auth-provider-id")))
+  def verifyUpdateAuthIdRequest(count: Int): Unit = verify(count, putRequestedFor(urlEqualTo("/agent-overseas-application/application/auth-provider-id")))
+
 }

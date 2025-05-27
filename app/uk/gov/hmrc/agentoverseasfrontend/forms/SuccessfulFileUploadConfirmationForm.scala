@@ -18,21 +18,21 @@ package uk.gov.hmrc.agentoverseasfrontend.forms
 
 import play.api.data.Forms._
 import play.api.data._
-import uk.gov.hmrc.agentoverseasfrontend.models.{RadioConfirm, SuccessfulFileUploadConfirmation}
+import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
+import uk.gov.hmrc.agentoverseasfrontend.models.SuccessfulFileUploadConfirmation
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators.radioInputSelected
 
 object SuccessfulFileUploadConfirmationForm {
 
-  def form: Form[SuccessfulFileUploadConfirmation] =
-    Form[SuccessfulFileUploadConfirmation](
-      mapping(
-        "fileType" -> text
-          .verifying("wrong fileType returned from user", f => f == "amls" || f == "trading-address" || f == "trn"),
-        "choice" -> mapping(
-          "correctFile" -> optional(boolean)
-            .verifying(radioInputSelected("fileUpload.correctFile.no-radio.selected"))
-            .transform(_.getOrElse(false), (Some(_)): Boolean => Option[Boolean])
-        )(RadioConfirm.apply)(RadioConfirm.unapply)
-      )(SuccessfulFileUploadConfirmation.apply)(SuccessfulFileUploadConfirmation.unapply)
-    )
+  def form: Form[SuccessfulFileUploadConfirmation] = Form[SuccessfulFileUploadConfirmation](
+    mapping(
+      "fileType" -> text
+        .verifying("wrong fileType returned from user", f => f == "amls" || f == "trading-address" || f == "trn"),
+      "choice" -> mapping(
+        "correctFile" -> optional(boolean)
+          .verifying(radioInputSelected("fileUpload.correctFile.no-radio.selected"))
+          .transform(_.getOrElse(false), (Some(_)): Boolean => Option[Boolean])
+      )(RadioConfirm.apply)(RadioConfirm.unapply)
+    )(SuccessfulFileUploadConfirmation.apply)(SuccessfulFileUploadConfirmation.unapply)
+  )
 }

@@ -23,15 +23,14 @@ import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
 
 object ContactDetailsForm {
 
-  def form: Form[ContactDetails] =
-    Form[ContactDetails](
-      mapping(
-        "firstName"         -> firstName,
-        "lastName"          -> lastName,
-        "jobTitle"          -> jobTitle,
-        "businessTelephone" -> businessTelephone,
-        "businessEmail"     -> businessEmail
-      )(ContactDetails.apply)(ContactDetails.unapply)
-    )
+  def form: Form[ContactDetails] = Form[ContactDetails](
+    mapping(
+      "firstName" -> firstName,
+      "lastName" -> lastName,
+      "jobTitle" -> jobTitle,
+      "businessTelephone" -> businessTelephone,
+      "businessEmail" -> businessEmail
+    )(ContactDetails.apply)(ContactDetails.unapply)
+  )
 
 }

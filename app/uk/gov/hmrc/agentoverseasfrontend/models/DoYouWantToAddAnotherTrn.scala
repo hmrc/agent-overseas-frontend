@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Format
+import play.api.libs.json.Json
 
 case class DoYouWantToAddAnotherTrn(value: Option[Boolean])
 
 object DoYouWantToAddAnotherTrn {
-  implicit val format: Format[DoYouWantToAddAnotherTrn] =
-    Json.format[DoYouWantToAddAnotherTrn]
+  implicit val format: Format[DoYouWantToAddAnotherTrn] = Json.format[DoYouWantToAddAnotherTrn]
 }

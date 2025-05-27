@@ -18,24 +18,38 @@ package uk.gov.hmrc.agentoverseasfrontend.connectors
 
 import play.api.Logging
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.models.{VerificationStatusResponse, VerifyEmailRequest, VerifyEmailResponse}
+import uk.gov.hmrc.agentoverseasfrontend.models.VerificationStatusResponse
+import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailRequest
+import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailResponse
 import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class EmailVerificationConnector @Inject() (http: HttpClient, val metrics: Metrics)(implicit
+class EmailVerificationConnector @Inject() (
+  http: HttpClient,
+  val metrics: Metrics
+)(implicit
   val appConfig: AppConfig,
   val ec: ExecutionContext
-) extends HttpAPIMonitor with Logging {
+)
+extends HttpAPIMonitor
+with Logging {
 
   def verifyEmail(
     request: VerifyEmailRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VerifyEmailResponse]] = {
+  )(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[VerifyEmailResponse]] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verify-email"
 
     monitor(s"ConsumedAPI-email-verify-POST") {
@@ -52,7 +66,10 @@ class EmailVerificationConnector @Inject() (http: HttpClient, val metrics: Metri
 
   def checkEmail(
     credId: String
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VerificationStatusResponse]] = {
+  )(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[VerificationStatusResponse]] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId"
 
     monitor(s"ConsumedAPI-email-verification-status-GET") {
@@ -67,4 +84,5 @@ class EmailVerificationConnector @Inject() (http: HttpClient, val metrics: Metri
       }
     }
   }
+
 }

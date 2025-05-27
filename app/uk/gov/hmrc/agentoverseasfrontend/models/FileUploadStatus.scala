@@ -16,9 +16,14 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Format, Json, OFormat}
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 
-case class FailureDetails(failureReason: String, message: String)
+case class FailureDetails(
+  failureReason: String,
+  message: String
+)
 
 object FailureDetails {
   implicit val format: Format[FailureDetails] = Json.format[FailureDetails]

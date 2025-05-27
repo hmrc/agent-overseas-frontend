@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
+import play.api.mvc.AnyContentAsFormUrlEncoded
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, AmlsDetails}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.AmlsDetails
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,7 +29,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
+class AntiMoneyLaunderingControllerISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -257,12 +261,11 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
     "redirect to upload/amls" in {
 
       sessionStoreService.cacheAgentSession(AgentSession()).futureValue
-      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
-        cleanCredsAgent(FakeRequest(POST, "/"))
-          .withFormUrlEncodedBody(
-            "amlsBody"         -> "Association of AccountingTechnicians (AAT)",
-            "membershipNumber" -> "123445"
-          )
+      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(
+          "amlsBody" -> "Association of AccountingTechnicians (AAT)",
+          "membershipNumber" -> "123445"
+        )
 
       val result = controller.submitAntiMoneyLaundering(authenticatedRequest)
 
@@ -279,12 +282,11 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
       // pre-state
       sessionStoreService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
 
-      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
-        cleanCredsAgent(FakeRequest(POST, "/"))
-          .withFormUrlEncodedBody(
-            "amlsBody"         -> "Association of AccountingTechnicians (AAT)",
-            "membershipNumber" -> "123445"
-          )
+      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(
+          "amlsBody" -> "Association of AccountingTechnicians (AAT)",
+          "membershipNumber" -> "123445"
+        )
 
       val result = controller.submitAntiMoneyLaundering(authenticatedRequest)
 
@@ -300,9 +302,8 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
 
       sessionStoreService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
 
-      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
-        cleanCredsAgent(FakeRequest(POST, "/"))
-          .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
+      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
 
       val result = controller.submitAntiMoneyLaundering(authenticatedRequest)
 
@@ -316,9 +317,8 @@ class AntiMoneyLaunderingControllerISpec extends BaseISpec with AgentOverseasApp
 
       sessionStoreService.cacheAgentSession(AgentSession()).futureValue
 
-      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
-        cleanCredsAgent(FakeRequest(POST, "/"))
-          .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
+      implicit val authenticatedRequest: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
 
       val result = controller.submitAntiMoneyLaundering(authenticatedRequest)
 

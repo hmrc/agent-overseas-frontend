@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
-import play.api.libs.json.{Format, Json, __}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.unlift
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import play.api.libs.json.__
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
 
 case class ContactDetails(
   firstName: String,
@@ -30,7 +34,11 @@ case class ContactDetails(
 )
 
 object ContactDetails {
-  def contactDetailsDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[ContactDetails] =
+
+  def contactDetailsDatabaseFormat(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): Format[ContactDetails] =
     (
       (__ \ "firstName").format[String](stringEncrypterDecrypter) and
         (__ \ "lastName").format[String](stringEncrypterDecrypter) and
@@ -39,6 +47,6 @@ object ContactDetails {
         (__ \ "businessEmail").format[String](stringEncrypterDecrypter)
     )(ContactDetails.apply, unlift(ContactDetails.unapply))
 
-  implicit val contactDetailsFormat: Format[ContactDetails] =
-    Json.format[ContactDetails]
+  implicit val contactDetailsFormat: Format[ContactDetails] = Json.format[ContactDetails]
+
 }

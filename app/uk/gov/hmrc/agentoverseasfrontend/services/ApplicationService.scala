@@ -16,42 +16,53 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, ApplicationEntityDetails, CreateOverseasApplicationRequest, FileUploadStatus}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationEntityDetails
+import uk.gov.hmrc.agentoverseasfrontend.models.CreateOverseasApplicationRequest
+import uk.gov.hmrc.agentoverseasfrontend.models.FileUploadStatus
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOverseasApplicationConnector) {
 
-  implicit val orderingLocalDateTime: Ordering[LocalDateTime] =
-    Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
+  implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
   def getCurrentApplication(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[Option[ApplicationEntityDetails]] =
-    agentOverseasApplicationConnector.getUserApplications.map { e =>
-      e.sortBy(_.applicationCreationDate).reverse.headOption
+  ): Future[Option[ApplicationEntityDetails]] = agentOverseasApplicationConnector.getUserApplications.map { e =>
+    e.sortBy(_.applicationCreationDate).reverse.headOption
+  }
+
+  def rejectedApplication(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[ApplicationEntityDetails]] = agentOverseasApplicationConnector.getUserApplications
+    .map { apps =>
+      if (apps.forall(_.status == Rejected))
+        apps.sortBy(_.maintainerReviewedOn).reverse.headOption
+      else
+        None
     }
 
-  def rejectedApplication(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ApplicationEntityDetails]] =
-    agentOverseasApplicationConnector.getUserApplications
-      .map { apps =>
-        if (apps.forall(_.status == Rejected))
-          apps.sortBy(_.maintainerReviewedOn).reverse.headOption
-        else None
-      }
+  def createApplication(application: AgentSession)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Unit] = agentOverseasApplicationConnector.createOverseasApplication(CreateOverseasApplicationRequest(application.sanitize))
 
-  def createApplication(application: AgentSession)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
-    agentOverseasApplicationConnector.createOverseasApplication(CreateOverseasApplicationRequest(application.sanitize))
-
-  def upscanPollStatus(reference: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FileUploadStatus] =
-    agentOverseasApplicationConnector.upscanPollStatus(reference)
+  def upscanPollStatus(reference: String)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[FileUploadStatus] = agentOverseasApplicationConnector.upscanPollStatus(reference)
 
 }

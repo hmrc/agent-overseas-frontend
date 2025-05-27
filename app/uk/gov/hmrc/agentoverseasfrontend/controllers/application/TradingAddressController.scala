@@ -16,15 +16,20 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Environment
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.MainBusinessAddressForm
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.main_business_address
 
@@ -40,9 +45,17 @@ class TradingAddressController @Inject() (
   authAction: ApplicationAuth,
   cc: MessagesControllerComponents,
   mainBusinessAddressView: main_business_address
-)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
-    with I18nSupport {
+)(implicit
+  appConfig: AppConfig,
+  override val ec: ExecutionContext
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with SessionBehaviour
+with I18nSupport {
 
   import authAction.withEnrollingEmailVerifiedAgent
 
@@ -51,8 +64,7 @@ class TradingAddressController @Inject() (
 
   def showMainBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
-      val form =
-        MainBusinessAddressForm.mainBusinessAddressForm(validCountryCodes)
+      val form = MainBusinessAddressForm.mainBusinessAddressForm(validCountryCodes)
       if (agentSession.changingAnswers) {
         Ok(
           mainBusinessAddressView(
@@ -61,7 +73,8 @@ class TradingAddressController @Inject() (
             Some(showCheckYourAnswersUrl)
           )
         )
-      } else {
+      }
+      else {
         Ok(mainBusinessAddressView(agentSession.overseasAddress.fold(form)(form.fill), countries))
       }
     }
@@ -75,8 +88,13 @@ class TradingAddressController @Inject() (
         .fold(
           formWithErrors =>
             if (agentSession.changingAnswers) {
-              Ok(mainBusinessAddressView(formWithErrors, countries, Some(showCheckYourAnswersUrl)))
-            } else {
+              Ok(mainBusinessAddressView(
+                formWithErrors,
+                countries,
+                Some(showCheckYourAnswersUrl)
+              ))
+            }
+            else {
               Ok(mainBusinessAddressView(formWithErrors, countries))
             },
           validForm =>
@@ -86,4 +104,5 @@ class TradingAddressController @Inject() (
         )
     }
   }
+
 }

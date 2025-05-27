@@ -29,16 +29,39 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
+class TaxRegControllerISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs {
+
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
+  private val contactDetails = ContactDetails(
+    "test",
+    "last",
+    "senior agent",
+    "12345",
+    "test@email.com"
+  )
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
-  private val overseasAddress = OverseasAddress("line 1", "line 2", None, None, countryCode = "IE")
-  private val personalDetails = PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
+  private val overseasAddress = OverseasAddress(
+    "line 1",
+    "line 2",
+    None,
+    None,
+    countryCode = "IE"
+  )
+  private val personalDetails = PersonalDetailsChoice(
+    Some(RadioOption.NinoChoice),
+    Some(Nino("AB123456A")),
+    None
+  )
   val failureDetails: FailureDetails = FailureDetails("QUARANTINE", "a virus was found!")
-  val fileUploadStatus: FileUploadStatus =
-    FileUploadStatus("reference", "READY", Some("filename"), Some(failureDetails))
+  val fileUploadStatus: FileUploadStatus = FileUploadStatus(
+    "reference",
+    "READY",
+    Some("filename"),
+    Some(failureDetails)
+  )
 
   private val agentSession = AgentSession(
     amlsDetails = Some(amlsDetails),
@@ -85,8 +108,10 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     "`if previously answered 'Yes' pre-populate form with 'Yes' and the value provided`" in {
       val authenticatedRequest = cleanCredsAgent(FakeRequest())
       val taxRegNo = Trn("tax_reg_number_123")
-      sessionStoreService.currentSession.agentSession =
-        Some(currentApplication.copy(hasTaxRegNumbers = Some(true), taxRegistrationNumbers = Some(SortedSet(taxRegNo))))
+      sessionStoreService.currentSession.agentSession = Some(currentApplication.copy(
+        hasTaxRegNumbers = Some(true),
+        taxRegistrationNumbers = Some(SortedSet(taxRegNo))
+      ))
 
       val result = controller.showTaxRegistrationNumberForm(authenticatedRequest)
 
@@ -264,8 +289,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "show validation error when TRN is blank when submitting the form" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet.empty[Trn])))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet.empty[Trn])))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("trn" -> "")
@@ -280,8 +304,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
 
   "GET /your-tax-registration-numbers" should {
     "display the /your-tax-registration-numbers page with DoYouWantToAddAnotherTrn form" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123")))))
 
       val result = controller.showYourTaxRegNumbersForm(cleanCredsAgent(FakeRequest()))
 
@@ -299,8 +322,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "display the /your-tax-registration-numbers page with /check-your-answers back link if user is changing answers" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), changingAnswers = true))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), changingAnswers = true))
 
       val result = controller.showYourTaxRegNumbersForm(cleanCredsAgent(FakeRequest()))
 
@@ -318,8 +340,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "display the /your-tax-registration-numbers page with /update-tax-registration-number back link if user is hasTrnsChanged" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), hasTrnsChanged = true))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), hasTrnsChanged = true))
 
       val result = controller.showYourTaxRegNumbersForm(cleanCredsAgent(FakeRequest()))
 
@@ -436,8 +457,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
   "POST /update-tax-registration-number" should {
 
     "submit the form (with original and updated trns populated) and should correctly update the trn stored in the session" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("original" -> "abc123", "updated" -> "abc12345")
@@ -467,8 +487,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
 
   "GET remove-tax-registration-number/:trn" should {
     "display the remove-tax-registration-number form" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.showRemoveTaxRegNumber("abc123")(cleanCredsAgent(FakeRequest()))
 
@@ -483,8 +502,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "contain back button in the remove-tax-registration-number form" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.showRemoveTaxRegNumber("abc123")(cleanCredsAgent(FakeRequest()))
 
@@ -505,8 +523,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "return 404 error page when the remove-tax-registration-number is called without trn" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.showRemoveTaxRegNumber("")(cleanCredsAgent(FakeRequest()))
 
@@ -523,8 +540,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
   "POST /remove-tax-registration-number/:trn" should {
 
     "submit the form and should correctly remove the trn stored in the session & redirect to ask whether user does poses any taxRegNumber" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "true", "value" -> "abc123")
@@ -539,8 +555,9 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "submit the form and should correctly remove the trn stored in the session" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123"), Trn("anotherRegNumber")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers =
+        Some(SortedSet(Trn("abc123"), Trn("anotherRegNumber")))
+      ))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "true", "value" -> "abc123")
@@ -556,8 +573,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "redirect to showYourTaxRegNumbersForm page when the choice selected is No and the trn should not be removed" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "false", "value" -> "abc123")
@@ -573,8 +589,7 @@ class TaxRegControllerISpec extends BaseISpec with AgentOverseasApplicationStubs
     }
 
     "return validation error when the form is submitted without a choice selection" in {
-      sessionStoreService.currentSession.agentSession =
-        Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "", "value" -> "abc123")

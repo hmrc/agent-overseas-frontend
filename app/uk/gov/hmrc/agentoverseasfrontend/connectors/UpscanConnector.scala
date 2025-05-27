@@ -16,26 +16,34 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
 import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class UpscanConnector @Inject() (appConfig: AppConfig, httpClient: HttpClient, val metrics: Metrics)(implicit
+class UpscanConnector @Inject() (
+  appConfig: AppConfig,
+  httpClient: HttpClient,
+  val metrics: Metrics
+)(implicit
   val ec: ExecutionContext
-) extends HttpAPIMonitor {
+)
+extends HttpAPIMonitor {
 
   val upscanUrl = s"${appConfig.upscanBaseUrl}/upscan/initiate"
 
-  val callBackUrl =
-    s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-callback"
+  val callBackUrl = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-callback"
 
   val maxFileSize = 5000000 // 5MB
 
@@ -46,11 +54,19 @@ class UpscanConnector @Inject() (appConfig: AppConfig, httpClient: HttpClient, v
                                        |}
     """.stripMargin)
 
-  def initiate()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UpscanInitiate] =
+  def initiate()(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[UpscanInitiate] =
     monitor("ConsumedAPI-upscan-initiate-POST") {
       httpClient
-        .POST[JsValue, JsValue](upscanUrl, payload, Seq("content-Type" -> "application/json"))
+        .POST[JsValue, JsValue](
+          upscanUrl,
+          payload,
+          Seq("content-Type" -> "application/json")
+        )
         .map(_.as[UpscanInitiate])
 
     }
+
 }

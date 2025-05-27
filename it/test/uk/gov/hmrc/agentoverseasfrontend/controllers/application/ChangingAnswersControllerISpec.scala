@@ -26,7 +26,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ChangingAnswersControllerISpec extends BaseISpec {
+class ChangingAnswersControllerISpec
+extends BaseISpec {
+
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private val agentSession = AgentSession()
@@ -34,8 +36,10 @@ class ChangingAnswersControllerISpec extends BaseISpec {
   private lazy val controller: ChangingAnswersController = app.injector.instanceOf[ChangingAnswersController]
 
   class SetUp {
+
     sessionStoreService.cacheAgentSession(agentSession).futureValue
     val authenticatedRequest = cleanCredsAgent(FakeRequest())
+
   }
 
   "GET /change-amls-details" should {
@@ -145,9 +149,13 @@ class ChangingAnswersControllerISpec extends BaseISpec {
     }
   }
 
-  private def verify(result: Future[Result], url: String) = {
+  private def verify(
+    result: Future[Result],
+    url: String
+  ) = {
     status(result) shouldBe 303
     header(LOCATION, result).get shouldBe url
     sessionStoreService.fetchAgentSession.futureValue.get.changingAnswers shouldBe true
   }
+
 }

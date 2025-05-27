@@ -22,7 +22,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
-class ApplicationSignOutControllerISpec extends BaseISpec {
+class ApplicationSignOutControllerISpec
+extends BaseISpec {
 
   private val controller: ApplicationSignOutController = app.injector.instanceOf[ApplicationSignOutController]
 
@@ -71,4 +72,5 @@ class ApplicationSignOutControllerISpec extends BaseISpec {
       contentAsString(result).contains("You have been signed out")
     }
   }
+
 }

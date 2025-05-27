@@ -16,16 +16,27 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.api.{Environment, Logging}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import play.api.Environment
+import play.api.Logging
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.removeTrnForm
-import uk.gov.hmrc.agentoverseasfrontend.forms.{AddTrnForm, DoYouWantToAddAnotherTrnForm, TaxRegistrationNumberForm, UpdateTrnForm}
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, TaxRegistrationNumber, Trn, UpdateTrn}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.forms.AddTrnForm
+import uk.gov.hmrc.agentoverseasfrontend.forms.DoYouWantToAddAnotherTrnForm
+import uk.gov.hmrc.agentoverseasfrontend.forms.TaxRegistrationNumberForm
+import uk.gov.hmrc.agentoverseasfrontend.forms.UpdateTrnForm
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.TaxRegistrationNumber
+import uk.gov.hmrc.agentoverseasfrontend.models.Trn
+import uk.gov.hmrc.agentoverseasfrontend.models.UpdateTrn
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
@@ -47,9 +58,18 @@ class TaxRegController @Inject() (
   updateTrnView: update_tax_registration_number,
   removeTrnView: remove_tax_reg_number,
   errorTemplateView: error_template
-)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
-    with I18nSupport with Logging {
+)(implicit
+  appConfig: AppConfig,
+  override val ec: ExecutionContext
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with SessionBehaviour
+with I18nSupport
+with Logging {
 
   import authAction.withEnrollingAgent
 
@@ -58,14 +78,15 @@ class TaxRegController @Inject() (
       val storedTrns = agentSession.taxRegistrationNumbers
         .getOrElse(SortedSet.empty[Trn])
 
-      val whichTrnToPopulate = if (storedTrns.size == 1) {
-        storedTrns.headOption
-      } else {
-        None
-      }
+      val whichTrnToPopulate =
+        if (storedTrns.size == 1) {
+          storedTrns.headOption
+        }
+        else {
+          None
+        }
 
-      val prePopulate =
-        TaxRegistrationNumber(agentSession.hasTaxRegNumbers, whichTrnToPopulate)
+      val prePopulate = TaxRegistrationNumber(agentSession.hasTaxRegNumbers, whichTrnToPopulate)
       Ok(trnView(TaxRegistrationNumberForm.form.fill(prePopulate)))
     }
   }
@@ -88,7 +109,8 @@ class TaxRegController @Inject() (
                   ),
                   routes.TaxRegController.showYourTaxRegNumbersForm.url
                 )
-              } else {
+              }
+              else {
                 (
                   agentSession.copy(
                     hasTaxRegNumbers = None,
@@ -125,10 +147,11 @@ class TaxRegController @Inject() (
         .fold(
           formWithErrors => Ok(addTrnView(formWithErrors)),
           validForm => {
-            val trns = agentSession.taxRegistrationNumbers match {
-              case Some(numbers) => numbers + Trn(validForm)
-              case None          => SortedSet(validForm).map(Trn.apply)
-            }
+            val trns =
+              agentSession.taxRegistrationNumbers match {
+                case Some(numbers) => numbers + Trn(validForm)
+                case None => SortedSet(validForm).map(Trn.apply)
+              }
             updateSession(
               agentSession
                 .copy(
@@ -148,7 +171,8 @@ class TaxRegController @Inject() (
       val trns = agentSession.taxRegistrationNumbers
         .getOrElse(SortedSet.empty[Trn])
       val backLink =
-        if (agentSession.changingAnswers) Some(showCheckYourAnswersUrl)
+        if (agentSession.changingAnswers)
+          Some(showCheckYourAnswersUrl)
         else if (agentSession.hasTrnsChanged)
           Some(
             routes.TaxRegController
@@ -157,8 +181,13 @@ class TaxRegController @Inject() (
               )
               .url
           )
-        else None
-      Ok(yourTrnsView(DoYouWantToAddAnotherTrnForm.form, trns.map(_.value), backLink))
+        else
+          None
+      Ok(yourTrnsView(
+        DoYouWantToAddAnotherTrnForm.form,
+        trns.map(_.value),
+        backLink
+      ))
     }
   }
 
@@ -171,21 +200,26 @@ class TaxRegController @Inject() (
             val trns = agentSession.taxRegistrationNumbers
               .getOrElse(SortedSet.empty[Trn])
             if (agentSession.changingAnswers) {
-              Ok(yourTrnsView(formWithErrors, trns.map(_.value), Some(showCheckYourAnswersUrl)))
-            } else {
+              Ok(yourTrnsView(
+                formWithErrors,
+                trns.map(_.value),
+                Some(showCheckYourAnswersUrl)
+              ))
+            }
+            else {
               Ok(yourTrnsView(formWithErrors, trns.map(_.value)))
             }
           },
           validForm =>
             validForm.value match {
-              case Some(true) =>
-                Redirect(routes.TaxRegController.showAddTaxRegNoForm.url)
+              case Some(true) => Redirect(routes.TaxRegController.showAddTaxRegNoForm.url)
               case _ =>
                 if (agentSession.hasTrnsChanged) {
                   updateSession(agentSession.copy(trnUploadStatus = None, hasTrnsChanged = false))(
                     routes.FileUploadController.showTrnUploadForm.url
                   )
-                } else {
+                }
+                else {
                   updateSession(agentSession.copy(hasTrnsChanged = false))(
                     routes.ApplicationController.showCheckYourAnswers.url
                   )
@@ -215,16 +249,20 @@ class TaxRegController @Inject() (
           validForm =>
             validForm.updated match {
               case Some(updatedTrn) =>
-                val updatedSet = agentSession.taxRegistrationNumbers
-                  .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(validForm.original) + Trn(updatedTrn))
+                val updatedSet =
+                  agentSession.taxRegistrationNumbers
+                    .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(validForm.original) + Trn(updatedTrn))
 
                 updateSession(
                   agentSession
-                    .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true)
+                    .copy(
+                      taxRegistrationNumbers = Some(updatedSet),
+                      changingAnswers = false,
+                      hasTrnsChanged = true
+                    )
                 )(routes.TaxRegController.showYourTaxRegNumbersForm.url)
 
-              case None =>
-                Ok(updateTrnView(UpdateTrnForm.form.fill(validForm.copy(updated = Some(validForm.original)))))
+              case None => Ok(updateTrnView(UpdateTrnForm.form.fill(validForm.copy(updated = Some(validForm.original)))))
             }
         )
     }
@@ -235,7 +273,11 @@ class TaxRegController @Inject() (
       if (agentSession.taxRegistrationNumbers.exists(_.contains(Trn(trn))))
         Ok(removeTrnView(removeTrnForm, trn))
       else
-        Ok(errorTemplateView("global.error.404.title", "global.error.404.heading", "global.error.404.message"))
+        Ok(errorTemplateView(
+          "global.error.404.title",
+          "global.error.404.heading",
+          "global.error.404.message"
+        ))
     }
   }
 
@@ -247,8 +289,9 @@ class TaxRegController @Inject() (
           formWithErrors => Ok(removeTrnView(formWithErrors, trn)),
           validForm =>
             if (validForm.value) {
-              val updatedSet = agentSession.taxRegistrationNumbers
-                .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(trn))
+              val updatedSet =
+                agentSession.taxRegistrationNumbers
+                  .fold[SortedSet[Trn]](SortedSet.empty)(trns => trns - Trn(trn))
               val toUpdate: AgentSession =
                 if (updatedSet.isEmpty)
                   agentSession
@@ -261,14 +304,20 @@ class TaxRegController @Inject() (
                     )
                 else
                   agentSession
-                    .copy(taxRegistrationNumbers = Some(updatedSet), changingAnswers = false, hasTrnsChanged = true)
+                    .copy(
+                      taxRegistrationNumbers = Some(updatedSet),
+                      changingAnswers = false,
+                      hasTrnsChanged = true
+                    )
 
               val redirectUrl =
                 if (updatedSet.nonEmpty)
                   routes.TaxRegController.showYourTaxRegNumbersForm.url
-                else routes.TaxRegController.showTaxRegistrationNumberForm.url
+                else
+                  routes.TaxRegController.showTaxRegistrationNumberForm.url
               updateSession(toUpdate)(redirectUrl)
-            } else {
+            }
+            else {
               Redirect(routes.TaxRegController.showYourTaxRegNumbersForm)
             }
         )

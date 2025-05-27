@@ -18,15 +18,20 @@ package uk.gov.hmrc.agentoverseasfrontend.services
 
 import play.api.Logging
 import uk.gov.hmrc.agentoverseasfrontend.connectors.EmailVerificationConnector
-import uk.gov.hmrc.agentoverseasfrontend.models.{Email, EmailVerificationStatus, VerifyEmailRequest}
+import uk.gov.hmrc.agentoverseasfrontend.models.Email
+import uk.gov.hmrc.agentoverseasfrontend.models.EmailVerificationStatus
+import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector) extends Logging {
+class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector)
+extends Logging {
 
   def verifyEmail(
     credId: String,
@@ -34,34 +39,37 @@ class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerif
     continueUrl: String,
     mBackUrl: Option[String],
     accessibilityStatementUrl: String
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] =
-    for {
-      mVerifyEmailResponse <- emailVerificationConnector.verifyEmail(
-                                VerifyEmailRequest(
-                                  credId = credId,
-                                  continueUrl = continueUrl,
-                                  origin = "HMRC Agent Services",
-                                  deskproServiceName = None,
-                                  accessibilityStatementUrl = accessibilityStatementUrl,
-                                  email = mEmail,
-                                  lang = None,
-                                  backUrl = mBackUrl,
-                                  pageTitle = None
-                                )
-                              )
-    } yield mVerifyEmailResponse.map(_.redirectUri)
-
-  def checkStatus(credId: String, email: String)(implicit
+  )(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[EmailVerificationStatus] =
-    emailVerificationConnector.checkEmail(credId).map {
-      case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.verified) =>
-        EmailVerificationStatus.Verified
-      case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.locked) =>
-        EmailVerificationStatus.Locked
-      case Some(x) => EmailVerificationStatus.Unverified
-      case None    => EmailVerificationStatus.Error
-    }
+  ): Future[Option[String]] =
+    for {
+      mVerifyEmailResponse <- emailVerificationConnector.verifyEmail(
+        VerifyEmailRequest(
+          credId = credId,
+          continueUrl = continueUrl,
+          origin = "HMRC Agent Services",
+          deskproServiceName = None,
+          accessibilityStatementUrl = accessibilityStatementUrl,
+          email = mEmail,
+          lang = None,
+          backUrl = mBackUrl,
+          pageTitle = None
+        )
+      )
+    } yield mVerifyEmailResponse.map(_.redirectUri)
+
+  def checkStatus(
+    credId: String,
+    email: String
+  )(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[EmailVerificationStatus] = emailVerificationConnector.checkEmail(credId).map {
+    case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.verified) => EmailVerificationStatus.Verified
+    case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.locked) => EmailVerificationStatus.Locked
+    case Some(x) => EmailVerificationStatus.Unverified
+    case None => EmailVerificationStatus.Error
+  }
 
 }

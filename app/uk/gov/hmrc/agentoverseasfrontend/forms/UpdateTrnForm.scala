@@ -25,7 +25,7 @@ object UpdateTrnForm {
   val form: Form[UpdateTrn] = Form[UpdateTrn](
     mapping(
       "original" -> nonEmptyText,
-      "updated"  -> optional(taxRegistrationNumber)
+      "updated" -> optional(taxRegistrationNumber)
     )(UpdateTrn.apply)(UpdateTrn.unapply)
   )
 }

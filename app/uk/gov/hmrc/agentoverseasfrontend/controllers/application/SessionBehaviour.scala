@@ -22,26 +22,28 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-trait SessionBehaviour extends CommonRouting {
+trait SessionBehaviour
+extends CommonRouting {
+
   val sessionStoreService: MongoDBSessionStoreService
   implicit val ec: ExecutionContext
 
-  val showCheckYourAnswersUrl: String =
-    routes.ApplicationController.showCheckYourAnswers.url
+  val showCheckYourAnswersUrl: String = routes.ApplicationController.showCheckYourAnswers.url
 
   def updateSessionAndRedirect(
     agentSession: AgentSession
-  )(redirectTo: String)(implicit hc: HeaderCarrier): Future[Result] =
-    sessionStoreService
-      .cacheAgentSession(agentSession)
-      .map(_ => Redirect(redirectTo))
+  )(redirectTo: String)(implicit hc: HeaderCarrier): Future[Result] = sessionStoreService
+    .cacheAgentSession(agentSession)
+    .map(_ => Redirect(redirectTo))
 
   def updateSession(agentSession: AgentSession)(redirectTo: String)(implicit hc: HeaderCarrier): Future[Result] =
     if (agentSession.changingAnswers) {
       updateSessionAndRedirect(agentSession.copy(changingAnswers = false))(showCheckYourAnswersUrl)
-    } else {
+    }
+    else {
       updateSessionAndRedirect(agentSession)(redirectTo)
     }
 

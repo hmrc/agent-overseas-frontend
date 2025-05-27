@@ -17,13 +17,18 @@
 package uk.gov.hmrc.agentoverseasfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms.{boolean, mapping, optional}
+import play.api.data.Forms.boolean
+import play.api.data.Forms.mapping
+import play.api.data.Forms.optional
 import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators.radioInputSelected
 
 object YesNoRadioButtonForms {
 
-  def form(field: String, errorMsg: String): Form[RadioConfirm] = Form(
+  def form(
+    field: String,
+    errorMsg: String
+  ): Form[RadioConfirm] = Form(
     mapping(
       field -> optional(boolean)
         .verifying(radioInputSelected(errorMsg))
@@ -31,28 +36,20 @@ object YesNoRadioButtonForms {
     )(RadioConfirm.apply)(RadioConfirm.unapply)
   )
 
-  val amlsRequiredForm: Form[RadioConfirm] =
-    form("amlsRequired", "error.amls.required.empty")
+  val amlsRequiredForm: Form[RadioConfirm] = form("amlsRequired", "error.amls.required.empty")
 
-  val removeTrnForm: Form[RadioConfirm] =
-    form("isRemovingTrn", "error.removeTrn.no-radio.selected")
+  val removeTrnForm: Form[RadioConfirm] = form("isRemovingTrn", "error.removeTrn.no-radio.selected")
 
-  val registeredForUkTaxForm: Form[RadioConfirm] =
-    form("registeredForUkTax", "error.registeredForUkTaxForm.no-radio.selected")
+  val registeredForUkTaxForm: Form[RadioConfirm] = form("registeredForUkTax", "error.registeredForUkTaxForm.no-radio.selected")
 
-  val registeredWithHmrcForm: Form[RadioConfirm] =
-    form("registeredWithHmrc", "error.registeredWithHmrc.no-radio.selected")
+  val registeredWithHmrcForm: Form[RadioConfirm] = form("registeredWithHmrc", "error.registeredWithHmrc.no-radio.selected")
 
-  val successfulFileUploadForm: Form[RadioConfirm] =
-    form("correctFile", "fileUploadTradingAddress.correctFile.no-radio.selected")
+  val successfulFileUploadForm: Form[RadioConfirm] = form("correctFile", "fileUploadTradingAddress.correctFile.no-radio.selected")
 
-  val businessNameCheckForm: Form[RadioConfirm] =
-    form("useThisName", "error.contact-trading-name-check.invalid")
+  val businessNameCheckForm: Form[RadioConfirm] = form("useThisName", "error.contact-trading-name-check.invalid")
 
-  val businessAddressCheckForm: Form[RadioConfirm] =
-    form("useThisAddress", "error.contact-trading-address-check.invalid")
+  val businessAddressCheckForm: Form[RadioConfirm] = form("useThisAddress", "error.contact-trading-address-check.invalid")
 
-  val businessEmailCheckForm: Form[RadioConfirm] =
-    form("useThisEmail", "error.contact-trading-email-check.invalid")
+  val businessEmailCheckForm: Form[RadioConfirm] = form("useThisEmail", "error.contact-trading-email-check.invalid")
 
 }

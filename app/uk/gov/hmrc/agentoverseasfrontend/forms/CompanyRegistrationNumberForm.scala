@@ -19,21 +19,25 @@ package uk.gov.hmrc.agentoverseasfrontend.forms
 import play.api.data.Form
 import play.api.data.Forms._
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
-import uk.gov.hmrc.agentoverseasfrontend.models.{CompanyRegistrationNumber, Crn}
+import uk.gov.hmrc.agentoverseasfrontend.models.CompanyRegistrationNumber
+import uk.gov.hmrc.agentoverseasfrontend.models.Crn
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 object CompanyRegistrationNumberForm {
 
-  def form: Form[CompanyRegistrationNumber] =
-    Form[CompanyRegistrationNumber](
-      mapping(
-        "confirmRegistration" -> optional(boolean).verifying(
-          radioInputSelected("companyRegistrationNumber.error.no-radio.selected")
-        ),
-        "registrationNumber" -> mandatoryIfTrue("confirmRegistration", CommonValidators.companyRegistrationNumber)
-      )((confirmRegistration, registrationNumber) =>
+  def form: Form[CompanyRegistrationNumber] = Form[CompanyRegistrationNumber](
+    mapping(
+      "confirmRegistration" -> optional(boolean).verifying(
+        radioInputSelected("companyRegistrationNumber.error.no-radio.selected")
+      ),
+      "registrationNumber" -> mandatoryIfTrue("confirmRegistration", CommonValidators.companyRegistrationNumber)
+    )(
+      (
+        confirmRegistration,
+        registrationNumber
+      ) =>
         CompanyRegistrationNumber(confirmRegistration, registrationNumber.map(Crn.apply))
-      )(crn => Some((crn.confirmRegistration, crn.registrationNumber.map(_.value))))
-    )
+    )(crn => Some((crn.confirmRegistration, crn.registrationNumber.map(_.value))))
+  )
 }

@@ -27,17 +27,38 @@ import uk.gov.hmrc.http.SessionKeys
 trait AuthStubs {
   me: WireMockSupport =>
 
-  case class Enrolment(serviceName: String, identifierName: String, identifierValue: String)
+  case class Enrolment(
+    serviceName: String,
+    identifierName: String,
+    identifierValue: String
+  )
 
-  def authorisedAsValidAgent[A](request: FakeRequest[A], arn: String) =
-    authenticated(request, Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn), isAgent = true)
+  def authorisedAsValidAgent[A](
+    request: FakeRequest[A],
+    arn: String
+  ) = authenticated(
+    request,
+    Enrolment(
+      "HMRC-AS-AGENT",
+      "AgentReferenceNumber",
+      arn
+    ),
+    isAgent = true
+  )
 
-  protected def authenticatedAs(user: SampleUser, method: String = GET): FakeRequest[AnyContentAsEmpty.type] = {
+  protected def authenticatedAs(
+    user: SampleUser,
+    method: String = GET
+  ): FakeRequest[AnyContentAsEmpty.type] = {
     userIsAuthenticated(user)
     FakeRequest(method, "/").withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
 
-  def authenticated[A](request: FakeRequest[A], enrolment: Enrolment, isAgent: Boolean): FakeRequest[A] = {
+  def authenticated[A](
+    request: FakeRequest[A],
+    enrolment: Enrolment,
+    isAgent: Boolean
+  ): FakeRequest[A] = {
     givenAuthorisedFor(
       s"""
          |{
@@ -60,21 +81,27 @@ trait AuthStubs {
     request.withSession(SessionKeys.authToken -> "Bearer XYZ")
   }
 
-  def givenUnauthorisedWith(mdtpDetail: String): StubMapping =
-    stubFor(
-      post(urlEqualTo("/auth/authorise"))
-        .willReturn(
-          aResponse()
-            .withStatus(401)
-            .withHeader("WWW-Authenticate", s"""MDTP detail="$mdtpDetail"""")
-        )
-    )
+  def givenUnauthorisedWith(mdtpDetail: String): StubMapping = stubFor(
+    post(urlEqualTo("/auth/authorise"))
+      .willReturn(
+        aResponse()
+          .withStatus(401)
+          .withHeader("WWW-Authenticate", s"""MDTP detail="$mdtpDetail"""")
+      )
+  )
 
-  def givenAuthorisedFor(payload: String, responseBody: String): StubMapping = {
+  def givenAuthorisedFor(
+    payload: String,
+    responseBody: String
+  ): StubMapping = {
     stubFor(
       post(urlEqualTo("/auth/authorise"))
         .atPriority(1)
-        .withRequestBody(equalToJson(payload, true, true))
+        .withRequestBody(equalToJson(
+          payload,
+          true,
+          true
+        ))
         .willReturn(
           aResponse()
             .withStatus(200)
@@ -94,10 +121,12 @@ trait AuthStubs {
     )
   }
 
-  def verifyAuthoriseAttempt(): Unit =
-    verify(1, postRequestedFor(urlEqualTo("/auth/authorise")))
+  def verifyAuthoriseAttempt(): Unit = verify(1, postRequestedFor(urlEqualTo("/auth/authorise")))
 
-  def agentWithAuthorisedEnrolment[A](request: FakeRequest[A], enrolment: Enrolment): FakeRequest[A] = {
+  def agentWithAuthorisedEnrolment[A](
+    request: FakeRequest[A],
+    enrolment: Enrolment
+  ): FakeRequest[A] = {
     givenAuthorisedFor(
       s"""
          |{
@@ -231,4 +260,5 @@ trait AuthStubs {
         )
     )
   }
+
 }

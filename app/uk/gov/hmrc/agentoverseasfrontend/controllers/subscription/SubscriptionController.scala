@@ -19,16 +19,25 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import javax.inject.Inject
 import play.api.Logging
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
-import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.{AlreadySubscribed, NoAgencyInSession, NoApplications, WrongApplicationStatus}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
-import uk.gov.hmrc.agentoverseasfrontend.views.html.application.{cannot_verify_email_locked, cannot_verify_email_technical}
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.AlreadySubscribed
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoAgencyInSession
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplications
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
+import uk.gov.hmrc.agentoverseasfrontend.views.html.application.cannot_verify_email_locked
+import uk.gov.hmrc.agentoverseasfrontend.views.html.application.cannot_verify_email_technical
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class SubscriptionController @Inject() (
   override val messagesApi: MessagesApi,
@@ -41,36 +50,44 @@ class SubscriptionController @Inject() (
   alreadySubscribedView: already_subscribed,
   emailLockedView: cannot_verify_email_locked,
   emailTechnicalErrorView: cannot_verify_email_technical
-)(implicit override val ec: ExecutionContext, appConfig: AppConfig)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) with Logging {
+)(implicit
+  override val ec: ExecutionContext,
+  appConfig: AppConfig
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  mcc
+)
+with Logging {
 
-  import authAction.{config, withBasicAgentAuth, withHmrcAsAgentAction}
+  import authAction.config
+  import authAction.withBasicAgentAuth
+  import authAction.withHmrcAsAgentAction
 
   def subscribe: Action[AnyContent] = Action.async { implicit request =>
     withBasicAgentAuth { implicit subRequest =>
       if (subRequest.enrolments.isEmpty) {
         sessionStoreService.fetchAgencyDetails.flatMap {
-          case Some(agencyDetails) if !agencyDetails.isEmailVerified =>
-            Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
+          case Some(agencyDetails) if !agencyDetails.isEmailVerified => Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
           case _ =>
             subscriptionService.subscribe.map {
-              case Right(_) =>
-                Redirect(routes.SubscriptionController.subscriptionComplete)
+              case Right(_) => Redirect(routes.SubscriptionController.subscriptionComplete)
               case Left(NoApplications) =>
                 logger.info("User has no known applications, redirecting to application frontend")
                 Redirect(s"${appConfig.agentOverseasFrontendUrl}/create-account")
               case Left(NoAgencyInSession) =>
                 logger.info("No agency details in session, redirecting to /check-answers")
                 Redirect(routes.BusinessIdentificationController.showCheckAnswers)
-              case Left(AlreadySubscribed) =>
-                Redirect(routes.SubscriptionController.alreadySubscribed)
+              case Left(AlreadySubscribed) => Redirect(routes.SubscriptionController.alreadySubscribed)
               case Left(WrongApplicationStatus) =>
                 throw new IllegalStateException(
                   "Can not proceed with application - can not subscribe with an application in this status"
                 )
             }
         }
-      } else {
+      }
+      else {
         logger.info("User has other enrolments, redirecting to /next-step")
         Future.successful(Redirect(routes.SubscriptionRootController.nextStep))
       }
@@ -110,4 +127,5 @@ class SubscriptionController @Inject() (
   def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(emailTechnicalErrorView()))
   }
+
 }
