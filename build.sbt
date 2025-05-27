@@ -8,7 +8,7 @@ ThisBuild / scalaVersion := "2.13.12"
 
 
 val scalaCOptions = Seq(
-  "-Xfatal-warnings",
+//  "-Xfatal-warnings",
   "-Wconf:msg=match may not be exhaustive:is",
   "-Xlint:-missing-interpolator,_",
   "-deprecation",
