@@ -54,7 +54,7 @@
 @(
     cyaForm: Form[CheckYourAnswersConfirmation],
     checkYourAnswers: CheckYourAnswers
-)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @summaryListRow(answerRow: AnswerRow) = @{
     SummaryListRow(

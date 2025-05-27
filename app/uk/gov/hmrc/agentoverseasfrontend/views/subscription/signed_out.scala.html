@@ -21,7 +21,7 @@
 
 @this(mainTemplate: main_template, p: p, h1: h1, a: a, span: span)
 
-@(redirectUrl: String)(implicit request: Request[_], msgs: Messages, configuration: Configuration, appConfig: AppConfig)
+@(redirectUrl: String)(implicit request: RequestHeader, msgs: Messages, configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("signed-out.header"), hasTimeout = false) {
 

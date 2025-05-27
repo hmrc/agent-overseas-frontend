@@ -44,7 +44,7 @@
     submitButton: submitButton,
 )
 
-@(businessNameCheckForm: Form[RadioConfirm], businessName: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+@(businessNameCheckForm: Form[RadioConfirm], businessName: String)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("contactTradingNameCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 

@@ -33,7 +33,7 @@
     hasTimeout: Boolean = true,
     backLinkHref: Option[String] = None,
     wide: Boolean = false
-)(mainContent: Html)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+)(mainContent: Html)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @mainContentWithHelpLink = {
     @mainContent

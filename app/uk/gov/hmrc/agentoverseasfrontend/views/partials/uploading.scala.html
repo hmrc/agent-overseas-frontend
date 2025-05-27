@@ -18,7 +18,7 @@
 
 @this()
 
-@(backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], configuration: Configuration){
+@(backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, configuration: Configuration){
 
     <h1 class="govuk-heading-xl margin-bottom-20">@msgs("")</h1>
 }

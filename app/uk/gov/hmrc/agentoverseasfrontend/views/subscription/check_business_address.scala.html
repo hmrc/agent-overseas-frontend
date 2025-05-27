@@ -45,7 +45,7 @@
     submitButton: submitButton,
 )
 
-@(businessAddressCheckForm: Form[RadioConfirm], businessAddress: OverseasAddress, businessAddressCountryName: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+@(businessAddressCheckForm: Form[RadioConfirm], businessAddress: OverseasAddress, businessAddressCountryName: String)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("contactTradingAddressCheck.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 

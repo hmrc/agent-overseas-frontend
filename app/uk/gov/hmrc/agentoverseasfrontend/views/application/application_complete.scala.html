@@ -28,7 +28,7 @@
     p: p, h2: h2, a: a, span: span, linkAsButton: linkAsButton
 )
 
-@(tradingName: String, contactEmail: String, guidanceApplicationUrl: String)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+@(tradingName: String, contactEmail: String, guidanceApplicationUrl: String)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("applicationComplete.title")){
 

@@ -34,7 +34,7 @@
     p: p, h1: h1
 )
 
-@(agencyDetails: AgencyDetails, addressCountryName: String)(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+@(agencyDetails: AgencyDetails, addressCountryName: String)(implicit msgs: Messages, request: RequestHeader, configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("subscription.checkAnswers.title")) {
 

@@ -20,7 +20,7 @@
 
 @this(mainTemplate: main_template, h1: h1, p: p, a: a, span: span)
 
-@()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+@()(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("global.error.500.title")) {
 

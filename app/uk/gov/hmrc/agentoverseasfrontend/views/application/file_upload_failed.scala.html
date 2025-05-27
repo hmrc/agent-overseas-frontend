@@ -20,7 +20,7 @@
 
 @this(mainTemplate: main_template, errorPrefix: error_prefix, p: p)
 
-@(backLink: Option[String] = None)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
+@(backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = msgs(s"fileUpload.failed.title"), backLinkHref = backLink) {
 

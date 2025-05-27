@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentoverseasfrontend
 
 import org.scalatest.BeforeAndAfterEach
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -32,7 +33,8 @@ import uk.gov.hmrc.agentoverseasfrontend.support.LogCapturing
 import scala.concurrent.Future
 
 class ErrorHandlerSpec
-    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfterEach with LogCapturing {
+    extends PlaySpec with MockitoSugar with GuiceOneAppPerSuite with BeforeAndAfterEach with LogCapturing
+    with ScalaFutures {
 
   val handler: ErrorHandler = app.injector.instanceOf[ErrorHandler]
   val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]

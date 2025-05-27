@@ -21,7 +21,7 @@
 
 @this(mainTemplate: main_template, p: p, h1: h1, h2: h2)
 
-@()(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+@()(implicit msgs: Messages, request: RequestHeader, configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("cannot_check_status.title")) {
 
