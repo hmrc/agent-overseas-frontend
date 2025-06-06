@@ -23,11 +23,10 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AmlsDetails
 
 object AmlsDetailsForm {
 
-  def form: Form[AmlsDetails] =
-    Form[AmlsDetails](
-      mapping(
-        "amlsBody"         -> amlsBody,
-        "membershipNumber" -> membershipNumber
-      )(AmlsDetails.apply)(AmlsDetails.unapply)
-    )
+  def form: Form[AmlsDetails] = Form[AmlsDetails](
+    mapping(
+      "amlsBody" -> amlsBody,
+      "membershipNumber" -> membershipNumber
+    )(AmlsDetails.apply)(AmlsDetails.unapply)
+  )
 }

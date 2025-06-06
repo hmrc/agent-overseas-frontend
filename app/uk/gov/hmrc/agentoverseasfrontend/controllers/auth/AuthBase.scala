@@ -16,9 +16,13 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
-import play.api.mvc.Results.{Forbidden, Redirect}
-import play.api.mvc.{Request, Result}
-import play.api.{Configuration, Environment, Logging}
+import play.api.mvc.Results.Forbidden
+import play.api.mvc.Results.Redirect
+import play.api.mvc.Request
+import play.api.mvc.Result
+import play.api.Configuration
+import play.api.Environment
+import play.api.Logging
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
@@ -26,9 +30,13 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-trait AuthBase extends AuthorisedFunctions with Logging {
+trait AuthBase
+extends AuthorisedFunctions
+with Logging {
+
   val authConnector: AuthConnector
   val env: Environment
   val config: Configuration
@@ -37,32 +45,34 @@ trait AuthBase extends AuthorisedFunctions with Logging {
 
   def withBasicAuth(
     block: Request[_] => Future[Result]
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
-    authorised(AuthProviders(GovernmentGateway)) {
-      block(request)
-    }.recover(handleFailure(request))
+  )(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[Result] = authorised(AuthProviders(GovernmentGateway)) {
+    block(request)
+  }.recover(handleFailure(request))
 
   def withBasicAuthAndAgentAffinity(
     block: Request[_] => Future[Result]
-  )(implicit hc: HeaderCarrier, request: Request[_]): Future[Result] =
-    authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
-      block(request)
-    }.recover(handleFailure(request))
+  )(implicit
+    hc: HeaderCarrier,
+    request: Request[_]
+  ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
+    block(request)
+  }.recover(handleFailure(request))
 
-  protected def hasAgentEnrolment(enrolments: Enrolments): Boolean =
-    enrolments.enrolments
-      .find(_.key equals "HMRC-AS-AGENT")
-      .exists(_.isActivated)
+  protected def hasAgentEnrolment(enrolments: Enrolments): Boolean = enrolments.enrolments
+    .find(_.key equals "HMRC-AS-AGENT")
+    .exists(_.isActivated)
 
   protected def getArn(enrolments: Enrolments): Option[Arn] =
     for {
-      enrolment  <- enrolments.getEnrolment("HMRC-AS-AGENT")
+      enrolment <- enrolments.getEnrolment("HMRC-AS-AGENT")
       identifier <- enrolment.getIdentifier("AgentReferenceNumber")
     } yield Arn(identifier.value)
 
   protected def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Result] = {
-    case _: NoActiveSession =>
-      Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}&origin=$appName")
+    case _: NoActiveSession => Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}&origin=$appName")
 
     case _: InsufficientEnrolments =>
       logger.warn(s"Logged in user does not have required enrolments")

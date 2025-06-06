@@ -24,7 +24,10 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
-class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplicationStubs {
+class SubscriptionRootControllerISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs {
+
   val arn = Arn("TARN0000001")
 
   lazy val controller = app.injector.instanceOf[SubscriptionRootController]
@@ -51,7 +54,11 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
       val result = controller.nextStep(request)
       status(result) shouldBe 200
 
-      result.futureValue should containMessages("createNewAccount.title", "createNewAccount.p1", "button.continue")
+      result.futureValue should containMessages(
+        "createNewAccount.title",
+        "createNewAccount.p1",
+        "button.continue"
+      )
     }
   }
 
@@ -67,4 +74,5 @@ class SubscriptionRootControllerISpec extends BaseISpec with AgentOverseasApplic
       )
     }
   }
+
 }

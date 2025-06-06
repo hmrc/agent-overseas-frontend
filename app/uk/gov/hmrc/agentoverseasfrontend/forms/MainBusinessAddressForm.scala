@@ -23,14 +23,13 @@ import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators._
 
 object MainBusinessAddressForm {
 
-  def mainBusinessAddressForm(validCountryCodes: Set[String]): Form[OverseasAddress] =
-    Form[OverseasAddress](
-      mapping(
-        "addressLine1" -> addressLine12(lineNumber = 1),
-        "addressLine2" -> addressLine12(lineNumber = 2),
-        "addressLine3" -> addressLine34(lineNumber = 3),
-        "addressLine4" -> addressLine34(lineNumber = 4),
-        "countryCode"  -> countryCode(validCountryCodes)
-      )(OverseasAddress.apply)(OverseasAddress.unapply)
-    )
+  def mainBusinessAddressForm(validCountryCodes: Set[String]): Form[OverseasAddress] = Form[OverseasAddress](
+    mapping(
+      "addressLine1" -> addressLine12(lineNumber = 1),
+      "addressLine2" -> addressLine12(lineNumber = 2),
+      "addressLine3" -> addressLine34(lineNumber = 3),
+      "addressLine4" -> addressLine34(lineNumber = 4),
+      "countryCode" -> countryCode(validCountryCodes)
+    )(OverseasAddress.apply)(OverseasAddress.unapply)
+  )
 }

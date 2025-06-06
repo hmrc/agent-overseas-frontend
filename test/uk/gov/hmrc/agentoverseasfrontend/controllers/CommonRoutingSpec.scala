@@ -20,47 +20,83 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatest.{Assertion, OptionValues}
+import org.scalatest.Assertion
+import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
-import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{CommonRouting, routes}
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Accepted, AttemptingRegistration, Complete, Registered, Rejected}
+import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
+import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Accepted
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.AttemptingRegistration
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Complete
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Registered
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, SessionId}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.SessionId
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures {
+class CommonRoutingSpec
+extends AnyWordSpecLike
+with Matchers
+with OptionValues
+with ScalaFutures {
+
   implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
 
-  private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
+  private val contactDetails = ContactDetails(
+    "test",
+    "last",
+    "senior agent",
+    "12345",
+    "test@email.com"
+  )
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
-  private val amlsUploadStatus = FileUploadStatus("ref", "READY", None)
-  private val overseasAddress = OverseasAddress("line1", "line2", None, None, "IE")
-  private val tradingAddressUploadStatus = FileUploadStatus("ref", "READY", None)
-  private val personalDetails = PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
+  private val amlsUploadStatus = FileUploadStatus(
+    "ref",
+    "READY",
+    None
+  )
+  private val overseasAddress = OverseasAddress(
+    "line1",
+    "line2",
+    None,
+    None,
+    "IE"
+  )
+  private val tradingAddressUploadStatus = FileUploadStatus(
+    "ref",
+    "READY",
+    None
+  )
+  private val personalDetails = PersonalDetailsChoice(
+    Some(RadioOption.NinoChoice),
+    Some(Nino("AB123456A")),
+    None
+  )
   private val companyRegistrationNumber = CompanyRegistrationNumber(Some(true), Some(Crn("123")))
 
   private val subscriptionRootPath = "/agent-services/apply-from-outside-uk/create-account"
 
-  private val detailsUpToRegisteredWithHmrc =
-    AgentSession(
-      amlsRequired = Some(true),
-      amlsDetails = Some(amlsDetails),
-      amlsUploadStatus = Some(amlsUploadStatus),
-      contactDetails = Some(contactDetails),
-      tradingName = Some("some name"),
-      overseasAddress = Some(overseasAddress),
-      tradingAddressUploadStatus = Some(tradingAddressUploadStatus),
-      verifiedEmails = Set(contactDetails.businessEmail)
-    )
+  private val detailsUpToRegisteredWithHmrc = AgentSession(
+    amlsRequired = Some(true),
+    amlsDetails = Some(amlsDetails),
+    amlsUploadStatus = Some(amlsUploadStatus),
+    contactDetails = Some(contactDetails),
+    tradingName = Some("some name"),
+    overseasAddress = Some(overseasAddress),
+    tradingAddressUploadStatus = Some(tradingAddressUploadStatus),
+    verifiedEmails = Set(contactDetails.businessEmail)
+  )
 
   private val applicationEntityDetails = ApplicationEntityDetails(
     applicationCreationDate = LocalDateTime.now(),
@@ -152,14 +188,22 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     "RegisteredForUkTax choice is Yes" should {
       "return showPersonalDetailsForm when personal details are not in session" in {
         val agentSession = detailsUpToRegisteredWithHmrc
-          .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(Yes), personalDetails = None)
+          .copy(
+            registeredWithHmrc = Some(No),
+            registeredForUkTax = Some(Yes),
+            personalDetails = None
+          )
 
         FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController.showPersonalDetailsForm
       }
 
       "return showCompanyRegistrationNumberForm when personal details are in session" in {
         val agentSession = detailsUpToRegisteredWithHmrc
-          .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(Yes), personalDetails = Some(personalDetails))
+          .copy(
+            registeredWithHmrc = Some(No),
+            registeredForUkTax = Some(Yes),
+            personalDetails = Some(personalDetails)
+          )
 
         FakeRouting.lookupNextPage(
           Some(agentSession)
@@ -170,7 +214,11 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     s"RegisteredForUkTax choice is No" should {
       "return showCompanyRegistrationNumberForm when company registration number is not in session" in {
         val agentSession = detailsUpToRegisteredWithHmrc
-          .copy(registeredWithHmrc = Some(No), registeredForUkTax = Some(No), personalDetails = None)
+          .copy(
+            registeredWithHmrc = Some(No),
+            registeredForUkTax = Some(No),
+            personalDetails = None
+          )
 
         FakeRouting.lookupNextPage(
           Some(agentSession)
@@ -250,7 +298,11 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
   "return correct branching page after having submitted no agent codes" when {
     "return showUkTaxRegistrationForm when they have not yet made a choice for whether they are registered for UK tax" in {
       val agentSession = detailsUpToRegisteredWithHmrc
-        .copy(registeredWithHmrc = Some(Yes), agentCodes = Some(AgentCodes(None, None)), registeredForUkTax = None)
+        .copy(
+          registeredWithHmrc = Some(Yes),
+          agentCodes = Some(AgentCodes(None, None)),
+          registeredForUkTax = None
+        )
 
       FakeRouting.lookupNextPage(Some(agentSession)) shouldBe routes.ApplicationController.showUkTaxRegistrationForm
     }
@@ -305,7 +357,12 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
     }
 
     "return overseas-subscription-frontend root page" when {
-      Set(Accepted, AttemptingRegistration, Registered, Complete).foreach { status =>
+      Set(
+        Accepted,
+        AttemptingRegistration,
+        Registered,
+        Complete
+      ).foreach { status =>
         s"the application status is ${status.key}" in {
           testRoutesForApplicationStatuses(List(applicationEntityDetails.copy(status = status)), subscriptionRootPath)
         }
@@ -331,11 +388,15 @@ class CommonRoutingSpec extends AnyWordSpecLike with Matchers with OptionValues 
 
 }
 
-object FakeRouting extends CommonRouting with MockitoSugar {
+object FakeRouting
+extends CommonRouting
+with MockitoSugar {
+
   val connector: AgentOverseasApplicationConnector = mock[AgentOverseasApplicationConnector]
 
   private val app: Application = new GuiceApplicationBuilder().build()
 
   override val sessionStoreService: MongoDBSessionStoreService = app.injector.instanceOf[MongoDBSessionStoreService]
   override val applicationService: ApplicationService = new ApplicationService(connector)
+
 }

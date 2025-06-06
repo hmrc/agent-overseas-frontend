@@ -42,7 +42,20 @@ object ApplicationEntityDetails {
       (__ \ "tradingDetails" \ "tradingName").read[String] and
       (__ \ "contactDetails" \ "businessEmail").read[String] and
       (__ \ "maintainerDetails")
-        .readNullable[MaintainerDetails])((createdDate, status, name, email, maintainerDetails) =>
-      ApplicationEntityDetails(createdDate, status, name, email, maintainerDetails.map(_.reviewedDate))
+        .readNullable[MaintainerDetails])(
+      (
+        createdDate,
+        status,
+        name,
+        email,
+        maintainerDetails
+      ) =>
+        ApplicationEntityDetails(
+          createdDate,
+          status,
+          name,
+          email,
+          maintainerDetails.map(_.reviewedDate)
+        )
     )
 }

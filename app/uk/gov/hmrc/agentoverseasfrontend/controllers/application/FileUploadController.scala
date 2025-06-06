@@ -16,21 +16,29 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Request
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.SuccessfulFileUploadConfirmationForm
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, Yes, YesNo}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.Yes
+import uk.gov.hmrc.agentoverseasfrontend.models.YesNo
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class FileUploadController @Inject() (
@@ -43,9 +51,17 @@ class FileUploadController @Inject() (
   tradingAddressNoJsView: trading_address_no_js_check_file,
   successfulFileUploadView: successful_file_upload,
   fileUploadFailedView: file_upload_failed
-)(implicit ex: ExecutionContext, appConfig: AppConfig)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
-    with Logging {
+)(implicit
+  ex: ExecutionContext,
+  appConfig: AppConfig
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with SessionBehaviour
+with Logging {
 
   import authAction.withEnrollingEmailVerifiedAgent
 
@@ -69,14 +85,23 @@ class FileUploadController @Inject() (
 
   private def showUploadForm(
     fileType: String
-  )(implicit agentSession: AgentSession, hc: HeaderCarrier, request: Request[_]) =
-    upscanConnector
-      .initiate()
-      .flatMap(upscan =>
-        sessionStoreService
-          .cacheAgentSession(agentSession.copy(fileType = Some(fileType)))
-          .map(_ => Ok(fileUploadView(upscan, fileType, getBackLink(fileType))))
-      )
+  )(implicit
+    agentSession: AgentSession,
+    hc: HeaderCarrier,
+    request: Request[_]
+  ) = upscanConnector
+    .initiate()
+    .flatMap(upscan =>
+      sessionStoreService
+        .cacheAgentSession(agentSession.copy(fileType = Some(fileType)))
+        .map(_ =>
+          Ok(fileUploadView(
+            upscan,
+            fileType,
+            getBackLink(fileType)
+          ))
+        )
+    )
 
   def showTradingAddressNoJsCheckPage: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
@@ -85,7 +110,10 @@ class FileUploadController @Inject() (
   }
 
   // these pollStatus functions are called via ajax in the assets/javascripts/script.js
-  def pollStatus(fileType: String, reference: String): Action[AnyContent] = Action.async { implicit request =>
+  def pollStatus(
+    fileType: String,
+    reference: String
+  ): Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
@@ -93,23 +121,21 @@ class FileUploadController @Inject() (
             .upscanPollStatus(reference)
             .flatMap { response =>
               if (response.fileStatus == "READY") {
-                val updatedSession = fileType match {
-                  case "trading-address" =>
-                    agentSession.copy(tradingAddressUploadStatus = Some(response))
-                  case "amls" =>
-                    agentSession.copy(amlsUploadStatus = Some(response))
-                  case "trn" =>
-                    agentSession.copy(trnUploadStatus = Some(response))
-                  case _ =>
-                    throw new RuntimeException(s"invalid fileType for upscan callback $fileType")
-                }
+                val updatedSession =
+                  fileType match {
+                    case "trading-address" => agentSession.copy(tradingAddressUploadStatus = Some(response))
+                    case "amls" => agentSession.copy(amlsUploadStatus = Some(response))
+                    case "trn" => agentSession.copy(trnUploadStatus = Some(response))
+                    case _ => throw new RuntimeException(s"invalid fileType for upscan callback $fileType")
+                  }
                 sessionStoreService
                   .cacheAgentSession(updatedSession)
                   .flatMap { _ =>
                     logger.info(s"saving the callback response $response for fileType $fileType")
                     Ok(Json.toJson(response))
                   }
-              } else {
+              }
+              else {
                 Ok(Json.toJson(response))
               }
             }
@@ -147,10 +173,9 @@ class FileUploadController @Inject() (
     fileType match {
 
       case "amls" => Some(routes.FileUploadController.showAmlsUploadForm.url)
-      case "trading-address" =>
-        Some(routes.FileUploadController.showTradingAddressUploadForm.url)
+      case "trading-address" => Some(routes.FileUploadController.showTradingAddressUploadForm.url)
       case "trn" => Some(routes.FileUploadController.showTrnUploadForm.url)
-      case _     => None
+      case _ => None
     }
 
   def submitSuccessfulFileUploadedForm: Action[AnyContent] = Action.async { implicit request =>
@@ -161,7 +186,12 @@ class FileUploadController @Inject() (
           formWithErrors => {
             val fileType = formWithErrors.data("fileType")
             getFileNameFromSession(fileType).map(filename =>
-              Ok(successfulFileUploadView(formWithErrors, filename, fileType, backToFileUploadPage(fileType)))
+              Ok(successfulFileUploadView(
+                formWithErrors,
+                filename,
+                fileType,
+                backToFileUploadPage(fileType)
+              ))
             )
           },
           validForm => {
@@ -169,7 +199,8 @@ class FileUploadController @Inject() (
             val newValue = YesNo(validForm.choice)
             if (Yes == newValue) {
               nextPage(fileType).map(url => Redirect(url))
-            } else
+            }
+            else
               Redirect(
                 backToFileUploadPage(fileType)
                   .getOrElse(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
@@ -184,8 +215,7 @@ class FileUploadController @Inject() (
       sessionStoreService.fetchAgentSession.map {
         case Some(agentSession) =>
           agentSession.fileType match {
-            case Some(fileType) =>
-              Ok(fileUploadFailedView(backToFileUploadPage(fileType)))
+            case Some(fileType) => Ok(fileUploadFailedView(backToFileUploadPage(fileType)))
             case None =>
               logger.info("expecting a fileType in session for failed upload but none found")
               Redirect(routes.FileUploadController.showAmlsUploadForm)
@@ -195,30 +225,27 @@ class FileUploadController @Inject() (
     }
   }
 
-  private def getFileNameFromSession(fileType: String)(implicit hc: HeaderCarrier): Future[Option[String]] =
-    sessionStoreService.fetchAgentSession.flatMap {
-      case Some(agentSession) =>
-        {
-          fileType match {
-            case "trading-address" => agentSession.tradingAddressUploadStatus
-            case "amls"            => agentSession.amlsUploadStatus
-            case "trn"             => agentSession.trnUploadStatus
-            case _ =>
-              throw new RuntimeException(s"could not get filename from session for fileType $fileType")
-          }
+  private def getFileNameFromSession(fileType: String)(implicit hc: HeaderCarrier): Future[Option[String]] = sessionStoreService.fetchAgentSession.flatMap {
+    case Some(agentSession) =>
+      {
+        fileType match {
+          case "trading-address" => agentSession.tradingAddressUploadStatus
+          case "amls" => agentSession.amlsUploadStatus
+          case "trn" => agentSession.trnUploadStatus
+          case _ => throw new RuntimeException(s"could not get filename from session for fileType $fileType")
+        }
 
-        }.map(_.fileName)
-          .getOrElse(throw new RuntimeException(s"filename is missing from the session for fileType $fileType"))
-      case None => throw new RuntimeException("no agent session")
-    }
+      }.map(_.fileName)
+        .getOrElse(throw new RuntimeException(s"filename is missing from the session for fileType $fileType"))
+    case None => throw new RuntimeException("no agent session")
+  }
 
   private def getBackLink(fileType: String)(implicit agentSession: AgentSession): Option[String] =
     if (
       agentSession.changingAnswers && (fileType match {
-        case "trading-address" =>
-          agentSession.tradingAddressUploadStatus.nonEmpty
+        case "trading-address" => agentSession.tradingAddressUploadStatus.nonEmpty
         case "amls" => agentSession.amlsUploadStatus.nonEmpty
-        case "trn"  => agentSession.trnUploadStatus.nonEmpty
+        case "trn" => agentSession.trnUploadStatus.nonEmpty
         case _ =>
           logger.info("routing error for back link- unrecognized document proof file key!")
           false
@@ -226,33 +253,33 @@ class FileUploadController @Inject() (
     ) {
       Some(showCheckYourAnswersUrl)
 
-    } else {
+    }
+    else {
       fileType match {
-        case "trading-address" =>
-          Some(routes.TradingAddressController.showMainBusinessAddressForm.url)
-        case "amls" =>
-          Some(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
-        case "trn" =>
-          Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)
+        case "trading-address" => Some(routes.TradingAddressController.showMainBusinessAddressForm.url)
+        case "amls" => Some(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
+        case "trn" => Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)
         case _ =>
           logger.info("routing error for back link- unrecognized document proof file key!")
           None
       }
     }
 
-  private def nextPage(fileType: String)(implicit agentSession: AgentSession, hc: HeaderCarrier): Future[String] =
+  private def nextPage(fileType: String)(implicit
+    agentSession: AgentSession,
+    hc: HeaderCarrier
+  ): Future[String] =
     if (agentSession.changingAnswers) {
       sessionStoreService
         .cacheAgentSession(agentSession.copy(changingAnswers = false))
         .map(_ => showCheckYourAnswersUrl)
-    } else {
+    }
+    else {
       fileType match {
-        case "trading-address" =>
-          routes.ApplicationController.showRegisteredWithHmrcForm.url
+        case "trading-address" => routes.ApplicationController.showRegisteredWithHmrcForm.url
         case "amls" => routes.ApplicationController.showContactDetailsForm.url
-        case "trn"  => routes.ApplicationController.showCheckYourAnswers.url
-        case _ =>
-          throw new RuntimeException("routing error for next page- unrecognized document proof file key!")
+        case "trn" => routes.ApplicationController.showCheckYourAnswers.url
+        case _ => throw new RuntimeException("routing error for next page- unrecognized document proof file key!")
       }
     }
 

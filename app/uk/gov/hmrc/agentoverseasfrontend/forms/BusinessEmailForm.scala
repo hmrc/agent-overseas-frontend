@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.forms
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 
 case class BusinessEmailForm(email: String)
 

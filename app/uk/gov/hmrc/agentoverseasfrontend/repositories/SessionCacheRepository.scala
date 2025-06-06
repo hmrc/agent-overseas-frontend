@@ -19,20 +19,26 @@ package uk.gov.hmrc.agentoverseasfrontend.repositories
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.mongo.cache.CacheIdType.SimpleCacheId
 import uk.gov.hmrc.mongo.cache.MongoCacheRepository
-import uk.gov.hmrc.mongo.{MongoComponent, TimestampSupport}
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.TimestampSupport
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
 @Singleton
-class SessionCacheRepository @Inject() (mongo: MongoComponent, timestampSupport: TimestampSupport)(implicit
+class SessionCacheRepository @Inject() (
+  mongo: MongoComponent,
+  timestampSupport: TimestampSupport
+)(implicit
   ec: ExecutionContext,
   appConfig: AppConfig
-) extends MongoCacheRepository(
-      mongoComponent = mongo,
-      collectionName = "sessions",
-      ttl = appConfig.mongoDbExpireAfterSeconds.seconds,
-      timestampSupport = timestampSupport,
-      cacheIdType = SimpleCacheId
-    )
+)
+extends MongoCacheRepository(
+  mongoComponent = mongo,
+  collectionName = "sessions",
+  ttl = appConfig.mongoDbExpireAfterSeconds.seconds,
+  timestampSupport = timestampSupport,
+  cacheIdType = SimpleCacheId
+)

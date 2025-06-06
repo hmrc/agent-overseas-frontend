@@ -24,13 +24,15 @@ import uk.gov.hmrc.agentoverseasfrontend.services.EmailVerificationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 abstract class GenericEmailVerificationController[S](
   val env: Environment,
   emailVerificationService: EmailVerificationService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController with I18nSupport {
+extends FrontendBaseController
+with I18nSupport {
 
   def emailVerificationEnabled: Boolean
 
@@ -55,13 +57,18 @@ abstract class GenericEmailVerificationController[S](
 
   /** Check whether the email has already been marked as verified in the current session state.
     */
-  def isAlreadyVerified(session: S, email: String): Boolean
+  def isAlreadyVerified(
+    session: S,
+    email: String
+  ): Boolean
 
-  /** An effectful call to mark the email as being verified in our session. Should return the new session state. This
-    * function is expected to be idempotent (marking the same email as verified twice should not lead to unexpected
-    * results)
+  /** An effectful call to mark the email as being verified in our session. Should return the new session state. This function is expected to be idempotent
+    * (marking the same email as verified twice should not lead to unexpected results)
     */
-  def markEmailAsVerified(session: S, email: String)(implicit hc: HeaderCarrier): Future[S]
+  def markEmailAsVerified(
+    session: S,
+    email: String
+  )(implicit hc: HeaderCarrier): Future[S]
 
   /*
   Continuation URLs
@@ -99,7 +106,8 @@ abstract class GenericEmailVerificationController[S](
         markEmailAsVerified(session, emailToVerify).map { updatedSession =>
           Redirect(redirectUrlIfVerified(updatedSession))
         }
-      } else {
+      }
+      else {
         // Check the status of the email with the email verification service
         emailVerificationService.checkStatus(credId, emailToVerify).flatMap {
           case EmailVerificationStatus.Verified =>
@@ -125,16 +133,18 @@ abstract class GenericEmailVerificationController[S](
               )
               .map {
                 case Some(redirectUri) =>
-                  val url = if (useAbsoluteUrls) emailVerificationFrontendBaseUrl + redirectUri else redirectUri
+                  val url =
+                    if (useAbsoluteUrls)
+                      emailVerificationFrontendBaseUrl + redirectUri
+                    else
+                      redirectUri
                   Redirect(url)
                 case None => throw new RuntimeException("Could not start email verification journey")
               }
           // The email provided was locked out due to too many failed verification attempts
-          case EmailVerificationStatus.Locked =>
-            Future.successful(Redirect(redirectUrlIfLocked(session)))
+          case EmailVerificationStatus.Locked => Future.successful(Redirect(redirectUrlIfLocked(session)))
           // Any other error
-          case EmailVerificationStatus.Error =>
-            Future.successful(Redirect(redirectUrlIfError(session)))
+          case EmailVerificationStatus.Error => Future.successful(Redirect(redirectUrlIfError(session)))
         }
       }
 
@@ -142,5 +152,9 @@ abstract class GenericEmailVerificationController[S](
   }
 
   private def urlFor(call: Call)(implicit request: RequestHeader): String =
-    if (useAbsoluteUrls) call.absoluteURL() else call.url
+    if (useAbsoluteUrls)
+      call.absoluteURL()
+    else
+      call.url
+
 }

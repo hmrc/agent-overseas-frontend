@@ -17,13 +17,21 @@
 package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.json.JsString
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
-import uk.gov.hmrc.crypto.json.JsonEncryption.{stringDecrypter, stringEncrypter}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
+import uk.gov.hmrc.crypto.json.JsonEncryption.stringDecrypter
+import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypter
 
 object EncryptDecryptModelHelper {
-  def decryptString(value: String)(implicit crypto: Encrypter with Decrypter): String =
-    stringDecrypter.reads(JsString(value)).getOrElse(value)
 
-  def encryptString(value: String)(implicit crypto: Encrypter with Decrypter): String =
-    stringEncrypter.writes(value).as[String]
+  def decryptString(value: String)(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): String = stringDecrypter.reads(JsString(value)).getOrElse(value)
+
+  def encryptString(value: String)(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): String = stringEncrypter.writes(value).as[String]
+
 }

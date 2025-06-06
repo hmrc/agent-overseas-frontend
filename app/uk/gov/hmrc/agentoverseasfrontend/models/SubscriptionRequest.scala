@@ -18,4 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import uk.gov.hmrc.auth.core.Enrolment
 
-case class SubscriptionRequest(authProviderId: String, enrolments: Set[Enrolment])
+case class SubscriptionRequest(
+  authProviderId: String,
+  enrolments: Set[Enrolment]
+)

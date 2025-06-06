@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Format, Json, Reads, Writes}
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 case class VerifyEmailRequest(
   credId: String,
@@ -30,7 +33,10 @@ case class VerifyEmailRequest(
   pageTitle: Option[String]
 )
 
-case class Email(address: String, enterUrl: String)
+case class Email(
+  address: String,
+  enterUrl: String
+)
 
 object Email {
   implicit val format: Format[Email] = Json.format[Email]
@@ -63,8 +69,14 @@ object VerificationStatusResponse {
 
 sealed trait EmailVerificationStatus
 object EmailVerificationStatus {
-  case object Verified extends EmailVerificationStatus
-  case object Unverified extends EmailVerificationStatus
-  case object Locked extends EmailVerificationStatus
-  case object Error extends EmailVerificationStatus
+
+  case object Verified
+  extends EmailVerificationStatus
+  case object Unverified
+  extends EmailVerificationStatus
+  case object Locked
+  extends EmailVerificationStatus
+  case object Error
+  extends EmailVerificationStatus
+
 }

@@ -17,17 +17,25 @@
 package uk.gov.hmrc.agentoverseasfrontend.services
 
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
-import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.{AlreadySubscribed, NoAgencyInSession, NoApplications, WrongApplicationStatus}
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.AlreadySubscribed
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoAgencyInSession
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplications
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
-import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AgentSubscriptionStubs}
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationStubs with AgentSubscriptionStubs {
+class SubscriptionServiceISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs
+with AgentSubscriptionStubs {
 
   implicit val hc = HeaderCarrier()
   val service = app.injector.instanceOf[SubscriptionService]
@@ -154,4 +162,5 @@ class SubscriptionServiceISpec extends BaseISpec with AgentOverseasApplicationSt
       findUsingIdRef shouldBe None
     }
   }
+
 }

@@ -16,22 +16,28 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Environment
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.AmlsDetailsForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.amlsRequiredForm
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, RadioConfirm}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class AntiMoneyLaunderingController @Inject() (
@@ -43,17 +49,27 @@ class AntiMoneyLaunderingController @Inject() (
   cc: MessagesControllerComponents,
   amlsView: anti_money_laundering,
   amlsRequiredView: anti_money_laundering_required
-)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
-    with I18nSupport {
+)(implicit
+  appConfig: AppConfig,
+  override val ec: ExecutionContext
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with SessionBehaviour
+with I18nSupport {
 
   import authAction.withEnrollingAgent
 
   def showMoneyLaunderingRequired: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       val backUrl =
-        if (agentSession.changingAnswers) Some(showCheckYourAnswersUrl)
-        else None
+        if (agentSession.changingAnswers)
+          Some(showCheckYourAnswersUrl)
+        else
+          None
       Ok(
         amlsRequiredView(
           agentSession.amlsRequired.fold(amlsRequiredForm)(amlsRequired =>
@@ -75,7 +91,11 @@ class AntiMoneyLaunderingController @Inject() (
             for {
               session <- agentSession
               isChanging = session.changingAnswers
-              updatedSession = updateAmlsSessionBasedOnChanging(isChanging, isRequired.value, session)
+              updatedSession = updateAmlsSessionBasedOnChanging(
+                isChanging,
+                isRequired.value,
+                session
+              )
               redirectUrl = amlsRedirectUrlBasedOnChanging(isChanging, isRequired.value)
               result <- updateSessionAndRedirect(updatedSession)(redirectUrl)
             } yield result
@@ -88,20 +108,25 @@ class AntiMoneyLaunderingController @Inject() (
     isRequired: Boolean,
     session: AgentSession
   ): AgentSession = {
-    val updatedSessionWithRemovedAmlsDetails =
-      session.copy(amlsRequired = Some(isRequired), amlsDetails = None, amlsUploadStatus = None)
+    val updatedSessionWithRemovedAmlsDetails = session.copy(
+      amlsRequired = Some(isRequired),
+      amlsDetails = None,
+      amlsUploadStatus = None
+    )
     (isChanging, isRequired) match {
       case (true, false) => updatedSessionWithRemovedAmlsDetails
-      case _             => session.copy(amlsRequired = Some(isRequired))
+      case _ => session.copy(amlsRequired = Some(isRequired))
     }
   }
 
-  private def amlsRedirectUrlBasedOnChanging(isChanging: Boolean, isRequired: Boolean): String =
+  private def amlsRedirectUrlBasedOnChanging(
+    isChanging: Boolean,
+    isRequired: Boolean
+  ): String =
     (isChanging, isRequired) match {
-      case (_, true) =>
-        routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url
+      case (_, true) => routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url
       case (true, _) => showCheckYourAnswersUrl
-      case _         => routes.ApplicationController.showContactDetailsForm.url
+      case _ => routes.ApplicationController.showContactDetailsForm.url
     }
 
   def showAntiMoneyLaunderingForm: Action[AnyContent] = Action.async { implicit request =>
@@ -112,25 +137,20 @@ class AntiMoneyLaunderingController @Inject() (
         if (agentSession.changingAnswers) {
           agentSession.amlsDetails match {
             case Some(_) => Some(showCheckYourAnswersUrl)
-            case None =>
-              Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
+            case None => Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
           }
-        } else
+        }
+        else
           applicationService.getCurrentApplication.map {
-            case Some(application) if application.status == Rejected =>
-              Some(routes.ApplicationRootController.applicationStatus.url)
-            case _ =>
-              Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
+            case Some(application) if application.status == Rejected => Some(routes.ApplicationRootController.applicationStatus.url)
+            case _ => Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
           }
 
       backUrl.map(url =>
         agentSession.amlsRequired match {
-          case Some(true) =>
-            Ok(amlsView(agentSession.amlsDetails.fold(form)(form.fill), url)) // happy path
-          case Some(false) =>
-            Redirect(routes.ApplicationController.showContactDetailsForm.url) // skip money laundering
-          case None =>
-            Redirect(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url) // go back and make a choice
+          case Some(true) => Ok(amlsView(agentSession.amlsDetails.fold(form)(form.fill), url)) // happy path
+          case Some(false) => Redirect(routes.ApplicationController.showContactDetailsForm.url) // skip money laundering
+          case None => Redirect(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url) // go back and make a choice
         }
       )
     }
@@ -143,10 +163,8 @@ class AntiMoneyLaunderingController @Inject() (
         .fold(
           formWithErrors =>
             sessionStoreService.fetchAgentSession.map {
-              case Some(session) if session.changingAnswers =>
-                Ok(amlsView(formWithErrors, Some(showCheckYourAnswersUrl)))
-              case _ =>
-                Ok(amlsView(formWithErrors, Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)))
+              case Some(session) if session.changingAnswers => Ok(amlsView(formWithErrors, Some(showCheckYourAnswersUrl)))
+              case _ => Ok(amlsView(formWithErrors, Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)))
             },
           validForm =>
             agentSession
@@ -155,4 +173,5 @@ class AntiMoneyLaunderingController @Inject() (
         )
     }
   }
+
 }

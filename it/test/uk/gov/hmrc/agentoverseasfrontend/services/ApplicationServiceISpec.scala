@@ -18,15 +18,20 @@ package uk.gov.hmrc.agentoverseasfrontend.services
 
 import java.time.LocalDateTime
 
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.{Accepted, Pending}
-import uk.gov.hmrc.agentoverseasfrontend.models.{ApplicationEntityDetails, ApplicationStatus}
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Accepted
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Pending
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationEntityDetails
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStubs {
+class ApplicationServiceISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs {
+
   implicit val hc = HeaderCarrier()
   val service = app.injector.instanceOf[ApplicationService]
 
@@ -98,4 +103,5 @@ class ApplicationServiceISpec extends BaseISpec with AgentOverseasApplicationStu
       service.rejectedApplication.failed.futureValue shouldBe an[Exception]
     }
   }
+
 }

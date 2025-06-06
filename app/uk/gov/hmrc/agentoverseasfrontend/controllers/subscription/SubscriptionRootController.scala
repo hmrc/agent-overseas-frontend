@@ -16,17 +16,21 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Configuration
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class SubscriptionRootController @Inject() (
@@ -38,8 +42,16 @@ class SubscriptionRootController @Inject() (
   mcc: MessagesControllerComponents,
   createNewAccountView: create_new_account,
   cannotCheckStatusView: cannot_check_status
-)(implicit appConfig: AppConfig, ec: ExecutionContext, configuration: Configuration)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) {
+)(implicit
+  appConfig: AppConfig,
+  ec: ExecutionContext,
+  configuration: Configuration
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  mcc
+) {
 
   import authAction.withBasicAgentAuth
 
@@ -58,4 +70,5 @@ class SubscriptionRootController @Inject() (
       Future.successful(Ok(cannotCheckStatusView()))
     }
   }
+
 }

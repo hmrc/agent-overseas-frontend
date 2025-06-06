@@ -17,21 +17,28 @@
 package uk.gov.hmrc.agentoverseasfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms.{boolean, mapping, optional}
-import uk.gov.hmrc.agentoverseasfrontend.models.{TaxRegistrationNumber, Trn}
+import play.api.data.Forms.boolean
+import play.api.data.Forms.mapping
+import play.api.data.Forms.optional
+import uk.gov.hmrc.agentoverseasfrontend.models.TaxRegistrationNumber
+import uk.gov.hmrc.agentoverseasfrontend.models.Trn
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators
 import uk.gov.hmrc.agentoverseasfrontend.validators.CommonValidators.radioInputSelected
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIfTrue
 
 object TaxRegistrationNumberForm {
 
-  def form: Form[TaxRegistrationNumber] =
-    Form[TaxRegistrationNumber](
-      mapping(
-        "canProvideTaxRegNo" -> optional(boolean).verifying(radioInputSelected("taxRegNo.form.no-radio.selected")),
-        "value"              -> mandatoryIfTrue("canProvideTaxRegNo", CommonValidators.taxRegistrationNumber)
-      )((canProvideTaxRegNo, value) => TaxRegistrationNumber(canProvideTaxRegNo, value.map(Trn.apply)))(taxRegNo =>
-        Some((taxRegNo.canProvideTaxRegNo, taxRegNo.value.map(_.value)))
-      )
+  def form: Form[TaxRegistrationNumber] = Form[TaxRegistrationNumber](
+    mapping(
+      "canProvideTaxRegNo" -> optional(boolean).verifying(radioInputSelected("taxRegNo.form.no-radio.selected")),
+      "value" -> mandatoryIfTrue("canProvideTaxRegNo", CommonValidators.taxRegistrationNumber)
+    )(
+      (
+        canProvideTaxRegNo,
+        value
+      ) => TaxRegistrationNumber(canProvideTaxRegNo, value.map(Trn.apply))
+    )(taxRegNo =>
+      Some((taxRegNo.canProvideTaxRegNo, taxRegNo.value.map(_.value)))
     )
+  )
 }

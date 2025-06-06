@@ -16,19 +16,32 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
-import play.api.libs.json.{Format, Json, OFormat, __}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.unlift
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import play.api.libs.json.__
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
 
-case class AmlsDetails(supervisoryBody: String, membershipNumber: Option[String])
+case class AmlsDetails(
+  supervisoryBody: String,
+  membershipNumber: Option[String]
+)
 
 object AmlsDetails {
-  def amlsDetailsDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[AmlsDetails] =
+
+  def amlsDetailsDatabaseFormat(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): Format[AmlsDetails] =
     (
       (__ \ "supervisoryBody").format[String](stringEncrypterDecrypter) and
         (__ \ "membershipNumber").formatNullable[String](stringEncrypterDecrypter)
     )(AmlsDetails.apply, unlift(AmlsDetails.unapply))
 
   implicit val format: OFormat[AmlsDetails] = Json.format[AmlsDetails]
+
 }

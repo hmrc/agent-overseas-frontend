@@ -21,10 +21,15 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
-import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AgentSubscriptionStubs}
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 
-class SubscriptionControllerISpec extends BaseISpec with AgentOverseasApplicationStubs with AgentSubscriptionStubs {
+class SubscriptionControllerISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs
+with AgentSubscriptionStubs {
+
   val arn = Arn("TARN0000001")
 
   private val agentServicesAccountBase = "http://localhost:9401"
@@ -79,8 +84,15 @@ class SubscriptionControllerISpec extends BaseISpec with AgentOverseasApplicatio
 
   "subscriptionComplete" should {
     "showSubscriptionCompletePage when HMRC-AS-AGENT" in {
-      implicit val request =
-        authenticated(FakeRequest(), Enrolment("HMRC-AS-AGENT", "AgentReferenceNumber", arn.value), true)
+      implicit val request = authenticated(
+        FakeRequest(),
+        Enrolment(
+          "HMRC-AS-AGENT",
+          "AgentReferenceNumber",
+          arn.value
+        ),
+        true
+      )
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
       val result = controller.subscriptionComplete(request)
 

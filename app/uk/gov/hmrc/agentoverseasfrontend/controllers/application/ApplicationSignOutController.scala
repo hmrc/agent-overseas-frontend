@@ -18,17 +18,22 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import java.net.URL
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Environment
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.timed_out
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class ApplicationSignOutController @Inject() (
@@ -37,8 +42,17 @@ class ApplicationSignOutController @Inject() (
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
   timedOutView: timed_out
-)(implicit ec: ExecutionContext, appConfig: AppConfig, val env: Environment)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with I18nSupport {
+)(implicit
+  ec: ExecutionContext,
+  appConfig: AppConfig,
+  val env: Environment
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with I18nSupport {
 
   import authAction.withBasicAuth
 
@@ -70,4 +84,5 @@ class ApplicationSignOutController @Inject() (
   def timedOut: Action[AnyContent] = Action.async { implicit request =>
     Future successful Forbidden(timedOutView())
   }
+
 }

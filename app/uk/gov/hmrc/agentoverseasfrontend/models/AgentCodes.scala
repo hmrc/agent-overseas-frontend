@@ -16,22 +16,37 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
-import play.api.libs.json.{Format, Json, OFormat, __}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.unlift
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import play.api.libs.json.__
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
 
-case class AgentCodes(selfAssessment: Option[SaAgentCode], corporationTax: Option[CtAgentCode]) {
-  def hasOneOrMoreCodes: Boolean = this match {
-    case AgentCodes(None, None) => false
-    case _                      => true
-  }
+case class AgentCodes(
+  selfAssessment: Option[SaAgentCode],
+  corporationTax: Option[CtAgentCode]
+) {
+
+  def hasOneOrMoreCodes: Boolean =
+    this match {
+      case AgentCodes(None, None) => false
+      case _ => true
+    }
 
   def isEmpty: Boolean = !hasOneOrMoreCodes
+
 }
 
 object AgentCodes {
-  def agentCodesDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[AgentCodes] =
+
+  def agentCodesDatabaseFormat(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): Format[AgentCodes] =
     (
       (__ \ "selfAssessment")
         .formatNullable[String](stringEncrypterDecrypter)
@@ -48,4 +63,5 @@ object AgentCodes {
     )(AgentCodes.apply, unlift(AgentCodes.unapply))
 
   implicit val format: OFormat[AgentCodes] = Json.format[AgentCodes]
+
 }

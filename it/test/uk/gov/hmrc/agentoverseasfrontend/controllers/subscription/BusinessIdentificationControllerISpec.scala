@@ -17,11 +17,15 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import org.jsoup.Jsoup
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Result}
-import play.api.test.{FakeRequest, Helpers}
+import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.AnyContentAsFormUrlEncoded
+import play.api.mvc.Result
+import play.api.test.FakeRequest
+import play.api.test.Helpers
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
-import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AgentSubscriptionStubs}
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
@@ -30,14 +34,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BusinessIdentificationControllerISpec
-    extends BaseISpec with AgentOverseasApplicationStubs with AgentSubscriptionStubs {
+extends BaseISpec
+with AgentOverseasApplicationStubs
+with AgentSubscriptionStubs {
 
   lazy val controller: BusinessIdentificationController = app.injector.instanceOf[BusinessIdentificationController]
 
   "GET /check-answers" should {
     "display the check-answers page if status is Accepted" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -77,8 +82,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to application root path page if no active application available" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenApplicationEmptyResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -88,8 +92,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to /application-status if Pending" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenPendingApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -102,8 +105,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to /application-status if Rejected" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenRejectedApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -116,8 +118,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "attempt subscribeAndEnrol if Registered then redirect to /complete" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenRegisteredApplicationResponse()
       givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
@@ -140,8 +141,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "attempt subscribeAndEnrol if Complete then redirect to /agent-services-account" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingAgentEnrolledForHMRCASAGENT)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForHMRCASAGENT)
       givenCompleteApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -154,8 +154,7 @@ class BusinessIdentificationControllerISpec
 
   "GET /check-business-address" should {
     "display the business address page" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -175,8 +174,10 @@ class BusinessIdentificationControllerISpec
 
   "POST /check-business-address" should {
     "show validation error when the form is submitted blank" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("useThisAddress" -> "")
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(
+        subscribingCleanAgentWithoutEnrolments,
+        POST
+      ).withFormUrlEncodedBody("useThisAddress" -> "")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -186,10 +187,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a Yes answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisAddress" -> "true"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisAddress" -> "true"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -201,10 +201,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to 'update address' page for a No answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisAddress" -> "false"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisAddress" -> "false"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -216,10 +215,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a No answer without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisAddress" -> "false"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisAddress" -> "false"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
@@ -235,8 +233,7 @@ class BusinessIdentificationControllerISpec
   "GET /update-business-address" should {
 
     "display the business address page" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -255,8 +252,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to checkAnswers page if no session details is available" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
 
       val result = controller.showUpdateBusinessAddressForm(request)
@@ -268,14 +264,13 @@ class BusinessIdentificationControllerISpec
 
   "POST /update-business-address" should {
     "redirect to check-answers page for a valid form with session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> "new addressline 1",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline 3",
-          "addressLine4" -> "new addressline 4",
-          "countryCode"  -> "IE"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> "new addressline 1",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline 3",
+        "addressLine4" -> "new addressline 4",
+        "countryCode" -> "IE"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -294,13 +289,12 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a valid form without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> "new addressline 1",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline 3",
-          "countryCode"  -> "IE"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> "new addressline 1",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline 3",
+        "countryCode" -> "IE"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
@@ -312,13 +306,12 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with empty address line 1" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> " ",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline 3",
-          "countryCode"  -> "IE"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> " ",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline 3",
+        "countryCode" -> "IE"
+      )
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -331,13 +324,12 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with invalid address line 3" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> "address line 1",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline **!",
-          "countryCode"  -> "IE"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> "address line 1",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline **!",
+        "countryCode" -> "IE"
+      )
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -350,14 +342,13 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with invalid address line 4" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> "address line 1",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline 3",
-          "addressLine4" -> "new addressline **!",
-          "countryCode"  -> "IE"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> "address line 1",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline 3",
+        "addressLine4" -> "new addressline **!",
+        "countryCode" -> "IE"
+      )
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -370,13 +361,12 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with invalid address line 1" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> "address line 1**",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline 3",
-          "countryCode"  -> "IE"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> "address line 1**",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline 3",
+        "countryCode" -> "IE"
+      )
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -389,13 +379,12 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with empty country code" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> " ",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline 3",
-          "countryCode"  -> ""
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> " ",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline 3",
+        "countryCode" -> ""
+      )
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -405,13 +394,12 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with invalid country code" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "addressLine1" -> " ",
-          "addressLine2" -> "new addressline 2",
-          "addressLine3" -> "new addressline 3",
-          "countryCode"  -> "INVALID"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "addressLine1" -> " ",
+        "addressLine2" -> "new addressline 2",
+        "addressLine3" -> "new addressline 3",
+        "countryCode" -> "INVALID"
+      )
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -423,8 +411,7 @@ class BusinessIdentificationControllerISpec
 
   "GET /check-business-email" should {
     "display the business email page" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -444,8 +431,10 @@ class BusinessIdentificationControllerISpec
 
   "POST /check-business-email" should {
     "show validation error when the form is submitted blank" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("useThisEmail" -> "")
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(
+        subscribingCleanAgentWithoutEnrolments,
+        POST
+      ).withFormUrlEncodedBody("useThisEmail" -> "")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -455,10 +444,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a Yes answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisEmail" -> "true"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisEmail" -> "true"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -470,10 +458,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to 'update email' page for a No answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisEmail" -> "false"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisEmail" -> "false"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -485,10 +472,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a No answer without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisEmail" -> "false"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisEmail" -> "false"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
@@ -503,8 +489,7 @@ class BusinessIdentificationControllerISpec
 
   "GET /update-business-email" should {
     "display the business email page" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -519,8 +504,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to checkAnswers page if no session details are available" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
 
       val result = controller.showUpdateBusinessEmailForm(request)
@@ -532,10 +516,9 @@ class BusinessIdentificationControllerISpec
 
   "POST /update-business-email" should {
     "redirect to check-answers page for a valid form with session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "email" -> "newemail@example.com"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "email" -> "newemail@example.com"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -549,10 +532,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a valid form without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "email" -> "newemail@example.com"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "email" -> "newemail@example.com"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -564,8 +546,10 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with empty email address" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("email" -> " ")
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(
+        subscribingCleanAgentWithoutEnrolments,
+        POST
+      ).withFormUrlEncodedBody("email" -> " ")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -577,8 +561,7 @@ class BusinessIdentificationControllerISpec
 
   "GET /check-business-name" should {
     "display the business name page" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -598,8 +581,10 @@ class BusinessIdentificationControllerISpec
 
   "POST /check-business-name" should {
     "show validation error when the form is submitted blank" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("useThisName" -> "")
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(
+        subscribingCleanAgentWithoutEnrolments,
+        POST
+      ).withFormUrlEncodedBody("useThisName" -> "")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -609,10 +594,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a Yes answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisName" -> "true"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisName" -> "true"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -624,10 +608,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to 'update name' page for a No answer" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisName" -> "false"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisName" -> "false"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -639,10 +622,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a No answer without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "useThisName" -> "false"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "useThisName" -> "false"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
@@ -657,8 +639,7 @@ class BusinessIdentificationControllerISpec
 
   "GET /update-business-name" should {
     "display the business name page" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -673,8 +654,7 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to checkAnswers page if no session details are available" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
 
       val result = controller.showUpdateBusinessNameForm(request)
@@ -686,8 +666,10 @@ class BusinessIdentificationControllerISpec
 
   "POST /update-business-name" should {
     "redirect to check-answers page for a valid form with session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("name" -> "New name")
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(
+        subscribingCleanAgentWithoutEnrolments,
+        POST
+      ).withFormUrlEncodedBody("name" -> "New name")
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
@@ -701,10 +683,9 @@ class BusinessIdentificationControllerISpec
     }
 
     "redirect to check-answers page for a valid form without session data" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
-          "name" -> "New name"
-        )
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody(
+        "name" -> "New name"
+      )
 
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = None
@@ -716,8 +697,10 @@ class BusinessIdentificationControllerISpec
     }
 
     "show validation error when the form is submitted with empty business name" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments, POST).withFormUrlEncodedBody("name" -> " ")
+      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = authenticatedAs(
+        subscribingCleanAgentWithoutEnrolments,
+        POST
+      ).withFormUrlEncodedBody("name" -> " ")
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
 
@@ -730,8 +713,7 @@ class BusinessIdentificationControllerISpec
   "GET /return-from-gg-registration" should {
     "redirect to check-answers page" when {
       "a valid session id found" in {
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-          authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
 
         val sessionId = sessionDetailsRepo.create("credId-12345").futureValue
 
@@ -748,8 +730,7 @@ class BusinessIdentificationControllerISpec
       }
 
       "an invalid session id found" in {
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-          authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
         val result = controller.returnFromGGRegistration("invalid-id")(request)
 
         status(result) shouldBe 303
@@ -764,8 +745,7 @@ class BusinessIdentificationControllerISpec
 
   "email verification" should {
     def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
       val result = f()
@@ -773,8 +753,7 @@ class BusinessIdentificationControllerISpec
       redirectLocation(result) shouldBe Some(routes.SubscriptionEmailVerificationController.verifyEmail.url)
     }
     def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-        authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
       sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
       val result = f()
@@ -814,11 +793,9 @@ class BusinessIdentificationControllerISpec
     }
     "not be triggered when using with the email retrieved by auth" when {
       "show check your answers" in checkVerifyEmailIsNotTriggered { () =>
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] =
-          authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
         // we use the email (authemail@email.com) which is returned in the mock auth response
-        sessionStoreService.currentSession.agencyDetails =
-          Some(agencyDetails.copy(agencyEmail = "authemail@email.com", verifiedEmails = Set.empty))
+        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(agencyEmail = "authemail@email.com", verifiedEmails = Set.empty))
         controller.showCheckAnswers(cleanCredsAgent(FakeRequest()))
       }
       // also all other pages but checking one should be enough as they all use the same logic

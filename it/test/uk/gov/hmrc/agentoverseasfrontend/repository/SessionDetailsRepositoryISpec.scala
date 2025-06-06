@@ -18,7 +18,8 @@ package uk.gov.hmrc.agentoverseasfrontend.repository
 
 import org.mongodb.scala.model.Filters
 import org.scalatest.OptionValues
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.IntegrationPatience
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
@@ -29,8 +30,12 @@ import uk.gov.hmrc.mongo.test.PlayMongoRepositorySupport
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SessionDetailsRepositoryISpec
-    extends AnyWordSpecLike with Matchers with OptionValues with ScalaFutures
-    with PlayMongoRepositorySupport[SessionDetails] with IntegrationPatience {
+extends AnyWordSpecLike
+with Matchers
+with OptionValues
+with ScalaFutures
+with PlayMongoRepositorySupport[SessionDetails]
+with IntegrationPatience {
 
   override val repository: PlayMongoRepository[SessionDetails] = new SessionDetailsRepository(mongoComponent)
 
@@ -73,4 +78,5 @@ class SessionDetailsRepositoryISpec
       result.futureValue shouldBe empty
     }
   }
+
 }

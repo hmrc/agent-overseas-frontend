@@ -16,12 +16,16 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, toInvariantFunctorOps, unlift}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.functional.syntax.toInvariantFunctorOps
+import play.api.libs.functional.syntax.unlift
 import play.api.libs.json._
-import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.{decryptString, encryptString}
+import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.decryptString
+import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.encryptString
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.crypto.Decrypter
+import uk.gov.hmrc.crypto.Encrypter
 
 case class AgencyDetails(
   agencyName: String,
@@ -29,23 +33,30 @@ case class AgencyDetails(
   agencyAddress: OverseasAddress,
   verifiedEmails: Set[String]
 ) {
+
   def isEmailVerified(email: String): Boolean = verifiedEmails.exists(compareEmail(email, _))
   def isEmailVerified: Boolean = isEmailVerified(agencyEmail)
+
 }
 
 object AgencyDetails {
+
   // manual instance for backwards compatibility if there are any stored details without 'verifiedEmails' field
   // We can remove this and have an auto-generated Format after this has been in production for some time.
-  val reads: Reads[AgencyDetails] = (
-    (__ \ "agencyName").read[String] and
-      (__ \ "agencyEmail").read[String] and
-      (__ \ "agencyAddress").read[OverseasAddress] and
-      (__ \ "verifiedEmails").readWithDefault[Set[String]](Set.empty)
-  )(AgencyDetails.apply _)
+  val reads: Reads[AgencyDetails] =
+    (
+      (__ \ "agencyName").read[String] and
+        (__ \ "agencyEmail").read[String] and
+        (__ \ "agencyAddress").read[OverseasAddress] and
+        (__ \ "verifiedEmails").readWithDefault[Set[String]](Set.empty)
+    )(AgencyDetails.apply _)
   val writes: Writes[AgencyDetails] = Json.writes[AgencyDetails]
   implicit val formats: Format[AgencyDetails] = Format(reads, writes)
 
-  def agencyDetailsDatabaseFormat(implicit crypto: Encrypter with Decrypter): Format[AgencyDetails] =
+  def agencyDetailsDatabaseFormat(implicit
+    crypto: Encrypter
+      with Decrypter
+  ): Format[AgencyDetails] =
     (
       (__ \ "agencyName")
         .format[String](stringEncrypterDecrypter) and
@@ -61,13 +72,13 @@ object AgencyDetails {
           )
     )(AgencyDetails.apply, unlift(AgencyDetails.unapply))
 
-  def fromOverseasApplication(overseasApplication: OverseasApplication): AgencyDetails =
-    AgencyDetails(
-      agencyName = overseasApplication.tradingDetails.tradingName,
-      agencyEmail = overseasApplication.contactDetails.businessEmail,
-      agencyAddress = overseasApplication.tradingDetails.tradingAddress,
-      verifiedEmails = Set(
-        overseasApplication.contactDetails.businessEmail
-      ) // When creating AgencyDetails from an overseas application we assume the email has already been verified.
-    )
+  def fromOverseasApplication(overseasApplication: OverseasApplication): AgencyDetails = AgencyDetails(
+    agencyName = overseasApplication.tradingDetails.tradingName,
+    agencyEmail = overseasApplication.contactDetails.businessEmail,
+    agencyAddress = overseasApplication.tradingDetails.tradingAddress,
+    verifiedEmails = Set(
+      overseasApplication.contactDetails.businessEmail
+    ) // When creating AgencyDetails from an overseas application we assume the email has already been verified.
+  )
+
 }

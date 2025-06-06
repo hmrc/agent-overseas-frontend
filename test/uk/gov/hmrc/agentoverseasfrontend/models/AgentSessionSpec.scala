@@ -24,12 +24,31 @@ import uk.gov.hmrc.domain.Nino
 
 import scala.collection.immutable.SortedSet
 
-class AgentSessionSpec extends AnyWordSpecLike with Matchers with OptionValues {
+class AgentSessionSpec
+extends AnyWordSpecLike
+with Matchers
+with OptionValues {
 
-  private val contactDetails = ContactDetails("test", "last", "senior agent", "12345", "test@email.com")
+  private val contactDetails = ContactDetails(
+    "test",
+    "last",
+    "senior agent",
+    "12345",
+    "test@email.com"
+  )
   private val amlsDetails = AmlsDetails("Keogh Chartered Accountants", Some("123456"))
-  private val overseasAddress = OverseasAddress("line 1", "line 2", None, None, countryCode = "IE")
-  private val personalDetails = PersonalDetailsChoice(Some(RadioOption.NinoChoice), Some(Nino("AB123456A")), None)
+  private val overseasAddress = OverseasAddress(
+    "line 1",
+    "line 2",
+    None,
+    None,
+    countryCode = "IE"
+  )
+  private val personalDetails = PersonalDetailsChoice(
+    Some(RadioOption.NinoChoice),
+    Some(Nino("AB123456A")),
+    None
+  )
   private val agentCodes = AgentCodes(Some(SaAgentCode("SA123456")), Some(CtAgentCode("CT123456")))
 
   private val crn = CompanyRegistrationNumber(Some(true), Some(Crn("123456")))
@@ -76,9 +95,14 @@ class AgentSessionSpec extends AnyWordSpecLike with Matchers with OptionValues {
 
         "no agents codes were provided" when {
           "UkTaxRegistration is Yes" in {
-            val cleanedSession = agentSession
-              .copy(registeredWithHmrc = Some(Yes), agentCodes = None, registeredForUkTax = Some(Yes))
-              .sanitize
+            val cleanedSession =
+              agentSession
+                .copy(
+                  registeredWithHmrc = Some(Yes),
+                  agentCodes = None,
+                  registeredForUkTax = Some(Yes)
+                )
+                .sanitize
 
             assertCommonDetails(cleanedSession)
 
@@ -93,9 +117,14 @@ class AgentSessionSpec extends AnyWordSpecLike with Matchers with OptionValues {
           }
 
           "UkTaxRegistration is No" in {
-            val cleanedSession = agentSession
-              .copy(registeredWithHmrc = Some(Yes), agentCodes = None, registeredForUkTax = Some(No))
-              .sanitize
+            val cleanedSession =
+              agentSession
+                .copy(
+                  registeredWithHmrc = Some(Yes),
+                  agentCodes = None,
+                  registeredForUkTax = Some(No)
+                )
+                .sanitize
 
             assertCommonDetails(cleanedSession)
             cleanedSession.agentCodes shouldBe None
@@ -146,4 +175,5 @@ class AgentSessionSpec extends AnyWordSpecLike with Matchers with OptionValues {
       cleanedSession.tradingName shouldBe agentSession.tradingName
     }
   }
+
 }

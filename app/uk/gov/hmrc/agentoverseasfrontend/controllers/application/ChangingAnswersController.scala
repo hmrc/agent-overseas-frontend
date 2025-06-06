@@ -16,13 +16,17 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Environment
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 
 import scala.concurrent.ExecutionContext
 
@@ -33,9 +37,17 @@ class ChangingAnswersController @Inject() (
   override val applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents
-)(implicit val env: Environment, override val ec: ExecutionContext)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
-    with I18nSupport {
+)(implicit
+  val env: Environment,
+  override val ec: ExecutionContext
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with SessionBehaviour
+with I18nSupport {
 
   import authAction.withEnrollingAgent
 
@@ -87,14 +99,13 @@ class ChangingAnswersController @Inject() (
     }
   }
 
-  def changeTradingAddressFile: Action[AnyContent] =
-    Action.async { implicit request =>
-      withEnrollingAgent { agentSession =>
-        updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
-          routes.FileUploadController.showTradingAddressUploadForm.url
-        )
-      }
+  def changeTradingAddressFile: Action[AnyContent] = Action.async { implicit request =>
+    withEnrollingAgent { agentSession =>
+      updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
+        routes.FileUploadController.showTradingAddressUploadForm.url
+      )
     }
+  }
 
   def changeRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
@@ -151,4 +162,5 @@ class ChangingAnswersController @Inject() (
       )
     }
   }
+
 }

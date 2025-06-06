@@ -17,31 +17,47 @@
 package uk.gov.hmrc.agentoverseasfrontend.models.upscan
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{Json, Reads, Writes, _}
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import play.api.libs.json._
 
-case class UpscanInitiate(reference: String, uploadRequest: UploadRequest)
+case class UpscanInitiate(
+  reference: String,
+  uploadRequest: UploadRequest
+)
 
-case class UploadRequest(href: String, fields: Map[String, String])
+case class UploadRequest(
+  href: String,
+  fields: Map[String, String]
+)
 
 object UploadRequest {
-  implicit val writes: Writes[UploadRequest] = new Writes[UploadRequest] {
-    def writes(uploadRequest: UploadRequest): JsObject = Json.obj(
-      "href"   -> uploadRequest.href,
-      "fields" -> uploadRequest.fields
-    )
-  }
-  implicit val reads: Reads[UploadRequest] = ((__ \ "href").read[String] and
-    (__ \ "fields").read[Map[String, String]])(UploadRequest.apply _)
+
+  implicit val writes: Writes[UploadRequest] =
+    new Writes[UploadRequest] {
+      def writes(uploadRequest: UploadRequest): JsObject = Json.obj(
+        "href" -> uploadRequest.href,
+        "fields" -> uploadRequest.fields
+      )
+    }
+  implicit val reads: Reads[UploadRequest] =
+    ((__ \ "href").read[String] and
+      (__ \ "fields").read[Map[String, String]])(UploadRequest.apply _)
+
 }
 
 object UpscanInitiate {
-  implicit val writes: Writes[UpscanInitiate] = new Writes[UpscanInitiate] {
-    def writes(upscan: UpscanInitiate): JsObject = Json.obj(
-      "reference"     -> upscan.reference,
-      "uploadRequest" -> upscan.uploadRequest
-    )
-  }
+
+  implicit val writes: Writes[UpscanInitiate] =
+    new Writes[UpscanInitiate] {
+      def writes(upscan: UpscanInitiate): JsObject = Json.obj(
+        "reference" -> upscan.reference,
+        "uploadRequest" -> upscan.uploadRequest
+      )
+    }
   implicit val reads: Reads[UpscanInitiate] =
     ((__ \ "reference").read[String] and
       (__ \ "uploadRequest").read[UploadRequest])(UpscanInitiate.apply _)
+
 }

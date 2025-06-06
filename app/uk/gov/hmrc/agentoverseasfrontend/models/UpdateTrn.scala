@@ -16,9 +16,13 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Format
+import play.api.libs.json.Json
 
-case class UpdateTrn(original: String, updated: Option[String] = None)
+case class UpdateTrn(
+  original: String,
+  updated: Option[String] = None
+)
 
 object UpdateTrn {
   implicit val format: Format[UpdateTrn] = Json.format[UpdateTrn]

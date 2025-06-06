@@ -18,17 +18,23 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.Environment
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Call, MessagesControllerComponents, RequestHeader}
+import play.api.mvc.Call
+import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.GenericEmailVerificationController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.models._
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, EmailVerificationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.EmailVerificationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig
 import uk.gov.hmrc.http.HeaderCarrier
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class ApplicationEmailVerificationController @Inject() (
@@ -39,30 +45,38 @@ class ApplicationEmailVerificationController @Inject() (
   emailVerificationService: EmailVerificationService,
   val controllerComponents: MessagesControllerComponents,
   accessibilityStatementConfig: AccessibilityStatementConfig
-)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
-    extends GenericEmailVerificationController[AgentSession](env, emailVerificationService) with SessionBehaviour
-    with I18nSupport {
+)(implicit
+  appConfig: AppConfig,
+  override val ec: ExecutionContext
+)
+extends GenericEmailVerificationController[AgentSession](env, emailVerificationService)
+with SessionBehaviour
+with I18nSupport {
 
   import authAction.getCredsAndAgentSession
 
   override def emailVerificationEnabled: Boolean = !appConfig.disableEmailVerification
 
   override def emailVerificationFrontendBaseUrl: String = appConfig.emailVerificationFrontendBaseUrl
-  override def accessibilityStatementUrl(implicit request: RequestHeader): String =
-    accessibilityStatementConfig.url.getOrElse("")
+  override def accessibilityStatementUrl(implicit request: RequestHeader): String = accessibilityStatementConfig.url.getOrElse("")
 
-  override def getState(implicit hc: HeaderCarrier): Future[(AgentSession, String)] =
-    getCredsAndAgentSession.map { case (creds, agentSession) =>
-      (agentSession, creds.providerId)
-    }
+  override def getState(implicit hc: HeaderCarrier): Future[(AgentSession, String)] = getCredsAndAgentSession.map { case (creds, agentSession) =>
+    (agentSession, creds.providerId)
+  }
 
   override def getEmailToVerify(session: AgentSession): String = session.contactDetails.map(_.businessEmail).getOrElse {
     throw new IllegalStateException("A verify email call has been made but no email to verify is present.")
   }
 
-  override def isAlreadyVerified(session: AgentSession, email: String): Boolean = !session.emailNeedsVerifying(email)
+  override def isAlreadyVerified(
+    session: AgentSession,
+    email: String
+  ): Boolean = !session.emailNeedsVerifying(email)
 
-  override def markEmailAsVerified(session: AgentSession, email: String)(implicit
+  override def markEmailAsVerified(
+    session: AgentSession,
+    email: String
+  )(implicit
     hc: HeaderCarrier
   ): Future[AgentSession] = {
     val newAgentSession = session.copy(verifiedEmails = session.verifiedEmails + email)
@@ -75,6 +89,9 @@ class ApplicationEmailVerificationController @Inject() (
   override def redirectUrlIfError(session: AgentSession): Call = routes.ApplicationController.showEmailTechnicalError
   override def backLinkUrl(session: AgentSession): Option[Call] = Some(enterEmailUrl(session))
   override def enterEmailUrl(session: AgentSession): Call =
-    if (session.changingAnswers) routes.ChangingAnswersController.changeContactDetails
-    else routes.ApplicationController.showContactDetailsForm
+    if (session.changingAnswers)
+      routes.ChangingAnswersController.changeContactDetails
+    else
+      routes.ApplicationController.showContactDetailsForm
+
 }

@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.config
 
-import com.google.inject.{ImplementedBy, Singleton}
+import com.google.inject.ImplementedBy
+import com.google.inject.Singleton
 import javax.inject.Inject
 import play.api.Environment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @ImplementedBy(classOf[FrontendAppConfig])
 trait AppConfig {
+
   val appName: String
   val countryListLocation: String
   val feedbackSurveyUrl: String
@@ -44,42 +46,38 @@ trait AppConfig {
   val emailVerificationFrontendBaseUrl: String
   val mongoDbExpireAfterSeconds: Int
   val disableEmailVerification: Boolean
+
 }
 
 @Singleton
-class FrontendAppConfig @Inject() (servicesConfig: ServicesConfig, environment: Environment) extends AppConfig {
+class FrontendAppConfig @Inject() (
+  servicesConfig: ServicesConfig,
+  environment: Environment
+)
+extends AppConfig {
+
   override val appName: String = "agent-overseas-frontend"
-  override val countryListLocation: String =
-    servicesConfig.getString("country.list.location")
-  override val feedbackSurveyUrl: String =
-    servicesConfig.getString("feedback-survey-url")
-  override val maintainerApplicationReviewDays: Int =
-    servicesConfig.getInt("maintainer-application-review-days")
-  override val companyAuthSignInUrl: String =
-    servicesConfig.getString("microservice.services.companyAuthSignInUrl")
-  override val ggRegistrationFrontendSosRedirectPath: String =
-    servicesConfig.getString("microservice.services.government-gateway-registration-frontend.sosRedirect-path")
-  override val guidancePageApplicationUrl: String =
-    servicesConfig.getString("microservice.services.guidancePageApplicationUrl")
+  override val countryListLocation: String = servicesConfig.getString("country.list.location")
+  override val feedbackSurveyUrl: String = servicesConfig.getString("feedback-survey-url")
+  override val maintainerApplicationReviewDays: Int = servicesConfig.getInt("maintainer-application-review-days")
+  override val companyAuthSignInUrl: String = servicesConfig.getString("microservice.services.companyAuthSignInUrl")
+  override val ggRegistrationFrontendSosRedirectPath: String = servicesConfig.getString(
+    "microservice.services.government-gateway-registration-frontend.sosRedirect-path"
+  )
+  override val guidancePageApplicationUrl: String = servicesConfig.getString("microservice.services.guidancePageApplicationUrl")
   override val authBaseUrl: String = servicesConfig.baseUrl("auth")
-  override val agentOverseasApplicationBaseUrl: String =
-    servicesConfig.baseUrl("agent-overseas-application")
-  override val agentOverseasFrontendUrl: String =
-    servicesConfig.getString("microservice.services.agent-overseas-frontend.url")
+  override val agentOverseasApplicationBaseUrl: String = servicesConfig.baseUrl("agent-overseas-application")
+  override val agentOverseasFrontendUrl: String = servicesConfig.getString("microservice.services.agent-overseas-frontend.url")
   override val upscanBaseUrl: String = servicesConfig.baseUrl("upscan")
-  override val betaFeedbackUrl: String =
-    servicesConfig.getString("betaFeedbackUrl")
-  override val timeout: Int =
-    servicesConfig.getInt("timeoutDialog.timeout-seconds")
-  override val timeoutCountdown: Int =
-    servicesConfig.getInt("timeoutDialog.timeout-countdown-seconds")
+  override val betaFeedbackUrl: String = servicesConfig.getString("betaFeedbackUrl")
+  override val timeout: Int = servicesConfig.getInt("timeoutDialog.timeout-seconds")
+  override val timeoutCountdown: Int = servicesConfig.getInt("timeoutDialog.timeout-countdown-seconds")
   override val agentGuidancePageFullUrl: String = servicesConfig.getString("agent-guidance-page.full-url")
-  override val asaFrontendUrl: String =
-    servicesConfig.getString("microservice.services.agent-services-account-frontend.url")
+  override val asaFrontendUrl: String = servicesConfig.getString("microservice.services.agent-services-account-frontend.url")
   override val agentSubscriptionBaseUrl: String = servicesConfig.baseUrl("agent-subscription")
   override val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
-  override val emailVerificationFrontendBaseUrl: String =
-    servicesConfig.getString("microservice.services.email-verification-frontend.external-url")
+  override val emailVerificationFrontendBaseUrl: String = servicesConfig.getString("microservice.services.email-verification-frontend.external-url")
   override val mongoDbExpireAfterSeconds: Int = servicesConfig.getInt("mongodb.session.expireAfterSeconds")
   override val disableEmailVerification: Boolean = servicesConfig.getBoolean("disable-email-verification")
+
 }

@@ -16,9 +16,13 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 
-case class SuccessfulFileUploadConfirmation(fileType: String, choice: RadioConfirm)
+case class SuccessfulFileUploadConfirmation(
+  fileType: String,
+  choice: RadioConfirm
+)
 
 object SuccessfulFileUploadConfirmation {
   implicit val format: OFormat[SuccessfulFileUploadConfirmation] = Json.format[SuccessfulFileUploadConfirmation]

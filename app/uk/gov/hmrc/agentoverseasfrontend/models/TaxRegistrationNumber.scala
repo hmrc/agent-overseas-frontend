@@ -16,4 +16,7 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-case class TaxRegistrationNumber(canProvideTaxRegNo: Option[Boolean], value: Option[Trn])
+case class TaxRegistrationNumber(
+  canProvideTaxRegNo: Option[Boolean],
+  value: Option[Trn]
+)

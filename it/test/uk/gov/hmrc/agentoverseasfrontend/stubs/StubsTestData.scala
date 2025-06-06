@@ -28,7 +28,13 @@ object StubsTestData {
   val contactDetails = SubscriptionContactDetails("test@test.com")
   val tradingDetails = SubscriptionTradingDetails(
     "Testing Agency",
-    OverseasAddress("addressLine1", "addressLine2", Some("addressLine3"), Some("addressLine4"), "CC")
+    OverseasAddress(
+      "addressLine1",
+      "addressLine2",
+      Some("addressLine3"),
+      Some("addressLine4"),
+      "CC"
+    )
   )
 
   val applicationcreationDate = LocalDateTime.parse("2019-02-20T15:11:51.729")
@@ -756,4 +762,5 @@ object StubsTestData {
         |    }
         |  }]
      """.stripMargin
+
 }

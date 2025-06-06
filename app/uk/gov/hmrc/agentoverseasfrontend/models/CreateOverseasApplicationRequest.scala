@@ -36,10 +36,10 @@ object CreateOverseasApplicationRequest {
 
   def apply(agentSession: AgentSession): CreateOverseasApplicationRequest =
     (for {
-      amlsRequired          <- agentSession.amlsRequired
-      contactDetails        <- agentSession.contactDetails
-      tradingName           <- agentSession.tradingName
-      businessAddress       <- agentSession.overseasAddress
+      amlsRequired <- agentSession.amlsRequired
+      contactDetails <- agentSession.contactDetails
+      tradingName <- agentSession.tradingName
+      businessAddress <- agentSession.overseasAddress
       isHmrcAgentRegistered <- agentSession.registeredWithHmrc
       tradingAddressFileRef <- agentSession.tradingAddressUploadStatus.map(_.reference)
     } yield CreateOverseasApplicationRequest(
@@ -64,4 +64,5 @@ object CreateOverseasApplicationRequest {
       tradingAddressFileRef,
       agentSession.trnUploadStatus.map(_.reference)
     )).getOrElse(throw new Exception("Could not create application request from agent session"))
+
 }

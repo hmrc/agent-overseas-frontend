@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.config
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 
 import scala.io.Source
-import scala.util.{Failure, Success, Try}
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 @Singleton
 class CountryNamesLoader @Inject() (appConfig: AppConfig) {
@@ -39,8 +42,8 @@ class CountryNamesLoader @Inject() (appConfig: AppConfig) {
         }
     } match {
       case Success(countryMap) if countryMap.nonEmpty => countryMap
-      case Failure(ex)                                => sys.error(ex.getMessage)
-      case _                                          => sys.error("No country codes or names found")
+      case Failure(ex) => sys.error(ex.getMessage)
+      case _ => sys.error("No country codes or names found")
     }
 
   // some country names may be in quotes in the CSV due to containing commas (e.g. "Bonaire, Saint Eustatius and Saba") and we must clean them up
@@ -49,4 +52,5 @@ class CountryNamesLoader @Inject() (appConfig: AppConfig) {
       str.tail.init
     else
       str
+
 }

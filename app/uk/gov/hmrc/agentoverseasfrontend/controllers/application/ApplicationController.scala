@@ -16,18 +16,28 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Environment
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.view.CheckYourAnswers
-import uk.gov.hmrc.agentoverseasfrontend.config.{AppConfig, CountryNamesLoader}
+import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
+import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
-import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.{registeredForUkTaxForm, registeredWithHmrcForm}
+import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.registeredForUkTaxForm
+import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.registeredWithHmrcForm
 import uk.gov.hmrc.agentoverseasfrontend.forms._
-import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.{IsRegisteredForUkTax, IsRegisteredWithHmrc}
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, No, Yes, _}
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.IsRegisteredForUkTax
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.IsRegisteredWithHmrc
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.No
+import uk.gov.hmrc.agentoverseasfrontend.models.Yes
+import uk.gov.hmrc.agentoverseasfrontend.models._
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -52,11 +62,21 @@ class ApplicationController @Inject() (
   applicationCompleteView: application_complete,
   emailLockedView: cannot_verify_email_locked,
   emailTechnicalErrorView: cannot_verify_email_technical
-)(implicit appConfig: AppConfig, override val ec: ExecutionContext)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, cc) with SessionBehaviour
-    with I18nSupport {
+)(implicit
+  appConfig: AppConfig,
+  override val ec: ExecutionContext
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  cc
+)
+with SessionBehaviour
+with I18nSupport {
 
-  import authAction.{withBasicAuthAndAgentAffinity, withEnrollingAgent, withEnrollingEmailVerifiedAgent}
+  import authAction.withBasicAuthAndAgentAffinity
+  import authAction.withEnrollingAgent
+  import authAction.withEnrollingEmailVerifiedAgent
 
   private val countries = countryNamesLoader.load
 
@@ -65,7 +85,8 @@ class ApplicationController @Inject() (
       val form = ContactDetailsForm.form
       if (agentSession.changingAnswers) {
         Ok(contactDetailsView(agentSession.contactDetails.fold(form)(form.fill), Some(showCheckYourAnswersUrl)))
-      } else {
+      }
+      else {
         val backLink =
           if (agentSession.amlsRequired.getOrElse(false))
             routes.FileUploadController.showSuccessfulUploadedForm
@@ -84,7 +105,8 @@ class ApplicationController @Inject() (
           formWithErrors =>
             if (agentSession.changingAnswers) {
               Ok(contactDetailsView(formWithErrors, Some(showCheckYourAnswersUrl)))
-            } else {
+            }
+            else {
               Ok(contactDetailsView(formWithErrors))
             },
           validForm =>
@@ -100,7 +122,8 @@ class ApplicationController @Inject() (
       val form = TradingNameForm.form
       if (agentSession.changingAnswers) {
         Ok(tradingNameView(agentSession.tradingName.fold(form)(form.fill), Some(showCheckYourAnswersUrl)))
-      } else {
+      }
+      else {
         Ok(tradingNameView(agentSession.tradingName.fold(form)(form.fill)))
       }
     }
@@ -114,7 +137,8 @@ class ApplicationController @Inject() (
           formWithErrors =>
             if (agentSession.changingAnswers) {
               Ok(tradingNameView(formWithErrors, Some(showCheckYourAnswersUrl)))
-            } else {
+            }
+            else {
               Ok(tradingNameView(formWithErrors))
             },
           validForm =>
@@ -135,7 +159,8 @@ class ApplicationController @Inject() (
             Some(showCheckYourAnswersUrl)
           )
         )
-      } else {
+      }
+      else {
         Ok(registeredWithHmrcView(agentSession.registeredWithHmrc.fold(form)(x => form.fill(YesNo.toRadioConfirm(x)))))
       }
     }
@@ -152,21 +177,22 @@ class ApplicationController @Inject() (
             val redirectTo =
               if (Yes == newValue)
                 routes.ApplicationController.showAgentCodesForm.url
-              else routes.ApplicationController.showUkTaxRegistrationForm.url
-            val toUpdate =
-              agentSession.copy(registeredWithHmrc = Some(newValue))
+              else
+                routes.ApplicationController.showUkTaxRegistrationForm.url
+            val toUpdate = agentSession.copy(registeredWithHmrc = Some(newValue))
             if (agentSession.changingAnswers) {
               agentSession.registeredWithHmrc match {
                 case Some(oldValue) =>
                   if (oldValue == newValue) {
                     updateSession(agentSession.copy(changingAnswers = false))(showCheckYourAnswersUrl)
-                  } else {
+                  }
+                  else {
                     updateSession(toUpdate.copy(changingAnswers = false))(redirectTo)
                   }
-                case None =>
-                  updateSession(toUpdate.copy(changingAnswers = false))(redirectTo)
+                case None => updateSession(toUpdate.copy(changingAnswers = false))(redirectTo)
               }
-            } else {
+            }
+            else {
               updateSession(toUpdate)(redirectTo)
             }
           }
@@ -180,7 +206,8 @@ class ApplicationController @Inject() (
 
       if (agentSession.changingAnswers) {
         Ok(saAgentCodeView(agentSession.agentCodes.fold(form)(form.fill), Some(showCheckYourAnswersUrl)))
-      } else {
+      }
+      else {
         Ok(saAgentCodeView(agentSession.agentCodes.fold(form)(form.fill)))
       }
     }
@@ -194,7 +221,8 @@ class ApplicationController @Inject() (
           formWithErrors =>
             if (agentSession.changingAnswers) {
               Ok(saAgentCodeView(formWithErrors, Some(showCheckYourAnswersUrl)))
-            } else {
+            }
+            else {
               Ok(saAgentCodeView(formWithErrors))
             },
           validFormValue =>
@@ -215,7 +243,8 @@ class ApplicationController @Inject() (
             showCheckYourAnswersUrl
           )
         )
-      } else {
+      }
+      else {
         Ok(
           ukTaxRegView(
             agentSession.registeredForUkTax.fold(form)(x => form.fill(YesNo.toRadioConfirm(x))),
@@ -234,7 +263,8 @@ class ApplicationController @Inject() (
           formWithErrors =>
             if (agentSession.changingAnswers) {
               Ok(ukTaxRegView(formWithErrors, showCheckYourAnswersUrl))
-            } else {
+            }
+            else {
               Ok(ukTaxRegView(formWithErrors, ukTaxRegistrationBackLink(agentSession).url))
             },
           validFormValue => {
@@ -244,8 +274,7 @@ class ApplicationController @Inject() (
                 routes.ApplicationController.showPersonalDetailsForm.url
               else
                 routes.ApplicationController.showCompanyRegistrationNumberForm.url
-            val toUpdate =
-              agentSession.copy(registeredForUkTax = Some(newValue))
+            val toUpdate = agentSession.copy(registeredForUkTax = Some(newValue))
 
             if (agentSession.changingAnswers) {
               agentSession.registeredForUkTax match {
@@ -254,13 +283,14 @@ class ApplicationController @Inject() (
                     updateSession(agentSession.copy(changingAnswers = false))(
                       routes.ApplicationController.showCheckYourAnswers.url
                     )
-                  } else {
+                  }
+                  else {
                     updateSession(toUpdate.copy(changingAnswers = false))(redirectTo)
                   }
-                case None =>
-                  updateSession(toUpdate.copy(changingAnswers = false))(redirectTo)
+                case None => updateSession(toUpdate.copy(changingAnswers = false))(redirectTo)
               }
-            } else {
+            }
+            else {
               updateSession(toUpdate)(redirectTo)
             }
           }
@@ -273,7 +303,8 @@ class ApplicationController @Inject() (
       val form = PersonalDetailsForm.form
       if (agentSession.changingAnswers) {
         Ok(personalDetailsView(agentSession.personalDetails.fold(form)(form.fill), Some(showCheckYourAnswersUrl)))
-      } else {
+      }
+      else {
         Ok(personalDetailsView(agentSession.personalDetails.fold(form)(form.fill)))
       }
     }
@@ -287,7 +318,8 @@ class ApplicationController @Inject() (
           formWithErrors =>
             if (agentSession.changingAnswers) {
               Ok(personalDetailsView(formWithErrors, Some(showCheckYourAnswersUrl)))
-            } else {
+            }
+            else {
               Ok(personalDetailsView(formWithErrors))
             },
           validForm =>
@@ -303,7 +335,8 @@ class ApplicationController @Inject() (
       val form = CompanyRegistrationNumberForm.form
       if (agentSession.changingAnswers) {
         Ok(crnView(agentSession.companyRegistrationNumber.fold(form)(form.fill), showCheckYourAnswersUrl))
-      } else {
+      }
+      else {
         Ok(
           crnView(agentSession.companyRegistrationNumber.fold(form)(form.fill), companyRegNumberBackLink(agentSession))
         )
@@ -319,7 +352,8 @@ class ApplicationController @Inject() (
           formWithErrors =>
             if (agentSession.changingAnswers) {
               Ok(crnView(formWithErrors, showCheckYourAnswersUrl))
-            } else {
+            }
+            else {
               Ok(crnView(formWithErrors, companyRegNumberBackLink(agentSession)))
             },
           validFormValue =>
@@ -343,13 +377,13 @@ class ApplicationController @Inject() (
       sessionStoreService.fetchAgentSession
         .map(lookupNextPage)
         .map { call =>
-          if (
-            call == routes.ApplicationController.showCheckYourAnswers || call == routes.TaxRegController.showYourTaxRegNumbersForm
-          ) {
+          if (call == routes.ApplicationController.showCheckYourAnswers || call == routes.TaxRegController.showYourTaxRegNumbersForm) {
 
             sessionStoreService.cacheAgentSession(agentSession.copy(changingAnswers = false))
             Ok(cyaView(CheckYourAnswers.form, CheckYourAnswers(agentSession, getCountryName(agentSession))))
-          } else Redirect(call)
+          }
+          else
+            Redirect(call)
         }
     }
   }
@@ -385,7 +419,11 @@ class ApplicationController @Inject() (
       val contactDetail = request.flash.get("contactDetail")
 
       if (tradingName.isDefined && contactDetail.isDefined)
-        Ok(applicationCompleteView(tradingName.get, contactDetail.get, appConfig.guidancePageApplicationUrl))
+        Ok(applicationCompleteView(
+          tradingName.get,
+          contactDetail.get,
+          appConfig.guidancePageApplicationUrl
+        ))
       else
         Redirect(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm)
     }
@@ -401,17 +439,14 @@ class ApplicationController @Inject() (
 
   private def ukTaxRegistrationBackLink(session: AgentSession) =
     Some(session) match {
-      case IsRegisteredWithHmrc(Yes) =>
-        routes.ApplicationController.showAgentCodesForm
-      case IsRegisteredWithHmrc(No) =>
-        routes.ApplicationController.showRegisteredWithHmrcForm
+      case IsRegisteredWithHmrc(Yes) => routes.ApplicationController.showAgentCodesForm
+      case IsRegisteredWithHmrc(No) => routes.ApplicationController.showRegisteredWithHmrcForm
     }
 
   private def companyRegNumberBackLink(session: AgentSession) =
     Some(session) match {
-      case IsRegisteredForUkTax(Yes) =>
-        routes.ApplicationController.showPersonalDetailsForm.url
-      case IsRegisteredForUkTax(No) =>
-        routes.ApplicationController.showUkTaxRegistrationForm.url
+      case IsRegisteredForUkTax(Yes) => routes.ApplicationController.showPersonalDetailsForm.url
+      case IsRegisteredForUkTax(No) => routes.ApplicationController.showUkTaxRegistrationForm.url
     }
+
 }

@@ -18,18 +18,24 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import java.net.URL
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.Configuration
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService, SubscriptionService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class SubscriptionSignOutController @Inject() (
@@ -41,16 +47,23 @@ class SubscriptionSignOutController @Inject() (
   sessionStoreService: MongoDBSessionStoreService,
   timedOutView: timed_out,
   signedOutView: signed_out
-)(implicit val appConfig: AppConfig, override val ec: ExecutionContext, config: Configuration)
-    extends AgentOverseasBaseController(sessionStoreService, applicationService, mcc) {
+)(implicit
+  val appConfig: AppConfig,
+  override val ec: ExecutionContext,
+  config: Configuration
+)
+extends AgentOverseasBaseController(
+  sessionStoreService,
+  applicationService,
+  mcc
+) {
 
   import authAction.withBasicAgentAuth
 
   def signOutWithContinueUrl: Action[AnyContent] = Action.async { implicit request =>
     withBasicAgentAuth { implicit subRequest =>
       service.storeSessionDetails(subRequest.authProviderId).map { idRef =>
-        val returnContinueUrl =
-          s"${appConfig.agentOverseasFrontendUrl}/create-account/return-from-gg-registration?sessionId=$idRef"
+        val returnContinueUrl = s"${appConfig.agentOverseasFrontendUrl}/create-account/return-from-gg-registration?sessionId=$idRef"
 
         SeeOther(
           CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(returnContinueUrl))
@@ -83,4 +96,5 @@ class SubscriptionSignOutController @Inject() (
     val continueUrl = CallOps.addParamsToUrl(routes.SubscriptionRootController.root.url)
     Future successful Forbidden(signedOutView(continueUrl)).withNewSession
   }
+
 }

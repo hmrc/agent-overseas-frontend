@@ -20,14 +20,19 @@ import org.jsoup.Jsoup
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgentSession, FileUploadStatus}
-import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, UpscanStubs}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.FileUploadStatus
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.UpscanStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationStubs with UpscanStubs {
+class FileUploadControllerISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs
+with UpscanStubs {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -114,7 +119,11 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
     "display the page with correct content" in {
       sessionStoreService.currentSession.agentSession = Some(
         agentSession.copy(
-          tradingAddressUploadStatus = Some(FileUploadStatus("reference", "READY", Some("filename"))),
+          tradingAddressUploadStatus = Some(FileUploadStatus(
+            "reference",
+            "READY",
+            Some("filename")
+          )),
           fileType = Some("trading-address")
         )
       )
@@ -164,7 +173,13 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
     "show the form with errors when invalid value for 'correctFile' is passed in the form" in {
       sessionStoreService.currentSession.agentSession = Some(
-        agentSession.copy(tradingAddressUploadStatus = Some(FileUploadStatus("reference", "READY", Some("filename"))))
+        agentSession.copy(tradingAddressUploadStatus =
+          Some(FileUploadStatus(
+            "reference",
+            "READY",
+            Some("filename")
+          ))
+        )
       )
 
       val request = cleanCredsAgent(
@@ -187,7 +202,13 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
     "show the form with errors when 'correctFile' field is missing the form" in {
       sessionStoreService.currentSession.agentSession = Some(
-        agentSession.copy(tradingAddressUploadStatus = Some(FileUploadStatus("reference", "READY", Some("filename"))))
+        agentSession.copy(tradingAddressUploadStatus =
+          Some(FileUploadStatus(
+            "reference",
+            "READY",
+            Some("filename")
+          ))
+        )
       )
 
       val request = cleanCredsAgent(
@@ -210,7 +231,13 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
     "show the form with errors when 'fileType' field has been modified by the user and contains invalid value" in {
       sessionStoreService.currentSession.agentSession = Some(
-        agentSession.copy(tradingAddressUploadStatus = Some(FileUploadStatus("reference", "READY", Some("filename"))))
+        agentSession.copy(tradingAddressUploadStatus =
+          Some(FileUploadStatus(
+            "reference",
+            "READY",
+            Some("filename")
+          ))
+        )
       )
 
       val request = cleanCredsAgent(
@@ -224,7 +251,11 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
 
   "GET /file-upload-failed" should {
 
-    val tradingAddressAddressUploadStatus = FileUploadStatus("reference", "READY", Some("filename"))
+    val tradingAddressAddressUploadStatus = FileUploadStatus(
+      "reference",
+      "READY",
+      Some("filename")
+    )
 
     "display page as expected" in {
       sessionStoreService.currentSession.agentSession = Some(
@@ -361,4 +392,5 @@ class FileUploadControllerISpec extends BaseISpec with AgentOverseasApplicationS
       redirectLocation(result) shouldBe Some(routes.FileUploadController.showTrnUploadForm.url)
     }
   }
+
 }

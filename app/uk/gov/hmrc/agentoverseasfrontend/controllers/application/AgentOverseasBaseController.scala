@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentoverseasfrontend.services.{ApplicationService, MongoDBSessionStoreService}
+import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
+import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.ExecutionContext
@@ -30,4 +32,6 @@ class AgentOverseasBaseController @Inject() (
   val applicationService: ApplicationService,
   override val controllerComponents: MessagesControllerComponents
 )(implicit val ec: ExecutionContext)
-    extends FrontendController(controllerComponents) with SessionBehaviour with I18nSupport {}
+extends FrontendController(controllerComponents)
+with SessionBehaviour
+with I18nSupport {}

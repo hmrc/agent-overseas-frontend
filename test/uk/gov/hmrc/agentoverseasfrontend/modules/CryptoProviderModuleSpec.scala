@@ -19,12 +19,15 @@ package uk.gov.hmrc.agentoverseasfrontend.modules
 import com.typesafe.config.ConfigFactory
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
-import uk.gov.hmrc.crypto.{Crypted, PlainBytes, PlainText}
+import uk.gov.hmrc.crypto.Crypted
+import uk.gov.hmrc.crypto.PlainBytes
+import uk.gov.hmrc.crypto.PlainText
 
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
-class CryptoProviderModuleSpec extends PlaySpec {
+class CryptoProviderModuleSpec
+extends PlaySpec {
 
   private def configuration(fieldLevelEncryptionEnabled: Boolean): Configuration = Configuration(
     ConfigFactory.parseString(s"""fieldLevelEncryption {
@@ -36,13 +39,11 @@ class CryptoProviderModuleSpec extends PlaySpec {
 
   "CryptoProviderModule" should {
     "provide a real crypto instance if field-level encryption is enabled in config" in {
-      val x =
-        new CryptoProviderModule().aesCryptoInstance(configuration(fieldLevelEncryptionEnabled = true))
+      val x = new CryptoProviderModule().aesCryptoInstance(configuration(fieldLevelEncryptionEnabled = true))
       x must not be a[NoCrypto]
     }
     "provide a no-op crypto instance if field-level encryption is disabled in config" in {
-      val x =
-        new CryptoProviderModule().aesCryptoInstance(configuration(fieldLevelEncryptionEnabled = false))
+      val x = new CryptoProviderModule().aesCryptoInstance(configuration(fieldLevelEncryptionEnabled = false))
       x mustBe a[NoCrypto]
     }
   }
@@ -62,4 +63,5 @@ class CryptoProviderModuleSpec extends PlaySpec {
       NoCrypto.decryptAsBytes(Crypted(base64Bytes)).value mustBe bytes
     }
   }
+
 }

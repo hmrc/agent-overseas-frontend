@@ -19,18 +19,30 @@ package uk.gov.hmrc.agentoverseasfrontend.connectors
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.WsScalaTestClient
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.models.{AgencyDetails, FileUploadStatus, OverseasAddress}
+import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
+import uk.gov.hmrc.agentoverseasfrontend.models.FileUploadStatus
+import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
-import uk.gov.hmrc.agentoverseasfrontend.stubs.{AgentOverseasApplicationStubs, AuthStubs, DataStreamStubs}
-import uk.gov.hmrc.agentoverseasfrontend.support.{BaseISpec, MetricsTestSupport, WireMockSupport}
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AuthStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.DataStreamStubs
+import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.agentoverseasfrontend.support.MetricsTestSupport
+import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AgentOverseasApplicationConnectorISpec
-    extends BaseISpec with AgentOverseasApplicationStubs with WsScalaTestClient with ScalaFutures with WireMockSupport
-    with AuthStubs with DataStreamStubs with MetricsTestSupport {
+extends BaseISpec
+with AgentOverseasApplicationStubs
+with WsScalaTestClient
+with ScalaFutures
+with WireMockSupport
+with AuthStubs
+with DataStreamStubs
+with MetricsTestSupport {
 
   private lazy val metrics = app.injector.instanceOf[Metrics]
   private lazy val http = app.injector.instanceOf[HttpClient]
@@ -39,7 +51,11 @@ class AgentOverseasApplicationConnectorISpec
   private implicit val hc = HeaderCarrier()
 
   private lazy val connector: AgentOverseasApplicationConnector =
-    new AgentOverseasApplicationConnector(appConfig, http, metrics)
+    new AgentOverseasApplicationConnector(
+      appConfig,
+      http,
+      metrics
+    )
 
   "createOverseasApplication" should {
 
@@ -71,13 +87,21 @@ class AgentOverseasApplicationConnectorISpec
     "return a FileUploadStatus with READY status when the file was received from AWS/Upscan" in {
       given200UpscanPollStatusReady()
 
-      connector.upscanPollStatus("reference").futureValue shouldBe FileUploadStatus("reference", "READY", Some("some"))
+      connector.upscanPollStatus("reference").futureValue shouldBe FileUploadStatus(
+        "reference",
+        "READY",
+        Some("some")
+      )
     }
 
     "return a FileUploadStatus with NOT_READY status when the file was NOT received from AWS/Upscan" in {
       given200UpscanPollStatusNotReady()
 
-      connector.upscanPollStatus("reference").futureValue shouldBe FileUploadStatus("reference", "NOT_READY", None)
+      connector.upscanPollStatus("reference").futureValue shouldBe FileUploadStatus(
+        "reference",
+        "NOT_READY",
+        None
+      )
     }
 
     "service is unavailable" in {
@@ -174,4 +198,5 @@ class AgentOverseasApplicationConnectorISpec
       e shouldBe a[UpstreamErrorResponse]
     }
   }
+
 }

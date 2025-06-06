@@ -17,27 +17,38 @@
 package uk.gov.hmrc.agentoverseasfrontend.repositories
 
 import play.api.Logging
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-trait SessionCache[T] extends MongoSessionStore[T] with Logging {
+trait SessionCache[T]
+extends MongoSessionStore[T]
+with Logging {
 
-  def fetch(implicit hc: HeaderCarrier, reads: Reads[T], ec: ExecutionContext): Future[Option[T]] =
-    get.flatMap {
-      case Right(input) => input
-      case Left(error) =>
-        logger.warn(error)
-        Future.failed(new RuntimeException(error))
-    }
+  def fetch(implicit
+    hc: HeaderCarrier,
+    reads: Reads[T],
+    ec: ExecutionContext
+  ): Future[Option[T]] = get.flatMap {
+    case Right(input) => input
+    case Left(error) =>
+      logger.warn(error)
+      Future.failed(new RuntimeException(error))
+  }
 
-  def save(input: T)(implicit hc: HeaderCarrier, writes: Writes[T], ec: ExecutionContext): Future[T] =
-    store(input).flatMap {
-      case Right(_) => input
-      case Left(error) =>
-        logger.warn(error)
-        Future.failed(new RuntimeException(error))
-    }
+  def save(input: T)(implicit
+    hc: HeaderCarrier,
+    writes: Writes[T],
+    ec: ExecutionContext
+  ): Future[T] = store(input).flatMap {
+    case Right(_) => input
+    case Left(error) =>
+      logger.warn(error)
+      Future.failed(new RuntimeException(error))
+  }
+
 }

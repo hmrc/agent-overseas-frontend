@@ -16,11 +16,15 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentmtdidentifiers.model.Utr
 import uk.gov.hmrc.domain.Nino
 
-case class PersonalDetails(saUtr: Option[Utr], nino: Option[Nino])
+case class PersonalDetails(
+  saUtr: Option[Utr],
+  nino: Option[Nino]
+)
 
 object PersonalDetails {
   implicit val format: OFormat[PersonalDetails] = Json.format

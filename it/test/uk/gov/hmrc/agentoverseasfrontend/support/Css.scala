@@ -25,8 +25,7 @@ object Css {
   val H2 = "main h2"
   val PRE_H1 = "main .govuk-caption-l"
   val paragraphs = "main p"
-  def errorSummaryForField(id: String): String =
-    s".govuk-error-summary__body li a[href=#$id]"
+  def errorSummaryForField(id: String): String = s".govuk-error-summary__body li a[href=#$id]"
   def errorForField(id: String): String = s"span#$id-error"
   def labelFor(id: String): String = s"label[for=$id]"
   val SUBMIT_BUTTON = "main form button"
