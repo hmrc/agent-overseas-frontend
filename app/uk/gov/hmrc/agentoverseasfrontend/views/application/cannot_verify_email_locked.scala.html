@@ -20,7 +20,7 @@
 
 @this(mainTemplate: main_template, p: p, h1: h1, h2: h2)
 
-@(retryLink: Call)(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+@(retryLink: Call)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("cannotVerifyEmail.locked.title")) {
 

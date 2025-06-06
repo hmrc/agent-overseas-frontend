@@ -21,6 +21,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.Results._
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.{Configuration, Environment}
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.http.{JsValidationException, NotFoundException}
@@ -39,7 +40,7 @@ class ErrorHandler @Inject() (
   val auditConnector: AuditConnector,
   errorTemplateView: error_template,
   errorTemplate5xxView: error_template_5xx
-)(implicit val config: Configuration, appConfig: AppConfig, ec: ExecutionContext)
+)(implicit val config: Configuration, appConfig: AppConfig, val ec: ExecutionContext)
     extends FrontendErrorHandler with ErrorAuditing {
 
   val appName: String = appConfig.appName
@@ -55,14 +56,14 @@ class ErrorHandler @Inject() (
     auditServerError(request, exception)
     implicit val r = Request(request, "")
     logger.error(s"resolveError $exception")
-    Ok(errorTemplate5xxView())
+    Future.successful(Ok(errorTemplate5xxView()))
   }
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
-    request: Request[_]
-  ) = {
+    request: RequestHeader
+  ): Future[Html] = {
     logger.error(s"$message")
-    errorTemplateView(pageTitle, heading, message)
+    Future.successful(errorTemplateView(pageTitle, heading, message))
   }
 }
 

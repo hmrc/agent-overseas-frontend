@@ -20,7 +20,7 @@
 
 @this(mainTemplate: main_template, h1: h1, p: p)
 
-@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit msgs: Messages, appConfig: AppConfig, request: Request[_])
+@(pageTitleMsgKey: String, headingMsgKey: String, messageMsgKey: String)(implicit msgs: Messages, appConfig: AppConfig, request: RequestHeader)
 
 @mainTemplate(title = msgs(pageTitleMsgKey)) {
     @h1(headingMsgKey)

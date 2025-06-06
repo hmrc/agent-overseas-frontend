@@ -21,7 +21,7 @@
 
 @this(mainTemplate: main_template, p: p)
 
-@()(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
+@()(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("fileUploadTradingAddress.no_js_page.title"), backLinkHref = Some(routes.FileUploadController.showTradingAddressUploadForm.url)) {
 

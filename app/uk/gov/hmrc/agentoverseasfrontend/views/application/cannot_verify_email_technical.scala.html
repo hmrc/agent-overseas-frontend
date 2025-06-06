@@ -20,7 +20,7 @@
 
 @this(mainTemplate: main_template, p: p, h1: h1, h2: h2)
 
-@()(implicit request: Request[_], msgs: Messages, appConfig: AppConfig)
+@()(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("cannotVerifyEmail.technical.title")) {
 

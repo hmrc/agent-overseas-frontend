@@ -38,7 +38,7 @@
     submitButton: submitButton
 )
 
-@(registeredForUkTaxForm: Form[RadioConfirm], backLinkRoute: String)(implicit msgs: Messages, request: Request[_], appConfig: AppConfig)
+@(registeredForUkTaxForm: Form[RadioConfirm], backLinkRoute: String)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(registeredForUkTaxForm) + msgs("ukTaxRegistration.title"), backLinkHref = Some(backLinkRoute)) {
 

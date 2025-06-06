@@ -42,7 +42,7 @@
     h1: h1,
 )
 
-@(businessNameForm: Form[BusinessNameForm])(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+@(businessNameForm: Form[BusinessNameForm])(implicit msgs: Messages, request: RequestHeader, configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(businessNameForm) + msgs("updateBusinessName.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 

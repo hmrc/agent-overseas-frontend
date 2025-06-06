@@ -29,7 +29,7 @@
     p: p, h1: h1, h2: h2, ul: ul, a: a, span: span
 )
 
-@(agentGuidancePageUrl: String, continueUrl: String, arn: String, agencyName: String, agencyEmail: String)(implicit msgs: Messages, request: Request[_], configuration: Configuration, appConfig: AppConfig)
+@(agentGuidancePageUrl: String, continueUrl: String, arn: String, agencyName: String, agencyEmail: String)(implicit msgs: Messages, request: RequestHeader, configuration: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("subscriptionComplete.title")) {
 
