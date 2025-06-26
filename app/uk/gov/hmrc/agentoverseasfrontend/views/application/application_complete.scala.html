@@ -46,17 +46,17 @@
     @p("applicationComplete.whatHappensNext.para3")
     @p("applicationComplete.whatHappensNext.para4")
     @h2("applicationComplete.whatYouCanDoNext.heading")
-    <p>
+    <p class="govuk-body">
         @a("applicationComplete.whatYouCanDoNext.link", href = guidanceApplicationUrl)
         @span("applicationComplete.whatYouCanDoNext.text")
     </p>
     @h2("applicationComplete.help.heading")
     @p("applicationComplete.help.text")
-    <p>
+    <p class="govuk-body">
      <a href="javascript:window.print()" class="print-link govuk-link">@msgs("applicationComplete.print")</a>
     </p>
 
-    <p>
+    <p class="govuk-body">
         @a(href = routes.ApplicationSignOutController.signOut.url, key = "finish.signout")
     </p>
 

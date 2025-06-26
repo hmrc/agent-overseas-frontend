@@ -42,13 +42,13 @@
     @p(msgs("subscriptionComplete.p2", s"$agencyEmail"))
 
     @h2("subscriptionComplete.h2")
-    <p>
+    <p class="govuk-body">
         @a("subscriptionComplete.p3.1", href = agentGuidancePageUrl)
         @span("subscriptionComplete.p3.2")
     </p>
     @ul(Seq("subscriptionComplete.bullet-list.1", "subscriptionComplete.bullet-list.2"))
 
-    <p>
+    <p class="govuk-body">
         @linkAsButton(continueUrl, key = "subscriptionComplete.button")
     </p>
 

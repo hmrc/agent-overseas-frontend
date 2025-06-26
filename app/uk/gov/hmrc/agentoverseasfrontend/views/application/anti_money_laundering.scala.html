@@ -82,9 +82,9 @@
 
         @govukDetails(Details(
             summary = Text(msgs(s"amls.hint.expandable")),
-            content = HtmlContent(s"""<p>${msgs("amls.hint.expandable.p1")}</p>
-                                     |<p>${Html(msgs(s"amls.hint.expandable.p2"))}</p>
-                                     |<p>${Html(msgs(s"amls.hint.expandable.sign_out", routes.ApplicationSignOutController.signOut))}</p>
+            content = HtmlContent(s"""<p class="govuk-body">${msgs("amls.hint.expandable.p1")}</p>
+                                     |<p class="govuk-body">${Html(msgs(s"amls.hint.expandable.p2"))}</p>
+                                     |<p class="govuk-body">${Html(msgs(s"amls.hint.expandable.sign_out", routes.ApplicationSignOutController.signOut))}</p>
                                      |""".stripMargin)
         ))
 

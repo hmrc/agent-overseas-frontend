@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
@@ -109,7 +110,13 @@
                 name = "countryCode",
                 items = SelectItem(value = Some(""), attributes= Map("label"->"empty")) :: countries.toList.sortBy(_._2).map { case (code, name) =>
                     SelectItem(value = Some(code), text = name) }
-            ).withFormField(mainBusinessAddressForm("countryCode")))
+            )
+            .asAccessibleAutocomplete(Some(
+                AccessibleAutocomplete(
+                    showAllValues = true
+                )
+            ))
+            .withFormField(mainBusinessAddressForm("countryCode")))
         </fieldset>
 
       @submitButton()
