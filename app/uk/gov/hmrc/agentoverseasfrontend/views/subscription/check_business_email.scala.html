@@ -55,7 +55,7 @@
                     classes = "govuk-fieldset__legend--xl"
                 ))
             )),
-            hint = Some(Hint(content = HtmlContent(Html(s"<p>${msgs("contactTradingEmailCheck.p")}</p><p>$businessEmail</p>")))),
+            hint = Some(Hint(content = HtmlContent(Html(s"""<p class="govuk-body">${msgs("contactTradingEmailCheck.p")}</p><p class="govuk-body">$businessEmail</p>""")))),
             items = Seq(
                 RadioItem(content = Text(msgs("contactTradingEmailCheck.option.yes")), value = Some("true")),
                 RadioItem(content = Text(msgs("contactTradingEmailCheck.option.no")), value = Some("false"))

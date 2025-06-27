@@ -15,17 +15,19 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.views.html.components.head
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcReportTechnicalIssueHelper}
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import views.html.helper.CSPNonce
 
 @this(
-    hmrcStandardPage: HmrcStandardPage,
-    fullWidthMainContent: fullWidthMainContentLayout,
-    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-    head: head,
+        hmrcStandardPage: HmrcStandardPage,
+        fullWidthMainContent: fullWidthMainContentLayout,
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+        autocompleteCss: HmrcAccessibleAutocompleteCss,
+        autocompleteJavascript: HmrcAccessibleAutocompleteJavascript,
+        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
 )
 
 @(
@@ -34,6 +36,17 @@
     backLinkHref: Option[String] = None,
     wide: Boolean = false
 )(mainContent: Html)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
+
+@head = {
+    @if(hasTimeout) {
+        @hmrcTimeoutDialogHelper(
+            signOutUrl = routes.ApplicationSignOutController.signOut.url,
+            timeoutUrl = Some(routes.ApplicationSignOutController.timedOut.url)
+        )
+    }
+    <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/application.css")" media="screen">
+    @autocompleteCss()
+}
 
 @mainContentWithHelpLink = {
     @mainContent
@@ -44,8 +57,8 @@
 
 @additionalScripts = {
     <script src="@controllers.routes.Assets.versioned("javascripts/jquery-3.6.3.min.js")"  @{CSPNonce.attr}></script>
-    <script src="@controllers.routes.Assets.versioned("javascripts/accessible-autocomplete.min.js")"  @{CSPNonce.attr}></script>
     <script src="@controllers.routes.Assets.versioned("javascripts/agent-overseas-frontend.js")"  @{CSPNonce.attr}></script>
+    @autocompleteJavascript()
 }
 
 @appName = {
@@ -75,7 +88,7 @@
     ),
     banners = Banners(displayHmrcBanner = true),
     templateOverrides = TemplateOverrides(
-        additionalHeadBlock = Some(head(hasTimeout)),
+        additionalHeadBlock = Some(head),
         additionalScriptsBlock = Some(additionalScripts),
         mainContentLayout = if(wide) Some(fullWidthMainContent(_)) else None
     )

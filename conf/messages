@@ -171,7 +171,7 @@ amls.form.membership_number=Membership number (optional)
 amls.hint.expandable=I am not registered with a money laundering supervisory body
 amls.hint.expandable.p1=You cannot apply for an agent services account until you are registered with a money laundering supervisory body.
 amls.hint.expandable.p2=Check the procedures for registering with a supervisory body in your country.
-amls.hint.expandable.sign_out=<a href="{0}" id="signOut">Finish and sign out</a>
+amls.hint.expandable.sign_out=<a class="govuk-link" href="{0}" id="signOut">Finish and sign out</a>
 
 # Contact Details
 contactDetails.caption=Your details
@@ -494,7 +494,7 @@ cannotVerifyEmail.locked.p1=We cannot check your identity because you entered an
 cannotVerifyEmail.locked.p2=The verification code was emailed to you.
 cannotVerifyEmail.locked.h2=What to do next
 cannotVerifyEmail.locked.p3=You can try again in 24 hours.
-cannotVerifyEmail.locked.p4=If you want to try again with a different email address <a href="{0}">you can change the email address you entered (opens in new tab)</a>.
+cannotVerifyEmail.locked.p4=If you want to try again with a different email address <a class="govuk-link" href="{0}">you can change the email address you entered (opens in new tab)</a>.
 
 cannotVerifyEmail.technical.title=We could not confirm your identity
 cannotVerifyEmail.technical.p1=We cannot check your identity because there is a temporary problem with our service.

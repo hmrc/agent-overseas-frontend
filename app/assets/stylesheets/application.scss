@@ -1,28 +1,15 @@
-$govuk-assets-path: "/agent-services/apply-from-outside-uk/assets/lib/govuk-frontend/govuk/assets/";
-$hmrc-assets-path: "/agent-services/apply-from-outside-uk/assets/lib/hmrc-frontend/hmrc/";
-
-@import "lib/govuk-frontend/govuk/all";
-@import "lib/hmrc-frontend/hmrc/all";
-@import 'partials/_accessibleAutocomplete';
+@import "lib/govuk-frontend/dist/govuk/base";
 @import 'partials/_loading-please-wait';
 @import 'partials/_forms';
-@import 'partials/_custom';
 
-$govuk-global-styles: true;
-
-a {@extend .govuk-link;}
-p {@extend .govuk-body;}
-h2 {@extend .govuk-heading-m;}
-h3 {@extend .govuk-heading-s;}
-
-.govuk-header__logo {
-  @extend .govuk-header__logo;
-// This service has a long name and we make some adjustments to avoid it wrapping onto two lines in the header
-  width: 25%;
-}
-
-.hmrc-header__service-name {
-  @extend .hmrc-header__service-name;
-// This service has a long name and we make some adjustments to avoid it wrapping onto two lines in the header
-  white-space: nowrap;
+@media (min-width: 40.0625em){
+  .govuk-header__logo {
+  // This service has a long name and we make some adjustments to avoid it wrapping onto two lines in the header
+    width: 25% !important;
+  }
+  .govuk-header__content {
+    width: 70%;
+  // This service has a long name and we make some adjustments to avoid it wrapping onto two lines in the header
+    white-space: nowrap;
+  }
 }

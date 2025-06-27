@@ -42,7 +42,7 @@
 
     <form method="POST" action="@upscan.uploadRequest.href" enctype="multipart/form-data">
 
-        <div class="flash error-summary"
+        <div class="flash error-summary govuk-error-summary"
         id="error-summary-display"
         role="alert"
         aria-labelledby="error-summary-heading"
@@ -50,7 +50,7 @@
             <h2 id="error-summary-heading" class="govuk-error-summary__title">@msgs("error.summary.heading")</h2>
             <ul class="govuk-list govuk-error-summary__list js-error-summary-messages">
                 <li>
-                    <a href="#file-to-upload" id="file-to-upload-error" data-focuses="#file-to-upload"></a>
+                    <a href="#file-to-upload"></a>
                 </li>
             </ul>
         </div>
@@ -70,11 +70,13 @@
             @p("fileUpload.p2")
             @ul(Seq(s"fileUpload.li.1.$fileType","fileUpload.li.2", "fileUpload.li.3"))
 
-            <div id="file-upload-container" class="form-group" style="margin-bottom: 20px !important;">
+            <div id="file-upload-container" class="govuk-form-group govuk-!-margin-bottom-2">
 
                 @for((key, value) <- upscan.uploadRequest.fields){
                     <input type="hidden" name="@key" value="@value">
                 }
+
+                <div class="govuk-error-message" id="file-upload-error"></div>
 
                 @govukFileUpload(FileUpload(
                     id = "file-to-upload",

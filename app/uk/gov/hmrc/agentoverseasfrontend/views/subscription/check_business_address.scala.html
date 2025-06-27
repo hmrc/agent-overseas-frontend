@@ -65,8 +65,8 @@
               ))
           )),
           hint = Some(Hint(content = HtmlContent(Html(
-              s"""<p>${msgs("contactTradingAddressCheck.p")}</p>
-                 |<p>
+              s"""<p class="govuk-body">${msgs("contactTradingAddressCheck.p")}</p>
+                 |<p class="govuk-body">
                  |    ${businessAddress.addressLine1} <br/>
  				 |    ${businessAddress.addressLine2} <br/>
  				 |    ${businessAddress.addressLine3.map(address => Html(s"$address <br/>")).getOrElse("")}
