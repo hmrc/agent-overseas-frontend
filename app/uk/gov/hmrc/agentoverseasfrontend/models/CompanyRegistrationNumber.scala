@@ -16,12 +16,7 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.functional.syntax.unlift
 import play.api.libs.json._
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
 
 case class CompanyRegistrationNumber(
   confirmRegistration: Option[Boolean],
@@ -29,20 +24,6 @@ case class CompanyRegistrationNumber(
 )
 
 object CompanyRegistrationNumber {
-
-  def companyRegistrationNumberDatabaseFormat(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): Format[CompanyRegistrationNumber] =
-    (
-      (__ \ "confirmRegistration").formatNullable[Boolean] and
-        (__ \ "registrationNumber")
-          .formatNullable[String](stringEncrypterDecrypter)
-          .bimap[Option[Crn]](
-            _.map(Crn(_)),
-            _.map(_.value)
-          )
-    )(CompanyRegistrationNumber.apply, unlift(CompanyRegistrationNumber.unapply))
 
   implicit val format: Format[CompanyRegistrationNumber] = Json.format[CompanyRegistrationNumber]
 

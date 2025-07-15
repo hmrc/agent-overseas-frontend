@@ -21,7 +21,6 @@ import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
-import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
 import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -39,8 +38,7 @@ class UpscanConnector @Inject() (
   val metrics: Metrics
 )(implicit
   val ec: ExecutionContext
-)
-extends HttpAPIMonitor {
+) {
 
   val upscanUrl = s"${appConfig.upscanBaseUrl}/upscan/initiate"
 
@@ -57,16 +55,12 @@ extends HttpAPIMonitor {
     """.stripMargin
   )
 
-  def initiate()(implicit rh: RequestHeader): Future[UpscanInitiate] =
-    monitor("ConsumedAPI-upscan-initiate-POST") {
-      httpClient
-        .POST[JsValue, JsValue](
-          upscanUrl,
-          payload,
-          Seq("content-Type" -> "application/json")
-        )
-        .map(_.as[UpscanInitiate])
-
-    }
+  def initiate()(implicit rh: RequestHeader): Future[UpscanInitiate] = httpClient
+    .POST[JsValue, JsValue](
+      upscanUrl,
+      payload,
+      Seq("content-Type" -> "application/json")
+    )
+    .map(_.as[UpscanInitiate])
 
 }

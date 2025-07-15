@@ -30,7 +30,6 @@ import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplication
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasApplication
-import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import java.time.LocalDateTime

@@ -16,14 +16,8 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.functional.syntax.unlift
 import play.api.libs.json.Format
 import play.api.libs.json.Json
-import play.api.libs.json.__
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
 
 case class OverseasAddress(
   addressLine1: String,
@@ -34,18 +28,6 @@ case class OverseasAddress(
 )
 
 object OverseasAddress {
-
-  def overseasAddressDatabaseFormat(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): Format[OverseasAddress] =
-    (
-      (__ \ "addressLine1").format[String](stringEncrypterDecrypter) and
-        (__ \ "addressLine2").format[String](stringEncrypterDecrypter) and
-        (__ \ "addressLine3").formatNullable[String](stringEncrypterDecrypter) and
-        (__ \ "addressLine4").formatNullable[String](stringEncrypterDecrypter) and
-        (__ \ "countryCode").format[String](stringEncrypterDecrypter)
-    )(OverseasAddress.apply, unlift(OverseasAddress.unapply))
 
   implicit val format: Format[OverseasAddress] = Json.format[OverseasAddress]
 
