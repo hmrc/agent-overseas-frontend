@@ -33,7 +33,6 @@ lazy val root = (project in file("."))
     Test / scalafmtOnCompile := true,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
   )
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(
     Test / parallelExecution := false,
     scoverageSettings
