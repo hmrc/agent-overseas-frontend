@@ -37,11 +37,11 @@ import play.api.test.Helpers._
 import play.api.test.DefaultAwaitTimeout
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AuthStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.DataStreamStubs
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.cache.SessionCacheRepository
 import uk.gov.hmrc.mongo.test.MongoSupport
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -96,19 +96,16 @@ with MongoSupport {
     ()
   }
 
-  protected lazy val sessionDetailsRepo = app.injector.instanceOf[SessionDetailsRepository]
-
-  protected lazy val sessionStoreService = new TestSessionCacheService
+  protected lazy val sessionCacheService = new TestSessionCacheService
 
   private class TestGuiceModule
   extends AbstractModule {
-    override def configure(): Unit = bind(classOf[SessionCacheService]).toInstance(sessionStoreService)
+    override def configure(): Unit = bind(classOf[SessionCacheService]).toInstance(sessionCacheService)
   }
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    sessionStoreService.clear()
-    sessionDetailsRepo.collection.drop().toFuture().futureValue
+    sessionCacheService.clear()
     ()
   }
 

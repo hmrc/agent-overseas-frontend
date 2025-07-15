@@ -17,20 +17,19 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import org.jsoup.Jsoup
-import play.api.mvc.AnyContentAsEmpty
-import play.api.mvc.AnyContentAsFormUrlEncoded
-import play.api.mvc.Result
+import play.api.mvc._
+import play.api.test.Helpers._
 import play.api.test.FakeRequest
 import play.api.test.Helpers
-import play.api.test.Helpers._
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
-import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
-import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.http.SessionKeys
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BusinessIdentificationControllerISpec
@@ -44,7 +43,7 @@ with AgentSubscriptionStubs {
     "display the check-answers page if status is Accepted" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showCheckAnswers(request)
       status(result) shouldBe 200
@@ -156,7 +155,7 @@ with AgentSubscriptionStubs {
     "display the business address page" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showCheckBusinessAddress(request)
       status(result) shouldBe 200
@@ -179,7 +178,7 @@ with AgentSubscriptionStubs {
         POST
       ).withFormUrlEncodedBody("useThisAddress" -> "")
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessAddress(request)
 
@@ -192,7 +191,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessAddress(request)
 
@@ -206,7 +205,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessAddress(request)
 
@@ -220,7 +219,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = None
+      sessionCacheService.currentSession.agencyDetails = None
 
       val result = controller.submitCheckBusinessAddress(request)
 
@@ -235,7 +234,7 @@ with AgentSubscriptionStubs {
     "display the business address page" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showUpdateBusinessAddressForm(request)
       status(result) shouldBe 200
@@ -273,14 +272,14 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
 
-      val updatedBusinessAddress = sessionStoreService.fetchAgencyDetails.futureValue.get.agencyAddress
+      val updatedBusinessAddress = sessionCacheService.fetchAgencyDetails.futureValue.get.agencyAddress
       updatedBusinessAddress.addressLine1 shouldBe "new addressline 1"
       updatedBusinessAddress.addressLine2 shouldBe "new addressline 2"
       updatedBusinessAddress.addressLine3 shouldBe Some("new addressline 3")
@@ -297,7 +296,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = None
+      sessionCacheService.currentSession.agencyDetails = None
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
@@ -313,7 +312,7 @@ with AgentSubscriptionStubs {
         "countryCode" -> "IE"
       )
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
@@ -331,7 +330,7 @@ with AgentSubscriptionStubs {
         "countryCode" -> "IE"
       )
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
@@ -350,7 +349,7 @@ with AgentSubscriptionStubs {
         "countryCode" -> "IE"
       )
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
@@ -368,7 +367,7 @@ with AgentSubscriptionStubs {
         "countryCode" -> "IE"
       )
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
@@ -386,7 +385,7 @@ with AgentSubscriptionStubs {
         "countryCode" -> ""
       )
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
@@ -401,7 +400,7 @@ with AgentSubscriptionStubs {
         "countryCode" -> "INVALID"
       )
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessAddressForm(request)
 
@@ -413,7 +412,7 @@ with AgentSubscriptionStubs {
     "display the business email page" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showCheckBusinessEmail(request)
       status(result) shouldBe 200
@@ -436,7 +435,7 @@ with AgentSubscriptionStubs {
         POST
       ).withFormUrlEncodedBody("useThisEmail" -> "")
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessEmail(request)
 
@@ -449,7 +448,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessEmail(request)
 
@@ -463,7 +462,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessEmail(request)
 
@@ -477,7 +476,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = None
+      sessionCacheService.currentSession.agencyDetails = None
 
       val result = controller.submitCheckBusinessEmail(request)
 
@@ -491,7 +490,7 @@ with AgentSubscriptionStubs {
     "display the business email page" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showUpdateBusinessEmailForm(request)
       status(result) shouldBe 200
@@ -521,14 +520,14 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessEmailForm(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
 
-      sessionStoreService.fetchAgencyDetails.futureValue.get.agencyEmail shouldBe "newemail@example.com"
+      sessionCacheService.fetchAgencyDetails.futureValue.get.agencyEmail shouldBe "newemail@example.com"
     }
 
     "redirect to check-answers page for a valid form without session data" in {
@@ -537,7 +536,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessEmailForm(request)
 
@@ -551,7 +550,7 @@ with AgentSubscriptionStubs {
         POST
       ).withFormUrlEncodedBody("email" -> " ")
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessEmailForm(request)
 
@@ -563,7 +562,7 @@ with AgentSubscriptionStubs {
     "display the business name page" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showCheckBusinessName(request)
       status(result) shouldBe 200
@@ -586,7 +585,7 @@ with AgentSubscriptionStubs {
         POST
       ).withFormUrlEncodedBody("useThisName" -> "")
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessName(request)
 
@@ -599,7 +598,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessName(request)
 
@@ -613,7 +612,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitCheckBusinessName(request)
 
@@ -627,7 +626,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = None
+      sessionCacheService.currentSession.agencyDetails = None
 
       val result = controller.submitCheckBusinessName(request)
 
@@ -641,7 +640,7 @@ with AgentSubscriptionStubs {
     "display the business name page" in {
       implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.showUpdateBusinessNameForm(request)
       status(result) shouldBe 200
@@ -672,14 +671,14 @@ with AgentSubscriptionStubs {
       ).withFormUrlEncodedBody("name" -> "New name")
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessNameForm(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get should include("/agent-services/apply-from-outside-uk/create-account/check-answers")
 
-      sessionStoreService.fetchAgencyDetails.futureValue.get.agencyName shouldBe "New name"
+      sessionCacheService.fetchAgencyDetails.futureValue.get.agencyName shouldBe "New name"
     }
 
     "redirect to check-answers page for a valid form without session data" in {
@@ -688,7 +687,7 @@ with AgentSubscriptionStubs {
       )
 
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = None
+      sessionCacheService.currentSession.agencyDetails = None
 
       val result = controller.submitUpdateBusinessNameForm(request)
 
@@ -702,7 +701,7 @@ with AgentSubscriptionStubs {
         POST
       ).withFormUrlEncodedBody("name" -> " ")
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
 
       val result = controller.submitUpdateBusinessNameForm(request)
 
@@ -713,13 +712,13 @@ with AgentSubscriptionStubs {
   "GET /return-from-gg-registration" should {
     "redirect to check-answers page" when {
       "a valid session id found" in {
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+        val oldSessionRequest = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+        sessionCacheService.cacheProviderId(ProviderId("credId-12345"))(oldSessionRequest).futureValue
 
-        val sessionId = sessionDetailsRepo.create("credId-12345").futureValue
-
+        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribing2ndCleanAgentWithoutEnrolments)
         givenUpdateAuthIdSuccessResponse("credId-12345")
 
-        val result = controller.returnFromGGRegistration(sessionId)(request)
+        val result = controller.returnFromGGRegistration(oldSessionRequest.session.apply(SessionKeys.sessionId))(request)
 
         status(result) shouldBe 303
         header(LOCATION, result).get should include(
@@ -744,76 +743,76 @@ with AgentSubscriptionStubs {
   }
 
   "email verification" should {
-    def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+    def checkVerifyEmailIsTriggered(f: Request[AnyContent] => Future[Result]) = {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
-      val result = f()
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+      val result = f(request)
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.SubscriptionEmailVerificationController.verifyEmail.url)
     }
-    def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+
+    def checkVerifyEmailIsNotTriggered(f: Request[AnyContent] => Future[Result]) = {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       givenAcceptedApplicationResponse()
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
-      val result = f()
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+      val result = f(request)
       status(result) should (equal(200) or equal(303))
       if (status(result) == 303)
         redirectLocation(result) should not be Some(routes.SubscriptionEmailVerificationController.verifyEmail.url)
     }
 
     "be triggered with an unverified email" when {
-      "show check your answers" in checkVerifyEmailIsTriggered(() =>
-        controller.showCheckAnswers(cleanCredsAgent(FakeRequest()))
-      )
-      "show check business address" in checkVerifyEmailIsTriggered(() =>
-        controller.showCheckBusinessAddress(cleanCredsAgent(FakeRequest()))
-      )
-      "submit check business address" in checkVerifyEmailIsTriggered(() =>
-        controller.submitCheckBusinessAddress(cleanCredsAgent(FakeRequest()))
-      )
-      "show update business address" in checkVerifyEmailIsTriggered(() =>
-        controller.showUpdateBusinessAddressForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit update business address" in checkVerifyEmailIsTriggered(() =>
-        controller.submitUpdateBusinessAddressForm(cleanCredsAgent(FakeRequest()))
-      )
-      "show check business name" in checkVerifyEmailIsTriggered(() =>
-        controller.showCheckBusinessName(cleanCredsAgent(FakeRequest()))
-      )
-      "submit check business name" in checkVerifyEmailIsTriggered(() =>
-        controller.submitCheckBusinessName(cleanCredsAgent(FakeRequest()))
-      )
-      "show update business name" in checkVerifyEmailIsTriggered(() =>
-        controller.showUpdateBusinessNameForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit update business name" in checkVerifyEmailIsTriggered(() =>
-        controller.submitUpdateBusinessNameForm(cleanCredsAgent(FakeRequest()))
-      )
+      "show check your answers" in checkVerifyEmailIsTriggered { request =>
+        controller.showCheckAnswers(request)
+      }
+      "show check business address" in checkVerifyEmailIsTriggered { request =>
+        controller.showCheckBusinessAddress(request)
+      }
+      "submit check business address" in checkVerifyEmailIsTriggered { request =>
+        controller.submitCheckBusinessAddress(request)
+      }
+      "show update business address" in checkVerifyEmailIsTriggered { request =>
+        controller.showUpdateBusinessAddressForm(request)
+      }
+      "submit update business address" in checkVerifyEmailIsTriggered { request =>
+        controller.submitUpdateBusinessAddressForm(request)
+      }
+      "show check business name" in checkVerifyEmailIsTriggered { request =>
+        controller.showCheckBusinessName(request)
+      }
+      "submit check business name" in checkVerifyEmailIsTriggered { request =>
+        controller.submitCheckBusinessName(request)
+      }
+      "show update business name" in checkVerifyEmailIsTriggered { request =>
+        controller.showUpdateBusinessNameForm(request)
+      }
+      "submit update business name" in checkVerifyEmailIsTriggered { request =>
+        controller.submitUpdateBusinessNameForm(request)
+      }
     }
     "not be triggered when using with the email retrieved by auth" when {
-      "show check your answers" in checkVerifyEmailIsNotTriggered { () =>
-        implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      "show check your answers" in checkVerifyEmailIsNotTriggered { implicit request =>
         // we use the email (authemail@email.com) which is returned in the mock auth response
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(agencyEmail = "authemail@email.com", verifiedEmails = Set.empty))
-        controller.showCheckAnswers(cleanCredsAgent(FakeRequest()))
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails.copy(agencyEmail = "authemail@email.com", verifiedEmails = Set.empty))
+        controller.showCheckAnswers(request)
       }
       // also all other pages but checking one should be enough as they all use the same logic
     }
     "not be triggered even with an unverified mail" when {
       // these pages must display even with an unverified email otherwise the user couldn't enter or correct their email address!
-      "show check business email" in checkVerifyEmailIsNotTriggered(() =>
-        controller.showCheckBusinessEmail(cleanCredsAgent(FakeRequest()))
-      )
-      "submit check business email" in checkVerifyEmailIsNotTriggered(() =>
-        controller.submitCheckBusinessEmail(cleanCredsAgent(FakeRequest()))
-      )
-      "show update business email" in checkVerifyEmailIsNotTriggered(() =>
-        controller.showUpdateBusinessEmailForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit update business email" in checkVerifyEmailIsNotTriggered(() =>
-        controller.submitUpdateBusinessEmailForm(cleanCredsAgent(FakeRequest()))
-      )
+      "show check business email" in checkVerifyEmailIsNotTriggered { request =>
+        controller.showCheckBusinessEmail(request)
+      }
+      "submit check business email" in checkVerifyEmailIsNotTriggered { request =>
+        controller.submitCheckBusinessEmail(request)
+      }
+      "show update business email" in checkVerifyEmailIsNotTriggered { request =>
+        controller.showUpdateBusinessEmailForm(request)
+      }
+      "submit update business email" in checkVerifyEmailIsNotTriggered { request =>
+        controller.submitUpdateBusinessEmailForm(request)
+      }
     }
   }
 

@@ -65,19 +65,19 @@ with AgentSubscriptionStubs {
 
       "most recent application is 'accepted' and the agency details are in the session" in {
         givenAcceptedApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         testSuccessfulSubscription()
       }
 
       "most recent application is 'registered' and there are no agency details in the session" in {
         givenRegisteredApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = None
+        sessionCacheService.currentSession.agencyDetails = None
         testSuccessfulSubscription()
       }
 
       "most recent application is 'complete' and there are no agency details in the session" in {
         givenCompleteApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = None
+        sessionCacheService.currentSession.agencyDetails = None
         testSuccessfulSubscription()
       }
     }
@@ -85,7 +85,7 @@ with AgentSubscriptionStubs {
     "fail with Left on unsuccessful subscription" when {
       "details are missing from the session store, return Left(NoAgencyInSession)" in {
         givenAcceptedApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = None
+        sessionCacheService.currentSession.agencyDetails = None
         service.subscribe.futureValue shouldBe Left(NoAgencyInSession)
       }
 
@@ -110,7 +110,7 @@ with AgentSubscriptionStubs {
       }
 
       "upstream agent-subscription returns 409 (i.e. the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group)" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenCompleteApplicationResponse()
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionFailedConflict()
@@ -120,21 +120,21 @@ with AgentSubscriptionStubs {
 
     "fail with exception on unsuccessful subscription" when {
       "upstream agent-overseas-application retrieve application fails with 500" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenApplicationServerError()
         givenApplicationUpdateServerError()
         service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
 
       "upstream agent-overseas-application retrieve application succeeds but update fails with 500" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenAcceptedApplicationResponse()
         givenApplicationUpdateServerError()
         service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
 
       "upstream agent-subscription is unavailable" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenAcceptedApplicationResponse()
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionFailedUnavailable()

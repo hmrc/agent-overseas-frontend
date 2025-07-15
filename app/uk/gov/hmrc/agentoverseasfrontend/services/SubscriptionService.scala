@@ -30,8 +30,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplication
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasApplication
-import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
-import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import java.time.LocalDateTime
@@ -45,7 +44,6 @@ import scala.concurrent.Future
 class SubscriptionService @Inject() (
   applicationConnector: AgentOverseasApplicationConnector,
   subscriptionConnector: AgentSubscriptionConnector,
-  repository: SessionDetailsRepository,
   sessionStoreService: SessionCacheService
 )(implicit executionContext: ExecutionContext)
 extends Logging {
@@ -93,17 +91,15 @@ extends Logging {
     apps.sortBy(_.createdDate).lastOption
   }
 
-  def storeSessionDetails(authProviderId: String): Future[SessionDetailsId] = repository.create(authProviderId)
-
   def updateAuthProviderId(
-    sessionId: SessionDetailsId
+    sessionId: String
   )(implicit
     rh: RequestHeader
   ): Future[Unit] =
     (for {
-      oldAuthId <- OptionT(repository.findAuthProviderId(sessionId))
+      oldAuthId <- OptionT(sessionStoreService.fetchOldProviderId(sessionId, rh))
       _ <- OptionT.liftF(applicationConnector.updateAuthId(oldAuthId))
-      _ <- OptionT.liftF(repository.delete(sessionId))
+      _ <- OptionT.liftF(sessionStoreService.removeOldProviderId(sessionId, rh))
     } yield ()).value.map(_ => ())
 
 }

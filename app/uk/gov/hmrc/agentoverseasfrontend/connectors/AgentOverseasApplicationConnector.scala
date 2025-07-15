@@ -145,12 +145,12 @@ extends HttpAPIMonitor {
     }
   }
 
-  def updateAuthId(oldAuthId: String)(implicit rh: RequestHeader): Future[Unit] = {
+  def updateAuthId(oldAuthId: ProviderId)(implicit rh: RequestHeader): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application/auth-provider-id"
 
     monitor(s"ConsumedAPI-agent-overseas-application-auth-provider-id-PUT") {
       http
-        .PUT[JsValue, HttpResponse](url, Json.obj("authId" -> oldAuthId))
+        .PUT[JsValue, HttpResponse](url, Json.obj("authId" -> oldAuthId.value))
         .map { response =>
           response.status match {
             case NOT_FOUND =>

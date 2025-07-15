@@ -19,9 +19,10 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import org.mongodb.scala.model.Filters
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.http.SessionKeys
 
 import java.net.URLEncoder
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -34,22 +35,19 @@ extends BaseISpec {
   "signOutWithContinueUrl" should {
     "storeAuthProviderId and redirect to GgCreateAccount" in {
       implicit val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      val sessionId = request.session.apply(SessionKeys.sessionId)
 
       val result = controller.signOutWithContinueUrl(request)
-      val _ = result.futureValue // await the completion
-
-      val details = findByAuthProviderId("12345-credId")
-      val detailsRef = details.map(_.id).get
 
       status(result) shouldBe 303
 
-      val continueUrl = URLEncoder.encode(
-        s"http://localhost:9414${routes.BusinessIdentificationController.returnFromGGRegistration(detailsRef)}",
+      lazy val continueUrl = URLEncoder.encode(
+        s"http://localhost:9414${routes.BusinessIdentificationController.returnFromGGRegistration(sessionId)}",
         "UTF-8"
       )
       header(LOCATION, result).get should
         include(
-          s"http://localhost:8571/government-gateway-registration-frontend?accountType=agent&origin=unknown&continue=$continueUrl"
+          s"http://localhost:8571/government-gateway-registration-frontend?accountType=agent&origin=unknown&continue_url=$continueUrl"
         )
     }
   }
@@ -102,12 +100,5 @@ extends BaseISpec {
       checkMessageIsDefined("timed-out.p2.link")
     }
   }
-
-  private def findByAuthProviderId(authProviderId: String): Option[SessionDetails] =
-    sessionDetailsRepo.collection
-      .find(Filters.equal("authProviderId", authProviderId))
-      .toFuture()
-      .map(_.headOption)
-      .futureValue
 
 }

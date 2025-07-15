@@ -17,9 +17,13 @@
 package uk.gov.hmrc.agentoverseasfrontend.services
 
 import play.api.mvc.RequestHeader
+import play.api.mvc.request.Cell
+import play.api.mvc.request.RequestAttrKey
 import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionCacheRepository
+import uk.gov.hmrc.http.SessionKeys
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,5 +50,34 @@ class SessionCacheService @Inject() (sessionCacheRepository: SessionCacheReposit
   ).map(_ => ())
 
   def removeAgencyDetails(implicit rh: RequestHeader): Future[Unit] = sessionCacheRepository.deleteFromSession(AgencyDetails.sessionKey)
+
+  def fetchOldProviderId(
+    oldSessionId: String,
+    rh: RequestHeader
+  ): Future[Option[ProviderId]] = {
+    implicit val oldRequestHeader: RequestHeader = changeHeaderSessionId(oldSessionId, rh)
+    sessionCacheRepository.getFromSession(ProviderId.sessionKey)
+  }
+
+  def cacheProviderId(providerId: ProviderId)(implicit rh: RequestHeader): Future[Unit] = sessionCacheRepository.putSession(
+    ProviderId.sessionKey,
+    providerId
+  ).map(_ => ())
+
+  def removeOldProviderId(
+    oldSessionId: String,
+    rh: RequestHeader
+  ): Future[Unit] = {
+    implicit val oldRequestHeader: RequestHeader = changeHeaderSessionId(oldSessionId, rh)
+    sessionCacheRepository.deleteFromSession(ProviderId.sessionKey)
+  }
+
+  protected def changeHeaderSessionId(
+    oldSessionId: String,
+    rh: RequestHeader
+  ): RequestHeader = {
+    val oldSession = rh.session + (SessionKeys.sessionId -> oldSessionId)
+    rh.addAttr(RequestAttrKey.Session, Cell(oldSession))
+  }
 
 }

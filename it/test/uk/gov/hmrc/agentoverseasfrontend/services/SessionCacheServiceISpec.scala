@@ -58,7 +58,7 @@ with CleanMongoCollectionSupport {
       appConfig = appConfig
     )
 
-  private val sessionCacheService: SessionCacheService =
+  private val testSessionCacheService: SessionCacheService =
     new SessionCacheService(
       sessionCacheRepository = sessionCacheRepository
     )
@@ -135,20 +135,20 @@ with CleanMongoCollectionSupport {
     "session ID is present" should {
       "cache and sanitize agent session" when {
         "registeredWithHmrc and registeredForUkTax are set to Yes" in {
-          await(sessionCacheService.cacheAgentSession(agentSession))
+          await(testSessionCacheService.cacheAgentSession(agentSession))
 
-          val result = await(sessionCacheService.fetchAgentSession)
+          val result = await(testSessionCacheService.fetchAgentSession)
 
           result.value shouldBe agentSession
         }
 
         "registeredWithHmrc and registeredForUkTax are set to No" in {
-          await(sessionCacheService.cacheAgentSession(agentSession.copy(
+          await(testSessionCacheService.cacheAgentSession(agentSession.copy(
             registeredWithHmrc = Some(No),
             registeredForUkTax = Some(No)
           )))
 
-          val result = await(sessionCacheService.fetchAgentSession)
+          val result = await(testSessionCacheService.fetchAgentSession)
 
           result.value shouldBe agentSession.copy(
             agentCodes = None,
@@ -160,23 +160,23 @@ with CleanMongoCollectionSupport {
       }
 
       "return None when no agent session data has been stored" in {
-        await(sessionCacheService.fetchAgentSession) shouldBe None
+        await(testSessionCacheService.fetchAgentSession) shouldBe None
       }
 
       "remove the underlying storage for the current agent session when removeAgentSession is called" in {
-        await(sessionCacheService.cacheAgentSession(agentSession))
+        await(testSessionCacheService.cacheAgentSession(agentSession))
 
         await(sessionCacheRepository.cacheRepo.collection.find().toFuture()).size shouldBe 1
 
-        await(sessionCacheService.removeAgentSession)
+        await(testSessionCacheService.removeAgentSession)
 
         await(sessionCacheRepository.cacheRepo.collection.find().toFuture()).head.data shouldBe Json.obj()
       }
 
       "cache agency details" in {
-        await(sessionCacheService.cacheAgencyDetails(agencyDetails))
+        await(testSessionCacheService.cacheAgencyDetails(agencyDetails))
 
-        val result = await(sessionCacheService.fetchAgencyDetails)
+        val result = await(testSessionCacheService.fetchAgencyDetails)
 
         result.value shouldBe agencyDetails
       }
@@ -187,24 +187,24 @@ with CleanMongoCollectionSupport {
             verifiedEmails = Set()
           )
 
-          await(sessionCacheService.cacheAgencyDetails(data))
+          await(testSessionCacheService.cacheAgencyDetails(data))
 
-          val result = await(sessionCacheService.fetchAgencyDetails)
+          val result = await(testSessionCacheService.fetchAgencyDetails)
 
           result.value shouldBe data
         }
       }
 
       "return None when no agency details data has been stored" in {
-        await(sessionCacheService.fetchAgencyDetails) shouldBe None
+        await(testSessionCacheService.fetchAgencyDetails) shouldBe None
       }
 
       "remove the underlying storage for the current agency details when remove is called" in {
-        await(sessionCacheService.cacheAgencyDetails(agencyDetails))
+        await(testSessionCacheService.cacheAgencyDetails(agencyDetails))
 
         await(sessionCacheRepository.cacheRepo.collection.find().toFuture()).size shouldBe 1
 
-        await(sessionCacheService.removeAgencyDetails)
+        await(testSessionCacheService.removeAgencyDetails)
 
         await(sessionCacheRepository.cacheRepo.collection.find().toFuture()).head.data shouldBe Json.obj()
       }

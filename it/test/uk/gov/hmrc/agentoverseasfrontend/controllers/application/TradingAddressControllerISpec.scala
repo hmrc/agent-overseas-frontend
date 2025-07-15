@@ -64,7 +64,7 @@ with AgentOverseasApplicationStubs {
     "display the trading address form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
       val result = controller.showMainBusinessAddressForm(request)
 
@@ -98,14 +98,14 @@ with AgentOverseasApplicationStubs {
           "countryCode" -> "IE"
         )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None))
 
       val result = controller.submitMainBusinessAddress(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.FileUploadController.showTradingAddressUploadForm.url
 
-      val tradingAddress = sessionStoreService.fetchAgentSession.futureValue.get.overseasAddress
+      val tradingAddress = sessionCacheService.fetchAgentSession.futureValue.get.overseasAddress
 
       tradingAddress shouldBe Some(OverseasAddress(
         "line1",
@@ -124,14 +124,14 @@ with AgentOverseasApplicationStubs {
           "countryCode" -> "IE"
         )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
       val result = controller.submitMainBusinessAddress(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.overseasAddress shouldBe Some(OverseasAddress(
         "line1",
@@ -154,7 +154,7 @@ with AgentOverseasApplicationStubs {
             "countryCode" -> "IE"
           )
 
-        sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+        sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
         val result = controller.submitMainBusinessAddress(request)
 
@@ -170,7 +170,7 @@ with AgentOverseasApplicationStubs {
             "countryCode" -> "GB"
           )
 
-        sessionStoreService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
+        sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
         val result = controller.submitMainBusinessAddress(request)
 

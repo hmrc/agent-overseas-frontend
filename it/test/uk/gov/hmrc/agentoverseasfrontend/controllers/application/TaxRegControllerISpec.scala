@@ -83,7 +83,7 @@ with AgentOverseasApplicationStubs {
     "page contains valid information on page the tax-registration-number page with form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(currentApplication)
+      sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
       val result = controller.showTaxRegistrationNumberForm(request)
       val backButtonUrl = routes.ApplicationController.showCompanyRegistrationNumberForm.url
@@ -105,7 +105,7 @@ with AgentOverseasApplicationStubs {
     "`if previously answered 'Yes' pre-populate form with 'Yes' and the value provided`" in {
       implicit val request = cleanCredsAgent(FakeRequest())
       val taxRegNo = Trn("tax_reg_number_123")
-      sessionStoreService.currentSession.agentSession = Some(currentApplication.copy(
+      sessionCacheService.currentSession.agentSession = Some(currentApplication.copy(
         hasTaxRegNumbers = Some(true),
         taxRegistrationNumbers = Some(SortedSet(taxRegNo))
       ))
@@ -122,7 +122,7 @@ with AgentOverseasApplicationStubs {
 
     "if previously answered 'No' pre-populate form with checked 'No'" in {
       implicit val request = cleanCredsAgent(FakeRequest())
-      sessionStoreService.currentSession.agentSession = Some(currentApplication.copy(hasTaxRegNumbers = Some(false)))
+      sessionCacheService.currentSession.agentSession = Some(currentApplication.copy(hasTaxRegNumbers = Some(false)))
 
       val result = controller.showTaxRegistrationNumberForm(request)
 
@@ -150,14 +150,14 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("canProvideTaxRegNo" -> "true", "value" -> taxRegNo.value)
 
-      sessionStoreService.currentSession.agentSession = Some(currentApplication)
+      sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
       val result = controller.submitTaxRegistrationNumber(request)
 
       status(result) shouldBe 303
 
       redirectLocation(result) shouldBe Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)
-      val modifiedApplication = sessionStoreService.currentSession.agentSession.get
+      val modifiedApplication = sessionCacheService.currentSession.agentSession.get
 
       modifiedApplication.hasTaxRegNumbers shouldBe Some(true)
       modifiedApplication.taxRegistrationNumbers shouldBe Some(Set(taxRegNo))
@@ -168,7 +168,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("canProvideTaxRegNo" -> "true")
 
-      sessionStoreService.currentSession.agentSession = Some(currentApplication)
+      sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
       val result = controller.submitTaxRegistrationNumber(request)
 
@@ -185,14 +185,14 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("canProvideTaxRegNo" -> "false")
 
-      sessionStoreService.currentSession.agentSession = Some(currentApplication)
+      sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
       val result = controller.submitTaxRegistrationNumber(request)
 
       status(result) shouldBe 303
 
       redirectLocation(result) shouldBe Some(routes.TaxRegController.showMoreInformationNeeded.url)
-      val modifiedApplication = sessionStoreService.currentSession.agentSession.get
+      val modifiedApplication = sessionCacheService.currentSession.agentSession.get
 
       modifiedApplication.hasTaxRegNumbers shouldBe None
       modifiedApplication.taxRegistrationNumbers shouldBe None
@@ -203,7 +203,7 @@ with AgentOverseasApplicationStubs {
     "Provided nothing selected on radio form submit and return with form error taxRegNo.form.no-radio.selected" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
 
-      sessionStoreService.currentSession.agentSession = Some(currentApplication)
+      sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
       val result = controller.submitTaxRegistrationNumber(request)
 
@@ -216,7 +216,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("canProvideTaxRegNo" -> "true", "value" -> "")
 
-      sessionStoreService.currentSession.agentSession = Some(currentApplication)
+      sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
       val result = controller.submitTaxRegistrationNumber(request)
 
@@ -230,7 +230,7 @@ with AgentOverseasApplicationStubs {
     "display the add-tax-registration-number form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.showAddTaxRegNoForm(request)
 
@@ -244,7 +244,7 @@ with AgentOverseasApplicationStubs {
     "contain back button in the add-tax-registration-number form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.showAddTaxRegNoForm(request)
 
@@ -281,14 +281,14 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("trn" -> "123456")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = numbers))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = numbers))
 
       val result = controller.submitAddTaxRegNo(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.TaxRegController.showYourTaxRegNumbersForm.url
 
-      val updatedSession = sessionStoreService.fetchAgentSession.futureValue.get
+      val updatedSession = sessionCacheService.fetchAgentSession.futureValue.get
       val taxRegNumbers = updatedSession.taxRegistrationNumbers.get
       taxRegNumbers should contain(Trn("123456"))
       updatedSession.hasTrnsChanged shouldBe true
@@ -298,7 +298,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("trn" -> "")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet.empty[Trn])))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet.empty[Trn])))
 
       val result = controller.submitAddTaxRegNo(request)
 
@@ -312,7 +312,7 @@ with AgentOverseasApplicationStubs {
     "display the /your-tax-registration-numbers page with DoYouWantToAddAnotherTrn form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123")))))
 
       val result = controller.showYourTaxRegNumbersForm(request)
 
@@ -332,7 +332,7 @@ with AgentOverseasApplicationStubs {
     "display the /your-tax-registration-numbers page with /check-your-answers back link if user is changing answers" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), changingAnswers = true))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), changingAnswers = true))
 
       val result = controller.showYourTaxRegNumbersForm(request)
 
@@ -352,7 +352,7 @@ with AgentOverseasApplicationStubs {
     "display the /your-tax-registration-numbers page with /update-tax-registration-number back link if user is hasTrnsChanged" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), hasTrnsChanged = true))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("123"))), hasTrnsChanged = true))
 
       val result = controller.showYourTaxRegNumbersForm(request)
 
@@ -372,7 +372,7 @@ with AgentOverseasApplicationStubs {
     "display the /your-tax-registration-numbers page with correct text if there are no stored tax registration numbers found in session" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.showYourTaxRegNumbersForm(request)
 
@@ -397,7 +397,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("value" -> "true")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitYourTaxRegNumbers(request)
 
@@ -409,7 +409,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("value" -> "false")
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           taxRegistrationNumbers = Some(SortedSet(Trn("12345"))),
           hasTaxRegNumbers = Some(true),
@@ -427,7 +427,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("value" -> "false")
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           taxRegistrationNumbers = Some(SortedSet(Trn("12345"))),
           hasTaxRegNumbers = Some(true),
@@ -444,7 +444,7 @@ with AgentOverseasApplicationStubs {
     "display the page with form errors if no radio button is selected" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitYourTaxRegNumbers(request)
 
@@ -458,7 +458,7 @@ with AgentOverseasApplicationStubs {
     "display the content" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.showUpdateTaxRegNumber("123")(request)
 
@@ -474,23 +474,23 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("original" -> "abc123", "updated" -> "abc12345")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.submitUpdateTaxRegNumber(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.TaxRegController.showYourTaxRegNumbersForm.url
-      sessionStoreService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe Some(
+      sessionCacheService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe Some(
         SortedSet(Trn("abc12345"))
       )
-      sessionStoreService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe true
+      sessionCacheService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe true
     }
 
     "submit form and initially redirect to /update-tax-registration-number again with UpdateTrn form if 'updated' trn field is not set in the form" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("original" -> "ABC123")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitUpdateTaxRegNumber(request)
 
@@ -503,7 +503,7 @@ with AgentOverseasApplicationStubs {
     "display the remove-tax-registration-number form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.showRemoveTaxRegNumber("abc123")(request)
 
@@ -520,7 +520,7 @@ with AgentOverseasApplicationStubs {
     "contain back button in the remove-tax-registration-number form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.showRemoveTaxRegNumber("abc123")(request)
 
@@ -543,7 +543,7 @@ with AgentOverseasApplicationStubs {
     "return 404 error page when the remove-tax-registration-number is called without trn" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.showRemoveTaxRegNumber("")(request)
 
@@ -563,22 +563,22 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "true", "value" -> "abc123")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.submitRemoveTaxRegNumber("abc123")(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.TaxRegController.showTaxRegistrationNumberForm.url
-      sessionStoreService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe None
-      sessionStoreService.fetchAgentSession.futureValue.get.hasTaxRegNumbers shouldBe None
-      sessionStoreService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe true
+      sessionCacheService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.get.hasTaxRegNumbers shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe true
     }
 
     "submit the form and should correctly remove the trn stored in the session" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "true", "value" -> "abc123")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers =
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers =
         Some(SortedSet(Trn("abc123"), Trn("anotherRegNumber")))
       ))
 
@@ -586,33 +586,33 @@ with AgentOverseasApplicationStubs {
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.TaxRegController.showYourTaxRegNumbersForm.url
-      sessionStoreService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe Some(
+      sessionCacheService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe Some(
         SortedSet(Trn("anotherRegNumber"))
       )
-      sessionStoreService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe true
+      sessionCacheService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe true
     }
 
     "redirect to showYourTaxRegNumbersForm page when the choice selected is No and the trn should not be removed" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "false", "value" -> "abc123")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.submitRemoveTaxRegNumber("abc123")(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.TaxRegController.showYourTaxRegNumbersForm.url
-      sessionStoreService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe Some(
+      sessionCacheService.fetchAgentSession.futureValue.get.taxRegistrationNumbers shouldBe Some(
         SortedSet(Trn("abc123"))
       )
-      sessionStoreService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe false
+      sessionCacheService.fetchAgentSession.futureValue.get.hasTrnsChanged shouldBe false
     }
 
     "return validation error when the form is submitted without a choice selection" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("isRemovingTrn" -> "", "value" -> "abc123")
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
       val result = controller.submitRemoveTaxRegNumber("abc123")(request)
 
@@ -626,7 +626,7 @@ with AgentOverseasApplicationStubs {
     "return page with expected content" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.showMoreInformationNeeded()(request)
 

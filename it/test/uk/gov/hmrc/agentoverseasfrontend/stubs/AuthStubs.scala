@@ -24,6 +24,8 @@ import play.api.test.Helpers.GET
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 import uk.gov.hmrc.http.SessionKeys
 
+import java.util.UUID
+
 trait AuthStubs {
   me: WireMockSupport =>
 
@@ -51,7 +53,10 @@ trait AuthStubs {
     method: String = GET
   ): FakeRequest[AnyContentAsEmpty.type] = {
     userIsAuthenticated(user)
-    FakeRequest(method, "/").withSession(SessionKeys.authToken -> "Bearer XYZ")
+    FakeRequest(method, "/").withSession(
+      SessionKeys.authToken -> "Bearer XYZ",
+      SessionKeys.sessionId -> UUID.randomUUID().toString
+    )
   }
 
   def authenticated[A](
@@ -78,7 +83,10 @@ trait AuthStubs {
          |]}
           """.stripMargin
     )
-    request.withSession(SessionKeys.authToken -> "Bearer XYZ")
+    request.withSession(
+      SessionKeys.authToken -> "Bearer XYZ",
+      SessionKeys.sessionId -> UUID.randomUUID().toString
+    )
   }
 
   def givenUnauthorisedWith(mdtpDetail: String): StubMapping = stubFor(
@@ -154,7 +162,10 @@ trait AuthStubs {
          |}
           """.stripMargin
     )
-    request.withSession(SessionKeys.authToken -> "Bearer XYZ")
+    request.withSession(
+      SessionKeys.authToken -> "Bearer XYZ",
+      SessionKeys.sessionId -> UUID.randomUUID().toString
+    )
   }
 
   def agentWithNoEnrolmentsOrCreds[A](request: FakeRequest[A]): FakeRequest[A] = {
@@ -173,7 +184,10 @@ trait AuthStubs {
       s"""
          |{"allEnrolments": [], "email":"authemail@email.com"}""".stripMargin
     )
-    request.withSession(SessionKeys.authToken -> "Bearer XYZ")
+    request.withSession(
+      SessionKeys.authToken -> "Bearer XYZ",
+      SessionKeys.sessionId -> UUID.randomUUID().toString
+    )
   }
 
   def cleanCredsAgent[A](request: FakeRequest[A]): FakeRequest[A] = {
@@ -200,7 +214,10 @@ trait AuthStubs {
          |}
           """.stripMargin
     )
-    request.withSession(SessionKeys.authToken -> "Bearer XYZ")
+    request.withSession(
+      SessionKeys.authToken -> "Bearer XYZ",
+      SessionKeys.sessionId -> UUID.randomUUID().toString
+    )
   }
 
   def basicRequest[A](request: FakeRequest[A]): FakeRequest[A] = {
@@ -221,7 +238,10 @@ trait AuthStubs {
          |}
           """.stripMargin
     )
-    request.withSession(SessionKeys.authToken -> "Bearer XYZ")
+    request.withSession(
+      SessionKeys.authToken -> "Bearer XYZ",
+      SessionKeys.sessionId -> UUID.randomUUID().toString
+    )
   }
 
   def basicAgentRequest[A](request: FakeRequest[A]): FakeRequest[A] = {
@@ -244,7 +264,10 @@ trait AuthStubs {
          |}
           """.stripMargin
     )
-    request.withSession(SessionKeys.authToken -> "Bearer XYZ")
+    request.withSession(
+      SessionKeys.authToken -> "Bearer XYZ",
+      SessionKeys.sessionId -> UUID.randomUUID().toString
+    )
   }
 
   def userIsAuthenticated(user: SampleUser) = {

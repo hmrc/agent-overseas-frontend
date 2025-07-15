@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.FileUploadStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AuthStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.DataStreamStubs
@@ -183,20 +184,20 @@ with MetricsTestSupport {
     "add the new authId to the application" in {
       givenUpdateAuthIdSuccessResponse(oldAuthId)
 
-      connector.updateAuthId(oldAuthId).futureValue shouldBe (())
+      connector.updateAuthId(ProviderId(oldAuthId)).futureValue shouldBe (())
     }
 
     "return exception if the upstream returns 404" in {
       givenUpdateAuthIdNotFoundResponse()
 
-      val e = connector.updateAuthId(oldAuthId).failed.futureValue
+      val e = connector.updateAuthId(ProviderId(oldAuthId)).failed.futureValue
       e shouldBe a[NotFoundException]
     }
 
     "return exception if the upstream responds with 500 internal server error" in {
       givenUpdateAuthIdServerError()
 
-      val e = connector.updateAuthId(oldAuthId).failed.futureValue
+      val e = connector.updateAuthId(ProviderId(oldAuthId)).failed.futureValue
       e shouldBe a[UpstreamErrorResponse]
     }
   }

@@ -44,13 +44,13 @@ with AgentOverseasApplicationStubs {
       val result = controller.showMoneyLaunderingRequired(request)
 
       redirectLocation(result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
-      sessionStoreService.fetchAgentSession.futureValue.isDefined shouldBe true
+      sessionCacheService.fetchAgentSession.futureValue.isDefined shouldBe true
     }
 
     "display the is money laundering required page" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.cacheAgentSession(AgentSession()).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
       val result = controller.showMoneyLaunderingRequired(request)
       status(result) shouldBe 200
@@ -64,7 +64,7 @@ with AgentOverseasApplicationStubs {
     "back link should be check your answers when changing" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.cacheAgentSession(AgentSession(changingAnswers = true))
+      sessionCacheService.cacheAgentSession(AgentSession(changingAnswers = true))
 
       val result = controller.showMoneyLaunderingRequired(request)
       status(result) shouldBe 200
@@ -82,35 +82,35 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsRequired" -> "true")
 
-      sessionStoreService.cacheAgentSession(AgentSession()).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
       val result = controller.submitMoneyLaunderingRequired(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
 
-      sessionStoreService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(true)
+      sessionCacheService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(true)
     }
 
     "redirect to /contact-details when NO is selected" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsRequired" -> "false")
 
-      sessionStoreService.cacheAgentSession(AgentSession()).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
       val result = controller.submitMoneyLaunderingRequired(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.ApplicationController.showContactDetailsForm.url)
 
-      sessionStoreService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(false)
+      sessionCacheService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(false)
     }
 
     "redirect to /check-answers and remove AMLS details from session when changing is true and the user selects NO (changing from YES to NO)" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsRequired" -> "false")
 
-      sessionStoreService
+      sessionCacheService
         .cacheAgentSession(
           AgentSession(
             amlsRequired = Some(true),
@@ -125,15 +125,15 @@ with AgentOverseasApplicationStubs {
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.ApplicationController.showCheckYourAnswers.url)
 
-      sessionStoreService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(false)
-      sessionStoreService.fetchAgentSession.futureValue.get.amlsDetails shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(false)
+      sessionCacheService.fetchAgentSession.futureValue.get.amlsDetails shouldBe None
     }
 
     "redirect to /money-landering when changing is true and the user selects YES (changing from NO to YES)" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsRequired" -> "true")
 
-      sessionStoreService
+      sessionCacheService
         .cacheAgentSession(AgentSession(amlsRequired = Some(false), changingAnswers = true))
         .futureValue
 
@@ -142,13 +142,13 @@ with AgentOverseasApplicationStubs {
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
 
-      sessionStoreService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(true)
+      sessionCacheService.fetchAgentSession.futureValue.get.amlsRequired shouldBe Some(true)
     }
 
     "redisplay the page with errors when no radio button is selected" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
 
-      sessionStoreService.cacheAgentSession(AgentSession()).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
       val result = controller.submitMoneyLaunderingRequired(request)
 
@@ -167,7 +167,7 @@ with AgentOverseasApplicationStubs {
     "display the is amls required page if user has not already selected an option" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.cacheAgentSession(AgentSession(amlsRequired = None)).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = None)).futureValue
       val result = controller.showAntiMoneyLaunderingForm(request)
 
       status(result) shouldBe 303
@@ -177,7 +177,7 @@ with AgentOverseasApplicationStubs {
     "display the contact form page if user has already selected false to amls required" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.cacheAgentSession(AgentSession(amlsRequired = Some(false))).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(false))).futureValue
       val result = controller.showAntiMoneyLaunderingForm(request)
 
       status(result) shouldBe 303
@@ -188,7 +188,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest())
 
       given404OverseasApplications()
-      sessionStoreService.cacheAgentSession(AgentSession(amlsRequired = Some(true))).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(true))).futureValue
       val result = controller.showAntiMoneyLaunderingForm(request)
 
       status(result) shouldBe 200
@@ -209,7 +209,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest())
 
       given404OverseasApplications()
-      sessionStoreService
+      sessionCacheService
         .cacheAgentSession(
           AgentSession(
             amlsDetails = Some(
@@ -232,7 +232,7 @@ with AgentOverseasApplicationStubs {
       implicit val request = cleanCredsAgent(FakeRequest())
 
       given404OverseasApplications()
-      sessionStoreService.cacheAgentSession(AgentSession(amlsRequired = Some(true), changingAnswers = true)).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(true), changingAnswers = true)).futureValue
 
       val result = controller.showAntiMoneyLaunderingForm(request)
 
@@ -247,7 +247,7 @@ with AgentOverseasApplicationStubs {
     "display the money-laundering form with correct back button link when user is not changing answers and Has seen previously rejected application page" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.cacheAgentSession(AgentSession(amlsRequired = Some(true))).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(true))).futureValue
       given200GetOverseasApplications(allRejected = true)
 
       val result = controller.showAntiMoneyLaunderingForm(request)
@@ -268,14 +268,14 @@ with AgentOverseasApplicationStubs {
           "membershipNumber" -> "123445"
         )
 
-      sessionStoreService.cacheAgentSession(AgentSession()).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
       val result = controller.submitAntiMoneyLaundering(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.FileUploadController.showAmlsUploadForm.url
 
-      val amlsDetails = sessionStoreService.fetchAgentSession.futureValue.get.amlsDetails
+      val amlsDetails = sessionCacheService.fetchAgentSession.futureValue.get.amlsDetails
 
       amlsDetails shouldBe Some(AmlsDetails("Association of AccountingTechnicians (AAT)", Some("123445")))
     }
@@ -288,14 +288,14 @@ with AgentOverseasApplicationStubs {
           "membershipNumber" -> "123445"
         )
 
-      sessionStoreService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
 
       val result = controller.submitAntiMoneyLaundering(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.FileUploadController.showAmlsUploadForm.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.amlsDetails shouldBe Some(AmlsDetails("Association of AccountingTechnicians (AAT)", Some("123445")))
     }
@@ -304,7 +304,7 @@ with AgentOverseasApplicationStubs {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
 
-      sessionStoreService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
 
       val result = controller.submitAntiMoneyLaundering(request)
 
@@ -318,7 +318,7 @@ with AgentOverseasApplicationStubs {
       implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
 
-      sessionStoreService.cacheAgentSession(AgentSession()).futureValue
+      sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
       val result = controller.submitAntiMoneyLaundering(request)
 
@@ -338,7 +338,7 @@ with AgentOverseasApplicationStubs {
       def checkVerifyEmailIsNotTriggered(f: Request[AnyContent] => Future[Result]) = {
         implicit val request = cleanCredsAgent(FakeRequest())
 
-        sessionStoreService
+        sessionCacheService
           .cacheAgentSession(AgentSession().copy(changingAnswers = true, verifiedEmails = Set.empty))
           .futureValue
         val result = f(request)

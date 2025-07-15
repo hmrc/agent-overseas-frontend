@@ -19,17 +19,20 @@ package uk.gov.hmrc.agentoverseasfrontend.support
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 
 import scala.concurrent.Future
 
+//This should probably be removed, we can simply rely on the actual mongo repository in integration tests
 class TestSessionCacheService
 extends SessionCacheService(null)(null) {
 
   class Session(
     var agentSession: Option[AgentSession] = None,
-    var agencyDetails: Option[AgencyDetails] = None
+    var agencyDetails: Option[AgencyDetails] = None,
+    var providerId: Option[ProviderId] = None
   )
 
   private val sessions = collection.mutable.Map[String, Session]()
@@ -54,7 +57,7 @@ extends SessionCacheService(null)(null) {
     agentSession: AgentSession
   )(implicit rc: RequestHeader): Future[Unit] = Future.successful(currentSession.agentSession = Some(agentSession))
 
-  override def removeAgentSession(implicit rc: RequestHeader) = Future.successful(sessions.clear())
+  override def removeAgentSession(implicit rc: RequestHeader): Future[Unit] = Future.successful(sessions.clear())
 
   override def fetchAgencyDetails(implicit rc: RequestHeader): Future[Option[AgencyDetails]] = Future successful currentSession.agencyDetails
 
@@ -66,5 +69,19 @@ extends SessionCacheService(null)(null) {
     sessions.clear()
     ()
   }
+
+  override def fetchOldProviderId(
+    oldSessionId: String,
+    rh: RequestHeader
+  ): Future[Option[ProviderId]] = Future.successful(currentSession(changeHeaderSessionId(oldSessionId, rh)).providerId)
+
+  override def cacheProviderId(providerId: ProviderId)(implicit rh: RequestHeader): Future[Unit] = Future.successful(
+    currentSession.providerId = Some(providerId)
+  )
+
+  override def removeOldProviderId(
+    oldSessionId: String,
+    rh: RequestHeader
+  ): Future[Unit] = Future.successful(sessions.clear())
 
 }

@@ -38,7 +38,7 @@ extends BaseISpec {
 
     implicit val request = cleanCredsAgent(FakeRequest())
 
-    sessionStoreService.cacheAgentSession(agentSession).futureValue
+    sessionCacheService.cacheAgentSession(agentSession).futureValue
 
   }
 
@@ -155,7 +155,7 @@ extends BaseISpec {
   )(implicit request: Request[AnyContent]) = {
     status(result) shouldBe 303
     header(LOCATION, result).get shouldBe url
-    sessionStoreService.fetchAgentSession.futureValue.get.changingAnswers shouldBe true
+    sessionCacheService.fetchAgentSession.futureValue.get.changingAnswers shouldBe true
   }
 
 }

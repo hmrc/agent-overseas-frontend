@@ -39,7 +39,7 @@ with UpscanStubs {
     "display the upload trading address form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
       given200UpscanInitiate()
 
       val result = controller.showTradingAddressUploadForm()(request)
@@ -65,7 +65,7 @@ with UpscanStubs {
     "display the page with correct content" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.showTradingAddressNoJsCheckPage(request)
 
@@ -84,7 +84,7 @@ with UpscanStubs {
     "given fileStatus NOT_READY return Ok with FileStatus response body and not store FileStatus in session" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       given200UpscanPollStatusNotReady()
 
@@ -94,14 +94,14 @@ with UpscanStubs {
 
       contentAsString(result) shouldBe """{"reference":"reference","fileStatus":"NOT_READY"}"""
 
-      sessionStoreService.fetchAgentSession.futureValue.flatMap(_.amlsUploadStatus) shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.flatMap(_.amlsUploadStatus) shouldBe None
 
     }
 
     "given fileStatus READY return Ok with FileStatus response body and store FileStatus in session" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       given200UpscanPollStatusReady()
 
@@ -113,7 +113,7 @@ with UpscanStubs {
 
       contentAsString(result) shouldBe fileUploadStatus
 
-      sessionStoreService.fetchAgentSession.futureValue.flatMap(_.amlsUploadStatus) shouldBe
+      sessionCacheService.fetchAgentSession.futureValue.flatMap(_.amlsUploadStatus) shouldBe
         Some(Json.parse(fileUploadStatus).as[FileUploadStatus])
     }
   }
@@ -122,7 +122,7 @@ with UpscanStubs {
     "display the page with correct content" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           tradingAddressUploadStatus = Some(FileUploadStatus(
             "reference",
@@ -155,7 +155,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "true")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
@@ -168,7 +168,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "false")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
@@ -181,7 +181,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "abcd")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(tradingAddressUploadStatus =
           Some(FileUploadStatus(
             "reference",
@@ -210,7 +210,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctabxgd" -> "true")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(tradingAddressUploadStatus =
           Some(FileUploadStatus(
             "reference",
@@ -239,7 +239,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "invalid", "choice.correctFile" -> "true")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(tradingAddressUploadStatus =
           Some(FileUploadStatus(
             "reference",
@@ -265,7 +265,7 @@ with UpscanStubs {
     "display page as expected" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           tradingAddressUploadStatus = Some(tradingAddressAddressUploadStatus),
           fileType = Some("trading-address")
@@ -298,7 +298,7 @@ with UpscanStubs {
     "display the upload amls form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
       given200UpscanInitiate()
 
       val result = controller.showAmlsUploadForm()(request)
@@ -326,7 +326,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "true")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
@@ -339,7 +339,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "false")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
@@ -352,7 +352,7 @@ with UpscanStubs {
     "display the upload trn form" in {
       implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
       given200UpscanInitiate()
 
       val result = controller.showTrnUploadForm()(request)
@@ -380,7 +380,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trn", "choice.correctFile" -> "true")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
@@ -393,7 +393,7 @@ with UpscanStubs {
         FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trn", "choice.correctFile" -> "false")
       )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       val result = controller.submitSuccessfulFileUploadedForm(request)
 
