@@ -16,20 +16,19 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
+import play.api.mvc.AnyContent
+import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ChangingAnswersControllerISpec
 extends BaseISpec {
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private val agentSession = AgentSession()
 
@@ -37,8 +36,9 @@ extends BaseISpec {
 
   class SetUp {
 
+    implicit val request = cleanCredsAgent(FakeRequest())
+
     sessionStoreService.cacheAgentSession(agentSession).futureValue
-    val authenticatedRequest = cleanCredsAgent(FakeRequest())
 
   }
 
@@ -46,7 +46,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to money-laundering form" in new SetUp {
 
-      val result = controller.changeAmlsDetails(authenticatedRequest)
+      val result = controller.changeAmlsDetails(request)
       verify(result, routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url)
     }
   }
@@ -55,7 +55,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to contact-details form" in new SetUp {
 
-      val result = controller.changeContactDetails(authenticatedRequest)
+      val result = controller.changeContactDetails(request)
 
       verify(result, routes.ApplicationController.showContactDetailsForm.url)
     }
@@ -65,7 +65,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to trading-name form" in new SetUp {
 
-      val result = controller.changeTradingName(authenticatedRequest)
+      val result = controller.changeTradingName(request)
 
       verify(result, routes.ApplicationController.showTradingNameForm.url)
     }
@@ -75,7 +75,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to trading-address form" in new SetUp {
 
-      val result = controller.changeTradingAddress(authenticatedRequest)
+      val result = controller.changeTradingAddress(request)
 
       verify(result, routes.TradingAddressController.showMainBusinessAddressForm.url)
     }
@@ -85,7 +85,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to trading-address-file-upload form" in new SetUp {
 
-      val result = controller.changeTradingAddressFile(authenticatedRequest)
+      val result = controller.changeTradingAddressFile(request)
 
       verify(result, routes.FileUploadController.showTradingAddressUploadForm.url)
     }
@@ -95,7 +95,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to registered-with-hmrc form" in new SetUp {
 
-      val result = controller.changeRegisteredWithHmrc(authenticatedRequest)
+      val result = controller.changeRegisteredWithHmrc(request)
 
       verify(result, routes.ApplicationController.showRegisteredWithHmrcForm.url)
     }
@@ -105,7 +105,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to agent-codes form" in new SetUp {
 
-      val result = controller.changeAgentCodes(authenticatedRequest)
+      val result = controller.changeAgentCodes(request)
 
       verify(result, routes.ApplicationController.showAgentCodesForm.url)
     }
@@ -115,7 +115,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to uk-tax-registration form" in new SetUp {
 
-      val result = controller.changeRegisteredForUKTax(authenticatedRequest)
+      val result = controller.changeRegisteredForUKTax(request)
 
       verify(result, routes.ApplicationController.showUkTaxRegistrationForm.url)
     }
@@ -125,7 +125,7 @@ extends BaseISpec {
 
     "update session with changingAnswers=true and redirect to personal-details form" in new SetUp {
 
-      val result = controller.changePersonalDetails(authenticatedRequest)
+      val result = controller.changePersonalDetails(request)
 
       verify(result, routes.ApplicationController.showPersonalDetailsForm.url)
     }
@@ -134,7 +134,7 @@ extends BaseISpec {
   "GET /change-company-reg-number" should {
 
     "update session with changingAnswers=true and redirect to company-reg-number form" in new SetUp {
-      val result = controller.changeCompanyRegistrationNumber(authenticatedRequest)
+      val result = controller.changeCompanyRegistrationNumber(request)
 
       verify(result, routes.ApplicationController.showCompanyRegistrationNumberForm.url)
     }
@@ -143,7 +143,7 @@ extends BaseISpec {
   "GET /change-your-tax-reg-numbers" should {
 
     "update session with changingAnswers=true and redirect to your-tax-registration-numbers form" in new SetUp {
-      val result = controller.changeYourTaxRegistrationNumbers(authenticatedRequest)
+      val result = controller.changeYourTaxRegistrationNumbers(request)
 
       verify(result, routes.TaxRegController.showYourTaxRegNumbersForm.url)
     }
@@ -152,7 +152,7 @@ extends BaseISpec {
   private def verify(
     result: Future[Result],
     url: String
-  ) = {
+  )(implicit request: Request[AnyContent]) = {
     status(result) shouldBe 303
     header(LOCATION, result).get shouldBe url
     sessionStoreService.fetchAgentSession.futureValue.get.changingAnswers shouldBe true

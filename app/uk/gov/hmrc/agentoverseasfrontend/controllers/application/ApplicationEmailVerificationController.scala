@@ -27,9 +27,8 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.EmailVerificationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -40,7 +39,7 @@ import scala.concurrent.Future
 class ApplicationEmailVerificationController @Inject() (
   env: Environment,
   authAction: ApplicationAuth,
-  val sessionStoreService: MongoDBSessionStoreService,
+  val sessionStoreService: SessionCacheService,
   val applicationService: ApplicationService,
   emailVerificationService: EmailVerificationService,
   val controllerComponents: MessagesControllerComponents,
@@ -58,9 +57,10 @@ with I18nSupport {
   override def emailVerificationEnabled: Boolean = !appConfig.disableEmailVerification
 
   override def emailVerificationFrontendBaseUrl: String = appConfig.emailVerificationFrontendBaseUrl
+
   override def accessibilityStatementUrl(implicit request: RequestHeader): String = accessibilityStatementConfig.url.getOrElse("")
 
-  override def getState(implicit hc: HeaderCarrier): Future[(AgentSession, String)] = getCredsAndAgentSession.map { case (creds, agentSession) =>
+  override def getState(implicit rh: RequestHeader): Future[(AgentSession, String)] = getCredsAndAgentSession.map { case (creds, agentSession) =>
     (agentSession, creds.providerId)
   }
 
@@ -77,17 +77,22 @@ with I18nSupport {
     session: AgentSession,
     email: String
   )(implicit
-    hc: HeaderCarrier
+    re: RequestHeader
   ): Future[AgentSession] = {
     val newAgentSession = session.copy(verifiedEmails = session.verifiedEmails + email)
     sessionStoreService.cacheAgentSession(newAgentSession).map(_ => newAgentSession)
   }
 
   override def selfRoute: Call = routes.ApplicationEmailVerificationController.verifyEmail
+
   override def redirectUrlIfVerified(session: AgentSession): Call = lookupNextPage(Some(session))
+
   override def redirectUrlIfLocked(session: AgentSession): Call = routes.ApplicationController.showEmailLocked
+
   override def redirectUrlIfError(session: AgentSession): Call = routes.ApplicationController.showEmailTechnicalError
+
   override def backLinkUrl(session: AgentSession): Option[Call] = Some(enterEmailUrl(session))
+
   override def enterEmailUrl(session: AgentSession): Call =
     if (session.changingAnswers)
       routes.ChangingAnswersController.changeContactDetails

@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers
 
+import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.Environment
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.EmailVerificationService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.ExecutionContext
@@ -37,6 +36,7 @@ with I18nSupport {
   def emailVerificationEnabled: Boolean
 
   def emailVerificationFrontendBaseUrl: String
+
   def accessibilityStatementUrl(implicit request: RequestHeader): String
 
   // if we are running locally, each service will have a different root URL so we need to use absolute URLs
@@ -49,7 +49,7 @@ with I18nSupport {
 
   /** Returns the session state and the credId of the current logged in user.
     */
-  def getState(implicit hc: HeaderCarrier): Future[(S, String)]
+  def getState(implicit rh: RequestHeader): Future[(S, String)]
 
   /** Extract the email to be verified from the current session state.
     */
@@ -68,7 +68,7 @@ with I18nSupport {
   def markEmailAsVerified(
     session: S,
     email: String
-  )(implicit hc: HeaderCarrier): Future[S]
+  )(implicit re: RequestHeader): Future[S]
 
   /*
   Continuation URLs

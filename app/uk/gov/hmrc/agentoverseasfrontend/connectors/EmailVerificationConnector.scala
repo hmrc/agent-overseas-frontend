@@ -17,13 +17,14 @@
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
 import play.api.Logging
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.VerificationStatusResponse
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailRequest
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailResponse
 import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
@@ -46,10 +47,7 @@ with Logging {
 
   def verifyEmail(
     request: VerifyEmailRequest
-  )(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Option[VerifyEmailResponse]] = {
+  )(implicit rh: RequestHeader): Future[Option[VerifyEmailResponse]] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verify-email"
 
     monitor(s"ConsumedAPI-email-verify-POST") {
@@ -66,10 +64,7 @@ with Logging {
 
   def checkEmail(
     credId: String
-  )(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Option[VerificationStatusResponse]] = {
+  )(implicit rh: RequestHeader): Future[Option[VerificationStatusResponse]] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId"
 
     monitor(s"ConsumedAPI-email-verification-status-GET") {

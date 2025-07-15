@@ -38,7 +38,7 @@ import play.api.test.DefaultAwaitTimeout
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AuthStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.DataStreamStubs
 import uk.gov.hmrc.http.HeaderCarrier
@@ -98,11 +98,11 @@ with MongoSupport {
 
   protected lazy val sessionDetailsRepo = app.injector.instanceOf[SessionDetailsRepository]
 
-  protected lazy val sessionStoreService = new TestSessionStoreService
+  protected lazy val sessionStoreService = new TestSessionCacheService
 
   private class TestGuiceModule
   extends AbstractModule {
-    override def configure(): Unit = bind(classOf[MongoDBSessionStoreService]).toInstance(sessionStoreService)
+    override def configure(): Unit = bind(classOf[SessionCacheService]).toInstance(sessionStoreService)
   }
 
   override protected def beforeEach(): Unit = {

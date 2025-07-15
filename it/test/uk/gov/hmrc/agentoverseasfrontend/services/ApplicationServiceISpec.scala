@@ -16,23 +16,22 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
-import java.time.LocalDateTime
-
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Accepted
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Pending
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationEntityDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Accepted
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Pending
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import java.time.LocalDateTime
 
 class ApplicationServiceISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs {
 
-  implicit val hc = HeaderCarrier()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   val service = app.injector.instanceOf[ApplicationService]
 
   "getCurrentApplication" should {

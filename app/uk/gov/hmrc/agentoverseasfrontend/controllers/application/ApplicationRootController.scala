@@ -34,7 +34,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Pending
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.application_not_ready
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.not_agent
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.status_rejected
@@ -45,7 +45,7 @@ import scala.concurrent.Future
 class ApplicationRootController @Inject() (
   val env: Environment,
   authAction: ApplicationAuth,
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
   notAgentView: not_agent,

@@ -16,14 +16,15 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
+import play.api.Configuration
+import play.api.Environment
+import play.api.Logging
 import play.api.mvc.Results.Forbidden
 import play.api.mvc.Results.Redirect
 import play.api.mvc.Results.SeeOther
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import play.api.Configuration
-import play.api.Environment
-import play.api.Logging
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
@@ -34,20 +35,20 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.SubscriptionRequest
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.AuthProviders
+import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.authorisedEnrolments
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.credentials
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.email
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.auth.core.AuthProviders
-import uk.gov.hmrc.auth.core.Enrolment
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -57,7 +58,7 @@ import scala.concurrent.Future
 @Singleton
 class SubscriptionAuth @Inject() (
   val authConnector: AuthConnector,
-  val sessionStoreService: MongoDBSessionStoreService,
+  val sessionStoreService: SessionCacheService,
   val applicationService: ApplicationService,
   val subscriptionService: SubscriptionService
 )(implicit
@@ -70,7 +71,7 @@ extends AuthBase
 with CommonRouting
 with Logging {
 
-  def getCreds(implicit hc: HeaderCarrier): Future[Credentials] =
+  def getCreds(implicit rh: RequestHeader): Future[Credentials] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent).retrieve(credentials) {
       case Some(creds) => Future.successful(creds)
       case None => throw new IllegalStateException("credentials expected but not found for the logged in user")
@@ -79,7 +80,6 @@ with Logging {
   def withBasicAgentAuth(
     block: SubscriptionRequest => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(allEnrolments and credentials) { case enrolments ~ creds =>
@@ -95,7 +95,6 @@ with Logging {
   def withHmrcAsAgentAction(
     block: Arn => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = authorised(Enrolment("HMRC-AS-AGENT") and AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(authorisedEnrolments) { enrolments =>
@@ -114,7 +113,6 @@ with Logging {
   )(
     block: AgencyDetails => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(allEnrolments and email) { case enrolments ~ maybeAuthEmail =>
@@ -144,6 +142,7 @@ with Logging {
                   case Some(agencyDetails) =>
                     // Consider the auth email as verified for email verification purposes (APB-7317)
                     val agencyDetailsFixed = agencyDetails.copy(verifiedEmails = agencyDetails.verifiedEmails ++ maybeAuthEmail.toSet)
+
                     def maybeUpdateSession(): Future[Unit] = {
                       val sessionNeedsUpdating = agencyDetailsFixed != agencyDetails
                       if (sessionNeedsUpdating)
@@ -151,6 +150,7 @@ with Logging {
                       else
                         Future.successful(())
                     }
+
                     maybeUpdateSession().flatMap { _ =>
                       if (checkForEmailVerification && !agencyDetailsFixed.isEmailVerified) {
                         // email needs verifying

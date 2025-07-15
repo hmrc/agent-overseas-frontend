@@ -36,7 +36,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.TaxRegistrationNumber
 import uk.gov.hmrc.agentoverseasfrontend.models.Trn
 import uk.gov.hmrc.agentoverseasfrontend.models.UpdateTrn
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
@@ -48,7 +48,7 @@ import scala.concurrent.ExecutionContext
 class TaxRegController @Inject() (
   val env: Environment,
   authAction: ApplicationAuth,
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   applicationService: ApplicationService,
   cc: MessagesControllerComponents,
   trnView: tax_registration_number,

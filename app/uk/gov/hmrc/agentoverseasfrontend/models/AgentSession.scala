@@ -16,19 +16,10 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.functional.syntax.toInvariantFunctorOps
-import play.api.libs.functional.syntax.unlift
-import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
-import play.api.libs.json.__
-import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.decryptString
-import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.encryptString
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
+import uk.gov.hmrc.mongo.cache.DataKey
 
 import scala.collection.immutable.SortedSet
 
@@ -102,47 +93,9 @@ case class AgentSession(
 
 object AgentSession {
 
-  def empty: AgentSession = AgentSession()
+  val sessionKey: DataKey[AgentSession] = DataKey[AgentSession]("agentSession")
 
-  def agentSessionDatabaseFormat(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): Format[AgentSession] =
-    (
-      (__ \ "amlsRequired").formatNullable[Boolean] and
-        (__ \ "amlsDetails").formatNullable[AmlsDetails](AmlsDetails.amlsDetailsDatabaseFormat) and
-        (__ \ "contactDetails").formatNullable[ContactDetails](ContactDetails.contactDetailsDatabaseFormat) and
-        (__ \ "tradingName").formatNullable[String](stringEncrypterDecrypter) and
-        (__ \ "overseasAddress").formatNullable[OverseasAddress](OverseasAddress.overseasAddressDatabaseFormat) and
-        (__ \ "registeredWithHmrc").formatNullable[YesNo] and
-        (__ \ "agentCodes").formatNullable[AgentCodes](AgentCodes.agentCodesDatabaseFormat) and
-        (__ \ "registeredForUkTax").formatNullable[YesNo] and
-        (__ \ "personalDetails").formatNullable[PersonalDetailsChoice](
-          PersonalDetailsChoice.personalDetailsChoiceDatabaseFormat
-        ) and
-        (__ \ "companyRegistrationNumber").formatNullable[CompanyRegistrationNumber](
-          CompanyRegistrationNumber.companyRegistrationNumberDatabaseFormat
-        ) and
-        (__ \ "hasTaxRegNumbers").formatNullable[Boolean] and
-        (__ \ "taxRegistrationNumbers")
-          .formatNullable[SortedSet[Trn]]
-          .bimap[Option[SortedSet[Trn]]](
-            _.map(_.map(trn => Trn(decryptString(trn.value)))),
-            _.map(_.map(trn => Trn(encryptString(trn.value))))
-          ) and
-        (__ \ "tradingAddressUploadStatus").formatNullable[FileUploadStatus] and
-        (__ \ "amlsUploadStatus").formatNullable[FileUploadStatus] and
-        (__ \ "trnUploadStatus").formatNullable[FileUploadStatus] and
-        (__ \ "fileType").formatNullable[String] and
-        (__ \ "changingAnswers").format[Boolean] and
-        (__ \ "hasTrnsChanged").format[Boolean] and
-        (__ \ "verifiedEmails")
-          .format[Set[String]]
-          .inmap[Set[String]](
-            _.map(decryptString),
-            _.map(encryptString)
-          )
-    )(AgentSession.apply, unlift(AgentSession.unapply))
+  def empty: AgentSession = AgentSession()
 
   implicit val format: OFormat[AgentSession] = Json.format[AgentSession]
 

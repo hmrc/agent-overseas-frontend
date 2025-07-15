@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import play.api.mvc.Results.Redirect
-import play.api.mvc.Request
-import play.api.mvc.Result
 import play.api.Configuration
 import play.api.Environment
+import play.api.mvc.Results.Redirect
+import play.api.mvc.Request
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
@@ -36,15 +36,16 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.credentials
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.email
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class ApplicationAuth @Inject() (
   val authConnector: AuthConnector,
-  val sessionStoreService: MongoDBSessionStoreService,
+  val sessionStoreService: SessionCacheService,
   val applicationService: ApplicationService
 )(implicit
   val env: Environment,
@@ -55,7 +56,7 @@ class ApplicationAuth @Inject() (
 extends AuthBase
 with CommonRouting {
 
-  def getCredsAndAgentSession(implicit hc: HeaderCarrier): Future[(Credentials, AgentSession)] =
+  def getCredsAndAgentSession(implicit rh: RequestHeader): Future[(Credentials, AgentSession)] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(credentials and allEnrolments) {
         case Some(credentials) ~ enrolments =>
@@ -72,7 +73,6 @@ with CommonRouting {
       AgentSession
     ) => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(credentials and allEnrolments and email) {
@@ -84,6 +84,7 @@ with CommonRouting {
             case Some(agentSession) =>
               // Consider the auth email as verified for email verification purposes (APB-7317)
               val agentSessionFixed = agentSession.copy(verifiedEmails = agentSession.verifiedEmails ++ maybeAuthEmail.toSet)
+
               def maybeUpdateSession(): Future[Unit] = {
                 val sessionNeedsUpdating = agentSessionFixed != agentSession
                 if (sessionNeedsUpdating)
@@ -91,6 +92,7 @@ with CommonRouting {
                 else
                   Future.successful(())
               }
+
               maybeUpdateSession().flatMap { _ =>
                 if (checkForEmailVerification && agentSessionFixed.emailNeedsVerifying) {
                   // email needs verifying
@@ -114,14 +116,12 @@ with CommonRouting {
   def withEnrollingAgent(
     body: AgentSession => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = false)((_, session) => body(session))
 
   def withEnrollingEmailVerifiedAgent(
     body: AgentSession => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = true)((_, session) => body(session))
 

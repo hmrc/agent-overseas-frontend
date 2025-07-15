@@ -16,18 +16,17 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
+import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc._
-import play.api.Environment
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.GenericEmailVerificationController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.EmailVerificationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,7 +37,7 @@ import scala.concurrent.Future
 class SubscriptionEmailVerificationController @Inject() (
   env: Environment,
   authAction: SubscriptionAuth,
-  val sessionStoreService: MongoDBSessionStoreService,
+  val sessionStoreService: SessionCacheService,
   val applicationService: SubscriptionService,
   emailVerificationService: EmailVerificationService,
   val controllerComponents: MessagesControllerComponents,
@@ -53,9 +52,10 @@ with I18nSupport {
   override def emailVerificationEnabled: Boolean = !appConfig.disableEmailVerification
 
   override def emailVerificationFrontendBaseUrl: String = appConfig.emailVerificationFrontendBaseUrl
+
   override def accessibilityStatementUrl(implicit request: RequestHeader): String = accessibilityStatementConfig.url.getOrElse("")
 
-  override def getState(implicit hc: HeaderCarrier): Future[(AgencyDetails, String)] =
+  override def getState(implicit rh: RequestHeader): Future[(AgencyDetails, String)] =
     for {
       mAgencyDetails <- sessionStoreService.fetchAgencyDetails
       agencyDetails = mAgencyDetails.getOrElse(
@@ -65,25 +65,32 @@ with I18nSupport {
     } yield (agencyDetails, creds.providerId)
 
   override def getEmailToVerify(session: AgencyDetails): String = session.agencyEmail
+
   override def isAlreadyVerified(
     session: AgencyDetails,
     email: String
   ): Boolean = session.isEmailVerified(email)
+
   override def markEmailAsVerified(
     session: AgencyDetails,
     email: String
   )(implicit
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[AgencyDetails] = {
     val newAgencyDetails = session.copy(verifiedEmails = session.verifiedEmails + email)
     sessionStoreService.cacheAgencyDetails(newAgencyDetails).map(_ => newAgencyDetails)
   }
 
   override def selfRoute: Call = routes.SubscriptionEmailVerificationController.verifyEmail
+
   override def redirectUrlIfVerified(session: AgencyDetails): Call = routes.BusinessIdentificationController.showCheckAnswers
+
   override def redirectUrlIfLocked(session: AgencyDetails): Call = routes.SubscriptionController.showEmailLocked
+
   override def redirectUrlIfError(session: AgencyDetails): Call = routes.SubscriptionController.showEmailTechnicalError
+
   override def backLinkUrl(session: AgencyDetails): Option[Call] = Some(routes.BusinessIdentificationController.showCheckBusinessEmail)
+
   override def enterEmailUrl(session: AgencyDetails): Call = routes.BusinessIdentificationController.showCheckBusinessEmail
 
 }

@@ -17,15 +17,9 @@
 package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.functional.syntax.toInvariantFunctorOps
-import play.api.libs.functional.syntax.unlift
 import play.api.libs.json._
-import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.decryptString
-import uk.gov.hmrc.agentoverseasfrontend.models.EncryptDecryptModelHelper.encryptString
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
+import uk.gov.hmrc.mongo.cache.DataKey
 
 case class AgencyDetails(
   agencyName: String,
@@ -35,11 +29,14 @@ case class AgencyDetails(
 ) {
 
   def isEmailVerified(email: String): Boolean = verifiedEmails.exists(compareEmail(email, _))
+
   def isEmailVerified: Boolean = isEmailVerified(agencyEmail)
 
 }
 
 object AgencyDetails {
+
+  val sessionKey: DataKey[AgencyDetails] = DataKey[AgencyDetails]("agencyDetails")
 
   // manual instance for backwards compatibility if there are any stored details without 'verifiedEmails' field
   // We can remove this and have an auto-generated Format after this has been in production for some time.
@@ -52,25 +49,6 @@ object AgencyDetails {
     )(AgencyDetails.apply _)
   val writes: Writes[AgencyDetails] = Json.writes[AgencyDetails]
   implicit val formats: Format[AgencyDetails] = Format(reads, writes)
-
-  def agencyDetailsDatabaseFormat(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): Format[AgencyDetails] =
-    (
-      (__ \ "agencyName")
-        .format[String](stringEncrypterDecrypter) and
-        (__ \ "agencyEmail")
-          .format[String](stringEncrypterDecrypter) and
-        (__ \ "agencyAddress")
-          .format[OverseasAddress](OverseasAddress.overseasAddressDatabaseFormat) and
-        (__ \ "verifiedEmails")
-          .formatWithDefault[Set[String]](Set.empty)
-          .inmap[Set[String]](
-            _.map(decryptString),
-            _.map(encryptString)
-          )
-    )(AgencyDetails.apply, unlift(AgencyDetails.unapply))
 
   def fromOverseasApplication(overseasApplication: OverseasApplication): AgencyDetails = AgencyDetails(
     agencyName = overseasApplication.tradingDetails.tradingName,

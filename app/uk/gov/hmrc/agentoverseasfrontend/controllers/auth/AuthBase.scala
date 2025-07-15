@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
-import play.api.mvc.Results.Forbidden
-import play.api.mvc.Results.Redirect
-import play.api.mvc.Request
-import play.api.mvc.Result
 import play.api.Configuration
 import play.api.Environment
 import play.api.Logging
+import play.api.mvc.Request
+import play.api.mvc.Result
+import play.api.mvc.Results.Forbidden
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -46,7 +46,6 @@ with Logging {
   def withBasicAuth(
     block: Request[_] => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway)) {
     block(request)
@@ -55,7 +54,6 @@ with Logging {
   def withBasicAuthAndAgentAffinity(
     block: Request[_] => Future[Result]
   )(implicit
-    hc: HeaderCarrier,
     request: Request[_]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
     block(request)

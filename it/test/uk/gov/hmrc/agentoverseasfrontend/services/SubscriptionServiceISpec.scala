@@ -16,28 +16,25 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.AlreadySubscribed
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoAgencyInSession
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplications
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
-import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
-import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
-import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SubscriptionServiceISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs
 with AgentSubscriptionStubs {
 
-  implicit val hc = HeaderCarrier()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   val service = app.injector.instanceOf[SubscriptionService]
 
   "mostRecentApplication" should {
@@ -143,23 +140,6 @@ with AgentSubscriptionStubs {
         givenSubscriptionFailedUnavailable()
         service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
-    }
-  }
-
-  "detailsStoreAuthProviderId" should {
-    "return produced Id as reference to obtaining stored authProviderId" in {
-      val idRef: SessionDetailsId = service.storeSessionDetails(authProviderId).futureValue
-      val findUsingIdRef = service.authProviderId(idRef).futureValue
-
-      idRef.toString.size shouldBe 32
-      findUsingIdRef shouldBe Some(authProviderId)
-    }
-
-    "return None when Id not found" in {
-      val sampleIdRef = new SessionDetails.SessionDetailsId("d4b872c5819f49f9aebc50f921f5bd2c")
-      val findUsingIdRef = service.authProviderId(sampleIdRef).futureValue
-
-      findUsingIdRef shouldBe None
     }
   }
 

@@ -20,12 +20,13 @@ import play.api.http.Status.NOT_FOUND
 import play.api.http.Status.OK
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.http.HttpErrorFunctions._
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http._
@@ -54,10 +55,7 @@ extends HttpAPIMonitor {
 
   val urlGetAllApplications = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application?$allStatuses"
 
-  def getUserApplications(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[List[ApplicationEntityDetails]] =
+  def getUserApplications(implicit rh: RequestHeader): Future[List[ApplicationEntityDetails]] =
     monitor("ConsumedAPI-Agent-Overseas-Application-application-GET") {
 
       http.GET[HttpResponse](urlGetAllApplications).map { response =>
@@ -74,10 +72,7 @@ extends HttpAPIMonitor {
 
   def createOverseasApplication(
     request: CreateOverseasApplicationRequest
-  )(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Unit] = {
+  )(implicit rh: RequestHeader): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
     monitor("ConsumedAPI-Agent-Overseas-Application-application-POST") {
       http
@@ -93,10 +88,7 @@ extends HttpAPIMonitor {
 
   def upscanPollStatus(
     reference: String
-  )(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[FileUploadStatus] = {
+  )(implicit rh: RequestHeader): Future[FileUploadStatus] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-poll-status/$reference"
     monitor("ConsumedAPI-Agent-overseas-Application-upscan-poll-status-GET") {
       http
@@ -104,10 +96,7 @@ extends HttpAPIMonitor {
     }
   }
 
-  def allApplications(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[List[OverseasApplication]] = {
+  def allApplications(implicit rh: RequestHeader): Future[List[OverseasApplication]] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
     monitor(s"ConsumedAPI-agent-overseas-application-application-GET") {
       http
@@ -124,10 +113,7 @@ extends HttpAPIMonitor {
 
   def updateApplicationWithAgencyDetails(
     agencyDetails: AgencyDetails
-  )(implicit
-    ec: ExecutionContext,
-    hc: HeaderCarrier
-  ): Future[Unit] = {
+  )(implicit rh: RequestHeader): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
 
     monitor(s"ConsumedAPI-agent-overseas-application-application-PUT") {
@@ -159,10 +145,7 @@ extends HttpAPIMonitor {
     }
   }
 
-  def updateAuthId(oldAuthId: String)(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Unit] = {
+  def updateAuthId(oldAuthId: String)(implicit rh: RequestHeader): Future[Unit] = {
     val url = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application/auth-provider-id"
 
     monitor(s"ConsumedAPI-agent-overseas-application-auth-provider-id-PUT") {

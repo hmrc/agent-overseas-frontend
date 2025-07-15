@@ -18,14 +18,16 @@ package uk.gov.hmrc.agentoverseasfrontend.connectors
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.WsScalaTestClient
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.FileUploadStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
-import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AuthStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.DataStreamStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.agentoverseasfrontend.support.MetricsTestSupport
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
@@ -48,7 +50,7 @@ with MetricsTestSupport {
   private lazy val http = app.injector.instanceOf[HttpClient]
   private lazy val appConfig = app.injector.instanceOf[AppConfig]
 
-  private implicit val hc = HeaderCarrier()
+  private implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val connector: AgentOverseasApplicationConnector =
     new AgentOverseasApplicationConnector(

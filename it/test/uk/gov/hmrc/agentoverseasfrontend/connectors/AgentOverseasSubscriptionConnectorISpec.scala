@@ -16,18 +16,18 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class AgentOverseasSubscriptionConnectorISpec
 extends BaseISpec
 with AgentSubscriptionStubs {
 
-  implicit val hc = HeaderCarrier()
+  private implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private val connector = app.injector.instanceOf[AgentSubscriptionConnector]
 

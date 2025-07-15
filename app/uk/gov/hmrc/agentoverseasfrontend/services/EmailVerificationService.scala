@@ -17,11 +17,11 @@
 package uk.gov.hmrc.agentoverseasfrontend.services
 
 import play.api.Logging
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.connectors.EmailVerificationConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.Email
 import uk.gov.hmrc.agentoverseasfrontend.models.EmailVerificationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailRequest
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 
 import javax.inject.Inject
@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector)
+class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector)(implicit executionContext: ExecutionContext)
 extends Logging {
 
   def verifyEmail(
@@ -39,10 +39,7 @@ extends Logging {
     continueUrl: String,
     mBackUrl: Option[String],
     accessibilityStatementUrl: String
-  )(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Option[String]] =
+  )(implicit rh: RequestHeader): Future[Option[String]] =
     for {
       mVerifyEmailResponse <- emailVerificationConnector.verifyEmail(
         VerifyEmailRequest(
@@ -62,10 +59,7 @@ extends Logging {
   def checkStatus(
     credId: String,
     email: String
-  )(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[EmailVerificationStatus] = emailVerificationConnector.checkEmail(credId).map {
+  )(implicit rh: RequestHeader): Future[EmailVerificationStatus] = emailVerificationConnector.checkEmail(credId).map {
     case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.verified) => EmailVerificationStatus.Verified
     case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.locked) => EmailVerificationStatus.Locked
     case Some(x) => EmailVerificationStatus.Unverified

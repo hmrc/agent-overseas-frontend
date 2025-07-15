@@ -16,14 +16,9 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.Request
+import play.api.mvc._
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
@@ -32,17 +27,18 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.Yes
 import uk.gov.hmrc.agentoverseasfrontend.models.YesNo
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
-import uk.gov.hmrc.http.HeaderCarrier
 
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class FileUploadController @Inject() (
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   authAction: ApplicationAuth,
   applicationService: ApplicationService,
   upscanConnector: UpscanConnector,
@@ -87,8 +83,7 @@ with Logging {
     fileType: String
   )(implicit
     agentSession: AgentSession,
-    hc: HeaderCarrier,
-    request: Request[_]
+    rh: RequestHeader
   ) = upscanConnector
     .initiate()
     .flatMap(upscan =>
@@ -225,7 +220,7 @@ with Logging {
     }
   }
 
-  private def getFileNameFromSession(fileType: String)(implicit hc: HeaderCarrier): Future[Option[String]] = sessionStoreService.fetchAgentSession.flatMap {
+  private def getFileNameFromSession(fileType: String)(implicit rh: RequestHeader): Future[Option[String]] = sessionStoreService.fetchAgentSession.flatMap {
     case Some(agentSession) =>
       {
         fileType match {
@@ -267,7 +262,7 @@ with Logging {
 
   private def nextPage(fileType: String)(implicit
     agentSession: AgentSession,
-    hc: HeaderCarrier
+    rh: RequestHeader
   ): Future[String] =
     if (agentSession.changingAnswers) {
       sessionStoreService

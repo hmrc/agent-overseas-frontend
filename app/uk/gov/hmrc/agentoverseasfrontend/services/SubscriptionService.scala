@@ -16,29 +16,28 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import cats.data.OptionT
 import cats.implicits._
-
-import javax.inject.Inject
-import javax.inject.Singleton
 import play.api.Logging
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentSubscriptionConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus._
-import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe
-import uk.gov.hmrc.agentoverseasfrontend.models.OverseasApplication
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.AlreadySubscribed
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoAgencyInSession
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplications
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
+import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe
+import uk.gov.hmrc.agentoverseasfrontend.models.OverseasApplication
 import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
 import uk.gov.hmrc.agentoverseasfrontend.repositories.SessionDetailsRepository
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -47,15 +46,14 @@ class SubscriptionService @Inject() (
   applicationConnector: AgentOverseasApplicationConnector,
   subscriptionConnector: AgentSubscriptionConnector,
   repository: SessionDetailsRepository,
-  sessionStoreService: MongoDBSessionStoreService
-)
+  sessionStoreService: SessionCacheService
+)(implicit executionContext: ExecutionContext)
 extends Logging {
 
   implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
   def subscribe(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Either[FailureToSubscribe, Arn]] = mostRecentApplicationStatus
     .flatMap {
       case Some(Accepted) => updateAgencyDetailsOnApp()
@@ -69,8 +67,7 @@ extends Logging {
     }
 
   private def updateOverseasSubscription(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Either[FailureToSubscribe, Arn]] = subscriptionConnector.overseasSubscription
     .map(arn => Right(arn))
     .recover {
@@ -80,34 +77,28 @@ extends Logging {
     }
 
   private def mostRecentApplicationStatus(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ) = mostRecentApplication.map(_.map(_.status))
 
   private def updateAgencyDetailsOnApp()(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Either[FailureToSubscribe, Unit]] = sessionStoreService.fetchAgencyDetails.flatMap {
     case Some(agency) => applicationConnector.updateApplicationWithAgencyDetails(agency).map(_ => Right(()))
     case None => Future.successful(Left(NoAgencyInSession))
   }
 
   def mostRecentApplication(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Option[OverseasApplication]] = applicationConnector.allApplications.map { apps =>
     apps.sortBy(_.createdDate).lastOption
   }
-
-  def authProviderId(detailsId: SessionDetailsId): Future[Option[String]] = repository.findAuthProviderId(detailsId)
 
   def storeSessionDetails(authProviderId: String): Future[SessionDetailsId] = repository.create(authProviderId)
 
   def updateAuthProviderId(
     sessionId: SessionDetailsId
   )(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Unit] =
     (for {
       oldAuthId <- OptionT(repository.findAuthProviderId(sessionId))
