@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,15 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.JsString
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringDecrypter
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypter
+import play.api.libs.json._
+import uk.gov.hmrc.mongo.cache.DataKey
 
-object EncryptDecryptModelHelper {
+case class ProviderId(value: String)
 
-  def decryptString(value: String)(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): String = stringDecrypter.reads(JsString(value)).getOrElse(value)
+object ProviderId {
 
-  def encryptString(value: String)(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): String = stringEncrypter.writes(value).as[String]
+  val sessionKey: DataKey[ProviderId] = DataKey[ProviderId]("providerId")
+
+  implicit val format: OFormat[ProviderId] = Json.format
 
 }

@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 trait UpscanStubs {
   me: WireMockSupport =>
 
-  val request =
+  implicit val requestJson =
     s"""{
        |"callbackUrl": "http://localhost:$wireMockPort/agent-overseas-application/upscan-callback",
        |"minimumFileSize": 1000,
@@ -34,7 +34,7 @@ trait UpscanStubs {
   def given200UpscanInitiate(): StubMapping = stubFor(
     post(urlEqualTo("/upscan/initiate"))
       .withRequestBody(equalToJson(
-        request,
+        requestJson,
         true,
         true
       ))

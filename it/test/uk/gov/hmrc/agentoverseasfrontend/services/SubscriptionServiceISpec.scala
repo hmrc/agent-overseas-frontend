@@ -16,28 +16,25 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.AlreadySubscribed
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoAgencyInSession
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplications
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
-import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
-import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails.SessionDetailsId
-import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class SubscriptionServiceISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs
 with AgentSubscriptionStubs {
 
-  implicit val hc = HeaderCarrier()
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   val service = app.injector.instanceOf[SubscriptionService]
 
   "mostRecentApplication" should {
@@ -68,19 +65,19 @@ with AgentSubscriptionStubs {
 
       "most recent application is 'accepted' and the agency details are in the session" in {
         givenAcceptedApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         testSuccessfulSubscription()
       }
 
       "most recent application is 'registered' and there are no agency details in the session" in {
         givenRegisteredApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = None
+        sessionCacheService.currentSession.agencyDetails = None
         testSuccessfulSubscription()
       }
 
       "most recent application is 'complete' and there are no agency details in the session" in {
         givenCompleteApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = None
+        sessionCacheService.currentSession.agencyDetails = None
         testSuccessfulSubscription()
       }
     }
@@ -88,7 +85,7 @@ with AgentSubscriptionStubs {
     "fail with Left on unsuccessful subscription" when {
       "details are missing from the session store, return Left(NoAgencyInSession)" in {
         givenAcceptedApplicationResponse()
-        sessionStoreService.currentSession.agencyDetails = None
+        sessionCacheService.currentSession.agencyDetails = None
         service.subscribe.futureValue shouldBe Left(NoAgencyInSession)
       }
 
@@ -113,7 +110,7 @@ with AgentSubscriptionStubs {
       }
 
       "upstream agent-subscription returns 409 (i.e. the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group)" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenCompleteApplicationResponse()
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionFailedConflict()
@@ -123,43 +120,26 @@ with AgentSubscriptionStubs {
 
     "fail with exception on unsuccessful subscription" when {
       "upstream agent-overseas-application retrieve application fails with 500" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenApplicationServerError()
         givenApplicationUpdateServerError()
         service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
 
       "upstream agent-overseas-application retrieve application succeeds but update fails with 500" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenAcceptedApplicationResponse()
         givenApplicationUpdateServerError()
         service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
 
       "upstream agent-subscription is unavailable" in {
-        sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+        sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
         givenAcceptedApplicationResponse()
         givenApplicationUpdateSuccessResponse()
         givenSubscriptionFailedUnavailable()
         service.subscribe.failed.futureValue shouldBe a[UpstreamErrorResponse]
       }
-    }
-  }
-
-  "detailsStoreAuthProviderId" should {
-    "return produced Id as reference to obtaining stored authProviderId" in {
-      val idRef: SessionDetailsId = service.storeSessionDetails(authProviderId).futureValue
-      val findUsingIdRef = service.authProviderId(idRef).futureValue
-
-      idRef.toString.size shouldBe 32
-      findUsingIdRef shouldBe Some(authProviderId)
-    }
-
-    "return None when Id not found" in {
-      val sampleIdRef = new SessionDetails.SessionDetailsId("d4b872c5819f49f9aebc50f921f5bd2c")
-      val findUsingIdRef = service.authProviderId(sampleIdRef).futureValue
-
-      findUsingIdRef shouldBe None
     }
   }
 

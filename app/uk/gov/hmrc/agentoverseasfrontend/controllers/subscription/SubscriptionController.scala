@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoAgencyInSes
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplications
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.WrongApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.cannot_verify_email_locked
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.cannot_verify_email_technical
@@ -45,7 +45,7 @@ class SubscriptionController @Inject() (
   subscriptionService: SubscriptionService,
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
-  override val sessionStoreService: MongoDBSessionStoreService,
+  override val sessionStoreService: SessionCacheService,
   subscriptionCompleteView: subscription_complete,
   alreadySubscribedView: already_subscribed,
   emailLockedView: cannot_verify_email_locked,

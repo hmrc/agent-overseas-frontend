@@ -37,7 +37,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.No
 import uk.gov.hmrc.agentoverseasfrontend.models.Yes
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -47,7 +47,7 @@ import scala.concurrent.ExecutionContext
 class ApplicationController @Inject() (
   val env: Environment,
   authAction: ApplicationAuth,
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents,

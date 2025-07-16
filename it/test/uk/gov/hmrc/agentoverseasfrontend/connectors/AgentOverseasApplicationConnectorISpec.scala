@@ -18,14 +18,17 @@ package uk.gov.hmrc.agentoverseasfrontend.connectors
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.WsScalaTestClient
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.FileUploadStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.OverseasAddress
-import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AuthStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.DataStreamStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.agentoverseasfrontend.support.MetricsTestSupport
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
@@ -48,7 +51,7 @@ with MetricsTestSupport {
   private lazy val http = app.injector.instanceOf[HttpClient]
   private lazy val appConfig = app.injector.instanceOf[AppConfig]
 
-  private implicit val hc = HeaderCarrier()
+  private implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val connector: AgentOverseasApplicationConnector =
     new AgentOverseasApplicationConnector(
@@ -181,20 +184,20 @@ with MetricsTestSupport {
     "add the new authId to the application" in {
       givenUpdateAuthIdSuccessResponse(oldAuthId)
 
-      connector.updateAuthId(oldAuthId).futureValue shouldBe (())
+      connector.updateAuthId(ProviderId(oldAuthId)).futureValue shouldBe (())
     }
 
     "return exception if the upstream returns 404" in {
       givenUpdateAuthIdNotFoundResponse()
 
-      val e = connector.updateAuthId(oldAuthId).failed.futureValue
+      val e = connector.updateAuthId(ProviderId(oldAuthId)).failed.futureValue
       e shouldBe a[NotFoundException]
     }
 
     "return exception if the upstream responds with 500 internal server error" in {
       givenUpdateAuthIdServerError()
 
-      val e = connector.updateAuthId(oldAuthId).failed.futureValue
+      val e = connector.updateAuthId(ProviderId(oldAuthId)).failed.futureValue
       e shouldBe a[UpstreamErrorResponse]
     }
   }

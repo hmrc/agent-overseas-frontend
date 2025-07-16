@@ -16,13 +16,8 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.functional.syntax.unlift
 import play.api.libs.json._
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.BadRequestException
@@ -35,14 +30,21 @@ case class PersonalDetailsChoice(
 
 object PersonalDetailsChoice {
 
-  sealed trait RadioOption { val value: String }
+  sealed trait RadioOption {
+    val value: String
+  }
 
   object RadioOption {
 
     case object NinoChoice
-    extends RadioOption { val value = "nino" }
+    extends RadioOption {
+      val value = "nino"
+    }
+
     case object SaUtrChoice
-    extends RadioOption { val value = "saUtr" }
+    extends RadioOption {
+      val value = "saUtr"
+    }
 
     def apply(str: String): RadioOption =
       str.trim match {
@@ -86,31 +88,6 @@ object PersonalDetailsChoice {
       saUtr
     )
   }
-
-  def personalDetailsChoiceDatabaseFormat(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): Format[PersonalDetailsChoice] =
-    (
-      (__ \ "choice")
-        .formatNullable[String](stringEncrypterDecrypter)
-        .bimap[Option[RadioOption]](
-          _.map(RadioOption(_)),
-          _.map(_.value)
-        ) and
-        (__ \ "nino")
-          .formatNullable[String](stringEncrypterDecrypter)
-          .bimap[Option[Nino]](
-            _.map(Nino(_)),
-            _.map(_.value)
-          ) and
-        (__ \ "saUtr")
-          .formatNullable[String](stringEncrypterDecrypter)
-          .bimap[Option[SaUtr]](
-            _.map(SaUtr(_)),
-            _.map(_.value)
-          )
-    )(PersonalDetailsChoice.apply, unlift(PersonalDetailsChoice.unapply))
 
   implicit val personalDetailsFormat: OFormat[PersonalDetailsChoice] = Json.format[PersonalDetailsChoice]
 

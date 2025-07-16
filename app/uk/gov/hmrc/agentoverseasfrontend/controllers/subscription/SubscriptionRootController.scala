@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
@@ -37,7 +37,7 @@ class SubscriptionRootController @Inject() (
   override val messagesApi: MessagesApi,
   service: SubscriptionService,
   authAction: SubscriptionAuth,
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   createNewAccountView: create_new_account,

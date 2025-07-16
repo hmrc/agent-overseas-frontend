@@ -16,15 +16,8 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.functional.syntax.unlift
-import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
-import play.api.libs.json.__
-import uk.gov.hmrc.crypto.json.JsonEncryption.stringEncrypterDecrypter
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
 
 case class AgentCodes(
   selfAssessment: Option[SaAgentCode],
@@ -42,25 +35,6 @@ case class AgentCodes(
 }
 
 object AgentCodes {
-
-  def agentCodesDatabaseFormat(implicit
-    crypto: Encrypter
-      with Decrypter
-  ): Format[AgentCodes] =
-    (
-      (__ \ "selfAssessment")
-        .formatNullable[String](stringEncrypterDecrypter)
-        .bimap[Option[SaAgentCode]](
-          _.map(SaAgentCode(_)),
-          _.map(_.value)
-        ) and
-        (__ \ "corporationTax")
-          .formatNullable[String](stringEncrypterDecrypter)
-          .bimap[Option[CtAgentCode]](
-            _.map(CtAgentCode(_)),
-            _.map(_.value)
-          )
-    )(AgentCodes.apply, unlift(AgentCodes.unapply))
 
   implicit val format: OFormat[AgentCodes] = Json.format[AgentCodes]
 

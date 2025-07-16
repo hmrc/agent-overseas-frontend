@@ -19,6 +19,9 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import org.jsoup.Jsoup
 import org.scalatest.Assertion
 import play.api.libs.json.Json
+import play.api.mvc.AnyContent
+import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -30,17 +33,13 @@ import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.agentoverseasfrontend.support.Css
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.domain.SaUtr
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.collection.immutable.SortedSet
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ApplicationControllerISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs {
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   private val contactDetails = ContactDetails(
     "test",
@@ -83,8 +82,9 @@ with AgentOverseasApplicationStubs {
 
   "GET /contact-details" should {
     "display the contact details form" in {
+      implicit val request = cleanCredsAgent(FakeRequest())
 
-      sessionStoreService
+      sessionCacheService
         .cacheAgentSession(
           AgentSession(
             amlsRequired = Some(true),
@@ -94,9 +94,7 @@ with AgentOverseasApplicationStubs {
         )
         .futureValue
 
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-
-      val result = controller.showContactDetailsForm(authenticatedRequest)
+      val result = controller.showContactDetailsForm(request)
 
       status(result) shouldBe 200
 
@@ -112,9 +110,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /money-laundering-registration when session not found" in {
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
 
-      val result = controller.showContactDetailsForm(authenticatedRequest)
+      val result = controller.showContactDetailsForm(request)
 
       status(result) shouldBe 303
 
@@ -124,16 +122,7 @@ with AgentOverseasApplicationStubs {
 
   "POST /contact-details" should {
     "submit form and then redirect to trading-name" in {
-
-      sessionStoreService
-        .cacheAgentSession(AgentSession(
-          amlsRequired = Some(true),
-          Some(AmlsDetails("body", Some("123"))),
-          None
-        ))
-        .futureValue
-
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "firstName" -> "test",
           "lastName" -> "last",
@@ -142,12 +131,20 @@ with AgentOverseasApplicationStubs {
           "businessEmail" -> "test@email.com"
         )
 
-      val result = controller.submitContactDetails(authenticatedRequest)
+      sessionCacheService
+        .cacheAgentSession(AgentSession(
+          amlsRequired = Some(true),
+          Some(AmlsDetails("body", Some("123"))),
+          None
+        ))
+        .futureValue
+
+      val result = controller.submitContactDetails(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showTradingNameForm.url
 
-      val mayBeContactDetails = sessionStoreService.fetchAgentSession.futureValue.get.contactDetails
+      val mayBeContactDetails = sessionCacheService.fetchAgentSession.futureValue.get.contactDetails
 
       mayBeContactDetails shouldBe Some(ContactDetails(
         "test",
@@ -160,8 +157,16 @@ with AgentOverseasApplicationStubs {
 
     "submit form and then redirect to check-your-answers if user is changing answers" in {
       // pre state
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(
+          "firstName" -> "test",
+          "lastName" -> "last",
+          "jobTitle" -> "senior agent",
+          "businessTelephone" -> "12345",
+          "businessEmail" -> "test@email.com"
+        )
 
-      sessionStoreService
+      sessionCacheService
         .cacheAgentSession(
           AgentSession(
             amlsRequired = Some(true),
@@ -171,21 +176,12 @@ with AgentOverseasApplicationStubs {
         )
         .futureValue
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody(
-          "firstName" -> "test",
-          "lastName" -> "last",
-          "jobTitle" -> "senior agent",
-          "businessTelephone" -> "12345",
-          "businessEmail" -> "test@email.com"
-        )
-
-      val result = controller.submitContactDetails(authenticatedRequest)
+      val result = controller.submitContactDetails(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.contactDetails shouldBe Some(ContactDetails(
         "test",
@@ -201,8 +197,16 @@ with AgentOverseasApplicationStubs {
 
     "show validation errors when form data is incorrect" in {
       // pre state
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(
+          "firstName" -> "",
+          "lastName" -> "last**",
+          "jobTitle" -> "senior agent",
+          "businessTelephone" -> "12345",
+          "businessEmail" -> "test"
+        )
 
-      sessionStoreService
+      sessionCacheService
         .cacheAgentSession(
           AgentSession(
             amlsRequired = Some(true),
@@ -212,16 +216,7 @@ with AgentOverseasApplicationStubs {
         )
         .futureValue
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody(
-          "firstName" -> "",
-          "lastName" -> "last**",
-          "jobTitle" -> "senior agent",
-          "businessTelephone" -> "12345",
-          "businessEmail" -> "test"
-        )
-
-      val result = controller.submitContactDetails(authenticatedRequest)
+      val result = controller.submitContactDetails(request)
 
       status(result) shouldBe 200
 
@@ -235,9 +230,11 @@ with AgentOverseasApplicationStubs {
 
   "GET /trading-name" should {
     "display the trading name form" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingName = None, changingAnswers = true))
+      implicit val request = cleanCredsAgent(FakeRequest())
 
-      val result = controller.showTradingNameForm(cleanCredsAgent(FakeRequest()))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(tradingName = None, changingAnswers = true))
+
+      val result = controller.showTradingNameForm(request)
 
       status(result) shouldBe 200
 
@@ -251,9 +248,9 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
 
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
 
-      val result = controller.showTradingNameForm(authenticatedRequest)
+      val result = controller.showTradingNameForm(request)
 
       status(result) shouldBe 303
 
@@ -261,9 +258,11 @@ with AgentOverseasApplicationStubs {
     }
 
     "pre-fill trading name if previously has used the endpoint POST /trading-name" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingName = Some("tradingName")))
+      implicit val request = cleanCredsAgent(FakeRequest())
 
-      val result = controller.showTradingNameForm(cleanCredsAgent(FakeRequest()))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(tradingName = Some("tradingName")))
+
+      val result = controller.showTradingNameForm(request)
 
       status(result) shouldBe 200
       result.futureValue should containMessages(
@@ -279,37 +278,37 @@ with AgentOverseasApplicationStubs {
 
   "POST /trading-name" should {
     "submit form and then redirect to main-business-details" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(tradingName = None, overseasAddress = None))
-
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("tradingName" -> "test")
 
-      val result = controller.submitTradingName(authenticatedRequest)
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(tradingName = None, overseasAddress = None))
+
+      val result = controller.submitTradingName(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.TradingAddressController.showMainBusinessAddressForm.url
 
-      val tradingName = sessionStoreService.fetchAgentSession.futureValue.get.tradingName
+      val tradingName = sessionCacheService.fetchAgentSession.futureValue.get.tradingName
 
       tradingName shouldBe Some("test")
     }
 
     "submit form and then redirect to check-your-details if user is changing answers" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("tradingName" -> "test")
+
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(
         tradingName = None,
         overseasAddress = None,
         changingAnswers = true
       ))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("tradingName" -> "test")
-
-      val result = controller.submitTradingName(authenticatedRequest)
+      val result = controller.submitTradingName(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.tradingName shouldBe Some("test")
 
@@ -318,16 +317,16 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation errors when form data is incorrect" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("tradingName" -> "")
+
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(
         tradingName = None,
         overseasAddress = None,
         changingAnswers = true
       ))
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("tradingName" -> "")
-
-      val result = controller.submitTradingName(authenticatedRequest)
+      val result = controller.submitTradingName(request)
 
       status(result) shouldBe 200
 
@@ -337,9 +336,9 @@ with AgentOverseasApplicationStubs {
 
   "GET /registered-with-hmrc" should {
     class RegisteredWithHmrcSetup(agentSession: AgentSession = agentSession.copy(registeredWithHmrc = None)) {
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showRegisteredWithHmrcForm(authenticatedRequest)
+      implicit val request = cleanCredsAgent(FakeRequest())
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
+      val result = controller.showRegisteredWithHmrcForm(request)
       val doc = Jsoup.parse(contentAsString(result))
     }
 
@@ -397,10 +396,11 @@ with AgentOverseasApplicationStubs {
     }
 
     "contain a back link to /check-your-answers if user is changing answers" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(changingAnswers = true, registeredWithHmrc = None))
+      implicit val request = cleanCredsAgent(FakeRequest())
 
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showRegisteredWithHmrcForm(authenticatedRequest)
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(changingAnswers = true, registeredWithHmrc = None))
+
+      val result = controller.showRegisteredWithHmrcForm(request)
 
       result.futureValue should containLink(
         expectedMessageKey = "button.back",
@@ -416,8 +416,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /money-laundering-registration when session not found" in {
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showRegisteredWithHmrcForm(authenticatedRequest)
+      val request = cleanCredsAgent(FakeRequest())
+      val result = controller.showRegisteredWithHmrcForm(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
@@ -426,16 +426,16 @@ with AgentOverseasApplicationStubs {
 
   "POST /registered-with-hmrc" should {
     "store choice in session after successful submission and redirect to next page" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None, changingAnswers = true))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
 
-      val result = controller.submitRegisteredWithHmrc(authenticatedRequest)
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None, changingAnswers = true))
+      val result = controller.submitRegisteredWithHmrc(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showAgentCodesForm.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.registeredWithHmrc shouldBe Some(Yes)
 
@@ -443,16 +443,17 @@ with AgentOverseasApplicationStubs {
     }
 
     "show /check-your-answers page when the user in the amending state but clicks Continue without making any changes to the state" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = Some(Yes), changingAnswers = true))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
 
-      val result = controller.submitRegisteredWithHmrc(authenticatedRequest)
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = Some(Yes), changingAnswers = true))
+
+      val result = controller.submitRegisteredWithHmrc(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.registeredWithHmrc shouldBe Some(Yes)
 
@@ -460,14 +461,15 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if no choice was selected" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None))
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
 
-      controller.submitRegisteredWithHmrc(authenticatedRequest).futureValue should containMessages(
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None))
+
+      controller.submitRegisteredWithHmrc(request).futureValue should containMessages(
         "error.registeredWithHmrc.no-radio.selected"
       )
 
-      sessionStoreService.fetchAgentSession.futureValue.get.registeredWithHmrc shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.get.registeredWithHmrc shouldBe None
     }
   }
 
@@ -477,9 +479,9 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
+      implicit val request = cleanCredsAgent(FakeRequest())
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
+      val result = controller.showUkTaxRegistrationForm(request)
       val doc = Jsoup.parse(contentAsString(result))
     }
 
@@ -579,8 +581,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /money-laundering-registration when session not found" in {
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
+      val request = cleanCredsAgent(FakeRequest())
+      val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
@@ -589,7 +591,10 @@ with AgentOverseasApplicationStubs {
 
   "POST /uk-tax-registration" should {
     "store choice in session after successful submission and redirect to next page" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("registeredForUkTax" -> "true")
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = None,
@@ -597,21 +602,22 @@ with AgentOverseasApplicationStubs {
           changingAnswers = true
         )
       )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("registeredForUkTax" -> "true")
 
-      val result = controller.submitUkTaxRegistration(authenticatedRequest)
+      val result = controller.submitUkTaxRegistration(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showPersonalDetailsForm.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
       session.registeredForUkTax shouldBe Some(Yes)
       session.changingAnswers shouldBe false
     }
 
     "show /check-your-answers page when the user in the amending state but clicks Continue without making any changes to the state" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("registeredForUkTax" -> "false")
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = Some(No),
@@ -619,33 +625,32 @@ with AgentOverseasApplicationStubs {
           changingAnswers = true
         )
       )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("registeredForUkTax" -> "false")
 
-      val result = controller.submitUkTaxRegistration(authenticatedRequest)
+      val result = controller.submitUkTaxRegistration(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
       session.registeredForUkTax shouldBe Some(No)
       session.changingAnswers shouldBe false
     }
 
     "show validation error if no choice was selected" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = None
         )
       )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
 
-      controller.submitUkTaxRegistration(authenticatedRequest).futureValue should containMessages(
+      controller.submitUkTaxRegistration(request).futureValue should containMessages(
         "error.registeredForUkTaxForm.no-radio.selected"
       )
 
-      sessionStoreService.fetchAgentSession.futureValue.get.registeredForUkTax shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.get.registeredForUkTax shouldBe None
     }
   }
 
@@ -655,9 +660,9 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = Some(Yes)
     )
     class PersonalDetailsSetup(agentSession: AgentSession = defaultAgentSession) {
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showPersonalDetailsForm(authenticatedRequest)
+      implicit val request = cleanCredsAgent(FakeRequest())
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
+      val result = controller.showPersonalDetailsForm(request)
       val doc = Jsoup.parse(contentAsString(result))
     }
 
@@ -699,8 +704,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /money-laundering-registration when session not found" in {
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
+      val request = cleanCredsAgent(FakeRequest())
+      val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
@@ -709,26 +714,27 @@ with AgentOverseasApplicationStubs {
 
   "POST /personal-details" should {
     "store choice in session after successful submission and redirect to next page" in {
-      sessionStoreService.currentSession.agentSession = Some(
-        agentSession.copy(
-          registeredWithHmrc = Some(No),
-          registeredForUkTax = Some(Yes),
-          personalDetails = None
-        )
-      )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "personalDetailsChoice" -> "nino",
           "nino" -> "AB123456A",
           "saUtr" -> ""
         )
 
-      val result = controller.submitPersonalDetails(authenticatedRequest)
+      sessionCacheService.currentSession.agentSession = Some(
+        agentSession.copy(
+          registeredWithHmrc = Some(No),
+          registeredForUkTax = Some(Yes),
+          personalDetails = None
+        )
+      )
+
+      val result = controller.submitPersonalDetails(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCompanyRegistrationNumberForm.url
 
-      val savedPersonalDetails = sessionStoreService.fetchAgentSession.futureValue.get.personalDetails.get
+      val savedPersonalDetails = sessionCacheService.fetchAgentSession.futureValue.get.personalDetails.get
       savedPersonalDetails shouldBe PersonalDetailsChoice(
         Some(RadioOption.NinoChoice),
         Some(Nino("AB123456A")),
@@ -737,7 +743,14 @@ with AgentOverseasApplicationStubs {
     }
 
     "store choice in session after successful submission and redirect check-your-answers if user is changing answers" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(
+          "personalDetailsChoice" -> "nino",
+          "nino" -> "AB123456A",
+          "saUtr" -> ""
+        )
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = Some(Yes),
@@ -746,19 +759,12 @@ with AgentOverseasApplicationStubs {
         )
       )
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody(
-          "personalDetailsChoice" -> "nino",
-          "nino" -> "AB123456A",
-          "saUtr" -> ""
-        )
-
-      val result = controller.submitPersonalDetails(authenticatedRequest)
+      val result = controller.submitPersonalDetails(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
       session.personalDetails.get shouldBe PersonalDetailsChoice(
         Some(RadioOption.NinoChoice),
         Some(Nino("AB123456A")),
@@ -768,70 +774,75 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if no options are selected" in {
-      sessionStoreService.currentSession.agentSession = Some(
-        agentSession.copy(
-          registeredWithHmrc = Some(No),
-          registeredForUkTax = Some(Yes),
-          personalDetails = None
-        )
-      )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "personalDetailsChoice" -> "",
           "nino" -> "",
           "saUtr" -> ""
         )
 
-      controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages(
-        "error.personalDetails.no-radio.selected"
-      )
-      sessionStoreService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
-    }
-
-    "show validation error if National Insurance number option is selected, but no value has been entered" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = Some(Yes),
           personalDetails = None
         )
       )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+
+      controller.submitPersonalDetails(request).futureValue should containMessages(
+        "error.personalDetails.no-radio.selected"
+      )
+      sessionCacheService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
+    }
+
+    "show validation error if National Insurance number option is selected, but no value has been entered" in {
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "personalDetailsChoice" -> "nino",
           "nino" -> "",
           "saUtr" -> ""
         )
 
-      controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages("error.nino.blank")
-      sessionStoreService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
-    }
-
-    "show validation error if SA UTR option is selected, but no value has been entered" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = Some(Yes),
           personalDetails = None
         )
       )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+
+      controller.submitPersonalDetails(request).futureValue should containMessages("error.nino.blank")
+      sessionCacheService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
+    }
+
+    "show validation error if SA UTR option is selected, but no value has been entered" in {
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "personalDetailsChoice" -> "saUtr",
           "nino" -> "",
           "saUtr" -> ""
         )
 
-      controller.submitPersonalDetails(authenticatedRequest).futureValue should containMessages("error.sautr.blank")
-      sessionStoreService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
+      sessionCacheService.currentSession.agentSession = Some(
+        agentSession.copy(
+          registeredWithHmrc = Some(No),
+          registeredForUkTax = Some(Yes),
+          personalDetails = None
+        )
+      )
+
+      controller.submitPersonalDetails(request).futureValue should containMessages("error.sautr.blank")
+      sessionCacheService.fetchAgentSession.futureValue.get.personalDetails shouldBe None
     }
   }
 
   "GET /company-registration-number" should {
     "display the company-registration-number form" in {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(registeredForUkTax = Some(Yes), companyRegistrationNumber = None))
+      implicit val request = cleanCredsAgent(FakeRequest())
 
-      val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredForUkTax = Some(Yes), companyRegistrationNumber = None))
+
+      val result = controller.showCompanyRegistrationNumberForm(request)
       val backButtonUrl = routes.ApplicationController.showPersonalDetailsForm.url
 
       status(result) shouldBe 200
@@ -844,7 +855,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the company-registration-number form with check-your-answers back link if user is changing answers" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest())
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredForUkTax = Some(Yes),
           companyRegistrationNumber = None,
@@ -852,7 +865,7 @@ with AgentOverseasApplicationStubs {
         )
       )
 
-      val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
+      val result = controller.showCompanyRegistrationNumberForm(request)
       val backButtonUrl = routes.ApplicationController.showCheckYourAnswers.url
 
       status(result) shouldBe 200
@@ -865,14 +878,16 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the company-registration-number form with correct back button link in case user selects No option in the /uk-tax-registration page" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest())
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredForUkTax = Some(No),
           companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(false), None))
         )
       )
 
-      val result = controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
+      val result = controller.showCompanyRegistrationNumberForm(request)
       val backButtonUrl = routes.ApplicationController.showUkTaxRegistrationForm.url
 
       status(result) shouldBe 200
@@ -891,7 +906,10 @@ with AgentOverseasApplicationStubs {
 
   "POST /company-registration-number" should {
     "store choice in session after successful submission and redirect to next page" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           companyRegistrationNumber = None,
           registeredWithHmrc = Some(No),
@@ -901,20 +919,20 @@ with AgentOverseasApplicationStubs {
         )
       )
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
-
-      val result = controller.submitCompanyRegistrationNumber(authenticatedRequest)
+      val result = controller.submitCompanyRegistrationNumber(request)
       status(result) shouldBe 303
 
       header(LOCATION, result).get shouldBe routes.TaxRegController.showTaxRegistrationNumberForm.url
-      sessionStoreService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe Some(
+      sessionCacheService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe Some(
         CompanyRegistrationNumber(Some(true), Some(Crn("AB123456")))
       )
     }
 
     "store choice in session after successful submission and redirect to check-your-answers page if user is changing answers" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           companyRegistrationNumber = None,
           registeredWithHmrc = Some(No),
@@ -925,51 +943,48 @@ with AgentOverseasApplicationStubs {
         )
       )
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
-
-      val result = controller.submitCompanyRegistrationNumber(authenticatedRequest)
+      val result = controller.submitCompanyRegistrationNumber(request)
       status(result) shouldBe 303
 
       header(LOCATION, result).get shouldBe routes.ApplicationController.showCheckYourAnswers.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.companyRegistrationNumber shouldBe Some(CompanyRegistrationNumber(Some(true), Some(Crn("AB123456"))))
       session.changingAnswers shouldBe false
     }
 
     "show validation error if no choice was selected" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = Some(No)
         )
       )
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-
-      controller.submitCompanyRegistrationNumber(authenticatedRequest).futureValue should containMessages(
+      controller.submitCompanyRegistrationNumber(request).futureValue should containMessages(
         "companyRegistrationNumber.error.no-radio.selected"
       )
-      sessionStoreService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe None
     }
 
     "show validation error if Yes is selected but no input passed for registrationNumber" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "")
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(No),
           registeredForUkTax = Some(No)
         )
       )
 
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "")
-
-      controller.submitCompanyRegistrationNumber(authenticatedRequest).futureValue should containMessages(
+      controller.submitCompanyRegistrationNumber(request).futureValue should containMessages(
         "error.crn.blank"
       )
-      sessionStoreService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe None
+      sessionCacheService.fetchAgentSession.futureValue.get.companyRegistrationNumber shouldBe None
     }
   }
 
@@ -979,9 +994,9 @@ with AgentOverseasApplicationStubs {
       agentCodes = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showAgentCodesForm(authenticatedRequest)
+      implicit val request = cleanCredsAgent(FakeRequest())
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
+      val result = controller.showAgentCodesForm(request)
       val doc = Jsoup.parse(contentAsString(result))
     }
 
@@ -1069,8 +1084,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /money-laundering-registration when session not found" in {
-      val authenticatedRequest = cleanCredsAgent(FakeRequest())
-      val result = controller.showUkTaxRegistrationForm(authenticatedRequest)
+      val request = cleanCredsAgent(FakeRequest())
+      val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
@@ -1079,14 +1094,7 @@ with AgentOverseasApplicationStubs {
 
   "POST /self-assessment-agent-code" should {
     "store choice in session after successful submission and redirect to next page" in {
-      sessionStoreService.currentSession.agentSession = Some(
-        agentSession.copy(
-          registeredWithHmrc = Some(Yes),
-          agentCodes = None,
-          changingAnswers = true
-        )
-      )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "self-assessment-checkbox" -> "true",
           "self-assessment" -> "SA1234",
@@ -1094,12 +1102,20 @@ with AgentOverseasApplicationStubs {
           "corporation-tax" -> "123456"
         )
 
-      val result = controller.submitAgentCodes(authenticatedRequest)
+      sessionCacheService.currentSession.agentSession = Some(
+        agentSession.copy(
+          registeredWithHmrc = Some(Yes),
+          agentCodes = None,
+          changingAnswers = true
+        )
+      )
+
+      val result = controller.submitAgentCodes(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
 
       session.agentCodes shouldBe Some(
         AgentCodes(
@@ -1112,47 +1128,49 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /uk-tax-registration if no agent code is selected" in {
-      sessionStoreService.currentSession.agentSession = Some(
+      implicit val request = cleanCredsAgent(FakeRequest())
+        .withFormUrlEncodedBody(
+          "self-assessment" -> "",
+          "corporation-tax" -> ""
+        )
+
+      sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
           registeredWithHmrc = Some(Yes),
           agentCodes = None,
           changingAnswers = true
         )
       )
-      implicit val authenticatedRequest = cleanCredsAgent(FakeRequest())
-        .withFormUrlEncodedBody(
-          "self-assessment" -> "",
-          "corporation-tax" -> ""
-        )
-      val result = controller.submitAgentCodes(authenticatedRequest)
+
+      val result = controller.submitAgentCodes(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showUkTaxRegistrationForm.url
 
-      val session = sessionStoreService.fetchAgentSession.futureValue.get
+      val session = sessionCacheService.fetchAgentSession.futureValue.get
       session.agentCodes shouldBe Some(AgentCodes(None, None))
       session.changingAnswers shouldBe false
     }
 
     Seq("saAgentCode" -> "self-assessment", "ctAgentCode" -> "corporation-tax").foreach { case (key, value) =>
       s"show validation error if $value checkbox was selected but the text does not pass validation" in {
-
-        sessionStoreService.currentSession.agentSession = Some(
-          agentSession.copy(
-            registeredWithHmrc = Some(Yes),
-            agentCodes = None
-          )
-        )
-        implicit val authenticatedRequest = cleanCredsAgent(FakeRequest(POST, "/"))
+        implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody(
             s"$value-checkbox" -> "true",
             "self-assessment" -> "",
             "corporation-tax" -> ""
           )
 
-        controller.submitAgentCodes(authenticatedRequest).futureValue should containMessages(s"error.$key.blank")
+        sessionCacheService.currentSession.agentSession = Some(
+          agentSession.copy(
+            registeredWithHmrc = Some(Yes),
+            agentCodes = None
+          )
+        )
 
-        sessionStoreService.fetchAgentSession.futureValue.get.agentCodes shouldBe None
+        controller.submitAgentCodes(request).futureValue should containMessages(s"error.$key.blank")
+
+        sessionCacheService.fetchAgentSession.futureValue.get.agentCodes shouldBe None
       }
     }
   }
@@ -1184,7 +1202,9 @@ with AgentOverseasApplicationStubs {
     "have correct back link" when {
 
       "back link to file-uploaded-successfully" in {
-        sessionStoreService.currentSession.agentSession = Some(
+        implicit val request = cleanCredsAgent(FakeRequest())
+
+        sessionCacheService.currentSession.agentSession = Some(
           AgentSession(
             amlsRequired = Some(true),
             Some(amlsDetails),
@@ -1204,14 +1224,16 @@ with AgentOverseasApplicationStubs {
           )
         )
 
-        val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+        val result = controller.showCheckYourAnswers(request)
 
         status(result) shouldBe 200
         result.futureValue should containLink("button.back", routes.FileUploadController.showSuccessfulUploadedForm.url)
       }
 
       "no agent codes no taxRegNumbers provided, back link to ask if has tax-registration-number" in {
-        sessionStoreService.currentSession.agentSession = Some(
+        implicit val request = cleanCredsAgent(FakeRequest())
+
+        sessionCacheService.currentSession.agentSession = Some(
           AgentSession(
             amlsRequired = Some(true),
             Some(amlsDetails),
@@ -1231,7 +1253,7 @@ with AgentOverseasApplicationStubs {
           )
         )
 
-        val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+        val result = controller.showCheckYourAnswers(request)
 
         status(result) shouldBe 200
         result.futureValue should containLink("button.back", routes.TaxRegController.showTaxRegistrationNumberForm.url)
@@ -1241,10 +1263,12 @@ with AgentOverseasApplicationStubs {
     "agents codes are not available" when {
       "UkTaxRegistration is Yes" when {
         "CompanyRegistrationNumber is empty" in {
+          implicit val request = cleanCredsAgent(FakeRequest())
+
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
 
-          sessionStoreService.currentSession.agentSession = Some(
+          sessionCacheService.currentSession.agentSession = Some(
             AgentSession(
               amlsRequired = Some(true),
               Some(amlsDetails),
@@ -1267,7 +1291,7 @@ with AgentOverseasApplicationStubs {
             )
           )
 
-          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+          val result = controller.showCheckYourAnswers(request)
 
           status(result) shouldBe 200
 
@@ -1285,10 +1309,12 @@ with AgentOverseasApplicationStubs {
         }
 
         "CompanyRegistrationNumber is non empty" in {
+          implicit val request = cleanCredsAgent(FakeRequest())
+
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
 
-          sessionStoreService.currentSession.agentSession = Some(
+          sessionCacheService.currentSession.agentSession = Some(
             AgentSession(
               amlsRequired = Some(true),
               Some(amlsDetails),
@@ -1311,7 +1337,7 @@ with AgentOverseasApplicationStubs {
             )
           )
 
-          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+          val result = controller.showCheckYourAnswers(request)
 
           status(result) shouldBe 200
           testMandatoryContent(result.futureValue)
@@ -1327,10 +1353,12 @@ with AgentOverseasApplicationStubs {
         }
 
         "TaxRegistrationNumbers is empty" in {
+          implicit val request = cleanCredsAgent(FakeRequest())
+
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
 
-          sessionStoreService.currentSession.agentSession = Some(
+          sessionCacheService.currentSession.agentSession = Some(
             AgentSession(
               amlsRequired = Some(true),
               Some(amlsDetails),
@@ -1354,7 +1382,7 @@ with AgentOverseasApplicationStubs {
             )
           )
 
-          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+          val result = controller.showCheckYourAnswers(request)
 
           status(result) shouldBe 200
           testMandatoryContent(result.futureValue)
@@ -1372,10 +1400,12 @@ with AgentOverseasApplicationStubs {
         }
 
         "TaxRegistrationNumbers is non empty" in {
+          implicit val request = cleanCredsAgent(FakeRequest())
+
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
 
-          sessionStoreService.currentSession.agentSession = Some(
+          sessionCacheService.currentSession.agentSession = Some(
             AgentSession(
               amlsRequired = Some(true),
               Some(amlsDetails),
@@ -1400,7 +1430,7 @@ with AgentOverseasApplicationStubs {
             )
           )
 
-          val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+          val result = controller.showCheckYourAnswers(request)
 
           status(result) shouldBe 200
 
@@ -1419,10 +1449,12 @@ with AgentOverseasApplicationStubs {
         }
       }
       "UkTaxRegistration is No" in {
+        implicit val request = cleanCredsAgent(FakeRequest())
+
         val registeredWithHmrc = Some(Yes)
         val agentCodes = AgentCodes(None, None)
 
-        sessionStoreService.currentSession.agentSession = Some(
+        sessionCacheService.currentSession.agentSession = Some(
           AgentSession(
             amlsRequired = Some(true),
             Some(amlsDetails),
@@ -1440,7 +1472,7 @@ with AgentOverseasApplicationStubs {
           )
         )
 
-        val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+        val result = controller.showCheckYourAnswers(request)
 
         status(result) shouldBe 200
 
@@ -1466,9 +1498,11 @@ with AgentOverseasApplicationStubs {
     }
 
     "should display the form with all data as expected when user goes through 'RegsiteredWithHmrc=No' flow" in {
+      implicit val request = cleanCredsAgent(FakeRequest())
+
       val registeredWithHmrc = Some(No)
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         AgentSession(
           amlsRequired = Some(true),
           Some(amlsDetails),
@@ -1488,7 +1522,7 @@ with AgentOverseasApplicationStubs {
         )
       )
 
-      val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+      val result = controller.showCheckYourAnswers(request)
 
       status(result) shouldBe 200
 
@@ -1514,9 +1548,11 @@ with AgentOverseasApplicationStubs {
     }
 
     "should redirect to the verify email stage when the email address is unverified" in {
+      implicit val request = cleanCredsAgent(FakeRequest())
+
       val registeredWithHmrc = Some(No)
 
-      sessionStoreService.currentSession.agentSession = Some(
+      sessionCacheService.currentSession.agentSession = Some(
         AgentSession(
           amlsRequired = Some(true),
           Some(amlsDetails),
@@ -1536,7 +1572,7 @@ with AgentOverseasApplicationStubs {
         )
       )
 
-      val result = controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+      val result = controller.showCheckYourAnswers(request)
 
       status(result) shouldBe 303
       redirectLocation(result) shouldBe Some(routes.ApplicationEmailVerificationController.verifyEmail.url)
@@ -1545,7 +1581,7 @@ with AgentOverseasApplicationStubs {
 
   "POST /check-your-answers" should {
 
-    def initialTestSetup = {
+    def initialTestSetup(implicit rh: RequestHeader) = {
       val registeredWithHmrc = Some(Yes)
       val agentCodes = AgentCodes(Some(SaAgentCode("selfAssessmentCode")), Some(CtAgentCode("corporationTaxCode")))
 
@@ -1563,32 +1599,34 @@ with AgentOverseasApplicationStubs {
         verifiedEmails = Set(contactDetails.businessEmail)
       )
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
       agentSession
     }
 
     "show error when user doesn't accept confirmation" in {
+      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+
       val agentSession = initialTestSetup
 
       givenPostOverseasApplication(201, Json.toJson(CreateOverseasApplicationRequest(agentSession)).toString())
 
-      val result = controller.submitCheckYourAnswers(cleanCredsAgent(FakeRequest(POST, "/")))
+      val result = controller.submitCheckYourAnswers(request)
 
       status(result) shouldBe 400
 
-      sessionStoreService.fetchAgentSession.futureValue.isDefined shouldBe true
+      sessionCacheService.fetchAgentSession.futureValue.isDefined shouldBe true
     }
 
     "submit the application and redirect to application-complete" in {
+      implicit val request = cleanCredsAgent(
+        FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
+      )
+
       val agentSession = initialTestSetup
 
       givenPostOverseasApplication(201, Json.toJson(CreateOverseasApplicationRequest(agentSession)).toString())
 
-      val result = controller.submitCheckYourAnswers(
-        cleanCredsAgent(
-          FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
-        )
-      )
+      val result = controller.submitCheckYourAnswers(request)
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe routes.ApplicationController.showApplicationComplete.url
@@ -1596,23 +1634,23 @@ with AgentOverseasApplicationStubs {
       flash(result).get("tradingName").get shouldBe "tradingName"
       flash(result).get("contactDetail").get shouldBe "test@email.com"
 
-      sessionStoreService.fetchAgentSession.futureValue.isDefined shouldBe false
+      sessionCacheService.fetchAgentSession.futureValue.isDefined shouldBe false
     }
 
     "return exception when agent-overseas-application backend is unavailable" in {
+      implicit val request = cleanCredsAgent(
+        FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
+      )
+
       val agentSession = initialTestSetup
 
-      sessionStoreService.currentSession.agentSession = Some(agentSession)
+      sessionCacheService.currentSession.agentSession = Some(agentSession)
 
       givenPostOverseasApplication(503, Json.toJson(CreateOverseasApplicationRequest(agentSession)).toString())
 
       val e =
         controller
-          .submitCheckYourAnswers(
-            cleanCredsAgent(
-              FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
-            )
-          )
+          .submitCheckYourAnswers(request)
           .failed
           .futureValue
       e shouldBe a[Exception]
@@ -1677,79 +1715,83 @@ with AgentOverseasApplicationStubs {
   }
 
   "email verification" should {
-    def checkVerifyEmailIsTriggered(f: () => Future[Result]) = {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
-      val result = f()
+    def checkVerifyEmailIsTriggered(f: Request[AnyContent] => Future[Result]) = {
+      implicit val request = cleanCredsAgent(FakeRequest())
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
+      val result = f(request)
       status(result) shouldBe 303
       redirectLocation(result).get shouldBe routes.ApplicationEmailVerificationController.verifyEmail.url
     }
-    def checkVerifyEmailIsNotTriggered(f: () => Future[Result]) = {
-      sessionStoreService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
-      val result = f()
+
+    def checkVerifyEmailIsNotTriggered(f: Request[AnyContent] => Future[Result]) = {
+      implicit val request = cleanCredsAgent(FakeRequest())
+      sessionCacheService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
+      val result = f(request)
       status(result) should (equal(200) or equal(303))
       if (status(result) == 303)
         redirectLocation(result) should not be routes.ApplicationEmailVerificationController.verifyEmail.url
     }
+
     "be triggered with an unverified email" when {
-      "show trading name" in checkVerifyEmailIsTriggered(() =>
-        controller.showTradingNameForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit trading name" in checkVerifyEmailIsTriggered(() =>
-        controller.submitTradingName(cleanCredsAgent(FakeRequest()))
-      )
-      "show registered with HMRC" in checkVerifyEmailIsTriggered(() =>
-        controller.showRegisteredWithHmrcForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit registered with HMRC" in checkVerifyEmailIsTriggered(() =>
-        controller.submitRegisteredWithHmrc(cleanCredsAgent(FakeRequest()))
-      )
-      "show agent codes form" in checkVerifyEmailIsTriggered(() =>
-        controller.showAgentCodesForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit agent codes form" in checkVerifyEmailIsTriggered(() =>
-        controller.submitAgentCodes(cleanCredsAgent(FakeRequest()))
-      )
-      "show uk tax reg form" in checkVerifyEmailIsTriggered(() =>
-        controller.showUkTaxRegistrationForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit uk tax reg" in checkVerifyEmailIsTriggered(() =>
-        controller.submitUkTaxRegistration(cleanCredsAgent(FakeRequest()))
-      )
-      "show company reg form" in checkVerifyEmailIsTriggered(() =>
-        controller.showCompanyRegistrationNumberForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit company reg" in checkVerifyEmailIsTriggered(() =>
-        controller.submitCompanyRegistrationNumber(cleanCredsAgent(FakeRequest()))
-      )
-      "check answers" in checkVerifyEmailIsTriggered(() =>
-        controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
-      )
-      "submit check answers" in checkVerifyEmailIsTriggered(() =>
-        controller.submitCheckYourAnswers(cleanCredsAgent(FakeRequest()))
-      )
+      "show trading name" in checkVerifyEmailIsTriggered { request =>
+        controller.showTradingNameForm(request)
+      }
+      "submit trading name" in checkVerifyEmailIsTriggered { request =>
+        controller.submitTradingName(request)
+      }
+      "show registered with HMRC" in checkVerifyEmailIsTriggered { request =>
+        controller.showRegisteredWithHmrcForm(request)
+      }
+      "submit registered with HMRC" in checkVerifyEmailIsTriggered { request =>
+        controller.submitRegisteredWithHmrc(request)
+      }
+      "show agent codes form" in checkVerifyEmailIsTriggered { request =>
+        controller.showAgentCodesForm(request)
+      }
+      "submit agent codes form" in checkVerifyEmailIsTriggered { request =>
+        controller.submitAgentCodes(request)
+      }
+      "show uk tax reg form" in checkVerifyEmailIsTriggered { request =>
+        controller.showUkTaxRegistrationForm(request)
+      }
+      "submit uk tax reg" in checkVerifyEmailIsTriggered { request =>
+        controller.submitUkTaxRegistration(request)
+      }
+      "show company reg form" in checkVerifyEmailIsTriggered { request =>
+        controller.showCompanyRegistrationNumberForm(request)
+      }
+      "submit company reg" in checkVerifyEmailIsTriggered { request =>
+        controller.submitCompanyRegistrationNumber(request)
+      }
+      "check answers" in checkVerifyEmailIsTriggered { request =>
+        controller.showCheckYourAnswers(request)
+      }
+      "submit check answers" in checkVerifyEmailIsTriggered { request =>
+        controller.submitCheckYourAnswers(request)
+      }
     }
     "not be triggered when using with the email retrieved by auth" when {
-      "check answers" in checkVerifyEmailIsNotTriggered { () =>
+      "check answers" in checkVerifyEmailIsNotTriggered { implicit request =>
         // we use the email (authemail@email.com) which is returned in the mock auth response
-        sessionStoreService.currentSession.agentSession = Some(
+        sessionCacheService.currentSession.agentSession = Some(
           agentSession.copy(
             contactDetails = agentSession.contactDetails.map(_.copy(businessEmail = "authemail@email.com")),
             verifiedEmails = Set.empty
           )
         )
-        controller.showCheckYourAnswers(cleanCredsAgent(FakeRequest()))
+        controller.showCheckYourAnswers(request)
       }
       // also all other pages but checking one should be enough as they all use the same logic
     }
 
     "not be triggered even with an unverified mail" when {
       // these pages must display even with an unverified email otherwise the user couldn't enter or correct their email address!
-      "show contact details form" in checkVerifyEmailIsNotTriggered(() =>
-        controller.showContactDetailsForm(cleanCredsAgent(FakeRequest()))
-      )
-      "submit contact details" in checkVerifyEmailIsNotTriggered(() =>
-        controller.submitContactDetails(cleanCredsAgent(FakeRequest()))
-      )
+      "show contact details form" in checkVerifyEmailIsNotTriggered { request =>
+        controller.showContactDetailsForm(request)
+      }
+      "submit contact details" in checkVerifyEmailIsNotTriggered { request =>
+        controller.submitContactDetails(request)
+      }
     }
   }
 

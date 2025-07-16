@@ -17,14 +17,16 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers
 
 import org.mockito.Mockito.when
+import org.scalatest.Assertion
+import org.scalatest.OptionValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatest.Assertion
-import org.scalatest.OptionValues
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
@@ -36,10 +38,9 @@ import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.SessionId
+import uk.gov.hmrc.http.SessionKeys
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,7 +52,7 @@ with Matchers
 with OptionValues
 with ScalaFutures {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier(sessionId = Some(SessionId("sessionId123456")))
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.sessionId -> "sessionId123456")
 
   private val contactDetails = ContactDetails(
     "test",
@@ -396,7 +397,7 @@ with MockitoSugar {
 
   private val app: Application = new GuiceApplicationBuilder().build()
 
-  override val sessionStoreService: MongoDBSessionStoreService = app.injector.instanceOf[MongoDBSessionStoreService]
+  override val sessionStoreService: SessionCacheService = app.injector.instanceOf[SessionCacheService]
   override val applicationService: ApplicationService = new ApplicationService(connector)
 
 }

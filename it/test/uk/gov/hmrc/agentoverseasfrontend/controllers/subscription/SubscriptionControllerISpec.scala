@@ -41,7 +41,7 @@ with AgentSubscriptionStubs {
   "subscribe" should {
     "redirect to /complete upon successful subscription" in {
       implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
       givenAcceptedApplicationResponse()
       givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(arn)
@@ -54,7 +54,7 @@ with AgentSubscriptionStubs {
 
     "redirect to /check-answers if there's no agency details in the session" in {
       implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      sessionStoreService.currentSession.agencyDetails = None
+      sessionCacheService.currentSession.agencyDetails = None
       givenAcceptedApplicationResponse()
       val result = controller.subscribe(request)
 
@@ -72,7 +72,7 @@ with AgentSubscriptionStubs {
 
     "redirect to /already-subscribed if the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group" in {
       implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
       givenCompleteApplicationResponse()
       givenSubscriptionFailedConflict()
       val result = controller.subscribe(request)
@@ -93,7 +93,7 @@ with AgentSubscriptionStubs {
         ),
         true
       )
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
       val result = controller.subscriptionComplete(request)
 
       status(result) shouldBe 200
@@ -138,7 +138,7 @@ with AgentSubscriptionStubs {
   "email verification" should {
     "be triggered if attempting to subscribe with an unverified email" in {
       implicit val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      sessionStoreService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
       givenAcceptedApplicationResponse()
       givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(arn)

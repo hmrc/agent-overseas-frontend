@@ -18,12 +18,12 @@ package uk.gov.hmrc.agentoverseasfrontend.connectors
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.utils.HttpAPIMonitor
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import javax.inject.Inject
@@ -44,17 +44,11 @@ class AgentSubscriptionConnector @Inject() (
 )(implicit
   val appConfig: AppConfig,
   val ec: ExecutionContext
-)
-extends HttpAPIMonitor {
+) {
 
-  def overseasSubscription(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Arn] = {
+  def overseasSubscription(implicit rh: RequestHeader): Future[Arn] = {
     val url = s"${appConfig.agentSubscriptionBaseUrl}/agent-subscription/overseas-subscription"
 
-    monitor(s"ConsumedAPI-agent-subscription-overseas-subscription-PUT") {
-      http.PUT[String, OverseasSubscriptionResponse](url, "").map(_.arn)
-    }
+    http.PUT[String, OverseasSubscriptionResponse](url, "").map(_.arn)
   }
 }

@@ -32,7 +32,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -42,7 +42,7 @@ import scala.concurrent.Future
 @Singleton
 class AntiMoneyLaunderingController @Inject() (
   val env: Environment,
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   applicationService: ApplicationService,
   val upscanConnector: UpscanConnector,
   authAction: ApplicationAuth,

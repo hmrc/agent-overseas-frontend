@@ -17,15 +17,14 @@
 package uk.gov.hmrc.agentoverseasfrontend
 
 import play.Logger
+import play.api.Configuration
+import play.api.Environment
 import play.api.i18n.MessagesApi
-import play.api.mvc.Results._
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import play.api.Configuration
-import play.api.Environment
+import play.api.mvc.Results._
 import play.twirl.api.Html
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.http.JsValidationException

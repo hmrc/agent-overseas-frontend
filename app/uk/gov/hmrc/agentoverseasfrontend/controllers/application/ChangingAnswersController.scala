@@ -26,14 +26,14 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class ChangingAnswersController @Inject() (
   authAction: ApplicationAuth,
-  override val sessionStoreService: MongoDBSessionStoreService,
+  override val sessionStoreService: SessionCacheService,
   override val applicationService: ApplicationService,
   countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents

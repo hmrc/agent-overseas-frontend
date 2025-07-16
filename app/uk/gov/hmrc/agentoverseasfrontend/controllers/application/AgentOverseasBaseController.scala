@@ -21,14 +21,14 @@ import javax.inject.Singleton
 import play.api.i18n.I18nSupport
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class AgentOverseasBaseController @Inject() (
-  val sessionStoreService: MongoDBSessionStoreService,
+  val sessionStoreService: SessionCacheService,
   val applicationService: ApplicationService,
   override val controllerComponents: MessagesControllerComponents
 )(implicit val ec: ExecutionContext)

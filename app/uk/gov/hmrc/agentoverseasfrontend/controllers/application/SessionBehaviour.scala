@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -28,18 +28,18 @@ import scala.concurrent.Future
 trait SessionBehaviour
 extends CommonRouting {
 
-  val sessionStoreService: MongoDBSessionStoreService
+  val sessionStoreService: SessionCacheService
   implicit val ec: ExecutionContext
 
   val showCheckYourAnswersUrl: String = routes.ApplicationController.showCheckYourAnswers.url
 
   def updateSessionAndRedirect(
     agentSession: AgentSession
-  )(redirectTo: String)(implicit hc: HeaderCarrier): Future[Result] = sessionStoreService
+  )(redirectTo: String)(implicit rh: RequestHeader): Future[Result] = sessionStoreService
     .cacheAgentSession(agentSession)
     .map(_ => Redirect(redirectTo))
 
-  def updateSession(agentSession: AgentSession)(redirectTo: String)(implicit hc: HeaderCarrier): Future[Result] =
+  def updateSession(agentSession: AgentSession)(redirectTo: String)(implicit rh: RequestHeader): Future[Result] =
     if (agentSession.changingAnswers) {
       updateSessionAndRedirect(agentSession.copy(changingAnswers = false))(showCheckYourAnswersUrl)
     }

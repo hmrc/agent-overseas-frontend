@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import java.net.URL
-
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.Configuration
@@ -28,11 +27,13 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.utils.CallOps
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
+import uk.gov.hmrc.http.SessionKeys.sessionId
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -44,7 +45,7 @@ class SubscriptionSignOutController @Inject() (
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   authAction: SubscriptionAuth,
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   timedOutView: timed_out,
   signedOutView: signed_out
 )(implicit
@@ -62,11 +63,13 @@ extends AgentOverseasBaseController(
 
   def signOutWithContinueUrl: Action[AnyContent] = Action.async { implicit request =>
     withBasicAgentAuth { implicit subRequest =>
-      service.storeSessionDetails(subRequest.authProviderId).map { idRef =>
-        val returnContinueUrl = s"${appConfig.agentOverseasFrontendUrl}/create-account/return-from-gg-registration?sessionId=$idRef"
+      sessionStoreService.cacheProviderId(ProviderId(subRequest.authProviderId)).map { _ =>
+        val returnContinueUrl =
+          s"${appConfig.agentOverseasFrontendUrl}/create-account/return-from-gg-registration" +
+            s"?sessionId=${request.session.apply(sessionId)}"
 
         SeeOther(
-          CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(returnContinueUrl))
+          CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue_url" -> Some(returnContinueUrl))
         ).withNewSession
       }
     }

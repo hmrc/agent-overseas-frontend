@@ -18,14 +18,14 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.http.HttpVerbs.GET
 import play.api.mvc.Call
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession._
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.No
 import uk.gov.hmrc.agentoverseasfrontend.models.Yes
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -37,7 +37,7 @@ trait CommonRouting {
     initialiseAgentSession: Boolean
   )
 
-  val sessionStoreService: MongoDBSessionStoreService
+  val sessionStoreService: SessionCacheService
 
   val applicationService: ApplicationService
 
@@ -61,7 +61,7 @@ trait CommonRouting {
   def routesIfExistingApplication(
     subscriptionRootPath: String
   )(implicit
-    hc: HeaderCarrier,
+    rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Call] = {
     def routing: Future[StatusRouting] = applicationService.getCurrentApplication.map {

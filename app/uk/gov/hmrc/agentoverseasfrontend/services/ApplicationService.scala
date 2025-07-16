@@ -16,37 +16,34 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-
-import javax.inject.Inject
-import javax.inject.Singleton
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationEntityDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.CreateOverseasApplicationRequest
 import uk.gov.hmrc.agentoverseasfrontend.models.FileUploadStatus
-import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOverseasApplicationConnector) {
+class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOverseasApplicationConnector)(implicit executionContext: ExecutionContext) {
 
   implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
   def getCurrentApplication(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Option[ApplicationEntityDetails]] = agentOverseasApplicationConnector.getUserApplications.map { e =>
     e.sortBy(_.applicationCreationDate).reverse.headOption
   }
 
   def rejectedApplication(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Option[ApplicationEntityDetails]] = agentOverseasApplicationConnector.getUserApplications
     .map { apps =>
       if (apps.forall(_.status == Rejected))
@@ -56,13 +53,11 @@ class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOver
     }
 
   def createApplication(application: AgentSession)(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[Unit] = agentOverseasApplicationConnector.createOverseasApplication(CreateOverseasApplicationRequest(application.sanitize))
 
   def upscanPollStatus(reference: String)(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
+    rh: RequestHeader
   ): Future[FileUploadStatus] = agentOverseasApplicationConnector.upscanPollStatus(reference)
 
 }
