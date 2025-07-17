@@ -47,7 +47,7 @@ extends BaseISpec {
       )
       header(LOCATION, result).get should
         include(
-          s"http://localhost:8571/government-gateway-registration-frontend?accountType=agent&origin=unknown&continue_url=$continueUrl"
+          s"http://localhost:8571/government-gateway-registration-frontend?accountType=agent&origin=unknown&continue=$continueUrl"
         )
     }
   }

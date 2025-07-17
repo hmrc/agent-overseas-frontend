@@ -69,7 +69,7 @@ extends AgentOverseasBaseController(
             s"?sessionId=${request.session.apply(sessionId)}"
 
         SeeOther(
-          CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue_url" -> Some(returnContinueUrl))
+          CallOps.addParamsToUrl(appConfig.ggRegistrationFrontendSosRedirectPath, "continue" -> Some(returnContinueUrl))
         ).withNewSession
       }
     }
