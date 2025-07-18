@@ -68,7 +68,8 @@ extends AgentOverseasBaseController(
   def signOutToGGRegistrationWhenSubscribing: Action[AnyContent] = Action.async { implicit request =>
     withBasicAgentAuth { implicit subRequest =>
       sessionStoreService.cacheProviderId(ProviderId(subRequest.authProviderId)).map { _ =>
-        val postRegistrationContinue = uri"${appConfig.selfExternalUrl + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(request.session.apply(sessionId)).url}"
+        val postRegistrationContinue =
+          uri"${appConfig.selfExternalUrl + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(request.session.apply(sessionId)).url}"
         val params = Seq(
           "accountType" -> "agent",
           "origin" -> "unknown",

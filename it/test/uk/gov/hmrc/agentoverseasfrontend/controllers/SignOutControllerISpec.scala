@@ -16,17 +16,14 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers
 
-import org.mongodb.scala.model.Filters
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
-import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{routes => applicationRoutes}
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.{routes => subscriptionRoutes}
-import uk.gov.hmrc.agentoverseasfrontend.models.SessionDetails
-import sttp.model.Uri.UriContext
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
+import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.http.SessionKeys
 
 class SignOutControllerISpec
 extends BaseISpec {
@@ -38,9 +35,8 @@ extends BaseISpec {
       implicit val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
       val result = controller.signOutToGGRegistrationWhenSubscribing(request)
       val _ = result.futureValue
-      val details = findByAuthProviderId("12345-credId").futureValue
-      val detailsRef = details.map(_.id).get
-      val continueFromGG = uri"""${"http://localhost:9414" + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(detailsRef)}"""
+      val sessionId = request.session.apply(SessionKeys.sessionId)
+      val continueFromGG = uri"""${"http://localhost:9414" + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(sessionId)}"""
       val params = Seq(
         "accountType" -> "agent",
         "origin" -> "unknown",
@@ -108,10 +104,5 @@ extends BaseISpec {
       checkMessageIsDefined("timed-out.p2.link")
     }
   }
-
-  private def findByAuthProviderId(authProviderId: String): Future[Option[SessionDetails]] = sessionDetailsRepo.collection
-    .find(Filters.equal("authProviderId", authProviderId))
-    .toFuture()
-    .map(_.headOption)
 
 }
