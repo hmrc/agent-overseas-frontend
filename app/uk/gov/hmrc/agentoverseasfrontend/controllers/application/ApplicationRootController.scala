@@ -90,7 +90,7 @@ with I18nSupport {
             daysUntilReviewed
           ))
         case Some(application) if application.status == Rejected => Ok(statusRejectedView(application))
-        case Some(_) => SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+        case Some(_) => SeeOther(s"${appConfig.selfExternalUrl + routes.ApplicationRootController.root.url}/create-account")
         case None => Redirect(routes.ApplicationRootController.root)
       }
     }

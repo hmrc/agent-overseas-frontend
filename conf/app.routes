@@ -2,6 +2,10 @@
 
 ->          /hmrc-frontend                               hmrcfrontend.Routes
 
+GET         /assets/*file                                controllers.Assets.versioned(path = "/public", file: Asset)
+
+# Application routes
+
 GET         /                                            @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationRootController.root
 
 GET         /not-agent                                   @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationRootController.showNotAgent
@@ -21,12 +25,10 @@ POST        /trading-name                                @uk.gov.hmrc.agentovers
 GET         /main-business-address                       @uk.gov.hmrc.agentoverseasfrontend.controllers.application.TradingAddressController.showMainBusinessAddressForm
 POST        /main-business-address                       @uk.gov.hmrc.agentoverseasfrontend.controllers.application.TradingAddressController.submitMainBusinessAddress
 
-
 GET         /upload-proof-anti-money-laundering-registration @uk.gov.hmrc.agentoverseasfrontend.controllers.application.FileUploadController.showAmlsUploadForm
 GET         /upload-proof-trading-address                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.FileUploadController.showTradingAddressUploadForm
 GET         /upload-proof-tax-registration               @uk.gov.hmrc.agentoverseasfrontend.controllers.application.FileUploadController.showTrnUploadForm
 GET         /poll-status/:fileType/:ref                  @uk.gov.hmrc.agentoverseasfrontend.controllers.application.FileUploadController.pollStatus(fileType: String, ref: String)
-
 
 GET         /trading-address-no-js-check-file            @uk.gov.hmrc.agentoverseasfrontend.controllers.application.FileUploadController.showTradingAddressNoJsCheckPage
 
@@ -92,16 +94,45 @@ GET         /verify-email                                @uk.gov.hmrc.agentovers
 GET         /email-locked                                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationController.showEmailLocked
 GET         /email-technical-error                       @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationController.showEmailTechnicalError
 
-GET         /sign-out/create-account                     @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOutWithContinueUrl
-GET         /sign-out                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOut
-GET         /sign-out-to-start                           @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.signOutToStart
-GET         /start-survey                                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.startFeedbackSurvey
-GET         /keep-alive                                  @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.keepAlive
-GET         /timed-out                                   @uk.gov.hmrc.agentoverseasfrontend.controllers.application.ApplicationSignOutController.timedOut
+# Sign out routes
 
-#GET         /server-error                                @uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController.serverError
+GET         /sign-out/create-account                     @uk.gov.hmrc.agentoverseasfrontend.controllers.SignOutController.signOutToGGRegistration
+GET         /sign-out                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.SignOutController.signOut
+GET         /start-survey                                @uk.gov.hmrc.agentoverseasfrontend.controllers.SignOutController.startFeedbackSurvey
+GET         /time-out                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.SignOutController.timeOut
+GET         /timed-out                                   @uk.gov.hmrc.agentoverseasfrontend.controllers.SignOutController.timedOut
 
-GET         /assets/*file                                controllers.Assets.versioned(path = "/public", file: Asset)
+# Subscription routes
 
+GET        /create-account/                                   @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.root
 
+GET        /create-account/next-step                          @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.nextStep
+POST       /create-account/subscribe                          @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscribe
+GET        /create-account/complete                           @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscriptionComplete
+GET        /create-account/already-subscribed                 @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.alreadySubscribed
 
+GET        /create-account/check-answers                      @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckAnswers
+GET        /create-account/return-from-gg-registration        @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.returnFromGGRegistration(sessionId: String)
+
+GET        /create-account/check-business-address             @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckBusinessAddress
+POST       /create-account/check-business-address             @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitCheckBusinessAddress
+GET        /create-account/update-business-address            @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessAddressForm
+POST       /create-account/update-business-address            @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessAddressForm
+
+GET        /create-account/check-business-email               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckBusinessEmail
+POST       /create-account/check-business-email               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitCheckBusinessEmail
+GET        /create-account/update-business-email              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessEmailForm
+POST       /create-account/update-business-email              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessEmailForm
+
+GET        /create-account/check-business-name                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showCheckBusinessName
+POST       /create-account/check-business-name                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitCheckBusinessName
+GET        /create-account/update-business-name               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.showUpdateBusinessNameForm
+POST       /create-account/update-business-name               @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.BusinessIdentificationController.submitUpdateBusinessNameForm
+
+GET        /create-account/cannot-check-status                @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.showApplicationIssue
+
+GET        /create-account/verify-email                       @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionEmailVerificationController.verifyEmail
+GET        /create-account/email-locked                       @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.showEmailLocked
+GET        /create-account/email-technical-error              @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.showEmailTechnicalError
+
+GET        /create-account/sign-out                           @uk.gov.hmrc.agentoverseasfrontend.controllers.SignOutController.signOutToGGRegistrationWhenSubscribing

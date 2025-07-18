@@ -29,11 +29,13 @@ trait AppConfig {
   val countryListLocation: String
   val feedbackSurveyUrl: String
   val maintainerApplicationReviewDays: Int
+  val signInUrl: String
+  val signOutUrl: String
   val companyAuthSignInUrl: String
   val ggRegistrationFrontendSosRedirectPath: String
   val guidancePageApplicationUrl: String
   val authBaseUrl: String
-  val agentOverseasFrontendUrl: String
+  val selfExternalUrl: String
   val agentOverseasApplicationBaseUrl: String
   val upscanBaseUrl: String
   val betaFeedbackUrl: String
@@ -67,7 +69,7 @@ extends AppConfig {
   override val guidancePageApplicationUrl: String = servicesConfig.getString("microservice.services.guidancePageApplicationUrl")
   override val authBaseUrl: String = servicesConfig.baseUrl("auth")
   override val agentOverseasApplicationBaseUrl: String = servicesConfig.baseUrl("agent-overseas-application")
-  override val agentOverseasFrontendUrl: String = servicesConfig.getString("microservice.services.agent-overseas-frontend.url")
+  override val selfExternalUrl: String = servicesConfig.getString("self.external-url")
   override val upscanBaseUrl: String = servicesConfig.baseUrl("upscan")
   override val betaFeedbackUrl: String = servicesConfig.getString("betaFeedbackUrl")
   override val timeout: Int = servicesConfig.getInt("timeoutDialog.timeout-seconds")
@@ -79,5 +81,11 @@ extends AppConfig {
   override val emailVerificationFrontendBaseUrl: String = servicesConfig.getString("microservice.services.email-verification-frontend.external-url")
   override val mongoDbExpireAfterSeconds: Int = servicesConfig.getInt("mongodb.session.expireAfterSeconds")
   override val disableEmailVerification: Boolean = servicesConfig.getBoolean("disable-email-verification")
+
+  private val basGatewayFrontendExternalUrl: String = servicesConfig.getString("bas-gateway-frontend.external-url")
+  private val signOutPath: String = servicesConfig.getString("bas-gateway-frontend.sign-out.path")
+  private val signInPath: String = servicesConfig.getString("bas-gateway-frontend.sign-in.path")
+  override lazy val signOutUrl: String = s"$basGatewayFrontendExternalUrl$signOutPath"
+  override lazy val signInUrl: String = s"$basGatewayFrontendExternalUrl$signInPath"
 
 }

@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.routes
 
 @this(
     mainTemplate: main_template,
@@ -39,6 +39,6 @@
     @h2("application_not_ready.h3")
     @p("application_not_ready.p5")
     <p class="govuk-body">
-        @a(href = routes.ApplicationSignOutController.signOut.url, key = "finish.signout")
+        @a(href = routes.SignOutController.signOut.url, key = "finish.signout")
     </p>
 }

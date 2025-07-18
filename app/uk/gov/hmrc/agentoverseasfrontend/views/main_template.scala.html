@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.routes
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
@@ -37,11 +37,19 @@
     wide: Boolean = false
 )(mainContent: Html)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
+@isSignedIn = @{
+    try {
+        request.session.get("authToken").isDefined
+    } catch {
+        case _: Throwable => false
+    }
+}
+
 @head = {
-    @if(hasTimeout) {
+    @if(isSignedIn) {
         @hmrcTimeoutDialogHelper(
-            signOutUrl = routes.ApplicationSignOutController.signOut.url,
-            timeoutUrl = Some(routes.ApplicationSignOutController.timedOut.url)
+            signOutUrl = routes.SignOutController.signOut.url,
+            timeoutUrl = Some(routes.SignOutController.timeOut.url)
         )
     }
     <link rel="stylesheet" href="@controllers.routes.Assets.versioned("stylesheets/application.css")" media="screen">
@@ -84,7 +92,7 @@
     backLink = if(backLinkHref.isDefined) Some(BackLink(href = backLinkHref.get)) else None,
     serviceURLs = ServiceURLs(
         serviceUrl = None,
-        signOutUrl = None
+        signOutUrl = if(isSignedIn) Some(routes.SignOutController.signOut.url) else None,
     ),
     banners = Banners(displayHmrcBanner = true),
     templateOverrides = TemplateOverrides(
