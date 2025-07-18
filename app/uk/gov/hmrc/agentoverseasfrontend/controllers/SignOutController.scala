@@ -27,10 +27,12 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBa
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{routes => applicationRoutes}
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.{routes => subscriptionRoutes}
+import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
-import uk.gov.hmrc.agentoverseasfrontend.services.MongoDBSessionStoreService
+import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
+import uk.gov.hmrc.http.SessionKeys.sessionId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,7 +45,7 @@ class SignOutController @Inject() (
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   authAction: SubscriptionAuth,
-  sessionStoreService: MongoDBSessionStoreService,
+  sessionStoreService: SessionCacheService,
   timedOutView: timed_out
 )(implicit
   val appConfig: AppConfig,
@@ -65,8 +67,8 @@ extends AgentOverseasBaseController(
 
   def signOutToGGRegistrationWhenSubscribing: Action[AnyContent] = Action.async { implicit request =>
     withBasicAgentAuth { implicit subRequest =>
-      service.storeSessionDetails(subRequest.authProviderId).map { idRef =>
-        val postRegistrationContinue = uri"${appConfig.selfExternalUrl + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(idRef)}"
+      sessionStoreService.cacheProviderId(ProviderId(subRequest.authProviderId)).map { _ =>
+        val postRegistrationContinue = uri"${appConfig.selfExternalUrl + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(request.session.apply(sessionId)).url}"
         val params = Seq(
           "accountType" -> "agent",
           "origin" -> "unknown",
