@@ -75,7 +75,7 @@ with Logging {
               case Right(_) => Redirect(routes.SubscriptionController.subscriptionComplete)
               case Left(NoApplications) =>
                 logger.info("User has no known applications, redirecting to application frontend")
-                Redirect(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+                Redirect(s"${appConfig.selfExternalUrl + routes.SubscriptionRootController.root.url}")
               case Left(NoAgencyInSession) =>
                 logger.info("No agency details in session, redirecting to /check-answers")
                 Redirect(routes.BusinessIdentificationController.showCheckAnswers)
@@ -109,7 +109,7 @@ with Logging {
           )
         case None =>
           logger.warn("no agent session found on subscription complete page")
-          SeeOther(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+          SeeOther(s"${appConfig.selfExternalUrl + routes.SubscriptionRootController.root.url}")
       }
     }
   }

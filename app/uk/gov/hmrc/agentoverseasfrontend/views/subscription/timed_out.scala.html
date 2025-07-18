@@ -16,7 +16,7 @@
 
 @import play.api.Configuration
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
@@ -34,7 +34,7 @@
     @h1("timed-out.header")
     @p(msgs("timed-out.p1", timeString))
     <p class="govuk-body">
-        @a("timed-out.p2.link", href = routes.SubscriptionSignOutController.signOut.url)
+        @a("timed-out.p2.link", href = routes.SignOutController.signOut.url)
         @span("timed-out.p2")
     </p>
 }

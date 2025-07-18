@@ -16,7 +16,7 @@
 
 @import play.api.Configuration
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
@@ -28,6 +28,6 @@
 
     @h1("already.subscribed.title")
     @p("already.subscribed.p1")
-    <p class="govuk-body">@a(href = routes.SubscriptionSignOutController.signOut.url, key = "finish.signout")</p>
+    <p class="govuk-body">@a(href = routes.SignOutController.signOut.url, key = "finish.signout")</p>
 
 }

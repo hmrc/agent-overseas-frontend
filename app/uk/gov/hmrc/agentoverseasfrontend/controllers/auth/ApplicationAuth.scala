@@ -104,7 +104,7 @@ with CommonRouting {
                 }
               }
             case None =>
-              routesIfExistingApplication(s"${appConfig.agentOverseasFrontendUrl}/create-account")
+              routesIfExistingApplication(s"${appConfig.selfExternalUrl + routes.ApplicationRootController.root.url}/create-account")
                 .map(Redirect)
           }
         }

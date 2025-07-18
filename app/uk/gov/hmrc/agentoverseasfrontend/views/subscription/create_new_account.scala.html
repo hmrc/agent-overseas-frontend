@@ -16,7 +16,7 @@
 
 @import play.api.Configuration
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
@@ -28,6 +28,6 @@
   @h1("createNewAccount.title")
   @p("createNewAccount.p1")
   <p class="govuk-body">
-    @linkAsButton(href=routes.SubscriptionSignOutController.signOutWithContinueUrl.url)
+    @linkAsButton(href=routes.SignOutController.signOutToGGRegistrationWhenSubscribing.url)
   </p>
 }
