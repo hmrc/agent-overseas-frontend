@@ -28,6 +28,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
+import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{routes => applicationRoutes}
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.routes
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus._
@@ -124,7 +125,7 @@ with Logging {
 
         subscriptionService.mostRecentApplication.flatMap {
           case Some(application) if application.status == Pending || application.status == Rejected =>
-            Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}/application-status"))
+            Future.successful(SeeOther(s"${appConfig.selfExternalUrl + applicationRoutes.ApplicationRootController.root.url}/application-status"))
           case Some(application) if application.status == ApplicationStatus.Accepted =>
             if (hasCleanCreds) {
               // happy path
@@ -178,7 +179,7 @@ with Logging {
               Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
           case Some(application) if application.status == AttemptingRegistration =>
             Future.successful(Redirect(subscription.routes.SubscriptionRootController.showApplicationIssue))
-          case None => Future.successful(SeeOther(s"${appConfig.agentOverseasFrontendUrl}"))
+          case None => Future.successful(SeeOther(s"${appConfig.selfExternalUrl + applicationRoutes.ApplicationRootController.root.url}"))
           case application => throw new RuntimeException(s"Could not proceed with application status ${application.map(_.status)}")
         }
       }

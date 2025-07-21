@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-@import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+@import uk.gov.hmrc.agentoverseasfrontend.controllers.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
@@ -26,7 +26,7 @@
 @mainTemplate(title = msgs("nonAgent.title")) {
 
    @h1("nonAgent.title")
-   @p(html = Some(Html(msgs("nonAgent.p1", routes.ApplicationSignOutController.signOut.url))))
-   @p(html = Some(Html(msgs("nonAgent.p2", routes.ApplicationSignOutController.signOutWithContinueUrl.url))))
+   @p(html = Some(Html(msgs("nonAgent.p1", routes.SignOutController.signOut.url))))
+   @p(html = Some(Html(msgs("nonAgent.p2", routes.SignOutController.signOutToGGRegistration.url))))
 
 }

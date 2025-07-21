@@ -1,5 +1,4 @@
-# Add all the application routes to the application.routes file
-->         /agent-services/apply-from-outside-uk                       application.Routes
-->         /agent-services/apply-from-outside-uk/create-account        subscription.Routes
+# Add all the application routes to the app.routes file
+->         /agent-services/apply-from-outside-uk                       app.Routes
 
 ->         /                                                           health.Routes

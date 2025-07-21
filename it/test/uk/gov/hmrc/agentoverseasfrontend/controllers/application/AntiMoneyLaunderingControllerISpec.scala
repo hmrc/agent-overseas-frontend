@@ -26,6 +26,8 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.AmlsDetails
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentoverseasfrontend.controllers.{routes => signOutRoutes}
 
 import scala.concurrent.Future
 
@@ -202,7 +204,7 @@ with AgentOverseasApplicationStubs {
         "amls.hint.expandable.p1"
       )
 
-      result.futureValue should containSubstrings(routes.ApplicationSignOutController.signOut.url)
+      result.futureValue should containSubstrings(signOutRoutes.SignOutController.signOut.url)
     }
 
     "display the money-laundering form with correct back button link when user is CHANGING ANSWERS" in {

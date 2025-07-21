@@ -33,7 +33,7 @@
     @h1("timed-out.header")
     @p(msgs("timed-out.p1", timeString))
     @p(html = Some(Html(
-        a("timed-out.p2.link", href = routes.ApplicationSignOutController.signOutToStart.url) + "" +
+        a("timed-out.p2.link", href = appConfig.selfExternalUrl + routes.ApplicationRootController.root.url) + "" +
                 span("timed-out.p2")
         )
     ))
