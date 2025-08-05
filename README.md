@@ -20,6 +20,12 @@ This frontend allows overseas agents to submit an application to HMRC for regist
 
     sbt clean coverageOn test it:test coverageReport
 
+
+### Automated testing
+This service is tested by the following automated test repositories:
+- [agent-overseas-ui-tests](https://github.com/hmrc/agent-overseas-ui-tests)
+- [agent-overseas-performance-tests](https://github.com/hmrc/agent-overseas-performance-tests)
+
 ## Running the app locally
 
     sm --start AGENT_ONBOARDING -r
