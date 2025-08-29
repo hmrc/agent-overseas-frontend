@@ -62,29 +62,27 @@
     </h1>
     @p(msgs("yourTaxRegistrationNumbers.body.text", trns.size))
 
-    <fieldset class="govuk-fieldset">
-        @govukSummaryList(SummaryList(
-            rows = trns.toList.map { trn =>
-                SummaryListRow(
-                    key = Key(Text(trn)),
-                    value = Value(content = HtmlContent(
-                        s"""<a href="${routes.TaxRegController.showRemoveTaxRegNumber(trn).url}" aria-label="${msgs("yourTaxRegistrationNumbers.remove.button")} $trn" class="govuk-link">
-                           |  ${msgs("yourTaxRegistrationNumbers.remove.button")}<span class="govuk-visually-hidden"> $trn</span>
-                           |</a>
-                           |""".stripMargin
-                    )),
-                    actions = Some(Actions(items = Seq(
-                        ActionItem(
-                            href = s"${routes.TaxRegController.showUpdateTaxRegNumber(trn)}",
-                            content = Text(msgs("yourTaxRegistrationNumbers.update.button")),
-                            classes = s"govuk-button",
-                            visuallyHiddenText = Some(s" $trn")
-                        )
-                    )))
-                )
-            }
-        ))
-    </fieldset>
+    @govukSummaryList(SummaryList(
+        rows = trns.toList.map { trn =>
+            SummaryListRow(
+                key = Key(Text(trn)),
+                value = Value(content = HtmlContent(
+                    s"""<a href="${routes.TaxRegController.showRemoveTaxRegNumber(trn).url}" aria-label="${msgs("yourTaxRegistrationNumbers.remove.button")} $trn" class="govuk-link">
+                       |  ${msgs("yourTaxRegistrationNumbers.remove.button")}<span class="govuk-visually-hidden"> $trn</span>
+                       |</a>
+                       |""".stripMargin
+                )),
+                actions = Some(Actions(items = Seq(
+                    ActionItem(
+                        href = s"${routes.TaxRegController.showUpdateTaxRegNumber(trn)}",
+                        content = Text(msgs("yourTaxRegistrationNumbers.update.button")),
+                        classes = s"govuk-button",
+                        visuallyHiddenText = Some(s" $trn")
+                    )
+                )))
+            )
+        }
+    ))
 
     @formWithCSRF(action = routes.TaxRegController.submitYourTaxRegNumbers, 'class -> "form js-form") {
 
