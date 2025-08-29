@@ -17,13 +17,11 @@
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
-@import uk.gov.hmrc.agentoverseasfrontend.views.html.helpers._
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukCheckboxes
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
@@ -32,12 +30,19 @@
     govukErrorSummary: GovukErrorSummary,
     submitButton: submitButton, p: p,
     govukCheckboxes: GovukCheckboxes,
-    formWithCsrf: FormWithCSRF,
-    checkBoxWithConditionalText: checkbox_with_conditional_text)
+    govukInput: GovukInput,
+    formWithCsrf: FormWithCSRF
+)
 
 @(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(agentCodesForm) + msgs("agentCodes.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm.url))) {
+@saValue = @{ agentCodesForm("self-assessment").value.getOrElse("") }
+@ctValue = @{ agentCodesForm("corporation-tax").value.getOrElse("") }
+
+@mainTemplate(
+    title = errorPrefix(agentCodesForm) + msgs("agentCodes.title"),
+    backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm.url))
+) {
 
     @if(agentCodesForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(agentCodesForm))
@@ -52,22 +57,45 @@
     @p("agentCodes.form.hint")
 
     @formWithCsrf(action = routes.ApplicationController.submitAgentCodes) {
-
-        <fieldset class="govuk-fieldset">
-            <div class="panels-conditionals form-group margin-bottom-30">
-                @checkBoxWithConditionalText(
-                    field = agentCodesForm("self-assessment"),
-                    labelCheckbox = msgs("agentCodes.form.self-assessment.label"),
-                    labelInset = msgs("agentCodes.form.self-assessment.inset")
+        @govukCheckboxes(Checkboxes(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(msgs("agentCodes.title")),
+                    classes = "govuk-visually-hidden"
+                ))
+            )),
+            name = "agentCodes",
+            items = Seq(
+                CheckboxItem(
+                    id = Some("self-assessment-checkbox"),
+                    name = Some("self-assessment-checkbox"),
+                    content = Text(msgs("agentCodes.form.self-assessment.label")),
+                    value = "true",
+                    checked = saValue.nonEmpty || agentCodesForm.error("self-assessment").isDefined,
+                    conditionalHtml = Some(
+                        govukInput(Input(
+                            label = Label(
+                                content = Text( msgs("agentCodes.form.self-assessment.inset"))
+                            )
+                        ).withFormField(agentCodesForm("self-assessment")))
+                  )
+                ),
+                CheckboxItem(
+                    id = Some("corporation-tax-checkbox"),
+                    name = Some("corporation-tax-checkbox"),
+                    content = Text(msgs("agentCodes.form.corporation-tax.label")),
+                    value = "true",
+                    checked = ctValue.nonEmpty || agentCodesForm.error("corporation-tax").isDefined,
+                    conditionalHtml = Some(
+                        govukInput(Input(
+                            label = Label(
+                                content = Text( msgs("agentCodes.form.corporation-tax.inset"))
+                            )
+                        ).withFormField(agentCodesForm("corporation-tax")))
+                    )
                 )
-                @checkBoxWithConditionalText(
-                    field = agentCodesForm("corporation-tax"),
-                    labelCheckbox = msgs("agentCodes.form.corporation-tax.label"),
-                    labelInset = msgs("agentCodes.form.corporation-tax.inset")
-                )
-            </div>
-
-        </fieldset>
+            )
+        ))
 
         @submitButton()
     }
