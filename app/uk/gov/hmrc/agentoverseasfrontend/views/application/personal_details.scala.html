@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Input
+@import uk.gov.hmrc.govukfrontend.views.Aliases.{Fieldset, Input, Legend}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.{RichInput, RichRadios}
 @import uk.gov.hmrc.govukfrontend.views.html.components.{FormWithCSRF, GovukButton, GovukErrorSummary, GovukInput, GovukInsetText, GovukRadios}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -51,14 +51,19 @@
     }
 
     @h1("personalDetails.title")
-    @p("personalDetails.p1", classes = Some("margin-bottom-10"))
 
-    <p class="govuk-hint">@msgs("personalDetails.p2")</p>
+    @p("personalDetails.p1", classes = Some("margin-bottom-10"))
 
     @formWithCsrf(action = routes.ApplicationController.submitPersonalDetails, 'class -> "form js-form") {
 
-        <fieldset class="govuk-fieldset">
         @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(msgs("personalDetails.title")),
+                    classes = "govuk-visually-hidden"
+                ))
+            )),
+            hint = Some(Hint(content = Text(msgs("personalDetails.p2")))),
             items = Seq(
                 RadioItem(
                     content = Text(msgs("personalDetails.form.nino")),
@@ -89,7 +94,6 @@
                 )
             ),
         ).withFormField(personalDetailsForm("personalDetailsChoice")))
-        </fieldset>
 
         @submitButton()
 
