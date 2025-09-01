@@ -16,32 +16,30 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentoverseasfrontend.config.view.CheckYourAnswers
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
+import uk.gov.hmrc.agentoverseasfrontend.config.view.CheckYourAnswers
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.registeredForUkTaxForm
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.registeredWithHmrcForm
 import uk.gov.hmrc.agentoverseasfrontend.forms._
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.IsRegisteredForUkTax
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.IsRegisteredWithHmrc
-import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
-import uk.gov.hmrc.agentoverseasfrontend.models.No
-import uk.gov.hmrc.agentoverseasfrontend.models.Yes
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class ApplicationController @Inject() (
@@ -74,6 +72,7 @@ extends AgentOverseasBaseController(
 with SessionBehaviour
 with I18nSupport {
 
+  import authAction.withBasicAuth
   import authAction.withBasicAuthAndAgentAffinity
   import authAction.withEnrollingAgent
   import authAction.withEnrollingEmailVerifiedAgent
@@ -429,12 +428,16 @@ with I18nSupport {
     }
   }
 
-  def showEmailLocked: Action[AnyContent] = Action { implicit request =>
-    Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm))
+  def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
+    withBasicAuth { _ =>
+      Future.successful(Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm)))
+    }
   }
 
-  def showEmailTechnicalError: Action[AnyContent] = Action { implicit request =>
-    Ok(emailTechnicalErrorView())
+  def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
+    withBasicAuth { _ =>
+      Future.successful(Ok(emailTechnicalErrorView()))
+    }
   }
 
   private def ukTaxRegistrationBackLink(session: AgentSession) =
