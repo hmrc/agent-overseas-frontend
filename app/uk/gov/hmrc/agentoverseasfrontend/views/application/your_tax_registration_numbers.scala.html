@@ -20,11 +20,8 @@
 @import uk.gov.hmrc.agentoverseasfrontend.models._
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
 @import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.errorsummary.ErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
@@ -36,54 +33,60 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
-@import uk.gov.hmrc.agentoverseasfrontend.views.html.components._
 
 @this(
-    mainTemplate: main_template,
-    errorPrefix: error_prefix,
-    govukErrorSummary: GovukErrorSummary,
-    govukSummaryList: GovukSummaryList,
-    govukRadios: GovukRadios,
-    formWithCSRF: FormWithCSRF,
-    submitButton: submitButton,
-    p: p, span: span
+        mainTemplate: main_template,
+        errorPrefix: error_prefix,
+        govukErrorSummary: GovukErrorSummary,
+        govukSummaryList: GovukSummaryList,
+        govukRadios: GovukRadios,
+        formWithCSRF: FormWithCSRF,
+        submitButton: submitButton
 )
-@(doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn], trns: SortedSet[String], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
-
-@mainTemplate(title = errorPrefix(doYouWantToAddAnotherTrnForm) + msgs("yourTaxRegistrationNumbers.title"), backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))) {
+@(
+        doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn],
+        trns: SortedSet[String],
+        backLink: Option[String] = None
+)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@pageTitle = @{msgs("yourTaxRegistrationNumbers.title")}
+@mainTemplate(
+    title = errorPrefix(doYouWantToAddAnotherTrnForm) + pageTitle,
+    backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))
+) {
 
     @if(doYouWantToAddAnotherTrnForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(doYouWantToAddAnotherTrnForm))
     }
 
-    <h1 class="govuk-heading-xl">
-        @span("yourTaxRegistrationNumbers.caption", classes = Some("govuk-caption-xl"))
-        @span("yourTaxRegistrationNumbers.title")
-    </h1>
-    @p(msgs("yourTaxRegistrationNumbers.body.text", trns.size))
+    <h2 class="govuk-caption-xl">@msgs("yourTaxRegistrationNumbers.caption")</h2>
+    <h1 class="govuk-heading-xl">@pageTitle</h1>
+
+    <p class="govuk-body">@msgs("yourTaxRegistrationNumbers.body.text", trns.size)</p>
 
     @govukSummaryList(SummaryList(
+        classes = "hmrc-list-with-actions hmrc-list-with-actions--short",
         rows = trns.toList.map { trn =>
             SummaryListRow(
-                key = Key(Text(trn)),
-                value = Value(content = HtmlContent(
-                    s"""<a href="${routes.TaxRegController.showRemoveTaxRegNumber(trn).url}" aria-label="${msgs("yourTaxRegistrationNumbers.remove.button")} $trn" class="govuk-link">
-                       |  ${msgs("yourTaxRegistrationNumbers.remove.button")}<span class="govuk-visually-hidden"> $trn</span>
-                       |</a>
-                       |""".stripMargin
-                )),
+                key = Key(
+                    content = Text(trn),
+                    classes = "hmrc-summary-list__key"
+                ),
                 actions = Some(Actions(items = Seq(
                     ActionItem(
                         href = s"${routes.TaxRegController.showUpdateTaxRegNumber(trn)}",
                         content = Text(msgs("yourTaxRegistrationNumbers.update.button")),
-                        classes = s"govuk-button",
+                        visuallyHiddenText = Some(s" $trn")
+                    ),
+                    ActionItem(
+                        href = s"${routes.TaxRegController.showRemoveTaxRegNumber(trn).url}",
+                        content = Text(msgs("yourTaxRegistrationNumbers.remove.button")),
                         visuallyHiddenText = Some(s" $trn")
                     )
                 )))
             )
         }
     ))
-
+  
     @formWithCSRF(action = routes.TaxRegController.submitYourTaxRegNumbers, 'class -> "form js-form") {
 
         @govukRadios(Radios(
