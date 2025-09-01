@@ -104,7 +104,7 @@ GET         /timed-out                                   @uk.gov.hmrc.agentovers
 
 # Subscription routes
 
-GET        /create-account/                                   @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.root
+GET        /create-account                                    @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.root
 
 GET        /create-account/next-step                          @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionRootController.nextStep
 POST       /create-account/subscribe                          @uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.SubscriptionController.subscribe
