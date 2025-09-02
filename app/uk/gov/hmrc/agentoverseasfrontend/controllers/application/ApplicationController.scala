@@ -429,13 +429,17 @@ with I18nSupport {
   }
 
   def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAuth { _ =>
+    withBasicAuthAndAgentAffinity { _ =>
       Future.successful(Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm)))
     }
   }
 
+//  def showEmailLocked: Action[AnyContent] = Action { implicit request =>
+//    Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm))
+//  }
+
   def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAuth { _ =>
+    withBasicAuthAndAgentAffinity { _ =>
       Future.successful(Ok(emailTechnicalErrorView()))
     }
   }

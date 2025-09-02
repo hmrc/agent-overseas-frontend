@@ -17,9 +17,11 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.scalatest.Assertion
 import play.api.libs.json.Json
 import play.api.mvc.AnyContent
+import play.api.mvc.AnyContentAsEmpty
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
@@ -1663,6 +1665,61 @@ with AgentOverseasApplicationStubs {
 
       redirectLocation(result) shouldBe Some(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
     }
+  }
+
+  "GET /email-locked" should {
+    "should display the page data as expected" in {
+      val tradingName = "testTradingName"
+      val email = "testEmail@test.com"
+
+      val result = controller.showEmailLocked(
+        basicAgentRequest(FakeRequest().withFlash("tradingName" -> tradingName, "contactDetail" -> email))
+      )
+
+      status(result) shouldBe 200
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.title() shouldBe "We could not confirm your identity - Apply for an agent services account if you are not in the UK - GOV.UK"
+      html.select(Css.H1).text() shouldBe "We could not confirm your identity"
+
+      val h2s = html.select(Css.H2)
+      h2s.get(0).text() shouldBe "What to do next"
+
+      val paras = html.select(Css.paragraphs)
+      paras.get(0).text() shouldBe "We cannot check your identity because you entered an incorrect verification code too many times."
+      paras.get(1).text() shouldBe "The verification code was emailed to you."
+      paras.get(2).text() shouldBe "You can try again in 24 hours."
+      paras.get(3).text() shouldBe "If you want to try again with a different email address you can change the email address you entered (opens in new tab)."
+
+      val hyperLinks = html.select("p > a")
+      hyperLinks.get(0).attr("href") shouldBe "/agent-services/apply-from-outside-uk/contact-details"
+    }
+
+  }
+
+  "GET /email-technical-error" should {
+    "should display the page data as expected" in {
+      val tradingName = "testTradingName"
+      val email = "testEmail@test.com"
+
+      val result = controller.showEmailTechnicalError(
+        basicAgentRequest(FakeRequest().withFlash("tradingName" -> tradingName, "contactDetail" -> email))
+      )
+
+      status(result) shouldBe 200
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.title() shouldBe "We could not confirm your identity - Apply for an agent services account if you are not in the UK - GOV.UK"
+      html.select(Css.H1).text() shouldBe "We could not confirm your identity"
+
+      val h2s = html.select(Css.H2)
+      h2s.get(0).text() shouldBe "What to do next"
+
+      val paras = html.select(Css.paragraphs)
+      paras.get(0).text() shouldBe "We cannot check your identity because there is a temporary problem with our service."
+      paras.get(1).text() shouldBe "You can try again in 24 hours."
+    }
+
   }
 
   "GET / application-complete" should {
