@@ -68,7 +68,7 @@ with ErrorAuditing {
       statusCode,
       message
     )
-    logger.error(s"onClientError $message | status: $statusCode request: $request")
+    logger.error(s"onClientError $message | status: $statusCode | requestHeader: $request")
     super.onClientError(
       request,
       statusCode,
