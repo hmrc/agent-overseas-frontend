@@ -1695,6 +1695,14 @@ with AgentOverseasApplicationStubs {
       hyperLinks.get(0).attr("href") shouldBe "/agent-services/apply-from-outside-uk/contact-details"
     }
 
+    "303 to JOURNEY START when no required fields in flash, authAction should deal with routing circumstances" in {
+      val result = controller.showEmailLocked(basicAgentRequest(FakeRequest()))
+
+      // as the Agent should have no agentSession at this point, previous last created application would be shown or start of Journey
+      status(result) shouldBe 303
+      redirectLocation(result).get shouldBe routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url
+    }
+
   }
 
   "GET /email-technical-error" should {
@@ -1718,6 +1726,14 @@ with AgentOverseasApplicationStubs {
       val paras = html.select(Css.paragraphs)
       paras.get(0).text() shouldBe "We cannot check your identity because there is a temporary problem with our service."
       paras.get(1).text() shouldBe "You can try again in 24 hours."
+    }
+
+    "303 to JOURNEY START when no required fields in flash, authAction should deal with routing circumstances" in {
+      val result = controller.showEmailTechnicalError(basicAgentRequest(FakeRequest()))
+
+      // as the Agent should have no agentSession at this point, previous last created application would be shown or start of Journey
+      status(result) shouldBe 303
+      redirectLocation(result).get shouldBe routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url
     }
 
   }

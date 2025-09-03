@@ -35,7 +35,7 @@ This service is tested by the following automated test repositories:
 It should then be listening on port 9414
 
     browse http://localhost:9414/agent-services/apply-from-outside-uk
-    browse http://localhost:9414/agent-services/apply-from-outside-uk/create-account
+    browse http://localhost:9414/agent-services/apply-from-outside-uk/create-accounthttp://localhost:9414/agent-services/apply-from-outside-uk/create-account
     
 ### License
 
