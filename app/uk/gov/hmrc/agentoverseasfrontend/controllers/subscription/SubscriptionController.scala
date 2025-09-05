@@ -121,11 +121,15 @@ with Logging {
   }
 
   def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm)))
+    authAction.authorised() {
+      Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm)))
+    }
   }
 
   def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(emailTechnicalErrorView()))
+    authAction.authorised() {
+      Future.successful(Ok(emailTechnicalErrorView()))
+    }
   }
 
 }
