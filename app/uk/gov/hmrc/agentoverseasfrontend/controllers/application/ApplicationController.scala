@@ -429,30 +429,14 @@ with I18nSupport {
   }
 
   def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAuthAndAgentAffinity { _ =>
-      val tradingName = request.flash.get("tradingName")
-      val contactDetail = request.flash.get("contactDetail")
-
-      if (tradingName.isDefined && contactDetail.isDefined)
-        Future.successful(Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm)))
-      else
-        Redirect(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm)
+    authAction.authorised() {
+      Future.successful(Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm)))
     }
   }
 
-//  def showEmailLocked: Action[AnyContent] = Action { implicit request =>
-//    Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm))
-//  }
-
   def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAuthAndAgentAffinity { _ =>
-      val tradingName = request.flash.get("tradingName")
-      val contactDetail = request.flash.get("contactDetail")
-
-      if (tradingName.isDefined && contactDetail.isDefined)
-        Future.successful(Ok(emailTechnicalErrorView()))
-      else
-        Redirect(routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm)
+    authAction.authorised() {
+      Future.successful(Ok(emailTechnicalErrorView()))
     }
   }
 

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
+import org.jsoup.Jsoup
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
@@ -24,6 +25,10 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
+import uk.gov.hmrc.agentoverseasfrontend.support.Css
+import uk.gov.hmrc.http.SessionKeys
+
+import java.util.UUID
 
 class SubscriptionControllerISpec
 extends BaseISpec
@@ -148,6 +153,71 @@ with AgentSubscriptionStubs {
       status(result) shouldBe 303
       redirectLocation(result).get shouldBe routes.SubscriptionEmailVerificationController.verifyEmail.url
     }
+  }
+
+  "GET /create-account/email-locked" should {
+    "should display the page data as expected" in {
+      stubResponseFromAuthenticationEndpoint()
+
+      val fakeAuthenticatedRequestToViewPage = FakeRequest().withSession(
+        SessionKeys.authToken -> "Bearer XYZ",
+        SessionKeys.sessionId -> UUID.randomUUID().toString
+      )
+
+      val result = controller.showEmailLocked(
+        fakeAuthenticatedRequestToViewPage
+      )
+
+      status(result) shouldBe 200
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.title() shouldBe "We could not confirm your identity - Apply for an agent services account if you are not in the UK - GOV.UK"
+      html.select(Css.H1).text() shouldBe "We could not confirm your identity"
+
+      val h2_headers = html.select(Css.H2)
+      h2_headers.get(0).text() shouldBe "What to do next"
+
+      val paragraphs = html.select(Css.paragraphs)
+      paragraphs.get(0).text() shouldBe "We cannot check your identity because you entered an incorrect verification code too many times."
+      paragraphs.get(1).text() shouldBe "The verification code was emailed to you."
+      paragraphs.get(2).text() shouldBe "You can try again in 24 hours."
+      paragraphs.get(
+        3
+      ).text() shouldBe "If you want to try again with a different email address you can change the email address you entered (opens in new tab)."
+
+      val hyperLinks = html.select("p > a")
+      hyperLinks.get(0).attr("href") shouldBe "/agent-services/apply-from-outside-uk/create-account/update-business-email"
+    }
+
+  }
+
+  "GET /create-account/email-technical-error" should {
+    "should display the page data as expected" in {
+      stubResponseFromAuthenticationEndpoint()
+
+      val fakeAuthenticatedRequestToViewPage = FakeRequest().withSession(
+        SessionKeys.authToken -> "Bearer XYZ",
+        SessionKeys.sessionId -> UUID.randomUUID().toString
+      )
+
+      val result = controller.showEmailTechnicalError(
+        fakeAuthenticatedRequestToViewPage
+      )
+
+      status(result) shouldBe 200
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.title() shouldBe "We could not confirm your identity - Apply for an agent services account if you are not in the UK - GOV.UK"
+      html.select(Css.H1).text() shouldBe "We could not confirm your identity"
+
+      val h2_headers = html.select(Css.H2)
+      h2_headers.get(0).text() shouldBe "What to do next"
+
+      val paragraphs = html.select(Css.paragraphs)
+      paragraphs.get(0).text() shouldBe "We cannot check your identity because there is a temporary problem with our service."
+      paragraphs.get(1).text() shouldBe "You can try again in 24 hours."
+    }
+
   }
 
 }

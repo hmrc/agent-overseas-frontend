@@ -284,4 +284,15 @@ trait AuthStubs {
     )
   }
 
+  def stubResponseFromAuthenticationEndpoint(): StubMapping = {
+    stubFor(
+      post(urlEqualTo("/auth/authorise")).willReturn(
+        aResponse()
+          .withStatus(200)
+          .withHeader("Content-Type", "application/json")
+          .withBody(s"""{}""")
+      )
+    )
+  }
+
 }
