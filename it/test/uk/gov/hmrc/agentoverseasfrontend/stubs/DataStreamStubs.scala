@@ -28,7 +28,7 @@ trait DataStreamStubs
 extends Eventually {
   me: WireMockSupport =>
 
-  override implicit val patienceConfig = PatienceConfig(scaled(Span(5, Seconds)), scaled(Span(500, Millis)))
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(scaled(Span(5, Seconds)), scaled(Span(500, Millis)))
 
   def givenAuditConnector(): StubMapping = {
     stubFor(post(urlPathEqualTo(auditUrl)).willReturn(aResponse().withStatus(204)))

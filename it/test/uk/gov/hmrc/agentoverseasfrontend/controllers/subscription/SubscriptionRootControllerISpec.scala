@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec

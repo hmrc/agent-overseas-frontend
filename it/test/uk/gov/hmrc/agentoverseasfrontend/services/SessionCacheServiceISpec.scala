@@ -63,8 +63,6 @@ with CleanMongoCollectionSupport {
       sessionCacheRepository = sessionCacheRepository
     )
 
-  private val id: String = "sessionId123456"
-  private val instant: Instant = Instant.now()
   private val contactDetails: ContactDetails = ContactDetails(
     firstName = "first",
     lastName = "last",

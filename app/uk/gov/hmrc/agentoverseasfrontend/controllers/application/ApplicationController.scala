@@ -72,7 +72,6 @@ extends AgentOverseasBaseController(
 with SessionBehaviour
 with I18nSupport {
 
-  import authAction.withBasicAuth
   import authAction.withBasicAuthAndAgentAffinity
   import authAction.withEnrollingAgent
   import authAction.withEnrollingEmailVerifiedAgent

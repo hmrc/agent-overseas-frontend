@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.scalatest.Assertion
 import play.api.libs.json.Json
 import play.api.mvc.AnyContent
@@ -340,7 +339,7 @@ with AgentOverseasApplicationStubs {
 
   "GET /registered-with-hmrc" should {
     class RegisteredWithHmrcSetup(agentSession: AgentSession = agentSession.copy(registeredWithHmrc = None)) {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showRegisteredWithHmrcForm(request)
       val doc = Jsoup.parse(contentAsString(result))
@@ -483,7 +482,7 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showUkTaxRegistrationForm(request)
       val doc = Jsoup.parse(contentAsString(result))
@@ -664,7 +663,7 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = Some(Yes)
     )
     class PersonalDetailsSetup(agentSession: AgentSession = defaultAgentSession) {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showPersonalDetailsForm(request)
       val doc = Jsoup.parse(contentAsString(result))
@@ -998,7 +997,7 @@ with AgentOverseasApplicationStubs {
       agentCodes = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showAgentCodesForm(request)
       val doc = Jsoup.parse(contentAsString(result))

@@ -16,16 +16,6 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentoverseasfrontend.models.Utr
-import uk.gov.hmrc.domain.Nino
-
-case class PersonalDetails(
-  saUtr: Option[Utr],
-  nino: Option[Nino]
-)
-
-object PersonalDetails {
-  implicit val format: OFormat[PersonalDetails] = Json.format
+trait TrustTaxIdentifier {
+  val value: String
 }

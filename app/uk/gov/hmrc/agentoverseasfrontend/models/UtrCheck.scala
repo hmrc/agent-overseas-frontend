@@ -16,16 +16,13 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentoverseasfrontend.models.Utr
-import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.domain.Modulus11Check
 
-case class PersonalDetails(
-  saUtr: Option[Utr],
-  nino: Option[Nino]
-)
+object UtrCheck
+extends Modulus11Check {
 
-object PersonalDetails {
-  implicit val format: OFormat[PersonalDetails] = Json.format
+  def isValid(utr: String): Boolean = {
+    val suffix: String = utr.substring(1)
+    calculateCheckCharacter(suffix) == utr.charAt(0)
+  }
 }

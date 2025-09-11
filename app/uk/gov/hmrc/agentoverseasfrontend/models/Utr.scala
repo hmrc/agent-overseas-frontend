@@ -16,16 +16,25 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.models
 
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentoverseasfrontend.models.Utr
-import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.domain.SimpleObjectReads
+import uk.gov.hmrc.domain.SimpleObjectWrites
+import uk.gov.hmrc.domain.TaxIdentifier
 
-case class PersonalDetails(
-  saUtr: Option[Utr],
-  nino: Option[Nino]
-)
+case class Utr(value: String)
+extends TaxIdentifier
+with TrustTaxIdentifier
 
-object PersonalDetails {
-  implicit val format: OFormat[PersonalDetails] = Json.format
+object Utr {
+
+  private val utrPattern = "^\\d{10}$".r
+
+  def isValid(utr: String): Boolean =
+    utr match {
+      case utrPattern(_*) => UtrCheck.isValid(utr)
+      case _ => false
+    }
+
+  implicit val utrReads: SimpleObjectReads[Utr] = new SimpleObjectReads[Utr]("value", Utr.apply)
+  implicit val utrWrites: SimpleObjectWrites[Utr] = new SimpleObjectWrites[Utr](_.value)
+
 }

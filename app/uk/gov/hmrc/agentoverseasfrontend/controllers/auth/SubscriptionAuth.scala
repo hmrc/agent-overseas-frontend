@@ -25,7 +25,7 @@ import play.api.mvc.Results.SeeOther
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.{routes => applicationRoutes}

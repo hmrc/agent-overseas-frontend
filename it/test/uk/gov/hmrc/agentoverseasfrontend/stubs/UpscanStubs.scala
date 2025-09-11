@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 trait UpscanStubs {
   me: WireMockSupport =>
 
-  implicit val requestJson =
+  implicit val requestJson: String =
     s"""{
        |"callbackUrl": "http://localhost:$wireMockPort/agent-overseas-application/upscan-callback",
        |"minimumFileSize": 1000,
