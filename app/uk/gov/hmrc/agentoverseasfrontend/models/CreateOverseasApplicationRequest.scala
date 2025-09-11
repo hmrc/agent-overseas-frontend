@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.json._
-import uk.gov.hmrc.agentmtdidentifiers.model.Utr
+import uk.gov.hmrc.agentoverseasfrontend.models.Utr
 
 case class CreateOverseasApplicationRequest(
   amlsRequired: Boolean,

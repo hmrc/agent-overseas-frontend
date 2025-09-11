@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.services
 
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.AlreadySubscribed
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoAgencyInSession
 import uk.gov.hmrc.agentoverseasfrontend.models.FailureToSubscribe.NoApplications

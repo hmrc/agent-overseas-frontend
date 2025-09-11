@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 
 trait AgentSubscriptionStubs { me: WireMockSupport =>

@@ -23,7 +23,7 @@ import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Forbidden
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._

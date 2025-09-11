@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.support
 
 import org.apache.pekko.util.Timeout
 import com.google.inject.AbstractModule
+import org.apache.pekko.stream.Materializer
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -41,7 +42,6 @@ import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AuthStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.DataStreamStubs
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mongo.cache.SessionCacheRepository
 import uk.gov.hmrc.mongo.test.MongoSupport
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -61,7 +61,7 @@ with MetricsTestSupport
 with DefaultAwaitTimeout
 with MongoSupport {
 
-  implicit val timeout = Timeout(5.seconds)
+  implicit val timeout: Timeout = Timeout(5.seconds)
 
   override implicit lazy val app: Application = appBuilder.build()
 
@@ -109,7 +109,7 @@ with MongoSupport {
     ()
   }
 
-  protected implicit val materializer = app.materializer
+  protected implicit val materializer: Materializer = app.materializer
 
   private def contentType(result: Result): Option[String] = result.body.contentType.map(_.split(";").take(1).mkString.trim)
 
@@ -142,7 +142,7 @@ with MongoSupport {
   protected def htmlMessage(
     key: String,
     args: Any*
-  ): String = Messages(key, args: _*).toString
+  ): String = Messages(key, args: _*)
 
   implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 

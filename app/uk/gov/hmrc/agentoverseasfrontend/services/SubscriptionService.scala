@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import play.api.Logging
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentSubscriptionConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus._
