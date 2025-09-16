@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.Assertion
+import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.mvc.AnyContentAsEmpty
@@ -1803,10 +1804,26 @@ with AgentOverseasApplicationStubs {
     "should display the page data as expected" in {
       stubResponseFromAuthenticationEndpoint()
 
-      val fakeAuthenticatedRequestToViewPage = FakeRequest().withSession(
-        SessionKeys.authToken -> "Bearer XYZ",
-        SessionKeys.sessionId -> UUID.randomUUID().toString
+      val bodyOfRequest: JsObject = Json.obj(
+        "authorise" -> Json.arr(
+          Json.obj(
+            "authProviders" -> Json.arr(
+              "GovernmentGateway"
+            )
+          ),
+          Json.obj(
+            "affinityGroup" -> "Agent"
+          )
+        ),
+        "retrieve" -> Json.arr()
       )
+
+      val fakeAuthenticatedRequestToViewPage = FakeRequest()
+        .withSession(
+          SessionKeys.authToken -> "Bearer XYZ",
+          SessionKeys.sessionId -> UUID.randomUUID().toString
+        )
+        .withJsonBody(bodyOfRequest)
 
       val result = controller.showEmailLocked(
         fakeAuthenticatedRequestToViewPage
@@ -1839,10 +1856,26 @@ with AgentOverseasApplicationStubs {
     "should display the page data as expected" in {
       stubResponseFromAuthenticationEndpoint()
 
-      val fakeAuthenticatedRequestToViewPage = FakeRequest().withSession(
-        SessionKeys.authToken -> "Bearer XYZ",
-        SessionKeys.sessionId -> UUID.randomUUID().toString
+      val bodyOfRequest: JsObject = Json.obj(
+        "authorise" -> Json.arr(
+          Json.obj(
+            "authProviders" -> Json.arr(
+              "GovernmentGateway"
+            )
+          ),
+          Json.obj(
+            "affinityGroup" -> "Agent"
+          )
+        ),
+        "retrieve" -> Json.arr()
       )
+
+      val fakeAuthenticatedRequestToViewPage = FakeRequest()
+        .withSession(
+          SessionKeys.authToken -> "Bearer XYZ",
+          SessionKeys.sessionId -> UUID.randomUUID().toString
+        )
+        .withJsonBody(bodyOfRequest)
 
       val result = controller.showEmailTechnicalError(
         fakeAuthenticatedRequestToViewPage

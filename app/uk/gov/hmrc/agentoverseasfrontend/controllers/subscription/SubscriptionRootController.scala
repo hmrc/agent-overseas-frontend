@@ -53,20 +53,20 @@ extends AgentOverseasBaseController(
   mcc
 ) {
 
-  import authAction.withBasicAgentAuth
+  import authAction.withSimpleAgentAuth
 
   def root: Action[AnyContent] = Action {
     Redirect(routes.BusinessIdentificationController.showCheckAnswers)
   }
 
   def nextStep: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { subRequest =>
+    withSimpleAgentAuth { subRequest =>
       Future.successful(Ok(createNewAccountView()))
     }
   }
 
   def showApplicationIssue: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { subRequest =>
+    withSimpleAgentAuth { subRequest =>
       Future.successful(Ok(cannotCheckStatusView()))
     }
   }

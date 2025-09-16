@@ -71,7 +71,7 @@ extends AgentOverseasBaseController(
   private lazy val validCountryCodes = countries.keys.toSet
 
   import authAction.config
-  import authAction.withBasicAgentAuth
+  import authAction.withSimpleAgentAuth
   import authAction.withSubscribingAgent
 
   def showCheckAnswers: Action[AnyContent] = Action.async { implicit request =>
@@ -265,7 +265,7 @@ extends AgentOverseasBaseController(
   }
 
   def returnFromGGRegistration(sessionId: String): Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { _ =>
+    withSimpleAgentAuth { _ =>
       subscriptionService
         .updateAuthProviderId(sessionId)
         .map(_ => Redirect(routes.BusinessIdentificationController.showCheckAnswers))

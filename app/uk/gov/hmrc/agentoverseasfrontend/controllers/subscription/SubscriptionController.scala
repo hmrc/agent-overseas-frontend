@@ -62,11 +62,11 @@ extends AgentOverseasBaseController(
 with Logging {
 
   import authAction.config
-  import authAction.withBasicAgentAuth
+  import authAction.withSimpleAgentAuth
   import authAction.withHmrcAsAgentAction
 
   def subscribe: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { implicit subRequest =>
+    withSimpleAgentAuth { implicit subRequest =>
       if (subRequest.enrolments.isEmpty) {
         sessionStoreService.fetchAgencyDetails.flatMap {
           case Some(agencyDetails) if !agencyDetails.isEmailVerified => Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
@@ -115,20 +115,20 @@ with Logging {
   }
 
   def alreadySubscribed: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { subRequest =>
+    withSimpleAgentAuth { _ =>
       Future.successful(Ok(alreadySubscribedView()))
     }
   }
 
   def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
-    authAction.authorised() {
-      Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm)))
+    authAction.withBasicAuthAndAgentAffinity {
+      _ => Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm)))
     }
   }
 
   def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
-    authAction.authorised() {
-      Future.successful(Ok(emailTechnicalErrorView()))
+    authAction.withBasicAuthAndAgentAffinity {
+      _ => Future.successful(Ok(emailTechnicalErrorView()))
     }
   }
 

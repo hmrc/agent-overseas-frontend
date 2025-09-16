@@ -78,7 +78,7 @@ with Logging {
       case None => throw new IllegalStateException("credentials expected but not found for the logged in user")
     }
 
-  def withBasicAgentAuth(
+  def withSimpleAgentAuth(
     block: SubscriptionRequest => Future[Result]
   )(implicit
     request: Request[_]

@@ -72,7 +72,6 @@ extends AgentOverseasBaseController(
 with SessionBehaviour
 with I18nSupport {
 
-  import authAction.withBasicAuth
   import authAction.withBasicAuthAndAgentAffinity
   import authAction.withEnrollingAgent
   import authAction.withEnrollingEmailVerifiedAgent
@@ -396,7 +395,7 @@ with I18nSupport {
             BadRequest(
               cyaView(formWithErrors, CheckYourAnswers(agentSession, getCountryName(agentSession)))
             ),
-          cyaConfirmation =>
+          _ =>
             for {
               _ <- applicationService.createApplication(agentSession)
               _ <- sessionStoreService.removeAgentSession
@@ -413,7 +412,7 @@ with I18nSupport {
   }
 
   def showApplicationComplete: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAuthAndAgentAffinity { cRequest =>
+    withBasicAuthAndAgentAffinity { _ =>
       val tradingName = request.flash.get("tradingName")
       val contactDetail = request.flash.get("contactDetail")
 
@@ -429,14 +428,14 @@ with I18nSupport {
   }
 
   def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
-    authAction.authorised() {
-      Future.successful(Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm)))
+    authAction.withBasicAuthAndAgentAffinity {
+      _ => Future.successful(Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm)))
     }
   }
 
   def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
-    authAction.authorised() {
-      Future.successful(Ok(emailTechnicalErrorView()))
+    authAction.withBasicAuthAndAgentAffinity {
+      _ => Future.successful(Ok(emailTechnicalErrorView()))
     }
   }
 

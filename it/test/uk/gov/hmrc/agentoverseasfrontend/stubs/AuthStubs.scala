@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.GET
@@ -38,7 +40,7 @@ trait AuthStubs {
   def authorisedAsValidAgent[A](
     request: FakeRequest[A],
     arn: String
-  ) = authenticated(
+  ): FakeRequest[A] = authenticated(
     request,
     Enrolment(
       "HMRC-AS-AGENT",
@@ -270,7 +272,7 @@ trait AuthStubs {
     )
   }
 
-  def userIsAuthenticated(user: SampleUser) = {
+  def userIsAuthenticated(user: SampleUser): StubMapping = {
     val response =
       s"""{${user.allEnrolments},${user.affinityGroup},"optionalCredentials": {"providerId": "${user.userId}", "providerType": "GovernmentGateway"}}"""
     stubFor(
@@ -284,14 +286,30 @@ trait AuthStubs {
     )
   }
 
+  val bodyOfRequestToAuthenticateAsAgentViaGovernmentGateway: JsObject = Json.obj(
+    "authorise" -> Json.arr(
+      Json.obj(
+        "authProviders" -> Json.arr(
+          "GovernmentGateway"
+        )
+      ),
+      Json.obj(
+        "affinityGroup" -> "Agent"
+      )
+    ),
+    "retrieve" -> Json.arr()
+  )
+
   def stubResponseFromAuthenticationEndpoint(): StubMapping = {
     stubFor(
-      post(urlEqualTo("/auth/authorise")).willReturn(
-        aResponse()
-          .withStatus(200)
-          .withHeader("Content-Type", "application/json")
-          .withBody(s"""{}""")
-      )
+      post(urlEqualTo("/auth/authorise"))
+        .withRequestBody(equalToJson(bodyOfRequestToAuthenticateAsAgentViaGovernmentGateway.toString()))
+        .willReturn(
+          aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(s"""{}""")
+        )
     )
   }
 
