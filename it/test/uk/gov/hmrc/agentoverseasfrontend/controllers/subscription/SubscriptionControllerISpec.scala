@@ -159,10 +159,9 @@ with AgentSubscriptionStubs {
   }
 
   "GET /create-account/email-locked" should {
-    "should display the page data as expected" in {
-      stubResponseFromAuthenticationEndpoint()
+    "should display the page data as expected when successfully authenticated" in {
 
-      val requestBody: JsObject = Json.obj(
+      val bodyOfRequest: JsObject = Json.obj(
         "authorise" -> Json.arr(
           Json.obj(
             "authProviders" -> Json.arr(
@@ -176,12 +175,20 @@ with AgentSubscriptionStubs {
         "retrieve" -> Json.arr()
       )
 
+      val bodyOfResponse: JsObject = Json.obj()
+
+      stubResponseFromAuthenticationEndpoint(
+        bodyOfRequest,
+        200,
+        bodyOfResponse
+      )
+
       val fakeAuthenticatedRequestToViewPage = FakeRequest()
         .withSession(
           SessionKeys.authToken -> "Bearer XYZ",
           SessionKeys.sessionId -> UUID.randomUUID().toString
         )
-        .withJsonBody(requestBody)
+        .withJsonBody(bodyOfRequest)
 
       val result = controller.showEmailLocked(
         fakeAuthenticatedRequestToViewPage
@@ -208,13 +215,23 @@ with AgentSubscriptionStubs {
       hyperLinks.get(0).attr("href") shouldBe "/agent-services/apply-from-outside-uk/create-account/update-business-email"
     }
 
+    "should return a SEE OTHER response when trying to access the service without an Auth token" in {
+
+      val fakeRequestToViewPage = FakeRequest()
+
+      val result = controller.showEmailLocked(
+        fakeRequestToViewPage
+      )
+
+      status(result) shouldBe 303
+    }
+
   }
 
   "GET /create-account/email-technical-error" should {
-    "should display the page data as expected" in {
-      stubResponseFromAuthenticationEndpoint()
+    "should display the page data as expected when successfully authenticated" in {
 
-      val requestBody: JsObject = Json.obj(
+      val bodyOfRequest: JsObject = Json.obj(
         "authorise" -> Json.arr(
           Json.obj(
             "authProviders" -> Json.arr(
@@ -228,12 +245,20 @@ with AgentSubscriptionStubs {
         "retrieve" -> Json.arr()
       )
 
+      val bodyOfResponse: JsObject = Json.obj()
+
+      stubResponseFromAuthenticationEndpoint(
+        bodyOfRequest,
+        200,
+        bodyOfResponse
+      )
+
       val fakeAuthenticatedRequestToViewPage = FakeRequest()
         .withSession(
           SessionKeys.authToken -> "Bearer XYZ",
           SessionKeys.sessionId -> UUID.randomUUID().toString
         )
-        .withJsonBody(requestBody)
+        .withJsonBody(bodyOfRequest)
 
       val result = controller.showEmailTechnicalError(
         fakeAuthenticatedRequestToViewPage
@@ -251,6 +276,17 @@ with AgentSubscriptionStubs {
       val paragraphs = html.select(Css.paragraphs)
       paragraphs.get(0).text() shouldBe "We cannot check your identity because there is a temporary problem with our service."
       paragraphs.get(1).text() shouldBe "You can try again in 24 hours."
+    }
+
+    "should return a SEE OTHER response when trying to access the service without an Auth token" in {
+
+      val fakeRequestToViewPage = FakeRequest()
+
+      val result = controller.showEmailLocked(
+        fakeRequestToViewPage
+      )
+
+      status(result) shouldBe 303
     }
 
   }
