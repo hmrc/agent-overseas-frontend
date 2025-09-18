@@ -22,8 +22,9 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentmtdidentifiers.model.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import javax.inject.Inject
@@ -39,7 +40,7 @@ object OverseasSubscriptionResponse {
 
 @Singleton
 class AgentSubscriptionConnector @Inject() (
-  http: HttpClient,
+  http: HttpClientV2,
   val metrics: Metrics
 )(implicit
   val appConfig: AppConfig,
@@ -47,8 +48,9 @@ class AgentSubscriptionConnector @Inject() (
 ) {
 
   def overseasSubscription(implicit rh: RequestHeader): Future[Arn] = {
-    val url = s"${appConfig.agentSubscriptionBaseUrl}/agent-subscription/overseas-subscription"
-
-    http.PUT[String, OverseasSubscriptionResponse](url, "").map(_.arn)
+    val url = url"${appConfig.agentSubscriptionBaseUrl}/agent-subscription/overseas-subscription"
+    http.put(url)
+      .execute[OverseasSubscriptionResponse]
+      .map(_.arn)
   }
 }

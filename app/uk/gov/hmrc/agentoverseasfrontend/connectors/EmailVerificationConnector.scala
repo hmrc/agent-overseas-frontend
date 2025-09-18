@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
 import play.api.Logging
+import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.VerificationStatusResponse
@@ -24,8 +25,9 @@ import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailRequest
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailResponse
 import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import javax.inject.Inject
@@ -35,7 +37,7 @@ import scala.concurrent.Future
 
 @Singleton
 class EmailVerificationConnector @Inject() (
-  http: HttpClient,
+  http: HttpClientV2,
   val metrics: Metrics
 )(implicit
   val appConfig: AppConfig,
@@ -46,32 +48,37 @@ extends Logging {
   def verifyEmail(
     request: VerifyEmailRequest
   )(implicit rh: RequestHeader): Future[Option[VerifyEmailResponse]] = {
-    val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verify-email"
+    val url = url"${appConfig.emailVerificationBaseUrl}/email-verification/verify-email"
 
-    http.POST[VerifyEmailRequest, HttpResponse](url, request).map { response =>
-      response.status match {
-        case 201 => Some(response.json.as[VerifyEmailResponse])
-        case status =>
-          logger.error(s"verifyEmail error for $request; HTTP status: $status, message: $response")
-          None
+    http.post(url)
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case 201 => Some(response.json.as[VerifyEmailResponse])
+          case status =>
+            logger.error(s"verifyEmail error for $request; HTTP status: $status, message: $response")
+            None
+        }
       }
-    }
   }
 
   def checkEmail(
     credId: String
   )(implicit rh: RequestHeader): Future[Option[VerificationStatusResponse]] = {
-    val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId"
+    val url = url"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId"
 
-    http.GET[HttpResponse](url).map { response =>
-      response.status match {
-        case 200 => Some(response.json.as[VerificationStatusResponse])
-        case 404 => Some(VerificationStatusResponse(List.empty))
-        case status =>
-          logger.error(s"email verification status error for $credId; HTTP status: $status, message: $response")
-          None
+    http.get(url)
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case 200 => Some(response.json.as[VerificationStatusResponse])
+          case 404 => Some(VerificationStatusResponse(List.empty))
+          case status =>
+            logger.error(s"email verification status error for $credId; HTTP status: $status, message: $response")
+            None
+        }
       }
-    }
   }
 
 }
