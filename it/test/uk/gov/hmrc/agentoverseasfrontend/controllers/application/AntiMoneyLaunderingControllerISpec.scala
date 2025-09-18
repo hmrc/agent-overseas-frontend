@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.AmlsDetails
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.agentoverseasfrontend.controllers.{routes => signOutRoutes}
 
 import scala.concurrent.Future

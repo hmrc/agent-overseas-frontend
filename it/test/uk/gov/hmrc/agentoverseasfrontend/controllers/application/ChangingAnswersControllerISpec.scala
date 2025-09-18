@@ -36,7 +36,7 @@ extends BaseISpec {
 
   class SetUp {
 
-    implicit val request = cleanCredsAgent(FakeRequest())
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
 
     sessionCacheService.cacheAgentSession(agentSession).futureValue
 

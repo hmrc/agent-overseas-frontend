@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentoverseasfrontend.connectors
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentmtdidentifiers.model.Arn
+import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 import uk.gov.hmrc.http.HttpClient
