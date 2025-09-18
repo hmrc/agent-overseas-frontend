@@ -22,8 +22,9 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
 import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import javax.inject.Inject
@@ -34,13 +35,13 @@ import scala.concurrent.Future
 @Singleton
 class UpscanConnector @Inject() (
   appConfig: AppConfig,
-  httpClient: HttpClient,
+  httpClient: HttpClientV2,
   val metrics: Metrics
 )(implicit
   val ec: ExecutionContext
 ) {
 
-  val upscanUrl = s"${appConfig.upscanBaseUrl}/upscan/initiate"
+  val upscanUrl = url"${appConfig.upscanBaseUrl}/upscan/initiate"
 
   val callBackUrl = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-callback"
 
@@ -55,12 +56,10 @@ class UpscanConnector @Inject() (
     """.stripMargin
   )
 
-  def initiate()(implicit rh: RequestHeader): Future[UpscanInitiate] = httpClient
-    .POST[JsValue, JsValue](
-      upscanUrl,
-      payload,
-      Seq("content-Type" -> "application/json")
-    )
+  def initiate()(implicit rh: RequestHeader): Future[UpscanInitiate] = httpClient.post(upscanUrl)
+    .withBody(payload)
+    .setHeader(("content-Type" -> "application/json"))
+    .execute[JsValue]
     .map(_.as[UpscanInitiate])
 
 }

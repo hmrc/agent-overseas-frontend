@@ -32,7 +32,9 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.agentoverseasfrontend.support.MetricsTestSupport
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -48,7 +50,7 @@ with DataStreamStubs
 with MetricsTestSupport {
 
   private lazy val metrics = app.injector.instanceOf[Metrics]
-  private lazy val http = app.injector.instanceOf[HttpClient]
+  private lazy val http = app.injector.instanceOf[HttpClientV2]
   private lazy val appConfig = app.injector.instanceOf[AppConfig]
 
   private implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()

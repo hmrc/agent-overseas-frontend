@@ -30,6 +30,7 @@
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
 )
 
+
 @(
     title: String,
     hasTimeout: Boolean = true,
@@ -99,5 +100,6 @@
         additionalHeadBlock = Some(head),
         additionalScriptsBlock = Some(additionalScripts),
         mainContentLayout = if(wide) Some(fullWidthMainContent(_)) else None
-    )
+    ),
+    serviceNavigation = None
 ))(mainContentWithHelpLink)
