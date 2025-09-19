@@ -58,7 +58,7 @@ extends AgentOverseasBaseController(
   mcc
 ) {
 
-  import authAction.withBasicAgentAuth
+  import authAction.withSimpleAgentAuth
 
   private def signOutWithContinue(continue: String) = {
     val signOutAndRedirectUrl: String = uri"""${appConfig.signOutUrl}?${Map("continue" -> continue)}""".toString
@@ -66,7 +66,7 @@ extends AgentOverseasBaseController(
   }
 
   def signOutToGGRegistrationWhenSubscribing: Action[AnyContent] = Action.async { implicit request =>
-    withBasicAgentAuth { implicit subRequest =>
+    withSimpleAgentAuth { implicit subRequest =>
       sessionStoreService.cacheProviderId(ProviderId(subRequest.authProviderId)).map { _ =>
         val postRegistrationContinue =
           uri"${appConfig.selfExternalUrl + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(request.session.apply(sessionId)).url}"
