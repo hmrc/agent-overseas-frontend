@@ -224,6 +224,7 @@ with AgentSubscriptionStubs {
       )
 
       status(result) shouldBe 303
+      header(LOCATION, result) shouldBe Some("http://localhost:9099/bas-gateway/sign-in?continue_url=http://localhost:9414/&origin=agent-overseas-frontend")
     }
 
   }
@@ -287,6 +288,7 @@ with AgentSubscriptionStubs {
       )
 
       status(result) shouldBe 303
+      header(LOCATION, result) shouldBe Some("http://localhost:9099/bas-gateway/sign-in?continue_url=http://localhost:9414/&origin=agent-overseas-frontend")
     }
 
   }
