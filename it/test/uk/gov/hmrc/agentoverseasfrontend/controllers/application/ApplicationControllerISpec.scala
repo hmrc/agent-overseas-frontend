@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import org.jsoup.Jsoup
 import org.scalatest.Assertion
+import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import play.api.mvc.AnyContent
 import play.api.mvc.AnyContentAsEmpty
@@ -1799,13 +1800,36 @@ with AgentOverseasApplicationStubs {
   }
 
   "GET /email-locked" should {
-    "should display the page data as expected" in {
-      stubResponseFromAuthenticationEndpoint()
+    "should display the page data as expected when successfully authenticated" in {
 
-      val fakeAuthenticatedRequestToViewPage = FakeRequest().withSession(
-        SessionKeys.authToken -> "Bearer XYZ",
-        SessionKeys.sessionId -> UUID.randomUUID().toString
+      val bodyOfRequest: JsObject = Json.obj(
+        "authorise" -> Json.arr(
+          Json.obj(
+            "authProviders" -> Json.arr(
+              "GovernmentGateway"
+            )
+          ),
+          Json.obj(
+            "affinityGroup" -> "Agent"
+          )
+        ),
+        "retrieve" -> Json.arr()
       )
+
+      val bodyOfResponse: JsObject = Json.obj()
+
+      stubResponseFromAuthenticationEndpoint(
+        bodyOfRequest,
+        200,
+        bodyOfResponse
+      )
+
+      val fakeAuthenticatedRequestToViewPage = FakeRequest()
+        .withSession(
+          SessionKeys.authToken -> "Bearer XYZ",
+          SessionKeys.sessionId -> UUID.randomUUID().toString
+        )
+        .withJsonBody(bodyOfRequest)
 
       val result = controller.showEmailLocked(
         fakeAuthenticatedRequestToViewPage
@@ -1832,16 +1856,51 @@ with AgentOverseasApplicationStubs {
       hyperLinks.get(0).attr("href") shouldBe "/agent-services/apply-from-outside-uk/contact-details"
     }
 
+    "should return a SEE OTHER response when trying to access the service without an Auth token" in {
+
+      val fakeRequestToViewPage = FakeRequest()
+
+      val result = controller.showEmailLocked(
+        fakeRequestToViewPage
+      )
+
+      status(result) shouldBe 303
+      header(LOCATION, result).value shouldBe "http://localhost:9099/bas-gateway/sign-in?continue_url=http://localhost:9414/&origin=agent-overseas-frontend"
+    }
+
   }
 
   "GET /email-technical-error" should {
-    "should display the page data as expected" in {
-      stubResponseFromAuthenticationEndpoint()
+    "should display the page data as expected when successfully authenticated" in {
 
-      val fakeAuthenticatedRequestToViewPage = FakeRequest().withSession(
-        SessionKeys.authToken -> "Bearer XYZ",
-        SessionKeys.sessionId -> UUID.randomUUID().toString
+      val bodyOfRequest: JsObject = Json.obj(
+        "authorise" -> Json.arr(
+          Json.obj(
+            "authProviders" -> Json.arr(
+              "GovernmentGateway"
+            )
+          ),
+          Json.obj(
+            "affinityGroup" -> "Agent"
+          )
+        ),
+        "retrieve" -> Json.arr()
       )
+
+      val bodyOfResponse: JsObject = Json.obj()
+
+      stubResponseFromAuthenticationEndpoint(
+        bodyOfRequest,
+        200,
+        bodyOfResponse
+      )
+
+      val fakeAuthenticatedRequestToViewPage = FakeRequest()
+        .withSession(
+          SessionKeys.authToken -> "Bearer XYZ",
+          SessionKeys.sessionId -> UUID.randomUUID().toString
+        )
+        .withJsonBody(bodyOfRequest)
 
       val result = controller.showEmailTechnicalError(
         fakeAuthenticatedRequestToViewPage
@@ -1859,6 +1918,18 @@ with AgentOverseasApplicationStubs {
       val paragraphs = html.select(Css.paragraphs)
       paragraphs.get(0).text() shouldBe "We cannot check your identity because there is a temporary problem with our service."
       paragraphs.get(1).text() shouldBe "You can try again in 24 hours."
+    }
+
+    "should return a SEE OTHER response when trying to access the service without an Auth token" in {
+
+      val fakeRequestToViewPage = FakeRequest()
+
+      val result = controller.showEmailLocked(
+        fakeRequestToViewPage
+      )
+
+      status(result) shouldBe 303
+      header(LOCATION, result).value shouldBe "http://localhost:9099/bas-gateway/sign-in?continue_url=http://localhost:9414/&origin=agent-overseas-frontend"
     }
 
   }
