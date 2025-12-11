@@ -30,6 +30,7 @@ with Serializable {
       case ApplicationStatus.AttemptingRegistration => "attempting_registration" // 3
       case ApplicationStatus.Registered => "registered" // 4
       case ApplicationStatus.Complete => "complete" // 5
+      case ApplicationStatus.NotReceivedInDms => "not_received_in_dms"
     }
 }
 
@@ -39,6 +40,9 @@ object ApplicationStatus {
   extends ApplicationStatus
 
   case object Rejected
+  extends ApplicationStatus
+
+  case object NotReceivedInDms
   extends ApplicationStatus
 
   case object Accepted
@@ -58,6 +62,7 @@ object ApplicationStatus {
 
       case ApplicationStatus.Pending.key => ApplicationStatus.Pending
       case ApplicationStatus.Rejected.key => ApplicationStatus.Rejected
+      case ApplicationStatus.NotReceivedInDms.key => ApplicationStatus.NotReceivedInDms
       case ApplicationStatus.Accepted.key => ApplicationStatus.Accepted
       case ApplicationStatus.AttemptingRegistration.key => ApplicationStatus.AttemptingRegistration
       case ApplicationStatus.Registered.key => ApplicationStatus.Registered
@@ -66,28 +71,23 @@ object ApplicationStatus {
 
   def unapply(arg: ApplicationStatus): Option[String] = Some(arg.key)
 
-  implicit val reads: Reads[ApplicationStatus] =
-    new Reads[ApplicationStatus] {
-      override def reads(json: JsValue): JsResult[ApplicationStatus] =
-        json match {
-          case JsString(ApplicationStatus.Pending.key) => JsSuccess(Pending)
-          case JsString(ApplicationStatus.Accepted.key) => JsSuccess(Accepted)
-          case JsString(ApplicationStatus.Rejected.key) => JsSuccess(Rejected)
-          case JsString(ApplicationStatus.AttemptingRegistration.key) => JsSuccess(AttemptingRegistration)
-          case JsString(ApplicationStatus.Registered.key) => JsSuccess(Registered)
-          case JsString(ApplicationStatus.Complete.key) => JsSuccess(Complete)
-          case invalid => JsError(s"Invalid ApplicationStatus found: $invalid")
-        }
-    }
+  implicit val reads: Reads[ApplicationStatus] = {
+    case JsString(ApplicationStatus.Pending.key) => JsSuccess(Pending)
+    case JsString(ApplicationStatus.Accepted.key) => JsSuccess(Accepted)
+    case JsString(ApplicationStatus.Rejected.key) => JsSuccess(Rejected)
+    case JsString(ApplicationStatus.NotReceivedInDms.key) => JsSuccess(NotReceivedInDms)
+    case JsString(ApplicationStatus.AttemptingRegistration.key) => JsSuccess(AttemptingRegistration)
+    case JsString(ApplicationStatus.Registered.key) => JsSuccess(Registered)
+    case JsString(ApplicationStatus.Complete.key) => JsSuccess(Complete)
+    case invalid => JsError(s"Invalid ApplicationStatus found: $invalid")
+  }
 
-  implicit val writes: Writes[ApplicationStatus] =
-    new Writes[ApplicationStatus] {
-      override def writes(o: ApplicationStatus): JsValue = JsString(o.key)
-    }
+  implicit val writes: Writes[ApplicationStatus] = (o: ApplicationStatus) => JsString(o.key)
 
   val allStatuses = Seq(
     Pending,
     Rejected,
+    NotReceivedInDms,
     Accepted,
     AttemptingRegistration,
     Registered,

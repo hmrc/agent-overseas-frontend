@@ -34,6 +34,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Accepted
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.AttemptingRegistration
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Complete
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Registered
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.NotReceivedInDms
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
@@ -352,6 +353,13 @@ with ScalaFutures {
       "the application status is rejected" in {
         testRoutesForApplicationStatuses(
           List(applicationEntityDetails.copy(status = Rejected)),
+          "/agent-services/apply-from-outside-uk/application-status"
+        )
+      }
+
+      "the application status is not received in dms" in {
+        testRoutesForApplicationStatuses(
+          List(applicationEntityDetails.copy(status = NotReceivedInDms)),
           "/agent-services/apply-from-outside-uk/application-status"
         )
       }

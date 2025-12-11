@@ -65,8 +65,13 @@ trait CommonRouting {
     ec: ExecutionContext
   ): Future[Call] = {
     def routing: Future[StatusRouting] = applicationService.getCurrentApplication.map {
-      case Some(application) if application.status == Rejected || application.status == Pending =>
-        val initialiseSession = application.status == Rejected
+      case Some(application)
+          if Set(
+            Pending,
+            Rejected,
+            NotReceivedInDms
+          ).contains(application.status) =>
+        val initialiseSession = application.status == Rejected || application.status == NotReceivedInDms
         StatusRouting(routes.ApplicationRootController.applicationStatus, initialiseSession)
       case Some(application)
           if Set(
