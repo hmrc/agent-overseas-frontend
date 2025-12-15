@@ -95,6 +95,18 @@ trait AgentOverseasApplicationStubs {
     )
   }
 
+  def given200OverseasNotReceivedInDmsApplication(): StubMapping = {
+    val responseData = StubsTestData.applicationInRedirectStatus("not_received_in_dms")
+    stubFor(
+      get(urlEqualTo(s"/agent-overseas-application/application?$allStatuses"))
+        .willReturn(
+          aResponse()
+            .withBody(responseData)
+            .withStatus(200)
+        )
+    )
+  }
+
   def given200OverseasAcceptedApplication(): StubMapping = {
     val responseData = StubsTestData.acceptedApplication
     stubFor(
