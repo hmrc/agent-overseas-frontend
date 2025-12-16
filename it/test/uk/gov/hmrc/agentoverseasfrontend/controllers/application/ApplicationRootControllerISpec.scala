@@ -137,6 +137,32 @@ with AgentOverseasApplicationStubs {
     }
   }
 
+  "GET /application-status applicationStatus NotReceivedInDms status" should {
+    "200 show detail about application with not received in DMS status with link to start new application" in {
+      given200OverseasNotReceivedInDmsApplication()
+      val result = controller.applicationStatus(basicRequest(FakeRequest()))
+
+      val stubMatchingTradingName = "Testing Agency"
+      val stubMatchingEmail = "test@test.com"
+
+      status(result) shouldBe 200
+      result.futureValue should containMessages(
+        "statusRejected.title",
+        "statusRejected.heading",
+        "statusRejected.para3"
+      )
+      result.futureValue should containSubstrings(
+        htmlEscapedMessage("statusRejected.para1", stubMatchingTradingName),
+        htmlMessage("statusRejected.para2", s"<strong class=bold-small>$stubMatchingEmail</strong>")
+      )
+
+      result.futureValue should containLink(
+        "statusRejected.link.text",
+        routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
+      )
+    }
+  }
+
   "GET / application-status applicationStatus Accepted status" should {
 
     behave like redirectToSubscriptionFrontend("accepted", controller.applicationStatus)

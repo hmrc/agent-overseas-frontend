@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Pending
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.NotReceivedInDms
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.application_not_ready
@@ -89,7 +90,7 @@ with I18nSupport {
             createdOnPrettifyDate,
             daysUntilReviewed
           ))
-        case Some(application) if application.status == Rejected => Ok(statusRejectedView(application))
+        case Some(application) if application.status == Rejected || application.status == NotReceivedInDms => Ok(statusRejectedView(application))
         case Some(_) => SeeOther(s"${appConfig.selfExternalUrl + routes.ApplicationRootController.root.url}/create-account")
         case None => Redirect(routes.ApplicationRootController.root)
       }

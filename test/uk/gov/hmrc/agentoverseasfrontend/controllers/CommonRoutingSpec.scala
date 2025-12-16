@@ -30,10 +30,12 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Accepted
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.AttemptingRegistration
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Complete
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Registered
+import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.NotReceivedInDms
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Rejected
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models._
@@ -355,6 +357,13 @@ with ScalaFutures {
           "/agent-services/apply-from-outside-uk/application-status"
         )
       }
+
+      "the application status is not received in dms" in {
+        testRoutesForApplicationStatuses(
+          List(applicationEntityDetails.copy(status = NotReceivedInDms)),
+          "/agent-services/apply-from-outside-uk/application-status"
+        )
+      }
     }
 
     "return overseas-subscription-frontend root page" when {
@@ -375,6 +384,24 @@ with ScalaFutures {
         List.empty,
         "/agent-services/apply-from-outside-uk/money-laundering-registration"
       )
+    }
+  }
+
+  "routesForApplicationStatuses (all statuses)" should {
+    ApplicationStatus.allStatuses.foreach { status =>
+      val expectedRoute =
+        status match {
+          case ApplicationStatus.Pending | ApplicationStatus.Rejected | ApplicationStatus.NotReceivedInDms =>
+            "/agent-services/apply-from-outside-uk/application-status"
+          case _ => subscriptionRootPath
+        }
+
+      s"route correctly when status is ${status.key}" in {
+        testRoutesForApplicationStatuses(
+          List(applicationEntityDetails.copy(status = status)),
+          expectedRoute
+        )
+      }
     }
   }
 

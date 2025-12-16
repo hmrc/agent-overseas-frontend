@@ -14,11 +14,11 @@ This frontend allows overseas agents to submit an application to HMRC for regist
 
 ## Running the tests
 
-    sbt test it:test
+    sbt test it/test
 
 ## Running the tests with coverage
 
-    sbt clean coverageOn test it:test coverageReport
+    sbt clean coverageOn test it/test coverageReport
 
 
 ### Automated testing
