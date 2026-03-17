@@ -48,6 +48,7 @@ trait AppConfig {
   val emailVerificationFrontendBaseUrl: String
   val mongoDbExpireAfterSeconds: Int
   val disableEmailVerification: Boolean
+  val allowExistingCredentialsForApprovedOverseasApplications: Boolean
 
 }
 
@@ -81,6 +82,9 @@ extends AppConfig {
   override val emailVerificationFrontendBaseUrl: String = servicesConfig.getString("microservice.services.email-verification-frontend.external-url")
   override val mongoDbExpireAfterSeconds: Int = servicesConfig.getInt("mongodb.session.expireAfterSeconds")
   override val disableEmailVerification: Boolean = servicesConfig.getBoolean("disable-email-verification")
+  override val allowExistingCredentialsForApprovedOverseasApplications: Boolean = servicesConfig.getBoolean(
+    "features.allow-existing-credentials-for-approved-overseas-applications"
+  )
 
   private val basGatewayFrontendExternalUrl: String = servicesConfig.getString("bas-gateway-frontend.external-url")
   private val signOutPath: String = servicesConfig.getString("bas-gateway-frontend.sign-out.path")
