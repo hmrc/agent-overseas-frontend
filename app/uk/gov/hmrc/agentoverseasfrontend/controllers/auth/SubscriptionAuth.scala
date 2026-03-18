@@ -122,12 +122,13 @@ with Logging {
       }
       else {
         val hasCleanCreds = enrolments.enrolments.isEmpty
+        val treatAsCleanCreds = hasCleanCreds || appConfig.allowExistingCredentialsForApprovedOverseasApplications
 
         subscriptionService.mostRecentApplication.flatMap {
           case Some(application) if application.status == Pending || application.status == Rejected =>
             Future.successful(SeeOther(s"${appConfig.selfExternalUrl + applicationRoutes.ApplicationRootController.root.url}/application-status"))
           case Some(application) if application.status == ApplicationStatus.Accepted =>
-            if (hasCleanCreds) {
+            if (treatAsCleanCreds) {
               // happy path
               sessionStoreService.fetchAgencyDetails
                 .flatMap { maybeAgencyDetails =>
@@ -170,7 +171,7 @@ with Logging {
             else
               Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
           case Some(application) if application.status == Registered || application.status == Complete =>
-            if (hasCleanCreds)
+            if (treatAsCleanCreds)
               subscriptionService.subscribe.flatMap {
                 case Right(_) => Future.successful(Redirect(subscription.routes.SubscriptionController.subscriptionComplete))
                 case Left(_) => Future.successful(Redirect(subscription.routes.SubscriptionController.alreadySubscribed))

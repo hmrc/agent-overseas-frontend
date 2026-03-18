@@ -294,3 +294,31 @@ with AgentSubscriptionStubs {
   }
 
 }
+
+class SubscriptionControllerWithExistingCredentialsEnabledISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs
+with AgentSubscriptionStubs {
+
+  override protected def appBuilder = super.appBuilder.configure("features.allow-existing-credentials-for-approved-overseas-applications" -> true)
+
+  val arn: Arn = Arn("TARN0000001")
+
+  lazy val controller: SubscriptionController = app.injector.instanceOf[SubscriptionController]
+
+  "subscribe" should {
+    "allow an accepted application to continue with existing enrolments when the feature switch is enabled" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
+      givenAcceptedApplicationResponse()
+      givenApplicationUpdateSuccessResponse()
+      givenSubscriptionSuccessfulResponse(arn)
+
+      val result = controller.subscribe(request)
+
+      status(result) shouldBe 303
+      header(LOCATION, result).get shouldBe routes.SubscriptionController.subscriptionComplete.url
+    }
+  }
+
+}

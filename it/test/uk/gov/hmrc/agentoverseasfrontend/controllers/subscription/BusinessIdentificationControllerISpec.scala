@@ -817,3 +817,50 @@ with AgentSubscriptionStubs {
   }
 
 }
+
+class BusinessIdentificationControllerExistingCredsEnabledISpec
+extends BaseISpec
+with AgentOverseasApplicationStubs
+with AgentSubscriptionStubs {
+
+  override protected def appBuilder = super.appBuilder.configure("features.allow-existing-credentials-for-approved-overseas-applications" -> true)
+
+  lazy val controller: BusinessIdentificationController = app.injector.instanceOf[BusinessIdentificationController]
+
+  "GET /check-answers" should {
+    "display the check-answers page for an accepted application with existing enrolments when the feature switch is enabled" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      givenAcceptedApplicationResponse()
+      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
+
+      val result = controller.showCheckAnswers(request)
+      status(result) shouldBe 200
+
+      result.futureValue should containMessages("subscription.checkAnswers.title")
+    }
+
+    "allow a registered application with existing enrolments to continue when the feature switch is enabled" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      givenRegisteredApplicationResponse()
+      givenApplicationUpdateSuccessResponse()
+      givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
+
+      val result = controller.showCheckAnswers(request)
+      status(result) shouldBe 303
+
+      header(LOCATION, result).get shouldBe "/agent-services/apply-from-outside-uk/create-account/complete"
+    }
+
+    "allow a complete application with existing enrolments to continue when the feature switch is enabled" in {
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      givenCompleteApplicationResponse()
+      givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
+
+      val result = controller.showCheckAnswers(request)
+      status(result) shouldBe 303
+
+      header(LOCATION, result).get shouldBe "/agent-services/apply-from-outside-uk/create-account/complete"
+    }
+  }
+
+}

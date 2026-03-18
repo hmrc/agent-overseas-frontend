@@ -22,6 +22,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Request
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBaseController
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
@@ -65,28 +66,29 @@ with Logging {
   import authAction.withSimpleAgentAuth
   import authAction.withHmrcAsAgentAction
 
+  private def continueSubscription()(implicit request: Request[_]) = sessionStoreService.fetchAgencyDetails.flatMap {
+    case Some(agencyDetails) if !agencyDetails.isEmailVerified => Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
+    case _ =>
+      subscriptionService.subscribe.map {
+        case Right(_) => Redirect(routes.SubscriptionController.subscriptionComplete)
+        case Left(NoApplications) =>
+          logger.info("User has no known applications, redirecting to application frontend")
+          Redirect(s"${appConfig.selfExternalUrl + routes.SubscriptionRootController.root.url}")
+        case Left(NoAgencyInSession) =>
+          logger.info("No agency details in session, redirecting to /check-answers")
+          Redirect(routes.BusinessIdentificationController.showCheckAnswers)
+        case Left(AlreadySubscribed) => Redirect(routes.SubscriptionController.alreadySubscribed)
+        case Left(WrongApplicationStatus) =>
+          throw new IllegalStateException(
+            "Can not proceed with application - can not subscribe with an application in this status"
+          )
+      }
+  }
+
   def subscribe: Action[AnyContent] = Action.async { implicit request =>
     withSimpleAgentAuth { implicit subRequest =>
-      if (subRequest.enrolments.isEmpty) {
-        sessionStoreService.fetchAgencyDetails.flatMap {
-          case Some(agencyDetails) if !agencyDetails.isEmailVerified => Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
-          case _ =>
-            subscriptionService.subscribe.map {
-              case Right(_) => Redirect(routes.SubscriptionController.subscriptionComplete)
-              case Left(NoApplications) =>
-                logger.info("User has no known applications, redirecting to application frontend")
-                Redirect(s"${appConfig.selfExternalUrl + routes.SubscriptionRootController.root.url}")
-              case Left(NoAgencyInSession) =>
-                logger.info("No agency details in session, redirecting to /check-answers")
-                Redirect(routes.BusinessIdentificationController.showCheckAnswers)
-              case Left(AlreadySubscribed) => Redirect(routes.SubscriptionController.alreadySubscribed)
-              case Left(WrongApplicationStatus) =>
-                throw new IllegalStateException(
-                  "Can not proceed with application - can not subscribe with an application in this status"
-                )
-            }
-        }
-      }
+      if (subRequest.enrolments.isEmpty || appConfig.allowExistingCredentialsForApprovedOverseasApplications)
+        continueSubscription()
       else {
         logger.info("User has other enrolments, redirecting to /next-step")
         Future.successful(Redirect(routes.SubscriptionRootController.nextStep))
