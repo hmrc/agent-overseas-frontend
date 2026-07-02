@@ -18,13 +18,14 @@ package uk.gov.hmrc.agentoverseasfrontend.connectors
 
 import play.api.Logging
 import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.VerificationStatusResponse
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailRequest
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailResponse
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.*
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
