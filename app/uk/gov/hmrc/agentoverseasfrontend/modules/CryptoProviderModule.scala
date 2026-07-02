@@ -52,7 +52,8 @@ extends Module {
 /** Encrypter/decrypter that does nothing (i.e. leaves content in plaintext). Only to be used for debugging.
   */
 trait NoCrypto
-extends Encrypter with Decrypter {
+extends Encrypter
+with Decrypter {
 
   def encrypt(plain: PlainContent): Crypted =
     plain match {

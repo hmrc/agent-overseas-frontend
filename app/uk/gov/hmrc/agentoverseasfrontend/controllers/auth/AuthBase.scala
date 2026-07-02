@@ -60,7 +60,7 @@ with Logging {
   }.recover(handleFailure(using request))
 
   protected def hasAgentEnrolment(enrolments: Enrolments): Boolean = enrolments.enrolments
-    .find(_.key equals "HMRC-AS-AGENT")
+    .find(_.key `equals` "HMRC-AS-AGENT")
     .exists(_.isActivated)
 
   protected def getArn(enrolments: Enrolments): Option[Arn] =
@@ -69,7 +69,7 @@ with Logging {
       identifier <- enrolment.getIdentifier("AgentReferenceNumber")
     } yield Arn(identifier.value)
 
-  protected def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Result] = {
+  protected def handleFailure(implicit request: Request[?]): PartialFunction[Throwable, Result] = {
     case _: NoActiveSession => Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}&origin=$appName")
 
     case _: InsufficientEnrolments =>

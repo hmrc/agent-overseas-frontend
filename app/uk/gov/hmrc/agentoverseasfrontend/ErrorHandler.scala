@@ -147,7 +147,8 @@ extends HttpAuditEvent {
         request,
         Map(TransactionFailureReason -> ex.getMessage)
       )(
-        using HeaderCarrierConverter
+        using
+        HeaderCarrierConverter
           .fromRequestAndSession(request, request.session)
       )
     )
@@ -170,7 +171,8 @@ extends HttpAuditEvent {
             request,
             Map(TransactionFailureReason -> message)
           )(
-            using HeaderCarrierConverter
+            using
+            HeaderCarrierConverter
               .fromRequestAndSession(request, request.session)
           )
         )
@@ -182,7 +184,8 @@ extends HttpAuditEvent {
             request,
             Map(TransactionFailureReason -> message)
           )(
-            using HeaderCarrierConverter
+            using
+            HeaderCarrierConverter
               .fromRequestAndSession(request, request.session)
           )
         )
@@ -194,7 +197,8 @@ extends HttpAuditEvent {
             request,
             Map(TransactionFailureReason -> message)
           )(
-            using HeaderCarrierConverter
+            using
+            HeaderCarrierConverter
               .fromRequestAndSession(request, request.session)
           )
         )
