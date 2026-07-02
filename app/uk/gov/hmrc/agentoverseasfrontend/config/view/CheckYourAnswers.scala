@@ -340,7 +340,7 @@ object CheckYourAnswers {
     }
 
   private def makeRegistrationDataGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.registeredWithHmrc.map {
-    isRegistered: YesNo =>
+    (isRegistered: YesNo) =>
       val agentCodeRows = getAgentCodeRows(isRegistered, session)
 
       val ukRegistrationRows = getUkRegistrationRows(session)

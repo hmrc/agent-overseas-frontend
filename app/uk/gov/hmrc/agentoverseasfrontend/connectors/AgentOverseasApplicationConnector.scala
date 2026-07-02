@@ -110,7 +110,7 @@ class AgentOverseasApplicationConnector @Inject() (
     http.put(url)
       .withBody((Json.toJson(agencyDetails)))
       .execute[HttpResponse]
-      .map { response: HttpResponse =>
+      .map { (response: HttpResponse) =>
         if (response.status == 204)
           ()
         else {
