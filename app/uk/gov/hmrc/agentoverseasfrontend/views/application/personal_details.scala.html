@@ -54,7 +54,7 @@
 
     @p("personalDetails.p1", classes = Some("margin-bottom-10"))
 
-    @formWithCsrf(action = routes.ApplicationController.submitPersonalDetails, 'class -> "form js-form") {
+    @formWithCsrf(action = routes.ApplicationController.submitPersonalDetails, Symbol("class") -> "form js-form") {
 
         @govukRadios(Radios(
             fieldset = Some(Fieldset(

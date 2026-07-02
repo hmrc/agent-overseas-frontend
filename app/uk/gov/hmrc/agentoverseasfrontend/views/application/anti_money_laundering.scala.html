@@ -58,7 +58,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsForm))
     }
 
-    @formWithCsrf(action = applicationRoutes.AntiMoneyLaunderingController.submitAntiMoneyLaundering, 'class -> "form js-form", 'id -> "amlsForm") {
+    @formWithCsrf(action = applicationRoutes.AntiMoneyLaunderingController.submitAntiMoneyLaundering, Symbol("class") -> "form js-form", Symbol("id") -> "amlsForm") {
 
         @h1("amls.title")
 

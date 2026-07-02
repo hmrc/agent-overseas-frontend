@@ -90,7 +90,7 @@
         }
     ))
   
-    @formWithCSRF(action = routes.TaxRegController.submitYourTaxRegNumbers, 'class -> "form js-form") {
+    @formWithCSRF(action = routes.TaxRegController.submitYourTaxRegNumbers, Symbol("class") -> "form js-form") {
 
         @govukRadios(Radios(
             classes = "govuk-radios--inline",

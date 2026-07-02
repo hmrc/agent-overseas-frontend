@@ -90,7 +90,7 @@
 
     @p("subscription.checkAnswers.description.p3")
 
-    @formWithCsrf(action = routes.SubscriptionController.subscribe, 'class -> "form js-form") {
+    @formWithCsrf(action = routes.SubscriptionController.subscribe, Symbol("class") -> "form js-form") {
         @submitButton(messageKey = "subscription.checkAnswers.confirm.button")
     }
 }

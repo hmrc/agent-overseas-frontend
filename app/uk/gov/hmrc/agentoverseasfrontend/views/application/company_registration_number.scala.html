@@ -48,7 +48,7 @@
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(companyRegistrationNumberForm))
     }
 
-    @formWithCsrf(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
+    @formWithCsrf(action = routes.ApplicationController.submitCompanyRegistrationNumber, Symbol("class") -> "form js-form") {
 
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
