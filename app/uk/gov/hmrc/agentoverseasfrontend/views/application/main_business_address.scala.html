@@ -62,7 +62,7 @@
     errorSummaryRaw.copy(errorList = newErrorList)
 }
     
-@mainTemplate(title = errorPrefix(mainBusinessAddressForm) + msgs("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
+@mainTemplate(title = errorPrefix(mainBusinessAddressForm).toString + msgs("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
 
     @if(mainBusinessAddressForm.hasErrors) {
         @govukErrorSummary(errorSummary)

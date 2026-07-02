@@ -42,7 +42,7 @@
 
 @(companyRegistrationNumberForm: Form[CompanyRegistrationNumber], backButtonLink: String)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(companyRegistrationNumberForm) + msgs("companyRegistrationNumber.title"), backLinkHref = Some(backButtonLink)) {
+@mainTemplate(title = errorPrefix(companyRegistrationNumberForm).toString + msgs("companyRegistrationNumber.title"), backLinkHref = Some(backButtonLink)) {
 
     @if(companyRegistrationNumberForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(companyRegistrationNumberForm))

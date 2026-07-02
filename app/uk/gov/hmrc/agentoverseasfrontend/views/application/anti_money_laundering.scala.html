@@ -52,7 +52,7 @@
 
 @(amlsForm: Form[AmlsDetails], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(amlsForm) + msgs("amls.title"), backLinkHref = backLink) {
+@mainTemplate(title = errorPrefix(amlsForm).toString + msgs("amls.title"), backLinkHref = backLink) {
 
     @if(amlsForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsForm))

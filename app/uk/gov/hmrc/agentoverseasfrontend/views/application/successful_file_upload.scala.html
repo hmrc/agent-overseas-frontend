@@ -45,7 +45,7 @@
 
 @(uploadSuccessForm: Form[SuccessfulFileUploadConfirmation], fileName: Option[String], fileType: String, backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(uploadSuccessForm) + msgs("fileUpload.success.title"), backLinkHref = backLink) {
+@mainTemplate(title = errorPrefix(uploadSuccessForm).toString + msgs("fileUpload.success.title"), backLinkHref = backLink) {
 
     @if(uploadSuccessForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(uploadSuccessForm))

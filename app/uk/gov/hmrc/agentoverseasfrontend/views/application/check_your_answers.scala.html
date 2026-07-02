@@ -81,7 +81,7 @@
     }
 }
 
-@mainTemplate(title = errorPrefix(cyaForm) + msgs("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
+@mainTemplate(title = errorPrefix(cyaForm).toString + msgs("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
 
     @h1("checkAnswers.title")
 
