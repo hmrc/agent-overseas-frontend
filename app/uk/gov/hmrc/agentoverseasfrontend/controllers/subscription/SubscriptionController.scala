@@ -66,7 +66,7 @@ with Logging {
   import authAction.withSimpleAgentAuth
   import authAction.withHmrcAsAgentAction
 
-  private def continueSubscription()(implicit request: Request[_]) = sessionStoreService.fetchAgencyDetails.flatMap {
+  private def continueSubscription()(implicit request: Request[?]) = sessionStoreService.fetchAgencyDetails.flatMap {
     case Some(agencyDetails) if !agencyDetails.isEmailVerified => Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
     case _ =>
       subscriptionService.subscribe.map {

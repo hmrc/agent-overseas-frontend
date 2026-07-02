@@ -73,7 +73,7 @@ with CommonRouting {
       AgentSession
     ) => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(credentials and allEnrolments and email) {
       case Some(credentials) ~ enrolments ~ maybeAuthEmail =>
@@ -111,18 +111,18 @@ with CommonRouting {
 
       case None ~ _ ~ _ => throw UnsupportedCredentialRole("User has no credentials")
     }
-    .recover(handleFailure(request))
+    .recover(handleFailure(using request))
 
   def withEnrollingAgent(
     body: AgentSession => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = false)((_, session) => body(session))
 
   def withEnrollingEmailVerifiedAgent(
     body: AgentSession => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = true)((_, session) => body(session))
 
 }

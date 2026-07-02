@@ -44,20 +44,20 @@ with Logging {
   implicit val ec: ExecutionContext
 
   def withBasicAuth(
-    block: Request[_] => Future[Result]
+    block: Request[?] => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway)) {
     block(request)
-  }.recover(handleFailure(request))
+  }.recover(handleFailure(using request))
 
   def withBasicAuthAndAgentAffinity(
-    block: Request[_] => Future[Result]
+    block: Request[?] => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
     block(request)
-  }.recover(handleFailure(request))
+  }.recover(handleFailure(using request))
 
   protected def hasAgentEnrolment(enrolments: Enrolments): Boolean = enrolments.enrolments
     .find(_.key equals "HMRC-AS-AGENT")

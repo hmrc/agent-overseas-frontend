@@ -81,7 +81,7 @@ with Logging {
   def withSimpleAgentAuth(
     block: SubscriptionRequest => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(allEnrolments and credentials) { case enrolments ~ creds =>
       creds match {
@@ -91,12 +91,12 @@ with Logging {
           Future.successful(Forbidden)
       }
     }
-    .recover(handleFailure(request))
+    .recover(handleFailure(using request))
 
   def withHmrcAsAgentAction(
     block: Arn => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = authorised(Enrolment("HMRC-AS-AGENT") and AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(authorisedEnrolments) { enrolments =>
       getArn(enrolments) match {
@@ -106,7 +106,7 @@ with Logging {
           Future.successful(Forbidden)
       }
     }
-    .recover(handleFailure(request))
+    .recover(handleFailure(using request))
 
   def withSubscribingAgent(
     checkForEmailVerification: Boolean,
@@ -114,7 +114,7 @@ with Logging {
   )(
     block: AgencyDetails => Future[Result]
   )(implicit
-    request: Request[_]
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(allEnrolments and email) { case enrolments ~ maybeAuthEmail =>
       if (hasAgentEnrolment(enrolments)) {
@@ -185,6 +185,6 @@ with Logging {
         }
       }
     }
-    .recover(handleFailure(request))
+    .recover(handleFailure(using request))
 
 }

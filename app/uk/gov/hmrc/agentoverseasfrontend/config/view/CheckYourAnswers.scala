@@ -79,7 +79,7 @@ object CheckYourAnswers {
     mapping(
       "confirmed" -> default(boolean, false)
         .verifying(Messages("checkAnswers.confirm.error"), _ == true)
-    )(CheckYourAnswersConfirmation.apply)(CheckYourAnswersConfirmation.unapply)
+    )(CheckYourAnswersConfirmation.apply)(o => Some(o.confirmed))
   )
 
   def apply(
