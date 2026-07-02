@@ -46,7 +46,7 @@ object AgencyDetails {
         (__ \ "agencyEmail").read[String] and
         (__ \ "agencyAddress").read[OverseasAddress] and
         (__ \ "verifiedEmails").readWithDefault[Set[String]](Set.empty)
-    )(AgencyDetails.apply _)
+    )(AgencyDetails.apply)
   val writes: Writes[AgencyDetails] = Json.writes[AgencyDetails]
   implicit val formats: Format[AgencyDetails] = Format(reads, writes)
 

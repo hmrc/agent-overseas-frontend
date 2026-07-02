@@ -43,7 +43,7 @@ object UploadRequest {
     }
   implicit val reads: Reads[UploadRequest] =
     ((__ \ "href").read[String] and
-      (__ \ "fields").read[Map[String, String]])(UploadRequest.apply _)
+      (__ \ "fields").read[Map[String, String]])(UploadRequest.apply)
 
 }
 
@@ -58,6 +58,6 @@ object UpscanInitiate {
     }
   implicit val reads: Reads[UpscanInitiate] =
     ((__ \ "reference").read[String] and
-      (__ \ "uploadRequest").read[UploadRequest])(UpscanInitiate.apply _)
+      (__ \ "uploadRequest").read[UploadRequest])(UpscanInitiate.apply)
 
 }
