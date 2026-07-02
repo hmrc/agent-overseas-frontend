@@ -103,7 +103,7 @@ object CommonValidators {
       TelephoneMaxLength
     )
 
-  def businessEmail: Mapping[String] = text verifying validEmailAddress
+  def businessEmail: Mapping[String] = text `verifying` validEmailAddress
 
   def tradingName: Mapping[String] =
     text verifying commonFormConstraint(
@@ -128,14 +128,14 @@ object CommonValidators {
 
   def countryCode(validCountryCodes: Set[String]): Mapping[String] = text.verifying(validCountryCode(validCountryCodes))
 
-  def radioInputSelected[T](message: String = "error.no-radio-selected"): Constraint[Option[T]] = Constraint[Option[T]] { fieldValue: Option[T] =>
+  def radioInputSelected[T](message: String = "error.no-radio-selected"): Constraint[Option[T]] = Constraint[Option[T]] { (fieldValue: Option[T]) =>
     if (fieldValue.isDefined)
       Valid
     else
       Invalid(ValidationError(message))
   }
 
-  private def validCountryCode(codes: Set[String]) = Constraint { fieldValue: String =>
+  private def validCountryCode(codes: Set[String]) = Constraint { (fieldValue: String) =>
     val code = fieldValue.trim
     nonEmptyWithMessage("error.country.empty")(code) match {
       case i: Invalid => i
@@ -151,7 +151,7 @@ object CommonValidators {
     codeType: String,
     regex: String = AgentCodeRegex,
     maxLength: Int = AgentCodeMaxLength
-  ): Constraint[String] = Constraint[String] { fieldValue: String =>
+  ): Constraint[String] = Constraint[String] { (fieldValue: String) =>
     val formattedCode = fieldValue.replace(" ", "")
 
     if (formattedCode.isEmpty)
@@ -164,7 +164,7 @@ object CommonValidators {
       Valid
   }
 
-  private def utrConstraint(errorMessages: UtrErrors): Constraint[String] = Constraint[String] { fieldValue: String =>
+  private def utrConstraint(errorMessages: UtrErrors): Constraint[String] = Constraint[String] { (fieldValue: String) =>
     val formattedField = fieldValue.replace(" ", "")
     val (blank, invalid) = errorMessages
 
@@ -177,7 +177,7 @@ object CommonValidators {
     }
   }
 
-  private val ninoConstraint: Constraint[String] = Constraint[String] { fieldValue: String =>
+  private val ninoConstraint: Constraint[String] = Constraint[String] { (fieldValue: String) =>
     val formattedField = fieldValue.replaceAll("\\s", "").toUpperCase
 
     Constraints.nonEmpty.apply(formattedField) match {
@@ -187,7 +187,7 @@ object CommonValidators {
     }
   }
 
-  private val jobTitleConstraint: Constraint[String] = Constraint[String] { fieldValue: String =>
+  private val jobTitleConstraint: Constraint[String] = Constraint[String] { (fieldValue: String) =>
     Constraints.nonEmpty.apply(fieldValue) match {
       case _: Invalid => Invalid(ValidationError("error.jobTitle.blank"))
       case _ if !fieldValue.matches(JobTitleRegex) => Invalid(ValidationError("error.jobTitle.invalid"))
@@ -200,7 +200,7 @@ object CommonValidators {
     formType: String,
     regex: String,
     maxLength: Int
-  ): Constraint[String] = Constraint[String] { fieldValue: String =>
+  ): Constraint[String] = Constraint[String] { (fieldValue: String) =>
     Constraints.nonEmpty.apply(fieldValue) match {
       case _: Invalid => Invalid(ValidationError(s"error.$formType.blank"))
       case _ if !fieldValue.matches(regex) => Invalid(ValidationError(s"error.$formType.invalid"))
@@ -212,7 +212,7 @@ object CommonValidators {
   private def validateRegex(
     regex: String,
     msgKeyInvalid: String
-  ): Constraint[String] = Constraint[String] { fieldValue: String =>
+  ): Constraint[String] = Constraint[String] { (fieldValue: String) =>
     Constraints.nonEmpty.apply(fieldValue) match {
       case i: Invalid => i
       case Valid =>
@@ -250,7 +250,7 @@ object CommonValidators {
       Valid
   }
 
-  private def validEmailAddress = Constraint { fieldValue: String =>
+  private def validEmailAddress = Constraint { (fieldValue: String) =>
     nonEmptyWithMessage("error.email.blank")(fieldValue) match {
       case i: Invalid => i
       case Valid =>
@@ -317,7 +317,7 @@ object CommonValidators {
     regex: String,
     msgKeyRequired: String,
     msgKeyInvalid: String
-  ): Constraint[String] = Constraint[String] { fieldValue: String =>
+  ): Constraint[String] = Constraint[String] { (fieldValue: String) =>
     nonEmptyWithMessage(msgKeyRequired)(fieldValue) match {
       case i: Invalid => i
       case Valid =>
@@ -336,7 +336,7 @@ object CommonValidators {
     firstConstraint: Constraint[T],
     secondConstraint: Constraint[T]
   ) = Constraint[T] {
-    fieldValue: T =>
+    (fieldValue: T) =>
       firstConstraint(fieldValue) match {
         case i @ Invalid(_) => i
         case Valid => secondConstraint(fieldValue)
