@@ -64,6 +64,7 @@ with OptionValues {
     personalDetails = Some(personalDetails),
     companyRegistrationNumber = Some(crn),
     hasTaxRegNumbers = Some(true),
+//    TODO: 11764 This is causing NullPointerException when running unit tests
     taxRegistrationNumbers = Some(SortedSet(Trn("123"), Trn("456"))),
     changingAnswers = false
   )
