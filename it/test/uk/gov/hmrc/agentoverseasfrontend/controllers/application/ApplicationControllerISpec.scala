@@ -128,11 +128,11 @@ with AgentOverseasApplicationStubs {
     "submit form and then redirect to trading-name" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "firstName" -> "test",
-          "lastName" -> "last",
-          "jobTitle" -> "senior agent",
-          "businessTelephone" -> "12345",
-          "businessEmail" -> "test@email.com"
+          ("firstName", "test"),
+          ("lastName", "last"),
+          ("jobTitle", "senior agent"),
+          ("businessTelephone", "12345"),
+          ("businessEmail", "test@email.com")
         )
 
       sessionCacheService
@@ -163,11 +163,11 @@ with AgentOverseasApplicationStubs {
       // pre state
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "firstName" -> "test",
-          "lastName" -> "last",
-          "jobTitle" -> "senior agent",
-          "businessTelephone" -> "12345",
-          "businessEmail" -> "test@email.com"
+          ("firstName", "test"),
+          ("lastName", "last"),
+          ("jobTitle", "senior agent"),
+          ("businessTelephone", "12345"),
+          ("businessEmail", "test@email.com")
         )
 
       sessionCacheService
@@ -203,11 +203,11 @@ with AgentOverseasApplicationStubs {
       // pre state
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "firstName" -> "",
-          "lastName" -> "last**",
-          "jobTitle" -> "senior agent",
-          "businessTelephone" -> "12345",
-          "businessEmail" -> "test"
+          ("firstName", ""),
+          ("lastName", "last**"),
+          ("jobTitle", "senior agent"),
+          ("businessTelephone", "12345"),
+          ("businessEmail", "test")
         )
 
       sessionCacheService
@@ -283,7 +283,7 @@ with AgentOverseasApplicationStubs {
   "POST /trading-name" should {
     "submit form and then redirect to main-business-details" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("tradingName" -> "test")
+        .withFormUrlEncodedBody(("tradingName", "test"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(tradingName = None, overseasAddress = None))
 
@@ -299,7 +299,7 @@ with AgentOverseasApplicationStubs {
 
     "submit form and then redirect to check-your-details if user is changing answers" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("tradingName" -> "test")
+        .withFormUrlEncodedBody(("tradingName", "test"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(
         tradingName = None,
@@ -322,7 +322,7 @@ with AgentOverseasApplicationStubs {
 
     "show validation errors when form data is incorrect" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("tradingName" -> "")
+        .withFormUrlEncodedBody(("tradingName", ""))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(
         tradingName = None,
@@ -431,7 +431,7 @@ with AgentOverseasApplicationStubs {
   "POST /registered-with-hmrc" should {
     "store choice in session after successful submission and redirect to next page" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
+        .withFormUrlEncodedBody(("registeredWithHmrc", "true"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None, changingAnswers = true))
       val result = controller.submitRegisteredWithHmrc(request)
@@ -448,7 +448,7 @@ with AgentOverseasApplicationStubs {
 
     "show /check-your-answers page when the user in the amending state but clicks Continue without making any changes to the state" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("registeredWithHmrc" -> "true")
+        .withFormUrlEncodedBody(("registeredWithHmrc", "true"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = Some(Yes), changingAnswers = true))
 
@@ -596,7 +596,7 @@ with AgentOverseasApplicationStubs {
   "POST /uk-tax-registration" should {
     "store choice in session after successful submission and redirect to next page" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("registeredForUkTax" -> "true")
+        .withFormUrlEncodedBody(("registeredForUkTax", "true"))
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -619,7 +619,7 @@ with AgentOverseasApplicationStubs {
 
     "show /check-your-answers page when the user in the amending state but clicks Continue without making any changes to the state" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("registeredForUkTax" -> "false")
+        .withFormUrlEncodedBody(("registeredForUkTax", "false"))
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -720,9 +720,9 @@ with AgentOverseasApplicationStubs {
     "store choice in session after successful submission and redirect to next page" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "personalDetailsChoice" -> "nino",
-          "nino" -> "AB123456A",
-          "saUtr" -> ""
+          ("personalDetailsChoice", "nino"),
+          ("nino", "AB123456A"),
+          ("saUtr", "")
         )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -749,9 +749,9 @@ with AgentOverseasApplicationStubs {
     "store choice in session after successful submission and redirect check-your-answers if user is changing answers" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "personalDetailsChoice" -> "nino",
-          "nino" -> "AB123456A",
-          "saUtr" -> ""
+          ("personalDetailsChoice", "nino"),
+          ("nino", "AB123456A"),
+          ("saUtr", "")
         )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -780,9 +780,9 @@ with AgentOverseasApplicationStubs {
     "show validation error if no options are selected" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "personalDetailsChoice" -> "",
-          "nino" -> "",
-          "saUtr" -> ""
+          ("personalDetailsChoice", ""),
+          ("nino", ""),
+          ("saUtr", "")
         )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -802,9 +802,9 @@ with AgentOverseasApplicationStubs {
     "show validation error if National Insurance number option is selected, but no value has been entered" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "personalDetailsChoice" -> "nino",
-          "nino" -> "",
-          "saUtr" -> ""
+          ("personalDetailsChoice", "nino"),
+          ("nino", ""),
+          ("saUtr", "")
         )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -822,9 +822,9 @@ with AgentOverseasApplicationStubs {
     "show validation error if SA UTR option is selected, but no value has been entered" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "personalDetailsChoice" -> "saUtr",
-          "nino" -> "",
-          "saUtr" -> ""
+          ("personalDetailsChoice", "saUtr"),
+          ("nino", ""),
+          ("saUtr", "")
         )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -911,7 +911,7 @@ with AgentOverseasApplicationStubs {
   "POST /company-registration-number" should {
     "store choice in session after successful submission and redirect to next page" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
+        .withFormUrlEncodedBody(("confirmRegistration", "true"), ("registrationNumber", "AB123456"))
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -934,7 +934,7 @@ with AgentOverseasApplicationStubs {
 
     "store choice in session after successful submission and redirect to check-your-answers page if user is changing answers" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "AB123456")
+        .withFormUrlEncodedBody(("confirmRegistration", "true"), ("registrationNumber", "AB123456"))
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -976,7 +976,7 @@ with AgentOverseasApplicationStubs {
 
     "show validation error if Yes is selected but no input passed for registrationNumber" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("confirmRegistration" -> "true", "registrationNumber" -> "")
+        .withFormUrlEncodedBody(("confirmRegistration", "true"), ("registrationNumber", ""))
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -1100,10 +1100,10 @@ with AgentOverseasApplicationStubs {
     "store choice in session after successful submission and redirect to next page" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "self-assessment-checkbox" -> "true",
-          "self-assessment" -> "SA1234",
-          "corporation-tax-checkbox" -> "true",
-          "corporation-tax" -> "123456"
+          ("self-assessment-checkbox", "true"),
+          ("self-assessment", "SA1234"),
+          ("corporation-tax-checkbox", "true"),
+          ("corporation-tax", "123456")
         )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -1134,8 +1134,8 @@ with AgentOverseasApplicationStubs {
     "redirect to /uk-tax-registration if no agent code is selected" in {
       implicit val request = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody(
-          "self-assessment" -> "",
-          "corporation-tax" -> ""
+          ("self-assessment", ""),
+          ("corporation-tax", "")
         )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -1160,9 +1160,9 @@ with AgentOverseasApplicationStubs {
       s"show validation error if $value checkbox was selected but the text does not pass validation" in {
         implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody(
-            s"$value-checkbox" -> "true",
-            "self-assessment" -> "",
-            "corporation-tax" -> ""
+            (s"$value-checkbox", "true"),
+            ("self-assessment", ""),
+            ("corporation-tax", "")
           )
 
         sessionCacheService.currentSession.agentSession = Some(
@@ -1623,7 +1623,7 @@ with AgentOverseasApplicationStubs {
 
     "submit the application and redirect to application-complete" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("confirmed", "true"))
       )
 
       val agentSession = initialTestSetup
@@ -1643,7 +1643,7 @@ with AgentOverseasApplicationStubs {
 
     "return exception when agent-overseas-application backend is unavailable" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("confirmed" -> "true")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("confirmed", "true"))
       )
 
       val agentSession = initialTestSetup

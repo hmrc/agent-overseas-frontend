@@ -32,6 +32,7 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.mongo.CurrentTimestampSupport
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.ObservableFuture
 import uk.gov.hmrc.mongo.test.CleanMongoCollectionSupport
 
 import scala.collection.immutable.SortedSet
