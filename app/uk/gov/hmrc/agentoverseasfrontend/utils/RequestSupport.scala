@@ -39,8 +39,7 @@ object RequestSupport {
     */
   private object HcProvider
   extends FrontendHeaderCarrierProvider {
-//    TODO: 11764 Fix compile error here relating to ambiguous reference
-    def headerCarrier(implicit request: RequestHeader): HeaderCarrier = hc(using request)
+    def headerCarrier(implicit request: RequestHeader): HeaderCarrier = super.hc(using request)
   }
 
 }
