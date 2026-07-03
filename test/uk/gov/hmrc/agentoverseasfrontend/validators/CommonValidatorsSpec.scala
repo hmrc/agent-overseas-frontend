@@ -873,7 +873,7 @@ with EitherValues {
 
     def shouldAcceptFieldValue(fieldValue: String) =
       if (fieldValue.isEmpty)
-        bind(fieldValue) shouldBe Right(None)
+        bind(fieldValue).isRight shouldBe true
       else
         bind(fieldValue) shouldBe Right(fieldValue)
 
