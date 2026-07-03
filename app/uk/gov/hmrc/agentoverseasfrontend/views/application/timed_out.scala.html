@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.HtmlFormat
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.views.html._
@@ -32,10 +33,9 @@
 
     @h1("timed-out.header")
     @p(msgs("timed-out.p1", timeString))
-    @p(html = Some(Html(
-        a("timed-out.p2.link", href = appConfig.selfExternalUrl + routes.ApplicationRootController.root.url) + "" +
-                span("timed-out.p2")
-        )
-    ))
+    @p(html=Some(HtmlFormat.fill(Seq(
+        a("timed-out.p2.link", href = appConfig.selfExternalUrl + routes.ApplicationRootController.root.url),
+        span("timed-out.p2")
+    ))))
 
 }
