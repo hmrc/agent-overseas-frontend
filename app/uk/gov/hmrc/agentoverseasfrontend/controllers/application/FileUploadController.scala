@@ -139,7 +139,7 @@ with Logging {
     }
   }
 
-  def showSuccessfulUploadedForm(): Action[AnyContent] = Action.async { implicit request =>
+  def showSuccessfulUploadedForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingEmailVerifiedAgent { agentSession =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
