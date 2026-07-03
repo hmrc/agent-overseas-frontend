@@ -81,7 +81,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering when YES is selected" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "true")
+        .withFormUrlEncodedBody(("amlsRequired", "true"))
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -95,7 +95,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /contact-details when NO is selected" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "false")
+        .withFormUrlEncodedBody(("amlsRequired", "false"))
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -109,7 +109,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /check-answers and remove AMLS details from session when changing is true and the user selects NO (changing from YES to NO)" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "false")
+        .withFormUrlEncodedBody(("amlsRequired", "false"))
 
       sessionCacheService
         .cacheAgentSession(
@@ -132,7 +132,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-landering when changing is true and the user selects YES (changing from NO to YES)" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "true")
+        .withFormUrlEncodedBody(("amlsRequired", "true"))
 
       sessionCacheService
         .cacheAgentSession(AgentSession(amlsRequired = Some(false), changingAnswers = true))

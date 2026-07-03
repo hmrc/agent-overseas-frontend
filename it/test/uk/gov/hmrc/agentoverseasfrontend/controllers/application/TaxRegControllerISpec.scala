@@ -148,7 +148,7 @@ with AgentOverseasApplicationStubs {
       val taxRegNo = Trn("someTaxRegNo")
 
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("canProvideTaxRegNo" -> "true", "value" -> taxRegNo.value)
+        .withFormUrlEncodedBody(("canProvideTaxRegNo", "true"), ("value", taxRegNo.value))
 
       sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
@@ -166,7 +166,7 @@ with AgentOverseasApplicationStubs {
 
     "Provided selected 'Yes' on radioButton without identifier, submit then show error message" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("canProvideTaxRegNo" -> "true")
+        .withFormUrlEncodedBody(("canProvideTaxRegNo", "true"))
 
       sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
@@ -183,7 +183,7 @@ with AgentOverseasApplicationStubs {
 
     "Provided selected 'No' on radioButton submit and redirect to next page /more-information-needed" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("canProvideTaxRegNo" -> "false")
+        .withFormUrlEncodedBody(("canProvideTaxRegNo", "false"))
 
       sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
@@ -214,7 +214,7 @@ with AgentOverseasApplicationStubs {
 
     "show validation error when TRN is blank" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("canProvideTaxRegNo" -> "true", "value" -> "")
+        .withFormUrlEncodedBody(("canProvideTaxRegNo", "true"), ("value", ""))
 
       sessionCacheService.currentSession.agentSession = Some(currentApplication)
 
@@ -279,7 +279,7 @@ with AgentOverseasApplicationStubs {
 
     def testSubmitAddTaxRegNo(numbers: Option[SortedSet[Trn]] = None) = {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("trn" -> "123456")
+        .withFormUrlEncodedBody(("trn", "123456"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = numbers))
 
@@ -296,7 +296,7 @@ with AgentOverseasApplicationStubs {
 
     "show validation error when TRN is blank when submitting the form" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("trn" -> "")
+        .withFormUrlEncodedBody(("trn", ""))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet.empty[Trn])))
 
@@ -395,7 +395,7 @@ with AgentOverseasApplicationStubs {
   "POST /your-tax-registration-numbers" should {
     "submit form and then redirect to /add-tax-registration-number page if user selects true" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("value" -> "true")
+        .withFormUrlEncodedBody(("value", "true"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
 
@@ -407,7 +407,7 @@ with AgentOverseasApplicationStubs {
 
     "submit form and then redirect to /upload/trn page if user selects false" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("value" -> "false")
+        .withFormUrlEncodedBody(("value", "false"))
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -425,7 +425,7 @@ with AgentOverseasApplicationStubs {
 
     "submit form and then redirect to /check-your-answers but NOT to /upload/trn page if user selects No and has not changed answers" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("value" -> "false")
+        .withFormUrlEncodedBody(("value", "false"))
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -472,7 +472,7 @@ with AgentOverseasApplicationStubs {
 
     "submit the form (with original and updated trns populated) and should correctly update the trn stored in the session" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("original" -> "abc123", "updated" -> "abc12345")
+        .withFormUrlEncodedBody(("original", "abc123"), ("updated", "abc12345"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
@@ -488,7 +488,7 @@ with AgentOverseasApplicationStubs {
 
     "submit form and initially redirect to /update-tax-registration-number again with UpdateTrn form if 'updated' trn field is not set in the form" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("original" -> "ABC123")
+        .withFormUrlEncodedBody(("original", "ABC123"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
 
@@ -561,7 +561,7 @@ with AgentOverseasApplicationStubs {
 
     "submit the form and should correctly remove the trn stored in the session & redirect to ask whether user does poses any taxRegNumber" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("isRemovingTrn" -> "true", "value" -> "abc123")
+        .withFormUrlEncodedBody(("isRemovingTrn", "true"), ("value", "abc123"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
@@ -576,7 +576,7 @@ with AgentOverseasApplicationStubs {
 
     "submit the form and should correctly remove the trn stored in the session" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("isRemovingTrn" -> "true", "value" -> "abc123")
+        .withFormUrlEncodedBody(("isRemovingTrn", "true"), ("value", "abc123"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers =
         Some(SortedSet(Trn("abc123"), Trn("anotherRegNumber")))
@@ -594,7 +594,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to showYourTaxRegNumbersForm page when the choice selected is No and the trn should not be removed" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("isRemovingTrn" -> "false", "value" -> "abc123")
+        .withFormUrlEncodedBody(("isRemovingTrn", "false"), ("value", "abc123"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 
@@ -610,7 +610,7 @@ with AgentOverseasApplicationStubs {
 
     "return validation error when the form is submitted without a choice selection" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("isRemovingTrn" -> "", "value" -> "abc123")
+        .withFormUrlEncodedBody(("isRemovingTrn", ""), ("value", "abc123"))
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(taxRegistrationNumbers = Some(SortedSet(Trn("abc123")))))
 

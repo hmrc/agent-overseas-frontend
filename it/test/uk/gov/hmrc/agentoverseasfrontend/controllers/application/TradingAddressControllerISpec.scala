@@ -93,9 +93,9 @@ with AgentOverseasApplicationStubs {
     "submit form and then redirect to trading-address-upload page" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "addressLine1" -> "line1",
-          "addressLine2" -> "line2",
-          "countryCode" -> "IE"
+          ("addressLine1", "line1"),
+          ("addressLine2", "line2"),
+          ("countryCode", "IE")
         )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None))
@@ -119,9 +119,9 @@ with AgentOverseasApplicationStubs {
     "submit form and then redirect to check-your-answers page if user is changing answers" in {
       implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "addressLine1" -> "line1",
-          "addressLine2" -> "line2",
-          "countryCode" -> "IE"
+          ("addressLine1", "line1"),
+          ("addressLine2", "line2"),
+          ("countryCode", "IE")
         )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
@@ -149,9 +149,9 @@ with AgentOverseasApplicationStubs {
       "address line 1 is blank" in {
         implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody(
-            "addressLine1" -> "",
-            "addressLine2" -> "line2",
-            "countryCode" -> "IE"
+            ("addressLine1", ""),
+            ("addressLine2", "line2"),
+            ("countryCode", "IE")
           )
 
         sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
@@ -165,9 +165,9 @@ with AgentOverseasApplicationStubs {
       "country code is GB" in {
         implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody(
-            "addressLine1" -> "Some address",
-            "addressLine2" -> "line2",
-            "countryCode" -> "GB"
+            ("addressLine1", "Some address"),
+            ("addressLine2", "line2"),
+            ("countryCode", "GB")
           )
 
         sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))

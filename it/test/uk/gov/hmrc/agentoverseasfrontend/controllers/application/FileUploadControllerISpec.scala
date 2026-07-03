@@ -152,7 +152,7 @@ with UpscanStubs {
   "POST /file-uploaded-successfully" should {
     "read the form and redirect to /registered-with-hmrc page if the user selects Yes" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "true")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "trading-address"), ("choice.correctFile", "true"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
@@ -165,7 +165,7 @@ with UpscanStubs {
 
     "read the form and redirect to /upload-proof-trading-address page if the user selects No" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "false")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "trading-address"), ("choice.correctFile", "false"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
@@ -178,7 +178,7 @@ with UpscanStubs {
 
     "show the form with errors when invalid value for 'correctFile' is passed in the form" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctFile" -> "abcd")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "trading-address"), ("choice.correctFile", "abcd"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -207,7 +207,7 @@ with UpscanStubs {
 
     "show the form with errors when 'correctFile' field is missing the form" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trading-address", "choice.correctabxgd" -> "true")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "trading-address"), ("choice.correctabxgd", "true"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -236,7 +236,7 @@ with UpscanStubs {
 
     "show the form with errors when 'fileType' field has been modified by the user and contains invalid value" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "invalid", "choice.correctFile" -> "true")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "invalid"), ("choice.correctFile", "true"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(
@@ -323,7 +323,7 @@ with UpscanStubs {
   "POST /file-uploaded-successfully" should {
     "read the form and redirect to /contact-details page if the user selects Yes" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "true")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "amls"), ("choice.correctFile", "true"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
@@ -336,7 +336,7 @@ with UpscanStubs {
 
     "read the form and redirect to /upload-proof-anti-money-laundering-registration page if the user selects No" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "amls", "choice.correctFile" -> "false")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "amls"), ("choice.correctFile", "false"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
@@ -377,7 +377,7 @@ with UpscanStubs {
   "POST /file-uploaded-successfully" should {
     "read the form and redirect to /check-your-answers page if the user selects Yes" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trn", "choice.correctFile" -> "true")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "trn"), ("choice.correctFile", "true"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
@@ -390,7 +390,7 @@ with UpscanStubs {
 
     "read the form and redirect to /upload-proof-tax-registration-number page if the user selects No" in {
       implicit val request = cleanCredsAgent(
-        FakeRequest(POST, "/").withFormUrlEncodedBody("fileType" -> "trn", "choice.correctFile" -> "false")
+        FakeRequest(POST, "/").withFormUrlEncodedBody(("fileType", "trn"), ("choice.correctFile", "false"))
       )
 
       sessionCacheService.currentSession.agentSession = Some(agentSession)
