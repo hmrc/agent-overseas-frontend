@@ -21,6 +21,8 @@ import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentoverseasfrontend.utils.compareEmail
 import uk.gov.hmrc.mongo.cache.DataKey
 
+import scala.collection.immutable.SortedSet
+
 case class AgentSession(
   amlsRequired: Option[Boolean] = None,
   amlsDetails: Option[AmlsDetails] = None,
@@ -33,7 +35,8 @@ case class AgentSession(
   personalDetails: Option[PersonalDetailsChoice] = None,
   companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
   hasTaxRegNumbers: Option[Boolean] = None,
-  taxRegistrationNumbers: Option[List[Trn]] = None,
+// TODO: 11764 Change SortedSet to List
+  taxRegistrationNumbers: Option[SortedSet[Trn]] = None,
   tradingAddressUploadStatus: Option[FileUploadStatus] = None,
   amlsUploadStatus: Option[FileUploadStatus] = None,
   trnUploadStatus: Option[FileUploadStatus] = None,

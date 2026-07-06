@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentoverseasfrontend.models
 
 import play.api.libs.json._
 
+import scala.collection.immutable.SortedSet
+
 case class TradingDetails(
   tradingName: String,
   tradingAddress: OverseasAddress,
@@ -26,7 +28,7 @@ case class TradingDetails(
   saAgentCode: Option[SaAgentCode],
   ctAgentCode: Option[CtAgentCode],
   companyRegistrationNumber: Option[Crn],
-  taxRegistrationNumbers: Option[List[Trn]]
+  taxRegistrationNumbers: Option[SortedSet[Trn]]
 )
 
 object TradingDetails {
