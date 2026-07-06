@@ -149,8 +149,7 @@ with Logging {
           validForm => {
             val trns =
               agentSession.taxRegistrationNumbers match {
-//                TODO: 11764 Make sure use of sorted is ok
-                case Some(numbers) => (numbers :+ Trn(validForm)).sorted
+                case Some(numbers) => (numbers :+ Trn(validForm))
                 case None => List(validForm).map(Trn.apply)
               }
             updateSession(
@@ -252,8 +251,7 @@ with Logging {
               case Some(updatedTrn) =>
                 val updatedSet =
                   agentSession.taxRegistrationNumbers
-                    //                TODO: 11764 Make sure use of sorted is ok
-                    .fold[List[Trn]](List.empty)(trns => trns.filterNot(_.value == validForm.original) :+ Trn(updatedTrn)).sorted
+                    .fold[List[Trn]](List.empty)(trns => trns.filterNot(_.value == validForm.original) :+ Trn(updatedTrn))
 
                 updateSession(
                   agentSession
@@ -293,8 +291,7 @@ with Logging {
             if (validForm.value) {
               val updatedSet =
                 agentSession.taxRegistrationNumbers
-                  //                TODO: 11764 Make sure use of sorted is ok
-                  .fold[List[Trn]](List.empty)(trns => trns.filterNot(_.value == trn)).sorted
+                  .fold[List[Trn]](List.empty)(trns => trns.filterNot(_.value == trn))
               val toUpdate: AgentSession =
                 if (updatedSet.isEmpty)
                   agentSession

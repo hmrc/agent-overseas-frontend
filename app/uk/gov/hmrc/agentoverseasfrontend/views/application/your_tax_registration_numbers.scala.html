@@ -67,7 +67,7 @@
 
     @govukSummaryList(SummaryList(
         classes = "hmrc-list-with-actions hmrc-list-with-actions--short",
-        rows = trns.map { trn =>
+        rows = trns.sorted.map { trn =>
             SummaryListRow(
                 key = Key(
                     content = Text(trn),
