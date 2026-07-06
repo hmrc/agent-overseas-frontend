@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBa
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
 import scala.concurrent.ExecutionContext

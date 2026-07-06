@@ -30,7 +30,6 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.{routes => sub
 import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 import uk.gov.hmrc.http.SessionKeys.sessionId
 
