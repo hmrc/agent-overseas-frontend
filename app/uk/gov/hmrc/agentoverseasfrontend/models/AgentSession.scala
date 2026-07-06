@@ -35,6 +35,7 @@ case class AgentSession(
   personalDetails: Option[PersonalDetailsChoice] = None,
   companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
   hasTaxRegNumbers: Option[Boolean] = None,
+// TODO: 11764 Change SortedSet to List
   taxRegistrationNumbers: Option[SortedSet[Trn]] = None,
   tradingAddressUploadStatus: Option[FileUploadStatus] = None,
   amlsUploadStatus: Option[FileUploadStatus] = None,
