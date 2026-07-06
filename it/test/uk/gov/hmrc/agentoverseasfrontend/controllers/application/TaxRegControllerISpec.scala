@@ -268,7 +268,6 @@ with AgentOverseasApplicationStubs {
   "POST /add-tax-registration-number" should {
     "submit form and then redirect to your-tax-registration-number page" when {
       "current session has some tax reg. numbers" in {
-//        TODO: 11764 FIX THIS
         testSubmitAddTaxRegNo(Some(List(Trn("67890"))))
       }
       "current session does not have any tax reg numbers" in {
