@@ -38,6 +38,7 @@ import uk.gov.hmrc.mongo.test.CleanMongoCollectionSupport
 import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 
+//TODO: 11764: Error during IT run - may be use of SortedSet
 class SessionCacheServiceISpec
 extends BaseISpec
 with CleanMongoCollectionSupport {
