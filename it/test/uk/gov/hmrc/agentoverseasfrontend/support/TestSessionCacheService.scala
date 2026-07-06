@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 //This should probably be removed, we can simply rely on the actual mongo repository in integration tests
 class TestSessionCacheService
-extends SessionCacheService(null)(null) {
+extends SessionCacheService(null)(using null) {
 
   class Session(
     var agentSession: Option[AgentSession] = None,
@@ -73,7 +73,7 @@ extends SessionCacheService(null)(null) {
   override def fetchOldProviderId(
     oldSessionId: String,
     rh: RequestHeader
-  ): Future[Option[ProviderId]] = Future.successful(currentSession(changeHeaderSessionId(oldSessionId, rh)).providerId)
+  ): Future[Option[ProviderId]] = Future.successful(currentSession(using changeHeaderSessionId(oldSessionId, rh)).providerId)
 
   override def cacheProviderId(providerId: ProviderId)(implicit rh: RequestHeader): Future[Unit] = Future.successful(
     currentSession.providerId = Some(providerId)

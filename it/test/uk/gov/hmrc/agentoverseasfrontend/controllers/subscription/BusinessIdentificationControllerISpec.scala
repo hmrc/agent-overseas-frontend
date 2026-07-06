@@ -713,7 +713,7 @@ with AgentSubscriptionStubs {
     "redirect to check-answers page" when {
       "a valid session id found" in {
         val oldSessionRequest = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-        sessionCacheService.cacheProviderId(ProviderId("credId-12345"))(oldSessionRequest).futureValue
+        sessionCacheService.cacheProviderId(ProviderId("credId-12345"))(using oldSessionRequest).futureValue
 
         implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribing2ndCleanAgentWithoutEnrolments)
         givenUpdateAuthIdSuccessResponse("credId-12345")

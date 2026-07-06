@@ -38,13 +38,11 @@ import uk.gov.hmrc.mongo.test.CleanMongoCollectionSupport
 import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//TODO: 11764: Error during IT run - may be use of SortedSet
 class SessionCacheServiceISpec
 extends BaseISpec
 with CleanMongoCollectionSupport {
 
-  private implicit val crypto: Encrypter
-    with Decrypter = SymmetricCryptoFactory.aesCrypto(
+  private implicit val crypto: Encrypter & Decrypter = SymmetricCryptoFactory.aesCrypto(
     "znbxS3YXv6TsIzb8OyeF7DlpXtl95Myvec+Hy8JHzO4="
   )
 

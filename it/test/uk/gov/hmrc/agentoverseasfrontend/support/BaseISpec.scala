@@ -139,13 +139,13 @@ with MongoSupport {
   protected def htmlEscapedMessage(
     key: String,
     args: Any*
-  ): String = HtmlFormat.escape(Messages(key, args: _*)).toString
+  ): String = HtmlFormat.escape(Messages(key, args*)).toString
   protected def htmlMessage(
     key: String,
     args: Any*
-  ): String = Messages(key, args: _*)
+  ): String = Messages(key, args*)
 
-  implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+  implicit def hc(implicit request: FakeRequest[?]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
   protected def checkMessageIsDefined(messageKey: String) =
     withClue(s"Message key ($messageKey) should be defined: ") {
