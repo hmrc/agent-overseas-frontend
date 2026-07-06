@@ -35,10 +35,8 @@ import uk.gov.hmrc.mongo.CurrentTimestampSupport
 import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.ObservableFuture
 import uk.gov.hmrc.mongo.test.CleanMongoCollectionSupport
 
-import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//TODO: 11764: Error during IT run - may be use of SortedSet
 class SessionCacheServiceISpec
 extends BaseISpec
 with CleanMongoCollectionSupport {
@@ -112,7 +110,7 @@ with CleanMongoCollectionSupport {
     personalDetails = Some(personalDetails),
     companyRegistrationNumber = Some(companyRegistrationNumber),
     hasTaxRegNumbers = Some(true),
-    taxRegistrationNumbers = Some(SortedSet(Trn("123"), Trn("456"))),
+    taxRegistrationNumbers = Some(List(Trn("123"), Trn("456"))),
     tradingAddressUploadStatus = Some(fileUploadStatus),
     amlsUploadStatus = Some(fileUploadStatus),
     trnUploadStatus = Some(fileUploadStatus),

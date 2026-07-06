@@ -38,10 +38,8 @@ import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.SessionKeys
 
 import java.util.UUID
-import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
-//TODO: 11764: Failure during IT run - may be use of SortedSet
 class ApplicationControllerISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs {
@@ -1221,7 +1219,7 @@ with AgentOverseasApplicationStubs {
             registeredForUkTax = Some(No),
             companyRegistrationNumber = Some(CompanyRegistrationNumber(None, None)),
             hasTaxRegNumbers = Some(true),
-            taxRegistrationNumbers = Some(SortedSet(Trn("someTaxRegNo"))),
+            taxRegistrationNumbers = Some(List(Trn("someTaxRegNo"))),
             amlsUploadStatus = Some(fileUploadStatus),
             tradingAddressUploadStatus = Some(fileUploadStatus),
             trnUploadStatus = Some(fileUploadStatus),
@@ -1427,7 +1425,7 @@ with AgentOverseasApplicationStubs {
               )),
               companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(true), Some(Crn("123456")))),
               hasTaxRegNumbers = Some(true),
-              taxRegistrationNumbers = Some(SortedSet(Trn("TX12345"))),
+              taxRegistrationNumbers = Some(List(Trn("TX12345"))),
               tradingAddressUploadStatus = Some(fileUploadStatus),
               amlsUploadStatus = Some(fileUploadStatus),
               trnUploadStatus = Some(fileUploadStatus),
@@ -1519,7 +1517,7 @@ with AgentOverseasApplicationStubs {
           personalDetails = Some(personalDetails),
           companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(true), Some(Crn("crnCode")))),
           hasTaxRegNumbers = Some(true),
-          taxRegistrationNumbers = Some(SortedSet(Trn("trn1"), Trn("trn2"))),
+          taxRegistrationNumbers = Some(List(Trn("trn1"), Trn("trn2"))),
           tradingAddressUploadStatus = Some(fileUploadStatus),
           amlsUploadStatus = Some(fileUploadStatus),
           trnUploadStatus = Some(fileUploadStatus),
@@ -1569,7 +1567,7 @@ with AgentOverseasApplicationStubs {
           personalDetails = Some(personalDetails),
           companyRegistrationNumber = Some(CompanyRegistrationNumber(Some(true), Some(Crn("crnCode")))),
           hasTaxRegNumbers = Some(true),
-          taxRegistrationNumbers = Some(SortedSet(Trn("trn1"), Trn("trn2"))),
+          taxRegistrationNumbers = Some(List(Trn("trn1"), Trn("trn2"))),
           tradingAddressUploadStatus = Some(fileUploadStatus),
           amlsUploadStatus = Some(fileUploadStatus),
           trnUploadStatus = Some(fileUploadStatus),

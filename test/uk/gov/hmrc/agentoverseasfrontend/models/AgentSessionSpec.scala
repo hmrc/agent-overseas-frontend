@@ -22,8 +22,6 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.domain.Nino
 
-import scala.collection.immutable.SortedSet
-
 class AgentSessionSpec
 extends AnyWordSpecLike
 with Matchers
@@ -64,8 +62,7 @@ with OptionValues {
     personalDetails = Some(personalDetails),
     companyRegistrationNumber = Some(crn),
     hasTaxRegNumbers = Some(true),
-//    TODO: 11764 This is causing NullPointerException when running unit tests
-    taxRegistrationNumbers = Some(SortedSet(Trn("123"), Trn("456"))),
+    taxRegistrationNumbers = Some(List(Trn("123"), Trn("456"))),
     changingAnswers = false
   )
 
@@ -91,7 +88,7 @@ with OptionValues {
           cleanedSession.registeredWithHmrc shouldBe Some(Yes)
           cleanedSession.personalDetails shouldBe None
           cleanedSession.companyRegistrationNumber shouldBe Some(crn)
-          cleanedSession.taxRegistrationNumbers shouldBe Some(SortedSet(Trn("123"), Trn("456")))
+          cleanedSession.taxRegistrationNumbers shouldBe Some(List(Trn("123"), Trn("456")))
         }
 
         "no agents codes were provided" when {

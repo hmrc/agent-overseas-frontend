@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import scala.collection.immutable.SortedSet
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models._
@@ -46,7 +45,7 @@
 
 @(
         doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn],
-        trns: SortedSet[String],
+        trns: List[String],
         backLink: Option[String] = None
 )(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
@@ -68,7 +67,7 @@
 
     @govukSummaryList(SummaryList(
         classes = "hmrc-list-with-actions hmrc-list-with-actions--short",
-        rows = trns.toList.map { trn =>
+        rows = trns.map { trn =>
             SummaryListRow(
                 key = Key(
                     content = Text(trn),
