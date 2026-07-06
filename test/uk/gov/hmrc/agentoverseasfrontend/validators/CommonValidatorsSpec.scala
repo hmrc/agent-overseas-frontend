@@ -959,7 +959,7 @@ with EitherValues {
   def randomString(limit: Int): String = {
     def nextAlphaNum: Char = {
       val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-      chars charAt Random.nextInt(chars.length)
+      chars `charAt` Random.nextInt(chars.length)
     }
     LazyList.continually(nextAlphaNum).take(limit).mkString
   }
