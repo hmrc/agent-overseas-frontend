@@ -41,6 +41,7 @@ import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
+import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -75,7 +76,7 @@ with Logging {
   def showTaxRegistrationNumberForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       val storedTrns = agentSession.taxRegistrationNumbers
-        .getOrElse(List.empty[Trn])
+        .getOrElse(SortedSet.empty[Trn])
 
       val whichTrnToPopulate =
         if (storedTrns.size == 1) {
@@ -168,7 +169,7 @@ with Logging {
   def showYourTaxRegNumbersForm: Action[AnyContent] = Action.async { implicit request =>
     withEnrollingAgent { agentSession =>
       val trns = agentSession.taxRegistrationNumbers
-        .getOrElse(List.empty[Trn])
+        .getOrElse(SortedSet.empty[Trn])
       val backLink =
         if (agentSession.changingAnswers)
           Some(showCheckYourAnswersUrl)
@@ -197,7 +198,7 @@ with Logging {
         .fold(
           formWithErrors => {
             val trns = agentSession.taxRegistrationNumbers
-              .getOrElse(List.empty[Trn])
+              .getOrElse(SortedSet.empty[Trn])
             if (agentSession.changingAnswers) {
               Ok(yourTrnsView(
                 formWithErrors,
