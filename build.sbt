@@ -8,9 +8,7 @@ ThisBuild / scalaVersion := "3.7.4"
 
 
 val scalaCOptions = Seq(
-//  "-Xfatal-warnings",
   "-Xlint:-missing-interpolator,_",
-//  "-Werror",
   "-Wconf:msg=Flag.*repeatedly:s",
   "-feature",
   "-Wconf:src=target/.*:s", // silence warnings from compiled files
