@@ -83,7 +83,8 @@ extends OverseasAgentIdentifier
 
 object Trn {
 
-  implicit val ordering: Ordering[Trn] = Ordering.by(unapply)
+//  TODO: 11764 Revert SortedSet changes and test??
+  implicit val ordering: Ordering[Trn] = Ordering.by(_.value)
   implicit val reads: SimpleObjectReads[Trn] = new SimpleObjectReads[Trn]("value", Trn.apply)
   implicit val writes: SimpleObjectWrites[Trn] = new SimpleObjectWrites[Trn](_.value)
 

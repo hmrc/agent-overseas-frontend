@@ -41,7 +41,6 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class SignOutController @Inject() (
   override val messagesApi: MessagesApi,
-  service: SubscriptionService,
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   authAction: SubscriptionAuth,

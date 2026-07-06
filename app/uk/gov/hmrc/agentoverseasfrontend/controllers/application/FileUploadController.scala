@@ -99,7 +99,7 @@ with Logging {
     )
 
   def showTradingAddressNoJsCheckPage: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { _ =>
       Ok(tradingAddressNoJsView())
     }
   }
@@ -109,7 +109,7 @@ with Logging {
     fileType: String,
     reference: String
   ): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { _ =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           applicationService
@@ -140,7 +140,7 @@ with Logging {
   }
 
   def showSuccessfulUploadedForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { _ =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           agentSession.fileType match {
@@ -206,7 +206,7 @@ with Logging {
   }
 
   def showUploadFailedPage: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+    withEnrollingEmailVerifiedAgent { _ =>
       sessionStoreService.fetchAgentSession.map {
         case Some(agentSession) =>
           agentSession.fileType match {

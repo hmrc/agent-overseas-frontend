@@ -35,7 +35,6 @@ class ChangingAnswersController @Inject() (
   authAction: ApplicationAuth,
   override val sessionStoreService: SessionCacheService,
   override val applicationService: ApplicationService,
-  countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents
 )(implicit
   val env: Environment,

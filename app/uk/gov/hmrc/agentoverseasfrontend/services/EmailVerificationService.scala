@@ -62,7 +62,7 @@ extends Logging {
   )(implicit rh: RequestHeader): Future[EmailVerificationStatus] = emailVerificationConnector.checkEmail(credId).map {
     case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.verified) => EmailVerificationStatus.Verified
     case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.locked) => EmailVerificationStatus.Locked
-    case Some(x) => EmailVerificationStatus.Unverified
+    case Some(_) => EmailVerificationStatus.Unverified
     case None => EmailVerificationStatus.Error
   }
 

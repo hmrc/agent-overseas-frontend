@@ -59,7 +59,7 @@ with CommonRouting {
   def getCredsAndAgentSession(implicit rh: RequestHeader): Future[(Credentials, AgentSession)] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(credentials and allEnrolments) {
-        case Some(credentials) ~ enrolments =>
+        case Some(credentials) ~ _ =>
           sessionStoreService.fetchAgentSession.flatMap {
             case Some(agentSession) => Future.successful((credentials, agentSession))
             case None => throw new IllegalStateException("Agent session not found")

@@ -35,7 +35,6 @@ import scala.concurrent.Future
 @Singleton
 class SubscriptionRootController @Inject() (
   override val messagesApi: MessagesApi,
-  service: SubscriptionService,
   authAction: SubscriptionAuth,
   sessionStoreService: SessionCacheService,
   applicationService: ApplicationService,
@@ -60,13 +59,13 @@ extends AgentOverseasBaseController(
   }
 
   def nextStep: Action[AnyContent] = Action.async { implicit request =>
-    withSimpleAgentAuth { subRequest =>
+    withSimpleAgentAuth { _ =>
       Future.successful(Ok(createNewAccountView()))
     }
   }
 
   def showApplicationIssue: Action[AnyContent] = Action.async { implicit request =>
-    withSimpleAgentAuth { subRequest =>
+    withSimpleAgentAuth { _ =>
       Future.successful(Ok(cannotCheckStatusView()))
     }
   }

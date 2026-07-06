@@ -128,13 +128,13 @@ with Logging {
   }
 
   def showMoreInformationNeeded: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingAgent { _ =>
       Ok(taxMoreInfoNeededView())
     }
   }
 
   def showAddTaxRegNoForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+    withEnrollingAgent { _ =>
       Ok(addTrnView(AddTrnForm.form))
     }
   }
@@ -184,7 +184,7 @@ with Logging {
           None
       Ok(yourTrnsView(
         DoYouWantToAddAnotherTrnForm.form,
-        trns.map(_.value).toList,
+        trns.map(_.value),
         backLink
       ))
     }
