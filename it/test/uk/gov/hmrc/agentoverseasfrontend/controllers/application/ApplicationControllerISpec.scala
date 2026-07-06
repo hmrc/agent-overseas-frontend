@@ -41,7 +41,6 @@ import java.util.UUID
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
-//TODO: 11764: Failure during IT run - may be use of SortedSet
 class ApplicationControllerISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs {

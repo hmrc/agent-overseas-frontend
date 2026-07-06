@@ -139,11 +139,11 @@ with MongoSupport {
   protected def htmlEscapedMessage(
     key: String,
     args: Any*
-  ): String = HtmlFormat.escape(Messages(key, args*)).toString
+  ): String = HtmlFormat.escape(Messages(key, args *)).toString
   protected def htmlMessage(
     key: String,
     args: Any*
-  ): String = Messages(key, args*)
+  ): String = Messages(key, args *)
 
   implicit def hc(implicit request: FakeRequest[?]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 

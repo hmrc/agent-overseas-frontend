@@ -27,7 +27,6 @@ import uk.gov.hmrc.domain.Nino
 
 import scala.collection.immutable.SortedSet
 
-//TODO: 11764: Failure during IT run - may be use of SortedSet
 class TaxRegControllerISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs {
