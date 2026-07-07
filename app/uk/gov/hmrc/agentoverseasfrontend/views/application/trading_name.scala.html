@@ -40,7 +40,7 @@
     submitButton: submitButton
 )
 
-@(tradingNameForm: Form[String], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@(tradingNameForm: Form[String], backLink: Option[String] = None)(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(tradingNameForm).toString + msgs("tradingName.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showContactDetailsForm.url))) {
 

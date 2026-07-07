@@ -16,7 +16,7 @@
 
 @this()
 
-@(key: String, classes: Option[String] = None, id: Option[String] = None)(implicit msgs: Messages)
+@(key: String, classes: Option[String] = None, id: Option[String] = None)(using msgs: Messages)
 
 <span @classes.map(cls => s"class=${cls}")
       @id.map(i => s"id=${i}")>@Html(msgs(key))</span>

@@ -31,7 +31,7 @@ class AgentOverseasBaseController @Inject() (
   val sessionStoreService: SessionCacheService,
   val applicationService: ApplicationService,
   override val controllerComponents: MessagesControllerComponents
-)(implicit val ec: ExecutionContext)
+)(using val ec: ExecutionContext)
 extends FrontendController(controllerComponents)
 with SessionBehaviour
 with I18nSupport {}

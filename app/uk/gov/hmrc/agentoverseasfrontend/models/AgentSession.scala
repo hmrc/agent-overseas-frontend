@@ -97,7 +97,7 @@ object AgentSession {
 
   def empty: AgentSession = AgentSession()
 
-  implicit val format: OFormat[AgentSession] = Json.format[AgentSession]
+  given OFormat[AgentSession] = Json.format[AgentSession]
 
   object MissingAmlsRequired {
     def unapply(session: Option[AgentSession]): Boolean = session.exists(_.amlsRequired.isEmpty)

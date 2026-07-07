@@ -29,7 +29,7 @@ import scala.concurrent.Future
 abstract class GenericEmailVerificationController[S](
   val env: Environment,
   emailVerificationService: EmailVerificationService
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
 extends FrontendBaseController
 with I18nSupport {
 
@@ -37,7 +37,7 @@ with I18nSupport {
 
   def emailVerificationFrontendBaseUrl: String
 
-  def accessibilityStatementUrl(implicit request: RequestHeader): String
+  def accessibilityStatementUrl(using request: RequestHeader): String
 
   // if we are running locally, each service will have a different root URL so we need to use absolute URLs
   // to redirect between calling service and email verification service
@@ -49,7 +49,7 @@ with I18nSupport {
 
   /** Returns the session state and the credId of the current logged in user.
     */
-  def getState(implicit rh: RequestHeader): Future[(S, String)]
+  def getState(using rh: RequestHeader): Future[(S, String)]
 
   /** Extract the email to be verified from the current session state.
     */
@@ -68,7 +68,7 @@ with I18nSupport {
   def markEmailAsVerified(
     session: S,
     email: String
-  )(implicit re: RequestHeader): Future[S]
+  )(using re: RequestHeader): Future[S]
 
   /*
   Continuation URLs
@@ -99,7 +99,8 @@ with I18nSupport {
     */
   def enterEmailUrl(session: S): Call
 
-  def verifyEmail: Action[AnyContent] = Action.async { implicit request =>
+  def verifyEmail: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     getState.flatMap { case (session, credId) =>
       val emailToVerify = getEmailToVerify(session)
       if (isAlreadyVerified(session, emailToVerify) || !emailVerificationEnabled) {
@@ -151,7 +152,7 @@ with I18nSupport {
     }
   }
 
-  private def urlFor(call: Call)(implicit request: RequestHeader): String =
+  private def urlFor(call: Call)(using request: RequestHeader): String =
     if (useAbsoluteUrls)
       call.absoluteURL()
     else

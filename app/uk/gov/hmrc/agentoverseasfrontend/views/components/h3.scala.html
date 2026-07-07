@@ -16,7 +16,7 @@
 
 @this()
 
-@(key: String, classes: Option[String] = None, id: Option[String] = None)(implicit msgs: Messages)
+@(key: String, classes: Option[String] = None, id: Option[String] = None)(using msgs: Messages)
 
 @cls = @{"govuk-heading-s".concat(classes.getOrElse(""))}
 

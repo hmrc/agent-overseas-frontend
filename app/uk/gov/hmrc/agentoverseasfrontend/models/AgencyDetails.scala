@@ -48,7 +48,7 @@ object AgencyDetails {
         (__ \ "verifiedEmails").readWithDefault[Set[String]](Set.empty)
     )(AgencyDetails.apply)
   val writes: Writes[AgencyDetails] = Json.writes[AgencyDetails]
-  implicit val formats: Format[AgencyDetails] = Format(reads, writes)
+  given Format[AgencyDetails] = Format(reads, writes)
 
   def fromOverseasApplication(overseasApplication: OverseasApplication): AgencyDetails = AgencyDetails(
     agencyName = overseasApplication.tradingDetails.tradingName,

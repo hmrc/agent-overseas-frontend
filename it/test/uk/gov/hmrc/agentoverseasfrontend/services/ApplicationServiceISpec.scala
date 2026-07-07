@@ -31,7 +31,7 @@ class ApplicationServiceISpec
 extends BaseISpec
 with AgentOverseasApplicationStubs {
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   val service = app.injector.instanceOf[ApplicationService]
 
   "getCurrentApplication" should {

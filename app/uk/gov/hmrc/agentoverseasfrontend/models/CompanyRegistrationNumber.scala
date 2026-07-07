@@ -25,6 +25,6 @@ case class CompanyRegistrationNumber(
 
 object CompanyRegistrationNumber {
 
-  implicit val format: Format[CompanyRegistrationNumber] = Json.format[CompanyRegistrationNumber]
+  given Format[CompanyRegistrationNumber] = Json.format[CompanyRegistrationNumber]
 
 }

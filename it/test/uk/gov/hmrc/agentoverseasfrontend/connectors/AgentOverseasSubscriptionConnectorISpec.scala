@@ -27,7 +27,7 @@ class AgentOverseasSubscriptionConnectorISpec
 extends BaseISpec
 with AgentSubscriptionStubs {
 
-  private implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private val connector = app.injector.instanceOf[AgentSubscriptionConnector]
 

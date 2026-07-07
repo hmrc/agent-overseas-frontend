@@ -43,7 +43,7 @@ with ScalaFutures {
 
   val handler: ErrorHandler = app.injector.instanceOf[ErrorHandler]
   val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-  implicit val lang: Lang = Lang("en")
+  given Lang = Lang("en")
 
   protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder().configure("auditing.enabled" -> false)
 

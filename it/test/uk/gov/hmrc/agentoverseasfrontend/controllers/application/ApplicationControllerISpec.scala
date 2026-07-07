@@ -86,7 +86,8 @@ with AgentOverseasApplicationStubs {
 
   "GET /contact-details" should {
     "display the contact details form" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService
         .cacheAgentSession(
@@ -115,6 +116,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       val result = controller.showContactDetailsForm(request)
 
@@ -126,7 +128,7 @@ with AgentOverseasApplicationStubs {
 
   "POST /contact-details" should {
     "submit form and then redirect to trading-name" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("firstName", "test"),
           ("lastName", "last"),
@@ -134,6 +136,7 @@ with AgentOverseasApplicationStubs {
           ("businessTelephone", "12345"),
           ("businessEmail", "test@email.com")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService
         .cacheAgentSession(AgentSession(
@@ -161,7 +164,7 @@ with AgentOverseasApplicationStubs {
 
     "submit form and then redirect to check-your-answers if user is changing answers" in {
       // pre state
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("firstName", "test"),
           ("lastName", "last"),
@@ -169,6 +172,7 @@ with AgentOverseasApplicationStubs {
           ("businessTelephone", "12345"),
           ("businessEmail", "test@email.com")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService
         .cacheAgentSession(
@@ -201,7 +205,7 @@ with AgentOverseasApplicationStubs {
 
     "show validation errors when form data is incorrect" in {
       // pre state
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("firstName", ""),
           ("lastName", "last**"),
@@ -209,6 +213,7 @@ with AgentOverseasApplicationStubs {
           ("businessTelephone", "12345"),
           ("businessEmail", "test")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService
         .cacheAgentSession(
@@ -234,7 +239,8 @@ with AgentOverseasApplicationStubs {
 
   "GET /trading-name" should {
     "display the trading name form" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(tradingName = None, changingAnswers = true))
 
@@ -253,6 +259,7 @@ with AgentOverseasApplicationStubs {
     "redirect to /money-laundering-registration when session not found" in {
 
       val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       val result = controller.showTradingNameForm(request)
 
@@ -262,7 +269,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "pre-fill trading name if previously has used the endpoint POST /trading-name" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(tradingName = Some("tradingName")))
 
@@ -282,8 +290,9 @@ with AgentOverseasApplicationStubs {
 
   "POST /trading-name" should {
     "submit form and then redirect to main-business-details" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("tradingName", "test"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(tradingName = None, overseasAddress = None))
 
@@ -298,8 +307,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "submit form and then redirect to check-your-details if user is changing answers" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("tradingName", "test"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(
         tradingName = None,
@@ -321,8 +331,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation errors when form data is incorrect" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("tradingName", ""))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(
         tradingName = None,
@@ -340,7 +351,8 @@ with AgentOverseasApplicationStubs {
 
   "GET /registered-with-hmrc" should {
     class RegisteredWithHmrcSetup(agentSession: AgentSession = agentSession.copy(registeredWithHmrc = None)) {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showRegisteredWithHmrcForm(request)
       val doc = Jsoup.parse(contentAsString(result))
@@ -400,7 +412,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "contain a back link to /check-your-answers if user is changing answers" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(changingAnswers = true, registeredWithHmrc = None))
 
@@ -421,6 +434,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       val result = controller.showRegisteredWithHmrcForm(request)
 
       status(result) shouldBe 303
@@ -430,8 +444,9 @@ with AgentOverseasApplicationStubs {
 
   "POST /registered-with-hmrc" should {
     "store choice in session after successful submission and redirect to next page" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("registeredWithHmrc", "true"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None, changingAnswers = true))
       val result = controller.submitRegisteredWithHmrc(request)
@@ -447,8 +462,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "show /check-your-answers page when the user in the amending state but clicks Continue without making any changes to the state" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("registeredWithHmrc", "true"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = Some(Yes), changingAnswers = true))
 
@@ -465,7 +481,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if no choice was selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredWithHmrc = None))
 
@@ -483,7 +500,8 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showUkTaxRegistrationForm(request)
       val doc = Jsoup.parse(contentAsString(result))
@@ -562,6 +580,19 @@ with AgentOverseasApplicationStubs {
           )
         }
 
+      "previous page is /registered-with-hmrc if the registered with HMRC answer is missing" in
+        new UkTaxRegistrationSetup(
+          defaultAgentSession.copy(
+            registeredWithHmrc = None,
+            agentCodes = None
+          )
+        ) {
+          result.futureValue should containLink(
+            expectedMessageKey = "button.back",
+            expectedHref = "/agent-services/apply-from-outside-uk/registered-with-hmrc"
+          )
+        }
+
       "previous page is /check-your-answers if user is changing answers" in
         new UkTaxRegistrationSetup(
           defaultAgentSession.copy(
@@ -586,6 +617,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
@@ -595,8 +627,9 @@ with AgentOverseasApplicationStubs {
 
   "POST /uk-tax-registration" should {
     "store choice in session after successful submission and redirect to next page" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("registeredForUkTax", "true"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -618,8 +651,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "show /check-your-answers page when the user in the amending state but clicks Continue without making any changes to the state" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("registeredForUkTax", "false"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -641,7 +675,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if no choice was selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -664,7 +699,8 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = Some(Yes)
     )
     class PersonalDetailsSetup(agentSession: AgentSession = defaultAgentSession) {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showPersonalDetailsForm(request)
       val doc = Jsoup.parse(contentAsString(result))
@@ -709,6 +745,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
@@ -718,12 +755,13 @@ with AgentOverseasApplicationStubs {
 
   "POST /personal-details" should {
     "store choice in session after successful submission and redirect to next page" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("personalDetailsChoice", "nino"),
           ("nino", "AB123456A"),
           ("saUtr", "")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -747,12 +785,13 @@ with AgentOverseasApplicationStubs {
     }
 
     "store choice in session after successful submission and redirect check-your-answers if user is changing answers" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("personalDetailsChoice", "nino"),
           ("nino", "AB123456A"),
           ("saUtr", "")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -778,12 +817,13 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if no options are selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("personalDetailsChoice", ""),
           ("nino", ""),
           ("saUtr", "")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -800,12 +840,13 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if National Insurance number option is selected, but no value has been entered" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("personalDetailsChoice", "nino"),
           ("nino", ""),
           ("saUtr", "")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -820,12 +861,13 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if SA UTR option is selected, but no value has been entered" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("personalDetailsChoice", "saUtr"),
           ("nino", ""),
           ("saUtr", "")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -842,7 +884,8 @@ with AgentOverseasApplicationStubs {
 
   "GET /company-registration-number" should {
     "display the company-registration-number form" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(registeredForUkTax = Some(Yes), companyRegistrationNumber = None))
 
@@ -859,7 +902,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the company-registration-number form with check-your-answers back link if user is changing answers" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -882,7 +926,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the company-registration-number form with correct back button link in case user selects No option in the /uk-tax-registration page" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -906,12 +951,36 @@ with AgentOverseasApplicationStubs {
 
       doc.select("#confirmRegistration-2[checked]") should have length 1
     }
+
+    "display the company-registration-number form with correct back button link when uk tax registration answer is missing" in {
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
+
+      sessionCacheService.currentSession.agentSession = Some(
+        agentSession.copy(
+          registeredForUkTax = None,
+          companyRegistrationNumber = None
+        )
+      )
+
+      val result = controller.showCompanyRegistrationNumberForm(request)
+      val backButtonUrl = routes.ApplicationController.showUkTaxRegistrationForm.url
+
+      status(result) shouldBe 200
+      result.futureValue should containMessages(
+        "companyRegistrationNumber.title",
+        "companyRegistrationNumber.caption"
+      )
+
+      result.futureValue should containSubstrings(backButtonUrl)
+    }
   }
 
   "POST /company-registration-number" should {
     "store choice in session after successful submission and redirect to next page" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("confirmRegistration", "true"), ("registrationNumber", "AB123456"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -933,8 +1002,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "store choice in session after successful submission and redirect to check-your-answers page if user is changing answers" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("confirmRegistration", "true"), ("registrationNumber", "AB123456"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -959,7 +1029,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if no choice was selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -975,8 +1046,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error if Yes is selected but no input passed for registrationNumber" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(("confirmRegistration", "true"), ("registrationNumber", ""))
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -998,7 +1070,8 @@ with AgentOverseasApplicationStubs {
       agentCodes = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
       val result = controller.showAgentCodesForm(request)
       val doc = Jsoup.parse(contentAsString(result))
@@ -1089,6 +1162,7 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
@@ -1098,13 +1172,14 @@ with AgentOverseasApplicationStubs {
 
   "POST /self-assessment-agent-code" should {
     "store choice in session after successful submission and redirect to next page" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("self-assessment-checkbox", "true"),
           ("self-assessment", "SA1234"),
           ("corporation-tax-checkbox", "true"),
           ("corporation-tax", "123456")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -1132,11 +1207,12 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /uk-tax-registration if no agent code is selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
         .withFormUrlEncodedBody(
           ("self-assessment", ""),
           ("corporation-tax", "")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(
         agentSession.copy(
@@ -1158,12 +1234,13 @@ with AgentOverseasApplicationStubs {
 
     Seq("saAgentCode" -> "self-assessment", "ctAgentCode" -> "corporation-tax").foreach { case (key, value) =>
       s"show validation error if $value checkbox was selected but the text does not pass validation" in {
-        implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        val request = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody(
             (s"$value-checkbox", "true"),
             ("self-assessment", ""),
             ("corporation-tax", "")
           )
+        given FakeRequest[?] = request
 
         sessionCacheService.currentSession.agentSession = Some(
           agentSession.copy(
@@ -1206,7 +1283,8 @@ with AgentOverseasApplicationStubs {
     "have correct back link" when {
 
       "back link to file-uploaded-successfully" in {
-        implicit val request = cleanCredsAgent(FakeRequest())
+        val request = cleanCredsAgent(FakeRequest())
+        given FakeRequest[?] = request
 
         sessionCacheService.currentSession.agentSession = Some(
           AgentSession(
@@ -1235,7 +1313,8 @@ with AgentOverseasApplicationStubs {
       }
 
       "no agent codes no taxRegNumbers provided, back link to ask if has tax-registration-number" in {
-        implicit val request = cleanCredsAgent(FakeRequest())
+        val request = cleanCredsAgent(FakeRequest())
+        given FakeRequest[?] = request
 
         sessionCacheService.currentSession.agentSession = Some(
           AgentSession(
@@ -1267,7 +1346,8 @@ with AgentOverseasApplicationStubs {
     "agents codes are not available" when {
       "UkTaxRegistration is Yes" when {
         "CompanyRegistrationNumber is empty" in {
-          implicit val request = cleanCredsAgent(FakeRequest())
+          val request = cleanCredsAgent(FakeRequest())
+          given FakeRequest[?] = request
 
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
@@ -1313,7 +1393,8 @@ with AgentOverseasApplicationStubs {
         }
 
         "CompanyRegistrationNumber is non empty" in {
-          implicit val request = cleanCredsAgent(FakeRequest())
+          val request = cleanCredsAgent(FakeRequest())
+          given FakeRequest[?] = request
 
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
@@ -1357,7 +1438,8 @@ with AgentOverseasApplicationStubs {
         }
 
         "TaxRegistrationNumbers is empty" in {
-          implicit val request = cleanCredsAgent(FakeRequest())
+          val request = cleanCredsAgent(FakeRequest())
+          given FakeRequest[?] = request
 
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
@@ -1404,7 +1486,8 @@ with AgentOverseasApplicationStubs {
         }
 
         "TaxRegistrationNumbers is non empty" in {
-          implicit val request = cleanCredsAgent(FakeRequest())
+          val request = cleanCredsAgent(FakeRequest())
+          given FakeRequest[?] = request
 
           val registeredWithHmrc = Some(Yes)
           val agentCodes = AgentCodes(None, None)
@@ -1453,7 +1536,8 @@ with AgentOverseasApplicationStubs {
         }
       }
       "UkTaxRegistration is No" in {
-        implicit val request = cleanCredsAgent(FakeRequest())
+        val request = cleanCredsAgent(FakeRequest())
+        given FakeRequest[?] = request
 
         val registeredWithHmrc = Some(Yes)
         val agentCodes = AgentCodes(None, None)
@@ -1502,7 +1586,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "should display the form with all data as expected when user goes through 'RegsiteredWithHmrc=No' flow" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       val registeredWithHmrc = Some(No)
 
@@ -1552,7 +1637,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "should redirect to the verify email stage when the email address is unverified" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       val registeredWithHmrc = Some(No)
 
@@ -1585,7 +1671,7 @@ with AgentOverseasApplicationStubs {
 
   "POST /check-your-answers" should {
 
-    def initialTestSetup(implicit rh: RequestHeader) = {
+    def initialTestSetup(using rh: RequestHeader) = {
       val registeredWithHmrc = Some(Yes)
       val agentCodes = AgentCodes(Some(SaAgentCode("selfAssessmentCode")), Some(CtAgentCode("corporationTaxCode")))
 
@@ -1608,7 +1694,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "show error when user doesn't accept confirmation" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      given FakeRequest[?] = request
 
       val agentSession = initialTestSetup
 
@@ -1622,9 +1709,10 @@ with AgentOverseasApplicationStubs {
     }
 
     "submit the application and redirect to application-complete" in {
-      implicit val request = cleanCredsAgent(
+      val request = cleanCredsAgent(
         FakeRequest(POST, "/").withFormUrlEncodedBody(("confirmed", "true"))
       )
+      given FakeRequest[?] = request
 
       val agentSession = initialTestSetup
 
@@ -1642,9 +1730,10 @@ with AgentOverseasApplicationStubs {
     }
 
     "return exception when agent-overseas-application backend is unavailable" in {
-      implicit val request = cleanCredsAgent(
+      val request = cleanCredsAgent(
         FakeRequest(POST, "/").withFormUrlEncodedBody(("confirmed", "true"))
       )
+      given FakeRequest[?] = request
 
       val agentSession = initialTestSetup
 
@@ -1720,7 +1809,8 @@ with AgentOverseasApplicationStubs {
 
   "email verification" should {
     def checkVerifyEmailIsTriggered(f: Request[AnyContent] => Future[Result]) = {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
       val result = f(request)
       status(result) shouldBe 303
@@ -1728,7 +1818,8 @@ with AgentOverseasApplicationStubs {
     }
 
     def checkVerifyEmailIsNotTriggered(f: Request[AnyContent] => Future[Result]) = {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(verifiedEmails = Set.empty))
       val result = f(request)
       status(result) should (equal(200) or equal(303))
@@ -1775,7 +1866,8 @@ with AgentOverseasApplicationStubs {
       }
     }
     "not be triggered when using with the email retrieved by auth" when {
-      "check answers" in checkVerifyEmailIsNotTriggered { implicit request =>
+      "check answers" in checkVerifyEmailIsNotTriggered { request =>
+        given FakeRequest[?] = request.asInstanceOf[FakeRequest[?]]
         // we use the email (authemail@email.com) which is returned in the mock auth response
         sessionCacheService.currentSession.agentSession = Some(
           agentSession.copy(

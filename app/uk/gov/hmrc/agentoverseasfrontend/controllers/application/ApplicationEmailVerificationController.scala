@@ -44,7 +44,7 @@ class ApplicationEmailVerificationController @Inject() (
   emailVerificationService: EmailVerificationService,
   val controllerComponents: MessagesControllerComponents,
   accessibilityStatementConfig: AccessibilityStatementConfig
-)(implicit
+)(using
   appConfig: AppConfig,
   override val ec: ExecutionContext
 )
@@ -58,9 +58,9 @@ with I18nSupport {
 
   override def emailVerificationFrontendBaseUrl: String = appConfig.emailVerificationFrontendBaseUrl
 
-  override def accessibilityStatementUrl(implicit request: RequestHeader): String = accessibilityStatementConfig.url.getOrElse("")
+  override def accessibilityStatementUrl(using request: RequestHeader): String = accessibilityStatementConfig.url.getOrElse("")
 
-  override def getState(implicit rh: RequestHeader): Future[(AgentSession, String)] = getCredsAndAgentSession.map { case (creds, agentSession) =>
+  override def getState(using rh: RequestHeader): Future[(AgentSession, String)] = getCredsAndAgentSession.map { case (creds, agentSession) =>
     (agentSession, creds.providerId)
   }
 
@@ -76,7 +76,7 @@ with I18nSupport {
   override def markEmailAsVerified(
     session: AgentSession,
     email: String
-  )(implicit
+  )(using
     re: RequestHeader
   ): Future[AgentSession] = {
     val newAgentSession = session.copy(verifiedEmails = session.verifiedEmails + email)

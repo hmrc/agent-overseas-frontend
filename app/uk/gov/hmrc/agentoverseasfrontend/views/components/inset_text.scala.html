@@ -26,7 +26,7 @@
     key: Option[String] = None,
     classes: String = "",
     id: Option[String] = None
-)(implicit msgs: Messages)
+)(using msgs: Messages)
 
 @content = @{
   if(key.isDefined) Text(msgs(key.get))

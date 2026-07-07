@@ -25,5 +25,5 @@ case class SuccessfulFileUploadConfirmation(
 )
 
 object SuccessfulFileUploadConfirmation {
-  implicit val format: OFormat[SuccessfulFileUploadConfirmation] = Json.format[SuccessfulFileUploadConfirmation]
+  given OFormat[SuccessfulFileUploadConfirmation] = Json.format[SuccessfulFileUploadConfirmation]
 }

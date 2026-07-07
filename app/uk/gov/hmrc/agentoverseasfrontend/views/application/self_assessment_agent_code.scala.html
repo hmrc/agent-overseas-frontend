@@ -34,7 +34,7 @@
     formWithCsrf: FormWithCSRF
 )
 
-@(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@(agentCodesForm: Form[AgentCodes], backLink: Option[String] = None)(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @saValue = @{ agentCodesForm("self-assessment").value.getOrElse("") }
 @ctValue = @{ agentCodesForm("corporation-tax").value.getOrElse("") }

@@ -22,7 +22,7 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.upscan.UpscanInitiate
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.*
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -38,7 +38,7 @@ class UpscanConnector @Inject() (
   appConfig: AppConfig,
   httpClient: HttpClientV2,
   val metrics: Metrics
-)(implicit
+)(using
   val ec: ExecutionContext
 ) {
 
@@ -57,7 +57,7 @@ class UpscanConnector @Inject() (
     """.stripMargin
   )
 
-  def initiate()(implicit rh: RequestHeader): Future[UpscanInitiate] = httpClient.post(upscanUrl)
+  def initiate()(using rh: RequestHeader): Future[UpscanInitiate] = httpClient.post(upscanUrl)
     .withBody(payload)
     .setHeader(("content-Type" -> "application/json"))
     .execute[JsValue]

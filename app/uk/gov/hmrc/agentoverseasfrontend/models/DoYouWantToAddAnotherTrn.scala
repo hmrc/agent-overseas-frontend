@@ -22,5 +22,5 @@ import play.api.libs.json.Json
 case class DoYouWantToAddAnotherTrn(value: Option[Boolean])
 
 object DoYouWantToAddAnotherTrn {
-  implicit val format: Format[DoYouWantToAddAnotherTrn] = Json.format[DoYouWantToAddAnotherTrn]
+  given Format[DoYouWantToAddAnotherTrn] = Json.format[DoYouWantToAddAnotherTrn]
 }

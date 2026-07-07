@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.VerificationStatusResponse
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailRequest
 import uk.gov.hmrc.agentoverseasfrontend.models.VerifyEmailResponse
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.*
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
@@ -40,7 +40,7 @@ import scala.concurrent.Future
 class EmailVerificationConnector @Inject() (
   http: HttpClientV2,
   val metrics: Metrics
-)(implicit
+)(using
   val appConfig: AppConfig,
   val ec: ExecutionContext
 )
@@ -48,7 +48,7 @@ extends Logging {
 
   def verifyEmail(
     request: VerifyEmailRequest
-  )(implicit rh: RequestHeader): Future[Option[VerifyEmailResponse]] = {
+  )(using rh: RequestHeader): Future[Option[VerifyEmailResponse]] = {
     val url = url"${appConfig.emailVerificationBaseUrl}/email-verification/verify-email"
 
     http.post(url)
@@ -66,7 +66,7 @@ extends Logging {
 
   def checkEmail(
     credId: String
-  )(implicit rh: RequestHeader): Future[Option[VerificationStatusResponse]] = {
+  )(using rh: RequestHeader): Future[Option[VerificationStatusResponse]] = {
     val url = url"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId"
 
     http.get(url)

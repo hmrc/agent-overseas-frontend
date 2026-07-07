@@ -16,7 +16,7 @@
 
 @this()
 
-@(items: Seq[String], id: Option[String] = None)(implicit msgs: Messages)
+@(items: Seq[String], id: Option[String] = None)(using msgs: Messages)
 
 <ul class="govuk-list govuk-list--bullet" @id.map(i => s"id=${i}")>
  @for(str <- items) {

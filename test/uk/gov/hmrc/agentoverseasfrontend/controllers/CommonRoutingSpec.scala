@@ -54,7 +54,7 @@ with Matchers
 with OptionValues
 with ScalaFutures {
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.sessionId -> "sessionId123456")
+  given FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.sessionId -> "sessionId123456")
 
   private val contactDetails = ContactDetails(
     "test",

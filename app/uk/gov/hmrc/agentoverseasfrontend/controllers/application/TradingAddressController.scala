@@ -22,6 +22,7 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
@@ -30,10 +31,10 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.MainBusinessAddressForm
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application.main_business_address
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class TradingAddressController @Inject() (
@@ -45,7 +46,7 @@ class TradingAddressController @Inject() (
   authAction: ApplicationAuth,
   cc: MessagesControllerComponents,
   mainBusinessAddressView: main_business_address
-)(implicit
+)(using
   appConfig: AppConfig,
   override val ec: ExecutionContext
 )
@@ -62,25 +63,27 @@ with I18nSupport {
   private val countries = countryNamesLoader.load
   private val validCountryCodes = countries.keys.toSet
 
-  def showMainBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
+  def showMainBusinessAddressForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       val form = MainBusinessAddressForm.mainBusinessAddressForm(validCountryCodes)
       if (agentSession.changingAnswers) {
-        Ok(
+        Future.successful(Ok(
           mainBusinessAddressView(
             agentSession.overseasAddress.fold(form)(form.fill),
             countries,
             Some(showCheckYourAnswersUrl)
           )
-        )
+        ))
       }
       else {
-        Ok(mainBusinessAddressView(agentSession.overseasAddress.fold(form)(form.fill), countries))
+        Future.successful(Ok(mainBusinessAddressView(agentSession.overseasAddress.fold(form)(form.fill), countries)))
       }
     }
   }
 
-  def submitMainBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
+  def submitMainBusinessAddress: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       MainBusinessAddressForm
         .mainBusinessAddressForm(validCountryCodes)
@@ -88,14 +91,14 @@ with I18nSupport {
         .fold(
           formWithErrors =>
             if (agentSession.changingAnswers) {
-              Ok(mainBusinessAddressView(
+              Future.successful(Ok(mainBusinessAddressView(
                 formWithErrors,
                 countries,
                 Some(showCheckYourAnswersUrl)
-              ))
+              )))
             }
             else {
-              Ok(mainBusinessAddressView(formWithErrors, countries))
+              Future.successful(Ok(mainBusinessAddressView(formWithErrors, countries)))
             },
           validForm =>
             updateSession(agentSession.copy(overseasAddress = Some(validForm)))(

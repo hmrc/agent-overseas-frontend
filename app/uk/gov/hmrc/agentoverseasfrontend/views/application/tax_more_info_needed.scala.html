@@ -27,7 +27,7 @@
     linkAsButton: linkAsButton
 )
 
-@()(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@()(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("taxRegNo.more_info_required.title"), backLinkHref = Some(routes.TaxRegController.showTaxRegistrationNumberForm.url)) {
 

@@ -36,7 +36,8 @@ extends BaseISpec {
 
   class SetUp {
 
-    implicit val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
+    val request = cleanCredsAgent(FakeRequest())
+    given FakeRequest[?] = request
 
     sessionCacheService.cacheAgentSession(agentSession).futureValue
 
@@ -152,7 +153,7 @@ extends BaseISpec {
   private def verify(
     result: Future[Result],
     url: String
-  )(implicit request: Request[AnyContent]) = {
+  )(using request: FakeRequest[?]) = {
     status(result) shouldBe 303
     header(LOCATION, result).get shouldBe url
     sessionCacheService.fetchAgentSession.futureValue.get.changingAnswers shouldBe true

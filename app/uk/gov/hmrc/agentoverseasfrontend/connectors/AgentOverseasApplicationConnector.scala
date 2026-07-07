@@ -23,7 +23,7 @@ import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.models.*
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.*
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.http.HttpErrorFunctions.*
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.HttpResponse
@@ -43,16 +43,16 @@ class AgentOverseasApplicationConnector @Inject() (
   appConfig: AppConfig,
   http: HttpClientV2,
   val metrics: Metrics
-)(implicit val ec: ExecutionContext) {
+)(using val ec: ExecutionContext) {
 
-  implicit val localDateTimeOrdering: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
+  given Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
   private val queryParams: String = ApplicationStatus.allStatuses
     .map(status => s"statusIdentifier=${status.key}")
     .mkString("&")
   private val urlString: String = s"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application?$queryParams"
 
-  def getUserApplications(implicit rh: RequestHeader): Future[List[ApplicationEntityDetails]] = http.get(url"$urlString")
+  def getUserApplications(using rh: RequestHeader): Future[List[ApplicationEntityDetails]] = http.get(url"$urlString")
     .execute[HttpResponse]
     .map {
       response =>
@@ -68,7 +68,7 @@ class AgentOverseasApplicationConnector @Inject() (
 
   def createOverseasApplication(
     request: CreateOverseasApplicationRequest
-  )(implicit rh: RequestHeader): Future[Unit] = {
+  )(using rh: RequestHeader): Future[Unit] = {
     val url = url"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
     http.post(url)
       .withBody(Json.toJson(request))
@@ -83,12 +83,12 @@ class AgentOverseasApplicationConnector @Inject() (
 
   def upscanPollStatus(
     reference: String
-  )(implicit rh: RequestHeader): Future[FileUploadStatus] = {
+  )(using rh: RequestHeader): Future[FileUploadStatus] = {
     val url = url"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/upscan-poll-status/$reference"
     http.get(url).execute[FileUploadStatus]
   }
 
-  def allApplications(implicit rh: RequestHeader): Future[List[OverseasApplication]] = {
+  def allApplications(using rh: RequestHeader): Future[List[OverseasApplication]] = {
     val url = url"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
     http.get(url)
       .execute[HttpResponse]
@@ -103,10 +103,10 @@ class AgentOverseasApplicationConnector @Inject() (
 
   def updateApplicationWithAgencyDetails(
     agencyDetails: AgencyDetails
-  )(implicit rh: RequestHeader): Future[Unit] = {
+  )(using rh: RequestHeader): Future[Unit] = {
     val url = url"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
 
-    import AgencyDetails.formats
+    import AgencyDetails.given
     http.put(url)
       .withBody((Json.toJson(agencyDetails)))
       .execute[HttpResponse]
@@ -133,7 +133,7 @@ class AgentOverseasApplicationConnector @Inject() (
       }
   }
 
-  def updateAuthId(oldAuthId: ProviderId)(implicit rh: RequestHeader): Future[Unit] = {
+  def updateAuthId(oldAuthId: ProviderId)(using rh: RequestHeader): Future[Unit] = {
     val url = url"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application/auth-provider-id"
     http.put(url)
       .withBody(Json.obj("authId" -> oldAuthId.value))

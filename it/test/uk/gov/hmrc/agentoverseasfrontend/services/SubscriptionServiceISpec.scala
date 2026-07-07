@@ -34,7 +34,7 @@ extends BaseISpec
 with AgentOverseasApplicationStubs
 with AgentSubscriptionStubs {
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   val service = app.injector.instanceOf[SubscriptionService]
 
   "mostRecentApplication" should {

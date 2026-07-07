@@ -26,6 +26,6 @@ case class AmlsDetails(
 
 object AmlsDetails {
 
-  implicit val format: OFormat[AmlsDetails] = Json.format[AmlsDetails]
+  given OFormat[AmlsDetails] = Json.format[AmlsDetails]
 
 }

@@ -42,11 +42,11 @@ class SessionCacheServiceISpec
 extends BaseISpec
 with CleanMongoCollectionSupport {
 
-  private implicit val crypto: Encrypter & Decrypter = SymmetricCryptoFactory.aesCrypto(
+  private given crypto: Encrypter & Decrypter = SymmetricCryptoFactory.aesCrypto(
     "znbxS3YXv6TsIzb8OyeF7DlpXtl95Myvec+Hy8JHzO4="
   )
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.sessionId -> "testValue")
+  private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.sessionId -> "testValue")
 
   private lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 

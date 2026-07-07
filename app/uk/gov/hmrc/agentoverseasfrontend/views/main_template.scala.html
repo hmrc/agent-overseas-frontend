@@ -36,7 +36,7 @@
     hasTimeout: Boolean = true,
     backLinkHref: Option[String] = None,
     wide: Boolean = false
-)(mainContent: Html)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
+)(mainContent: Html)(using request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @isSignedIn = @{
     try {

@@ -26,7 +26,7 @@ import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 
@@ -41,11 +41,11 @@ with Logging {
   val env: Environment
   val config: Configuration
   val appConfig: AppConfig
-  implicit val ec: ExecutionContext
+  given ec: ExecutionContext
 
   def withBasicAuth(
     block: Request[?] => Future[Result]
-  )(implicit
+  )(using
     request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway)) {
     block(request)
@@ -53,7 +53,7 @@ with Logging {
 
   def withBasicAuthAndAgentAffinity(
     block: Request[?] => Future[Result]
-  )(implicit
+  )(using
     request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
     block(request)
@@ -69,7 +69,7 @@ with Logging {
       identifier <- enrolment.getIdentifier("AgentReferenceNumber")
     } yield Arn(identifier.value)
 
-  protected def handleFailure(implicit request: Request[?]): PartialFunction[Throwable, Result] = {
+  protected def handleFailure(using request: Request[?]): PartialFunction[Throwable, Result] = {
     case _: NoActiveSession => Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}&origin=$appName")
 
     case _: InsufficientEnrolments =>

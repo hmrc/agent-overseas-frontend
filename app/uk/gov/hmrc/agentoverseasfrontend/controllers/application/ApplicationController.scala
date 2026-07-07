@@ -20,6 +20,7 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
@@ -33,7 +34,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession.IsRegisteredWithHmr
 import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
+import uk.gov.hmrc.agentoverseasfrontend.utils.given
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
 import javax.inject.Inject
@@ -60,7 +61,7 @@ class ApplicationController @Inject() (
   applicationCompleteView: application_complete,
   emailLockedView: cannot_verify_email_locked,
   emailTechnicalErrorView: cannot_verify_email_technical
-)(implicit
+)(using
   appConfig: AppConfig,
   override val ec: ExecutionContext
 )
@@ -78,7 +79,8 @@ with I18nSupport {
 
   private val countries = countryNamesLoader.load
 
-  def showContactDetailsForm: Action[AnyContent] = Action.async { implicit request =>
+  def showContactDetailsForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       val form = ContactDetailsForm.form
       if (agentSession.changingAnswers) {
@@ -95,7 +97,8 @@ with I18nSupport {
     }
   }
 
-  def submitContactDetails: Action[AnyContent] = Action.async { implicit request =>
+  def submitContactDetails: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       ContactDetailsForm.form
         .bindFromRequest()
@@ -115,7 +118,8 @@ with I18nSupport {
     }
   }
 
-  def showTradingNameForm: Action[AnyContent] = Action.async { implicit request =>
+  def showTradingNameForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       val form = TradingNameForm.form
       if (agentSession.changingAnswers) {
@@ -127,7 +131,8 @@ with I18nSupport {
     }
   }
 
-  def submitTradingName: Action[AnyContent] = Action.async { implicit request =>
+  def submitTradingName: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       TradingNameForm.form
         .bindFromRequest()
@@ -147,7 +152,8 @@ with I18nSupport {
     }
   }
 
-  def showRegisteredWithHmrcForm: Action[AnyContent] = Action.async { implicit request =>
+  def showRegisteredWithHmrcForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       val form = registeredWithHmrcForm
       if (agentSession.changingAnswers) {
@@ -164,7 +170,8 @@ with I18nSupport {
     }
   }
 
-  def submitRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
+  def submitRegisteredWithHmrc: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       registeredWithHmrcForm
         .bindFromRequest()
@@ -198,7 +205,8 @@ with I18nSupport {
     }
   }
 
-  def showAgentCodesForm: Action[AnyContent] = Action.async { implicit request =>
+  def showAgentCodesForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       val form = AgentCodesForm.form
 
@@ -211,7 +219,8 @@ with I18nSupport {
     }
   }
 
-  def submitAgentCodes: Action[AnyContent] = Action.async { implicit request =>
+  def submitAgentCodes: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       AgentCodesForm.form
         .bindFromRequest()
@@ -231,7 +240,8 @@ with I18nSupport {
     }
   }
 
-  def showUkTaxRegistrationForm: Action[AnyContent] = Action.async { implicit request =>
+  def showUkTaxRegistrationForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       val form = registeredForUkTaxForm
       if (agentSession.changingAnswers) {
@@ -253,7 +263,8 @@ with I18nSupport {
     }
   }
 
-  def submitUkTaxRegistration: Action[AnyContent] = Action.async { implicit request =>
+  def submitUkTaxRegistration: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       registeredForUkTaxForm
         .bindFromRequest()
@@ -296,7 +307,8 @@ with I18nSupport {
     }
   }
 
-  def showPersonalDetailsForm: Action[AnyContent] = Action.async { implicit request =>
+  def showPersonalDetailsForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       val form = PersonalDetailsForm.form
       if (agentSession.changingAnswers) {
@@ -308,7 +320,8 @@ with I18nSupport {
     }
   }
 
-  def submitPersonalDetails: Action[AnyContent] = Action.async { implicit request =>
+  def submitPersonalDetails: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       PersonalDetailsForm.form
         .bindFromRequest()
@@ -328,7 +341,8 @@ with I18nSupport {
     }
   }
 
-  def showCompanyRegistrationNumberForm: Action[AnyContent] = Action.async { implicit request =>
+  def showCompanyRegistrationNumberForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       val form = CompanyRegistrationNumberForm.form
       if (agentSession.changingAnswers) {
@@ -342,7 +356,8 @@ with I18nSupport {
     }
   }
 
-  def submitCompanyRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
+  def submitCompanyRegistrationNumber: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       CompanyRegistrationNumberForm.form
         .bindFromRequest()
@@ -369,7 +384,8 @@ with I18nSupport {
       .getOrElse(sys.error(s"No country found for code: '${countryCode.getOrElse("")}'"))
   }
 
-  def showCheckYourAnswers: Action[AnyContent] = Action.async { implicit request =>
+  def showCheckYourAnswers: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       // make sure user has gone through all the required pages, if not redirect to appropriate page
       sessionStoreService.fetchAgentSession
@@ -386,7 +402,8 @@ with I18nSupport {
     }
   }
 
-  def submitCheckYourAnswers: Action[AnyContent] = Action.async { implicit request =>
+  def submitCheckYourAnswers: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingEmailVerifiedAgent { agentSession =>
       CheckYourAnswers.form
         .bindFromRequest()
@@ -411,7 +428,8 @@ with I18nSupport {
     }
   }
 
-  def showApplicationComplete: Action[AnyContent] = Action.async { implicit request =>
+  def showApplicationComplete: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withBasicAuthAndAgentAffinity { _ =>
       val tradingName = request.flash.get("tradingName")
       val contactDetail = request.flash.get("contactDetail")
@@ -427,13 +445,15 @@ with I18nSupport {
     }
   }
 
-  def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
+  def showEmailLocked: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authAction.withBasicAuthAndAgentAffinity {
       _ => Future.successful(Ok(emailLockedView(routes.ApplicationController.showContactDetailsForm)))
     }
   }
 
-  def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
+  def showEmailTechnicalError: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authAction.withBasicAuthAndAgentAffinity {
       _ => Future.successful(Ok(emailTechnicalErrorView()))
     }
@@ -443,12 +463,14 @@ with I18nSupport {
     Some(session) match {
       case IsRegisteredWithHmrc(Yes) => routes.ApplicationController.showAgentCodesForm
       case IsRegisteredWithHmrc(No) => routes.ApplicationController.showRegisteredWithHmrcForm
+      case _ => routes.ApplicationController.showRegisteredWithHmrcForm
     }
 
   private def companyRegNumberBackLink(session: AgentSession) =
     Some(session) match {
       case IsRegisteredForUkTax(Yes) => routes.ApplicationController.showPersonalDetailsForm.url
       case IsRegisteredForUkTax(No) => routes.ApplicationController.showUkTaxRegistrationForm.url
+      case _ => routes.ApplicationController.showUkTaxRegistrationForm.url
     }
 
 }

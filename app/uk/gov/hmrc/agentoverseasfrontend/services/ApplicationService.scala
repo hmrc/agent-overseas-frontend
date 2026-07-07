@@ -32,17 +32,17 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOverseasApplicationConnector)(implicit executionContext: ExecutionContext) {
+class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOverseasApplicationConnector)(using executionContext: ExecutionContext) {
 
-  implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
+  given Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
-  def getCurrentApplication(implicit
+  def getCurrentApplication(using
     rh: RequestHeader
   ): Future[Option[ApplicationEntityDetails]] = agentOverseasApplicationConnector.getUserApplications.map { e =>
     e.sortBy(_.applicationCreationDate).reverse.headOption
   }
 
-  def rejectedApplication(implicit
+  def rejectedApplication(using
     rh: RequestHeader
   ): Future[Option[ApplicationEntityDetails]] = agentOverseasApplicationConnector.getUserApplications
     .map { apps =>
@@ -52,11 +52,11 @@ class ApplicationService @Inject() (agentOverseasApplicationConnector: AgentOver
         None
     }
 
-  def createApplication(application: AgentSession)(implicit
+  def createApplication(application: AgentSession)(using
     rh: RequestHeader
   ): Future[Unit] = agentOverseasApplicationConnector.createOverseasApplication(CreateOverseasApplicationRequest(application.sanitize))
 
-  def upscanPollStatus(reference: String)(implicit
+  def upscanPollStatus(reference: String)(using
     rh: RequestHeader
   ): Future[FileUploadStatus] = agentOverseasApplicationConnector.upscanPollStatus(reference)
 

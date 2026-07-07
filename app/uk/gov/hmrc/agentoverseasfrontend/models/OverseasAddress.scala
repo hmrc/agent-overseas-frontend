@@ -29,6 +29,6 @@ case class OverseasAddress(
 
 object OverseasAddress {
 
-  implicit val format: Format[OverseasAddress] = Json.format[OverseasAddress]
+  given Format[OverseasAddress] = Json.format[OverseasAddress]
 
 }

@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
@@ -47,7 +47,7 @@ class ApplicationAuth @Inject() (
   val authConnector: AuthConnector,
   val sessionStoreService: SessionCacheService,
   val applicationService: ApplicationService
-)(implicit
+)(using
   val env: Environment,
   val config: Configuration,
   val appConfig: AppConfig,
@@ -56,7 +56,7 @@ class ApplicationAuth @Inject() (
 extends AuthBase
 with CommonRouting {
 
-  def getCredsAndAgentSession(implicit rh: RequestHeader): Future[(Credentials, AgentSession)] =
+  def getCredsAndAgentSession(using rh: RequestHeader): Future[(Credentials, AgentSession)] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
       .retrieve(credentials and allEnrolments) {
         case Some(credentials) ~ _ =>
@@ -72,7 +72,7 @@ with CommonRouting {
       Credentials,
       AgentSession
     ) => Future[Result]
-  )(implicit
+  )(using
     request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(credentials and allEnrolments and email) {
@@ -115,13 +115,13 @@ with CommonRouting {
 
   def withEnrollingAgent(
     body: AgentSession => Future[Result]
-  )(implicit
+  )(using
     request: Request[?]
   ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = false)((_, session) => body(session))
 
   def withEnrollingEmailVerifiedAgent(
     body: AgentSession => Future[Result]
-  )(implicit
+  )(using
     request: Request[?]
   ): Future[Result] = withCredsAndEnrollingAgent(checkForEmailVerification = true)((_, session) => body(session))
 

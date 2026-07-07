@@ -22,7 +22,7 @@
 
 @this(mainTemplate: main_template, h1: h1, p: p, a: a, span: span)
 
-@()(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
+@()(using request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @timeString = @{
     val timeout = appConfig.timeout

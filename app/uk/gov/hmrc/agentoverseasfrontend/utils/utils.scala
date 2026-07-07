@@ -17,10 +17,13 @@
 package uk.gov.hmrc.agentoverseasfrontend
 
 import scala.concurrent.Future
+import scala.Conversion
 
 package object utils {
 
-  implicit def toFuture[T](a: T): Future[T] = Future.successful(a)
+  given [T]: Conversion[T, Future[T]] with {
+    def apply(a: T): Future[T] = Future.successful(a)
+  }
 
   /** A function to compare emails in a whitespace and case-tolerant way. */
   def compareEmail(

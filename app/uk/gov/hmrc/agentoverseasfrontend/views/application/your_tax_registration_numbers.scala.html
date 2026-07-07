@@ -48,7 +48,7 @@
         doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn],
         trns: SortedSet[String],
         backLink: Option[String] = None
-)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+)(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @pageTitle = @{msgs("yourTaxRegistrationNumbers.title")}
 

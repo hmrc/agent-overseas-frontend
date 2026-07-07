@@ -34,7 +34,7 @@ object Utr {
       case _ => false
     }
 
-  implicit val utrReads: SimpleObjectReads[Utr] = new SimpleObjectReads[Utr]("value", Utr.apply)
-  implicit val utrWrites: SimpleObjectWrites[Utr] = new SimpleObjectWrites[Utr](_.value)
+  given SimpleObjectReads[Utr] = new SimpleObjectReads[Utr]("value", Utr.apply)
+  given SimpleObjectWrites[Utr] = new SimpleObjectWrites[Utr](_.value)
 
 }

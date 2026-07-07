@@ -48,7 +48,8 @@ with AgentSubscriptionStubs {
 
   "subscribe" should {
     "redirect to /complete upon successful subscription" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
       givenAcceptedApplicationResponse()
       givenApplicationUpdateSuccessResponse()
@@ -61,7 +62,8 @@ with AgentSubscriptionStubs {
     }
 
     "redirect to /check-answers if there's no agency details in the session" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agencyDetails = None
       givenAcceptedApplicationResponse()
       val result = controller.subscribe(request)
@@ -71,7 +73,8 @@ with AgentSubscriptionStubs {
     }
 
     "redirect to /next-steps if user has unclean credentials (they have 1 or more enrolments)" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      given FakeRequest[?] = request
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
@@ -79,7 +82,8 @@ with AgentSubscriptionStubs {
     }
 
     "redirect to /already-subscribed if the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
       givenCompleteApplicationResponse()
       givenSubscriptionFailedConflict()
@@ -92,7 +96,7 @@ with AgentSubscriptionStubs {
 
   "subscriptionComplete" should {
     "showSubscriptionCompletePage when HMRC-AS-AGENT" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticated(
+      val request = authenticated(
         FakeRequest(),
         Enrolment(
           "HMRC-AS-AGENT",
@@ -101,6 +105,7 @@ with AgentSubscriptionStubs {
         ),
         isAgent = true
       )
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
       val result = controller.subscriptionComplete(request)
 
@@ -129,7 +134,8 @@ with AgentSubscriptionStubs {
 
   "/already-subscribed" should {
     "show the already subscribed page for a user with Agent affinity group" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      given FakeRequest[?] = request
 
       val result = controller.alreadySubscribed(request)
 
@@ -145,7 +151,8 @@ with AgentSubscriptionStubs {
 
   "email verification" should {
     "be triggered if attempting to subscribe with an unverified email" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agencyDetails = Some(agencyDetails.copy(verifiedEmails = Set.empty))
       givenAcceptedApplicationResponse()
       givenApplicationUpdateSuccessResponse()
@@ -308,7 +315,8 @@ with AgentSubscriptionStubs {
 
   "subscribe" should {
     "allow an accepted application to continue with existing enrolments when the feature switch is enabled" in {
-      implicit val request: FakeRequest[AnyContentAsEmpty.type] = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+      given FakeRequest[?] = request
       sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
       givenAcceptedApplicationResponse()
       givenApplicationUpdateSuccessResponse()

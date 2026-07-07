@@ -30,7 +30,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector)(implicit executionContext: ExecutionContext)
+class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector)(using executionContext: ExecutionContext)
 extends Logging {
 
   def verifyEmail(
@@ -39,7 +39,7 @@ extends Logging {
     continueUrl: String,
     mBackUrl: Option[String],
     accessibilityStatementUrl: String
-  )(implicit rh: RequestHeader): Future[Option[String]] =
+  )(using rh: RequestHeader): Future[Option[String]] =
     for {
       mVerifyEmailResponse <- emailVerificationConnector.verifyEmail(
         VerifyEmailRequest(
@@ -59,7 +59,7 @@ extends Logging {
   def checkStatus(
     credId: String,
     email: String
-  )(implicit rh: RequestHeader): Future[EmailVerificationStatus] = emailVerificationConnector.checkEmail(credId).map {
+  )(using rh: RequestHeader): Future[EmailVerificationStatus] = emailVerificationConnector.checkEmail(credId).map {
     case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.verified) => EmailVerificationStatus.Verified
     case Some(vsr) if vsr.emails.filter(ce => compareEmail(ce.emailAddress, email)).exists(_.locked) => EmailVerificationStatus.Locked
     case Some(_) => EmailVerificationStatus.Unverified

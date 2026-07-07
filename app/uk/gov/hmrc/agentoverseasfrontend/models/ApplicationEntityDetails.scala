@@ -24,7 +24,7 @@ import play.api.libs.json._
 case class MaintainerDetails(reviewedDate: LocalDateTime)
 
 object MaintainerDetails {
-  implicit val format: OFormat[MaintainerDetails] = Json.format[MaintainerDetails]
+  given OFormat[MaintainerDetails] = Json.format[MaintainerDetails]
 }
 
 case class ApplicationEntityDetails(
@@ -36,7 +36,7 @@ case class ApplicationEntityDetails(
 )
 
 object ApplicationEntityDetails {
-  implicit val reads: Reads[ApplicationEntityDetails] =
+  given Reads[ApplicationEntityDetails] =
     ((__ \ "createdDate").read[LocalDateTime] and
       (__ \ "status").read[ApplicationStatus] and
       (__ \ "tradingDetails" \ "tradingName").read[String] and

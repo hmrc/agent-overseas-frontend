@@ -50,7 +50,7 @@
     submitButton: submitButton
 )
 
-@(amlsForm: Form[AmlsDetails], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@(amlsForm: Form[AmlsDetails], backLink: Option[String] = None)(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(amlsForm).toString + msgs("amls.title"), backLinkHref = backLink) {
 

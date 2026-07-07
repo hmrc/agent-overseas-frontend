@@ -44,12 +44,12 @@ class SubscriptionService @Inject() (
   applicationConnector: AgentOverseasApplicationConnector,
   subscriptionConnector: AgentSubscriptionConnector,
   sessionStoreService: SessionCacheService
-)(implicit executionContext: ExecutionContext)
+)(using executionContext: ExecutionContext)
 extends Logging {
 
-  implicit val orderingLocalDateTime: Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
+  given Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 
-  def subscribe(implicit
+  def subscribe(using
     rh: RequestHeader
   ): Future[Either[FailureToSubscribe, Arn]] = mostRecentApplicationStatus
     .flatMap {
@@ -63,7 +63,7 @@ extends Logging {
       case Left(failure) => Future.successful(Left(failure))
     }
 
-  private def updateOverseasSubscription(implicit
+  private def updateOverseasSubscription(using
     rh: RequestHeader
   ): Future[Either[FailureToSubscribe, Arn]] = subscriptionConnector.overseasSubscription
     .map(arn => Right(arn))
@@ -73,18 +73,18 @@ extends Logging {
         Left(AlreadySubscribed)
     }
 
-  private def mostRecentApplicationStatus(implicit
+  private def mostRecentApplicationStatus(using
     rh: RequestHeader
   ) = mostRecentApplication.map(_.map(_.status))
 
-  private def updateAgencyDetailsOnApp()(implicit
+  private def updateAgencyDetailsOnApp()(using
     rh: RequestHeader
   ): Future[Either[FailureToSubscribe, Unit]] = sessionStoreService.fetchAgencyDetails.flatMap {
     case Some(agency) => applicationConnector.updateApplicationWithAgencyDetails(agency).map(_ => Right(()))
     case None => Future.successful(Left(NoAgencyInSession))
   }
 
-  def mostRecentApplication(implicit
+  def mostRecentApplication(using
     rh: RequestHeader
   ): Future[Option[OverseasApplication]] = applicationConnector.allApplications.map { apps =>
     apps.sortBy(_.createdDate).lastOption
@@ -92,7 +92,7 @@ extends Logging {
 
   def updateAuthProviderId(
     sessionId: String
-  )(implicit
+  )(using
     rh: RequestHeader
   ): Future[Unit] =
     (for {

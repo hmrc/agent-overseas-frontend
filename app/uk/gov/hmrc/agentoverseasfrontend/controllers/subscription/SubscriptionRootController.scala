@@ -40,7 +40,7 @@ class SubscriptionRootController @Inject() (
   mcc: MessagesControllerComponents,
   createNewAccountView: create_new_account,
   cannotCheckStatusView: cannot_check_status
-)(implicit
+)(using
   appConfig: AppConfig,
   ec: ExecutionContext,
   configuration: Configuration
@@ -57,13 +57,15 @@ extends AgentOverseasBaseController(
     Redirect(routes.BusinessIdentificationController.showCheckAnswers)
   }
 
-  def nextStep: Action[AnyContent] = Action.async { implicit request =>
+  def nextStep: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSimpleAgentAuth { _ =>
       Future.successful(Ok(createNewAccountView()))
     }
   }
 
-  def showApplicationIssue: Action[AnyContent] = Action.async { implicit request =>
+  def showApplicationIssue: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSimpleAgentAuth { _ =>
       Future.successful(Ok(cannotCheckStatusView()))
     }

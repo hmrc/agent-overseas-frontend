@@ -53,7 +53,7 @@ with MetricsTestSupport {
   private lazy val http = app.injector.instanceOf[HttpClientV2]
   private lazy val appConfig = app.injector.instanceOf[AppConfig]
 
-  private implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val connector: AgentOverseasApplicationConnector =
     new AgentOverseasApplicationConnector(
