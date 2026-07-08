@@ -17,19 +17,18 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
 import org.scalatest.Assertion
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import play.api.mvc.AnyContent
-import play.api.mvc.AnyContentAsEmpty
-import play.api.mvc.Request
-import play.api.mvc.RequestHeader
-import play.api.mvc.Result
+import play.api.mvc.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.agentoverseasfrontend.models.*
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption
 import uk.gov.hmrc.agentoverseasfrontend.models.PersonalDetailsChoice.RadioOption.SaUtrChoice
-import uk.gov.hmrc.agentoverseasfrontend.models._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.agentoverseasfrontend.support.Css
@@ -116,7 +115,6 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
-      given FakeRequest[?] = request
 
       val result = controller.showContactDetailsForm(request)
 
@@ -163,7 +161,7 @@ with AgentOverseasApplicationStubs {
     }
 
     "submit form and then redirect to check-your-answers if user is changing answers" in {
-      // pre state
+      // pre-state
       val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("firstName", "test"),
@@ -204,7 +202,7 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation errors when form data is incorrect" in {
-      // pre state
+      // pre-state
       val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           ("firstName", ""),
@@ -259,7 +257,6 @@ with AgentOverseasApplicationStubs {
     "redirect to /money-laundering-registration when session not found" in {
 
       val request = cleanCredsAgent(FakeRequest())
-      given FakeRequest[?] = request
 
       val result = controller.showTradingNameForm(request)
 
@@ -351,11 +348,11 @@ with AgentOverseasApplicationStubs {
 
   "GET /registered-with-hmrc" should {
     class RegisteredWithHmrcSetup(agentSession: AgentSession = agentSession.copy(registeredWithHmrc = None)) {
-      val request = cleanCredsAgent(FakeRequest())
+      val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
-      val result = controller.showRegisteredWithHmrcForm(request)
-      val doc = Jsoup.parse(contentAsString(result))
+      val result: Future[Result] = controller.showRegisteredWithHmrcForm(request)
+      val doc: Document = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new RegisteredWithHmrcSetup {
@@ -368,25 +365,25 @@ with AgentOverseasApplicationStubs {
 
     "ask for whether they are registered with HMRC" in new RegisteredWithHmrcSetup {
 
-      val elRadio = doc.getElementById(s"registeredWithHmrc")
+      val elRadio: Element = doc.getElementById(s"registeredWithHmrc")
       elRadio should not be null
       elRadio.tagName() shouldBe "input"
       elRadio.attr("type") shouldBe "radio"
       elRadio.attr("value") shouldBe "true"
 
       checkMessageIsDefined("registeredWithHmrc.form.registered.yes")
-      val elLabel = doc.select(s"label[for=registeredWithHmrc]").first()
+      val elLabel: Element = doc.select(s"label[for=registeredWithHmrc]").first()
       elLabel should not be null
       elLabel.text() shouldBe htmlEscapedMessage("registeredWithHmrc.form.registered.yes")
 
-      val elRadio2 = doc.getElementById(s"registeredWithHmrc-2")
+      val elRadio2: Element = doc.getElementById(s"registeredWithHmrc-2")
       elRadio2 should not be null
       elRadio2.tagName() shouldBe "input"
       elRadio2.attr("type") shouldBe "radio"
       elRadio2.attr("value") shouldBe "false"
 
       checkMessageIsDefined("registeredWithHmrc.form.registered.no")
-      val elLabel2 = doc.select(s"label[for=registeredWithHmrc-2]").first()
+      val elLabel2: Element = doc.select(s"label[for=registeredWithHmrc-2]").first()
       elLabel2 should not be null
       elLabel2.text() shouldBe htmlEscapedMessage("registeredWithHmrc.form.registered.no")
 
@@ -426,7 +423,7 @@ with AgentOverseasApplicationStubs {
     }
 
     "contain a form that would POST to /registered-with-hmrc" in new RegisteredWithHmrcSetup {
-      val elForm = doc.select("form")
+      val elForm: Elements = doc.select("form")
       elForm should not be null
       elForm.attr("action") shouldBe "/agent-services/apply-from-outside-uk/registered-with-hmrc"
       elForm.attr("method") shouldBe "POST"
@@ -434,7 +431,6 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
-      given FakeRequest[?] = request
       val result = controller.showRegisteredWithHmrcForm(request)
 
       status(result) shouldBe 303
@@ -500,11 +496,11 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      val request = cleanCredsAgent(FakeRequest())
+      val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
-      val result = controller.showUkTaxRegistrationForm(request)
-      val doc = Jsoup.parse(contentAsString(result))
+      val result: Future[Result] = controller.showUkTaxRegistrationForm(request)
+      val doc: Document = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new UkTaxRegistrationSetup {
@@ -517,25 +513,25 @@ with AgentOverseasApplicationStubs {
 
     "ask for whether they are registered for UK tax" in new UkTaxRegistrationSetup {
 
-      val elRadio = doc.getElementById(s"registeredForUkTax")
+      val elRadio: Element = doc.getElementById(s"registeredForUkTax")
       elRadio should not be null
       elRadio.tagName() shouldBe "input"
       elRadio.attr("type") shouldBe "radio"
       elRadio.attr("value") shouldBe "true"
 
       checkMessageIsDefined("ukTaxRegistration.form.registered.yes")
-      val elLabel = doc.select(s"label[for=registeredForUkTax]").first()
+      val elLabel: Element = doc.select(s"label[for=registeredForUkTax]").first()
       elLabel should not be null
       elLabel.text() shouldBe htmlEscapedMessage("ukTaxRegistration.form.registered.yes")
 
-      val elRadio2 = doc.getElementById(s"registeredForUkTax-2")
+      val elRadio2: Element = doc.getElementById(s"registeredForUkTax-2")
       elRadio2 should not be null
       elRadio2.tagName() shouldBe "input"
       elRadio2.attr("type") shouldBe "radio"
       elRadio2.attr("value") shouldBe "false"
 
       checkMessageIsDefined("ukTaxRegistration.form.registered.no")
-      val elLabel2 = doc.select(s"label[for=registeredForUkTax-2]").first()
+      val elLabel2: Element = doc.select(s"label[for=registeredForUkTax-2]").first()
       elLabel2 should not be null
       elLabel2.text() shouldBe htmlEscapedMessage("ukTaxRegistration.form.registered.no")
 
@@ -609,7 +605,7 @@ with AgentOverseasApplicationStubs {
     }
 
     "contain a form that would POST to /uk-tax-registration" in new UkTaxRegistrationSetup {
-      val elForm = doc.select("form")
+      val elForm: Elements = doc.select("form")
       elForm should not be null
       elForm.attr("action") shouldBe "/agent-services/apply-from-outside-uk/uk-tax-registration"
       elForm.attr("method") shouldBe "POST"
@@ -617,7 +613,6 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
-      given FakeRequest[?] = request
       val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
@@ -699,11 +694,11 @@ with AgentOverseasApplicationStubs {
       registeredForUkTax = Some(Yes)
     )
     class PersonalDetailsSetup(agentSession: AgentSession = defaultAgentSession) {
-      val request = cleanCredsAgent(FakeRequest())
+      val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
-      val result = controller.showPersonalDetailsForm(request)
-      val doc = Jsoup.parse(contentAsString(result))
+      val result: Future[Result] = controller.showPersonalDetailsForm(request)
+      val doc: Document = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new PersonalDetailsSetup {
@@ -737,7 +732,7 @@ with AgentOverseasApplicationStubs {
     }
 
     "contain a form that would POST to /personal-details" in new PersonalDetailsSetup {
-      val elForm = doc.select("form")
+      val elForm: Elements = doc.select("form")
       elForm should not be null
       elForm.attr("action") shouldBe "/agent-services/apply-from-outside-uk/personal-details"
       elForm.attr("method") shouldBe "POST"
@@ -745,7 +740,6 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
-      given FakeRequest[?] = request
       val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303
@@ -1070,11 +1064,11 @@ with AgentOverseasApplicationStubs {
       agentCodes = None
     )
     class UkTaxRegistrationSetup(agentSession: AgentSession = defaultAgentSession) {
-      val request = cleanCredsAgent(FakeRequest())
+      val request: FakeRequest[AnyContentAsEmpty.type] = cleanCredsAgent(FakeRequest())
       given FakeRequest[?] = request
       sessionCacheService.currentSession.agentSession = Some(agentSession)
-      val result = controller.showAgentCodesForm(request)
-      val doc = Jsoup.parse(contentAsString(result))
+      val result: Future[Result] = controller.showAgentCodesForm(request)
+      val doc: Document = Jsoup.parse(contentAsString(result))
     }
 
     "contain page titles and header content" in new UkTaxRegistrationSetup {
@@ -1154,7 +1148,7 @@ with AgentOverseasApplicationStubs {
     }
 
     "contain a form that would POST to /self-assessment-agent-code" in new UkTaxRegistrationSetup {
-      val elForm = doc.select("form")
+      val elForm: Elements = doc.select("form")
       elForm should not be null
       elForm.attr("action") shouldBe "/agent-services/apply-from-outside-uk/self-assessment-agent-code"
       elForm.attr("method") shouldBe "POST"
@@ -1162,7 +1156,6 @@ with AgentOverseasApplicationStubs {
 
     "redirect to /money-laundering-registration when session not found" in {
       val request = cleanCredsAgent(FakeRequest())
-      given FakeRequest[?] = request
       val result = controller.showUkTaxRegistrationForm(request)
 
       status(result) shouldBe 303

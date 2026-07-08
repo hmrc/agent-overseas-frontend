@@ -103,7 +103,7 @@ object CommonValidators {
       TelephoneMaxLength
     )
 
-  def businessEmail: Mapping[String] = text `verifying` validEmailAddress
+  def businessEmail: Mapping[String] = text.verifying(validEmailAddress)
 
   def tradingName: Mapping[String] =
     text verifying commonFormConstraint(

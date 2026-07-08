@@ -147,12 +147,12 @@ with MongoSupport {
 
   given hc(using request: FakeRequest[?]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-  protected def checkMessageIsDefined(messageKey: String) =
+  protected def checkMessageIsDefined(messageKey: String): Assertion =
     withClue(s"Message key ($messageKey) should be defined: ") {
       Messages.isDefinedAt(messageKey) shouldBe true
     }
 
-  protected def checkIsHtml200(result: Result) = {
+  protected def checkIsHtml200(result: Result): Assertion = {
     result.header.status shouldBe 200
     charset(result) shouldBe Some("utf-8")
     contentType(result) shouldBe Some("text/html")

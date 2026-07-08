@@ -45,8 +45,7 @@ trait AuthStubs {
       "HMRC-AS-AGENT",
       "AgentReferenceNumber",
       arn
-    ),
-    isAgent = true
+    )
   )
 
   protected def authenticatedAs(
@@ -62,8 +61,7 @@ trait AuthStubs {
 
   def authenticated[A](
     request: FakeRequest[A],
-    enrolment: Enrolment,
-    isAgent: Boolean
+    enrolment: Enrolment
   ): FakeRequest[A] = {
     givenAuthorisedFor(
       s"""

@@ -40,7 +40,6 @@ trait CommonRouting {
   val sessionStoreService: SessionCacheService
 
   val applicationService: ApplicationService
-
   def lookupNextPage(agentSession: Option[AgentSession]): Call =
     agentSession match {
       case MissingAmlsRequired() => routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired

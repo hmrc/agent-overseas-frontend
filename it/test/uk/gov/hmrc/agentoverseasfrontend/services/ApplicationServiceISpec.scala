@@ -32,7 +32,7 @@ extends BaseISpec
 with AgentOverseasApplicationStubs {
 
   private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  val service = app.injector.instanceOf[ApplicationService]
+  val service: ApplicationService = app.injector.instanceOf[ApplicationService]
 
   "getCurrentApplication" should {
     "return application record for an auth provider id" in {
