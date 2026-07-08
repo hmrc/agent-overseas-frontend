@@ -28,7 +28,7 @@ legendClass: Option[String] = None,
 caption: Option[String] = None,
 hint: Option[String] = None,
 headingIsLegend: Boolean = false
-)(using msgs: Messages)
+)(implicit msgs: Messages)
 
 @govukRadios(Radios(
     idPrefix = Some(field.id),

@@ -17,14 +17,15 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import org.jsoup.Jsoup
-import play.api.mvc._
-import play.api.test.Helpers._
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.*
+import play.api.test.Helpers.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
-import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
-import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
+import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser.*
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.*
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
@@ -83,7 +84,7 @@ with AgentSubscriptionStubs {
 
     "redirect to application root path page if no active application available" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenApplicationEmptyResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -94,7 +95,7 @@ with AgentSubscriptionStubs {
 
     "redirect to /application-status if Pending" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenPendingApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -108,7 +109,7 @@ with AgentSubscriptionStubs {
 
     "redirect to /application-status if Rejected" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenRejectedApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -122,7 +123,7 @@ with AgentSubscriptionStubs {
 
     "attempt subscribeAndEnrol if Registered then redirect to /complete" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenRegisteredApplicationResponse()
       givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
@@ -136,7 +137,7 @@ with AgentSubscriptionStubs {
 
     "redirect to next-steps if Registered with unclean credential" in {
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenRegisteredApplicationResponse()
 
       val result: Future[Result] = controller.showCheckAnswers(request)
@@ -147,7 +148,7 @@ with AgentSubscriptionStubs {
 
     "attempt subscribeAndEnrol if Complete then redirect to /agent-services-account" in {
       val request = authenticatedAs(subscribingAgentEnrolledForHMRCASAGENT)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenCompleteApplicationResponse()
 
       val result = controller.showCheckAnswers(request)
@@ -265,7 +266,7 @@ with AgentSubscriptionStubs {
 
     "redirect to checkAnswers page if no session details is available" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenAcceptedApplicationResponse()
 
       val result = controller.showUpdateBusinessAddressForm(request)
@@ -532,7 +533,7 @@ with AgentSubscriptionStubs {
 
     "redirect to checkAnswers page if no session details are available" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenAcceptedApplicationResponse()
 
       val result = controller.showUpdateBusinessEmailForm(request)
@@ -692,7 +693,7 @@ with AgentSubscriptionStubs {
 
     "redirect to checkAnswers page if no session details are available" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenAcceptedApplicationResponse()
 
       val result = controller.showUpdateBusinessNameForm(request)
@@ -758,7 +759,7 @@ with AgentSubscriptionStubs {
         sessionCacheService.cacheProviderId(ProviderId("credId-12345"))(using oldSessionRequest).futureValue
 
         val request = authenticatedAs(subscribing2ndCleanAgentWithoutEnrolments)
-        given FakeRequest[?] = request
+//        given FakeRequest[?] = request
         givenUpdateAuthIdSuccessResponse("credId-12345")
 
         val result = controller.returnFromGGRegistration(oldSessionRequest.session.apply(SessionKeys.sessionId))(request)
@@ -773,7 +774,7 @@ with AgentSubscriptionStubs {
 
       "an invalid session id found" in {
         val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-        given FakeRequest[?] = request
+//        given FakeRequest[?] = request
         val result = controller.returnFromGGRegistration("invalid-id")(request)
 
         status(result) shouldBe 303
@@ -870,7 +871,9 @@ extends BaseISpec
 with AgentOverseasApplicationStubs
 with AgentSubscriptionStubs {
 
-  override protected def appBuilder = super.appBuilder.configure("features.allow-existing-credentials-for-approved-overseas-applications" -> true)
+  override protected def appBuilder: GuiceApplicationBuilder = super.appBuilder.configure(
+    "features.allow-existing-credentials-for-approved-overseas-applications" -> true
+  )
 
   lazy val controller: BusinessIdentificationController = app.injector.instanceOf[BusinessIdentificationController]
 
@@ -889,7 +892,7 @@ with AgentSubscriptionStubs {
 
     "allow a registered application with existing enrolments to continue when the feature switch is enabled" in {
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenRegisteredApplicationResponse()
       givenApplicationUpdateSuccessResponse()
       givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
@@ -902,7 +905,7 @@ with AgentSubscriptionStubs {
 
     "allow a complete application with existing enrolments to continue when the feature switch is enabled" in {
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       givenCompleteApplicationResponse()
       givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
 

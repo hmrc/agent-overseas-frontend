@@ -40,7 +40,7 @@
     govukInput: GovukInput
 )
 
-@(updateTrnForm: Form[UpdateTrn])(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@(updateTrnForm: Form[UpdateTrn])(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(updateTrnForm).toString + msgs("updateTrn.title"), backLinkHref = Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)) {
 

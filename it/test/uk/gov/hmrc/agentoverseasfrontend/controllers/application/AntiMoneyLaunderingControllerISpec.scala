@@ -17,16 +17,15 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.mvc.AnyContent
-import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.agentoverseasfrontend.controllers.routes as signOutRoutes
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.AmlsDetails
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.agentoverseasfrontend.controllers.{routes => signOutRoutes}
 
 import scala.concurrent.Future
 

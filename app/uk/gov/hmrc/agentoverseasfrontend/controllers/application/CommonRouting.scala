@@ -40,7 +40,7 @@ trait CommonRouting {
   val sessionStoreService: SessionCacheService
 
   val applicationService: ApplicationService
-
+// TODO: Are the default cases in the methods below justified ?
   def lookupNextPage(agentSession: Option[AgentSession]): Call =
     agentSession match {
       case MissingAmlsRequired() => routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired

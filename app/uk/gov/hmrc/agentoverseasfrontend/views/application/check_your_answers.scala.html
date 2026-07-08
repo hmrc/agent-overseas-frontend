@@ -54,7 +54,7 @@
 @(
     cyaForm: Form[CheckYourAnswersConfirmation],
     checkYourAnswers: CheckYourAnswers
-)(using request: RequestHeader, msgs: Messages, appConfig: AppConfig)
+)(implicit request: RequestHeader, msgs: Messages, appConfig: AppConfig)
 
 @summaryListRow(answerRow: AnswerRow) = @{
     SummaryListRow(
@@ -63,8 +63,8 @@
         actions = answerRow.changeLink.map(link => Actions(items = List(
             ActionItem(
                 href = link.url,
-                content = HtmlContent(s"""${msgs("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}</span>"""),
-                attributes = Map("data-include-hidden" -> s"${msgs("checkAnswers.change.button")} ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}")
+                content = HtmlContent(s"""${msgs("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toLowerCase)}</span>"""),
+                attributes = Map("data-include-hidden" -> s"${msgs("checkAnswers.change.button")} ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toLowerCase)}")
             )
         )))
     )

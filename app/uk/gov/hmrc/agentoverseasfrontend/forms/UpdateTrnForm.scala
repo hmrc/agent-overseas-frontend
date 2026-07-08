@@ -26,6 +26,6 @@ object UpdateTrnForm {
     mapping(
       "original" -> nonEmptyText,
       "updated" -> optional(taxRegistrationNumber)
-    )(UpdateTrn.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(UpdateTrn.apply)(o => Some(o.original, o.updated))
   )
 }

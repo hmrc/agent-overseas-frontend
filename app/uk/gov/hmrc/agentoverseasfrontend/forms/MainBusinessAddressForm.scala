@@ -30,6 +30,14 @@ object MainBusinessAddressForm {
       "addressLine3" -> addressLine34(lineNumber = 3),
       "addressLine4" -> addressLine34(lineNumber = 4),
       "countryCode" -> countryCode(validCountryCodes)
-    )(OverseasAddress.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(OverseasAddress.apply)(o =>
+      Some(
+        o.addressLine1,
+        o.addressLine2,
+        o.addressLine3,
+        o.addressLine4,
+        o.countryCode
+      )
+    )
   )
 }

@@ -81,7 +81,7 @@ with AgentOverseasApplicationStubs {
     "redirect to /money-laundering-registration when session not found" in {
 
       val request = cleanCredsAgent(FakeRequest())
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
 
       val result = controller.showMainBusinessAddressForm(request)
 

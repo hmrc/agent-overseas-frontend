@@ -304,7 +304,7 @@ trait AgentOverseasApplicationStubs {
   )
 
   def verifyApplicationUpdate(requestBody: AgencyDetails): Unit = {
-    import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails.given
+//    import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails.given
     val expectedRequestBody: String = Json.toJson(requestBody).toString
 
     verify(

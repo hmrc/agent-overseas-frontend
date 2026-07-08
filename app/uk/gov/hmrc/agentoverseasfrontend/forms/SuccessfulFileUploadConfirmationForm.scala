@@ -33,6 +33,6 @@ object SuccessfulFileUploadConfirmationForm {
           .verifying(radioInputSelected("fileUpload.correctFile.no-radio.selected"))
           .transform(_.getOrElse(false), (Some(_)): Boolean => Option[Boolean])
       )(RadioConfirm.apply)(o => Some(o.value))
-    )(SuccessfulFileUploadConfirmation.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(SuccessfulFileUploadConfirmation.apply)(o => Some(o.fileType, o.choice))
   )
 }

@@ -60,7 +60,7 @@ with Logging {
   }.recover(handleFailure(using request))
 
   protected def hasAgentEnrolment(enrolments: Enrolments): Boolean = enrolments.enrolments
-    .find(_.key `equals` "HMRC-AS-AGENT")
+    .find(_.key.equals("HMRC-AS-AGENT"))
     .exists(_.isActivated)
 
   protected def getArn(enrolments: Enrolments): Option[Arn] =

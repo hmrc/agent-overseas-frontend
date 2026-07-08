@@ -33,7 +33,7 @@ extends BaseISpec {
   "signOutToGGRegistrationWhenSubscribing" should {
     "storeAuthProviderId and redirect to GgCreateAccount" in {
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       val result = controller.signOutToGGRegistrationWhenSubscribing(request)
       val _ = result.futureValue
       val sessionId = request.session.apply(SessionKeys.sessionId)
@@ -43,7 +43,7 @@ extends BaseISpec {
         "origin" -> "unknown",
         "continue" -> continueFromGG.toString
       )
-      val continueUrl = uri"http://localhost:8571/government-gateway-registration-frontend?${params}"
+      val continueUrl = uri"http://localhost:8571/government-gateway-registration-frontend?$params"
 
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe uri"""${controller.appConfig.signOutUrl}?${Map("continue" -> continueUrl.toString)}""".toString
@@ -53,14 +53,14 @@ extends BaseISpec {
   "signOutToGGRegistration" should {
     "redirect to GgCreateAccount" in {
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       val continueFromGG = uri"""${controller.appConfig.selfExternalUrl + applicationRoutes.ApplicationRootController.root.url}"""
       val params = Seq(
         "accountType" -> "agent",
         "origin" -> "unknown",
         "continue" -> continueFromGG.toString
       )
-      val continueUrl = uri"http://localhost:8571/government-gateway-registration-frontend?${params}"
+      val continueUrl = uri"http://localhost:8571/government-gateway-registration-frontend?$params"
       val result = controller.signOutToGGRegistration(request)
       status(result) shouldBe 303
       header(LOCATION, result).get shouldBe uri"""${controller.appConfig.signOutUrl}?${Map("continue" -> continueUrl.toString)}""".toString
@@ -70,7 +70,7 @@ extends BaseISpec {
   "startFeedbackSurvey" should {
     "redirect to feedback survey page" in {
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       val expectedLocation = uri"${controller.appConfig.signOutUrl}?${Map("continue" -> controller.appConfig.feedbackSurveyUrl)}"
       val result = controller.startFeedbackSurvey(request)
       status(result) shouldBe 303
@@ -101,7 +101,7 @@ extends BaseISpec {
   "/timed-out" should {
     "display the timed out page" in {
       val request = FakeRequest()
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       val result = controller.timedOut(request)
       status(result) shouldBe 200
       checkMessageIsDefined("timed-out.header")

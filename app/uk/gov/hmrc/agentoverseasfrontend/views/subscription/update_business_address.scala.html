@@ -48,7 +48,7 @@
     govukErrorSummary: GovukErrorSummary
 )
 
-@(addressForm: Form[BusinessAddressForm], countries: Map[String, String])(using msgs: Messages, request: RequestHeader, configuration: Configuration, appConfig: AppConfig)
+@(addressForm: Form[BusinessAddressForm], countries: Map[String, String])(implicit msgs: Messages, request: RequestHeader, configuration: Configuration, appConfig: AppConfig)
 
 @value = @{ addressForm("countryCode").value.getOrElse("")}
 

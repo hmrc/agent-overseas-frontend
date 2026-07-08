@@ -106,9 +106,9 @@ class AgentOverseasApplicationConnector @Inject() (
   )(using rh: RequestHeader): Future[Unit] = {
     val url = url"${appConfig.agentOverseasApplicationBaseUrl}/agent-overseas-application/application"
 
-    import AgencyDetails.given
+//    import AgencyDetails.given
     http.put(url)
-      .withBody((Json.toJson(agencyDetails)))
+      .withBody(Json.toJson(agencyDetails))
       .execute[HttpResponse]
       .map { (response: HttpResponse) =>
         if (response.status == 204)

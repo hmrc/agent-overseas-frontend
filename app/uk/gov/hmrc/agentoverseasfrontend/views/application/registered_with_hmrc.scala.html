@@ -35,7 +35,7 @@
     submitButton: submitButton
 )
 
-@(registeredWithHmrcForm: Form[RadioConfirm], backLink: Option[String] = None)(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@(registeredWithHmrcForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(registeredWithHmrcForm).toString + msgs("registeredWithHmrc.title"), backLinkHref = Some(backLink.getOrElse(routes.FileUploadController.showSuccessfulUploadedForm.url))) {
 

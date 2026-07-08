@@ -19,14 +19,13 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 import org.jsoup.Jsoup
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
-import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser._
-import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData._
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser.*
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.*
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.agentoverseasfrontend.support.Css
 import uk.gov.hmrc.http.SessionKeys
@@ -74,7 +73,7 @@ with AgentSubscriptionStubs {
 
     "redirect to /next-steps if user has unclean credentials (they have 1 or more enrolments)" in {
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
@@ -102,8 +101,7 @@ with AgentSubscriptionStubs {
           "HMRC-AS-AGENT",
           "AgentReferenceNumber",
           arn.value
-        ),
-        isAgent = true
+        )
       )
       given FakeRequest[?] = request
       sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
@@ -135,7 +133,7 @@ with AgentSubscriptionStubs {
   "/already-subscribed" should {
     "show the already subscribed page for a user with Agent affinity group" in {
       val request = authenticatedAs(subscribingCleanAgentWithoutEnrolments)
-      given FakeRequest[?] = request
+//      given FakeRequest[?] = request
 
       val result = controller.alreadySubscribed(request)
 

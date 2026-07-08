@@ -22,7 +22,7 @@
 
 @this(mainTemplate: main_template, p: p, h1: h1, h2: h2, a: a)
 
-@()(using request: RequestHeader, msgs: Messages, config: Configuration, appConfig: AppConfig)
+@()(implicit request: RequestHeader, msgs: Messages, config: Configuration, appConfig: AppConfig)
 
 @mainTemplate(title = msgs("already.subscribed.title")) {
 

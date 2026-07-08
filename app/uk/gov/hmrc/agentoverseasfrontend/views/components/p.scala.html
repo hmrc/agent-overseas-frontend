@@ -21,7 +21,7 @@
    html: Option[Html] = None,
    classes: Option[String] = None,
    id: Option[String] = None
-)(using msgs: Messages)
+)(implicit msgs: Messages)
 
 @cls = @{if(classes.isDefined) classes.get.concat(" govuk-body") else "govuk-body"}
 

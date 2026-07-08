@@ -35,7 +35,7 @@ with AgentOverseasApplicationStubs
 with AgentSubscriptionStubs {
 
   private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  val service = app.injector.instanceOf[SubscriptionService]
+  val service: SubscriptionService = app.injector.instanceOf[SubscriptionService]
 
   "mostRecentApplication" should {
     "return application record for an auth provider id" in {

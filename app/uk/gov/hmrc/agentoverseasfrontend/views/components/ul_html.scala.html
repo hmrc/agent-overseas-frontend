@@ -16,7 +16,7 @@
 
 @this()
 
-@(items: Seq[Html])(using msgs: Messages)
+@(items: Seq[Html])(implicit msgs: Messages)
 
 <ul class="govuk-list govuk-list--bullet">
     @for(html <- items) {

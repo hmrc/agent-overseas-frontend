@@ -298,7 +298,15 @@ object BusinessIdentificationController {
       "addressLine3" -> addressLine34(lineNumber = 3),
       "addressLine4" -> addressLine34(lineNumber = 4),
       "countryCode" -> countryCode(validCountryCodes)
-    )(BusinessAddressForm.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(BusinessAddressForm.apply)(o =>
+      Some(
+        o.addressLine1,
+        o.addressLine2,
+        o.addressLine3,
+        o.addressLine4,
+        o.countryCode
+      )
+    )
   )
 
   val updateBusinessEmailForm: Form[BusinessEmailForm] = Form[BusinessEmailForm](

@@ -30,7 +30,15 @@ object ContactDetailsForm {
       "jobTitle" -> jobTitle,
       "businessTelephone" -> businessTelephone,
       "businessEmail" -> businessEmail
-    )(ContactDetails.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )(ContactDetails.apply)(o =>
+      Some(
+        o.firstName,
+        o.lastName,
+        o.jobTitle,
+        o.businessTelephone,
+        o.businessEmail
+      )
+    )
   )
 
 }
