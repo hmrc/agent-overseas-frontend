@@ -20,7 +20,6 @@ import play.Logger
 import play.api.Configuration
 import play.api.Environment
 import play.api.i18n.MessagesApi
-import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import play.api.mvc.Results._
@@ -47,7 +46,7 @@ class ErrorHandler @Inject() (
   val auditConnector: AuditConnector,
   errorTemplateView: error_template,
   errorTemplate5xxView: error_template_5xx
-)(implicit
+)(using
   val config: Configuration,
   appConfig: AppConfig,
   val ec: ExecutionContext
@@ -81,7 +80,7 @@ with ErrorAuditing {
     exception: Throwable
   ) = {
     auditServerError(request, exception)
-    implicit val r = Request(request, "")
+    given RequestHeader = request
     logger.error(s"resolveError $exception")
     Future.successful(Ok(errorTemplate5xxView()))
   }
@@ -90,7 +89,7 @@ with ErrorAuditing {
     pageTitle: String,
     heading: String,
     message: String
-  )(implicit
+  )(using
     request: RequestHeader
   ): Future[Html] = {
     logger.error(s"$message")
@@ -128,7 +127,7 @@ extends HttpAuditEvent {
   def auditServerError(
     request: RequestHeader,
     ex: Throwable
-  )(implicit ec: ExecutionContext): Future[AuditResult] = {
+  )(using ec: ExecutionContext): Future[AuditResult] = {
     val eventType =
       ex match {
         case _: NotFoundException => ResourceNotFound
@@ -147,6 +146,7 @@ extends HttpAuditEvent {
         request,
         Map(TransactionFailureReason -> ex.getMessage)
       )(
+        using
         HeaderCarrierConverter
           .fromRequestAndSession(request, request.session)
       )
@@ -157,7 +157,7 @@ extends HttpAuditEvent {
     request: RequestHeader,
     statusCode: Int,
     message: String
-  )(implicit
+  )(using
     ec: ExecutionContext
   ): Future[AuditResult] = {
     import play.api.http.Status._
@@ -170,6 +170,7 @@ extends HttpAuditEvent {
             request,
             Map(TransactionFailureReason -> message)
           )(
+            using
             HeaderCarrierConverter
               .fromRequestAndSession(request, request.session)
           )
@@ -182,6 +183,7 @@ extends HttpAuditEvent {
             request,
             Map(TransactionFailureReason -> message)
           )(
+            using
             HeaderCarrierConverter
               .fromRequestAndSession(request, request.session)
           )
@@ -194,6 +196,7 @@ extends HttpAuditEvent {
             request,
             Map(TransactionFailureReason -> message)
           )(
+            using
             HeaderCarrierConverter
               .fromRequestAndSession(request, request.session)
           )

@@ -23,7 +23,7 @@ import play.api.libs.json._
 case class SubscriptionContactDetails(businessEmail: String)
 
 object SubscriptionContactDetails {
-  implicit val format: OFormat[SubscriptionContactDetails] = Json.format[SubscriptionContactDetails]
+  given OFormat[SubscriptionContactDetails] = Json.format[SubscriptionContactDetails]
 }
 
 case class SubscriptionTradingDetails(
@@ -32,7 +32,7 @@ case class SubscriptionTradingDetails(
 )
 
 object SubscriptionTradingDetails {
-  implicit val format: OFormat[SubscriptionTradingDetails] = Json.format[SubscriptionTradingDetails]
+  given OFormat[SubscriptionTradingDetails] = Json.format[SubscriptionTradingDetails]
 }
 
 case class OverseasApplication(
@@ -44,5 +44,5 @@ case class OverseasApplication(
 )
 
 object OverseasApplication {
-  implicit val format: OFormat[OverseasApplication] = Json.format[OverseasApplication]
+  given OFormat[OverseasApplication] = Json.format[OverseasApplication]
 }

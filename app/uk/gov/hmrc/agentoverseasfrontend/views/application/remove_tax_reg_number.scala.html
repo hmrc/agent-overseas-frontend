@@ -38,7 +38,7 @@
 
 @(trnForm: Form[RadioConfirm], trn: String)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(trnForm) + msgs("removeTrn.title"), backLinkHref = Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)) {
+@mainTemplate(title = errorPrefix(trnForm).toString + msgs("removeTrn.title"), backLinkHref = Some(routes.TaxRegController.showYourTaxRegNumbersForm.url)) {
 
     @if(trnForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(trnForm))

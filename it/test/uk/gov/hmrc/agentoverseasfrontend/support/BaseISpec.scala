@@ -61,9 +61,9 @@ with MetricsTestSupport
 with DefaultAwaitTimeout
 with MongoSupport {
 
-  implicit val timeout: Timeout = Timeout(5.seconds)
+  given Timeout = Timeout(5.seconds)
 
-  override implicit lazy val app: Application = appBuilder.build()
+  override lazy val app: Application = appBuilder.build()
 
   protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
     .configure(
@@ -83,7 +83,7 @@ with MongoSupport {
       "maintainer-application-review-days" -> 28,
       "feedback-survey-url" -> "http://localhost:9514/feedback/OVERSEAS_AGENTS",
       "features.allow-existing-credentials-for-approved-overseas-applications" -> false,
-      "metrics.enabled" -> true,
+      "metrics.enabled" -> false,
       "auditing.enabled" -> true,
       "auditing.consumer.baseUri.host" -> wireMockHost,
       "auditing.consumer.baseUri.port" -> wireMockPort,
@@ -110,7 +110,7 @@ with MongoSupport {
     ()
   }
 
-  protected implicit val materializer: Materializer = app.materializer
+  protected given Materializer = app.materializer
 
   private def contentType(result: Result): Option[String] = result.body.contentType.map(_.split(";").take(1).mkString.trim)
 
@@ -133,26 +133,26 @@ with MongoSupport {
   }
 
   private val messagesApi = app.injector.instanceOf[MessagesApi]
-  private implicit val messages: Messages = messagesApi.preferred(Seq.empty[Lang])
+  private given Messages = messagesApi.preferred(Seq.empty[Lang])
 
   protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
   protected def htmlEscapedMessage(
     key: String,
     args: Any*
-  ): String = HtmlFormat.escape(Messages(key, args: _*)).toString
+  ): String = HtmlFormat.escape(Messages(key, args*)).toString
   protected def htmlMessage(
     key: String,
     args: Any*
-  ): String = Messages(key, args: _*)
+  ): String = Messages(key, args*)
 
-  implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+  given hc(using request: FakeRequest[?]): HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-  protected def checkMessageIsDefined(messageKey: String) =
+  protected def checkMessageIsDefined(messageKey: String): Assertion =
     withClue(s"Message key ($messageKey) should be defined: ") {
       Messages.isDefinedAt(messageKey) shouldBe true
     }
 
-  protected def checkIsHtml200(result: Result) = {
+  protected def checkIsHtml200(result: Result): Assertion = {
     result.header.status shouldBe 200
     charset(result) shouldBe Some("utf-8")
     contentType(result) shouldBe Some("text/html")

@@ -22,5 +22,5 @@ import play.api.libs.json.OFormat
 case class BusinessNameForm(name: String)
 
 object BusinessNameForm {
-  implicit val format: OFormat[BusinessNameForm] = Json.format[BusinessNameForm]
+  given OFormat[BusinessNameForm] = Json.format[BusinessNameForm]
 }

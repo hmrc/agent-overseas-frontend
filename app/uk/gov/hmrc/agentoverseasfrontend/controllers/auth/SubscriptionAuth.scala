@@ -38,7 +38,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.SubscriptionRequest
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -62,7 +62,7 @@ class SubscriptionAuth @Inject() (
   val sessionStoreService: SessionCacheService,
   val applicationService: ApplicationService,
   val subscriptionService: SubscriptionService
-)(implicit
+)(using
   val env: Environment,
   val config: Configuration,
   val appConfig: AppConfig,
@@ -72,7 +72,7 @@ extends AuthBase
 with CommonRouting
 with Logging {
 
-  def getCreds(implicit rh: RequestHeader): Future[Credentials] =
+  def getCreds(using rh: RequestHeader): Future[Credentials] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent).retrieve(credentials) {
       case Some(creds) => Future.successful(creds)
       case None => throw new IllegalStateException("credentials expected but not found for the logged in user")
@@ -80,8 +80,8 @@ with Logging {
 
   def withSimpleAgentAuth(
     block: SubscriptionRequest => Future[Result]
-  )(implicit
-    request: Request[_]
+  )(using
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(allEnrolments and credentials) { case enrolments ~ creds =>
       creds match {
@@ -91,12 +91,12 @@ with Logging {
           Future.successful(Forbidden)
       }
     }
-    .recover(handleFailure(request))
+    .recover(handleFailure(using request))
 
   def withHmrcAsAgentAction(
     block: Arn => Future[Result]
-  )(implicit
-    request: Request[_]
+  )(using
+    request: Request[?]
   ): Future[Result] = authorised(Enrolment("HMRC-AS-AGENT") and AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(authorisedEnrolments) { enrolments =>
       getArn(enrolments) match {
@@ -106,15 +106,15 @@ with Logging {
           Future.successful(Forbidden)
       }
     }
-    .recover(handleFailure(request))
+    .recover(handleFailure(using request))
 
   def withSubscribingAgent(
     checkForEmailVerification: Boolean,
     generateNewDetailsIfNoSession: Boolean = false
   )(
     block: AgencyDetails => Future[Result]
-  )(implicit
-    request: Request[_]
+  )(using
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent)
     .retrieve(allEnrolments and email) { case enrolments ~ maybeAuthEmail =>
       if (hasAgentEnrolment(enrolments)) {
@@ -185,6 +185,6 @@ with Logging {
         }
       }
     }
-    .recover(handleFailure(request))
+    .recover(handleFailure(using request))
 
 }

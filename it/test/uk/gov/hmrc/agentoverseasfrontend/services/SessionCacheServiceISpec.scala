@@ -32,6 +32,7 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.domain.SaUtr
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.mongo.CurrentTimestampSupport
+import uk.gov.hmrc.mongo.logging.ObservableFutureImplicits.ObservableFuture
 import uk.gov.hmrc.mongo.test.CleanMongoCollectionSupport
 
 import scala.collection.immutable.SortedSet
@@ -41,12 +42,11 @@ class SessionCacheServiceISpec
 extends BaseISpec
 with CleanMongoCollectionSupport {
 
-  private implicit val crypto: Encrypter
-    with Decrypter = SymmetricCryptoFactory.aesCrypto(
+  private given crypto: Encrypter & Decrypter = SymmetricCryptoFactory.aesCrypto(
     "znbxS3YXv6TsIzb8OyeF7DlpXtl95Myvec+Hy8JHzO4="
   )
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.sessionId -> "testValue")
+  private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.sessionId -> "testValue")
 
   private lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 

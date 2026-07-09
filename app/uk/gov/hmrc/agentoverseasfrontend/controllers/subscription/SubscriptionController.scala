@@ -51,7 +51,7 @@ class SubscriptionController @Inject() (
   alreadySubscribedView: already_subscribed,
   emailLockedView: cannot_verify_email_locked,
   emailTechnicalErrorView: cannot_verify_email_technical
-)(implicit
+)(using
   override val ec: ExecutionContext,
   appConfig: AppConfig
 )
@@ -66,7 +66,7 @@ with Logging {
   import authAction.withSimpleAgentAuth
   import authAction.withHmrcAsAgentAction
 
-  private def continueSubscription()(implicit request: Request[_]) = sessionStoreService.fetchAgencyDetails.flatMap {
+  private def continueSubscription()(using request: Request[?]) = sessionStoreService.fetchAgencyDetails.flatMap {
     case Some(agencyDetails) if !agencyDetails.isEmailVerified => Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
     case _ =>
       subscriptionService.subscribe.map {
@@ -85,8 +85,9 @@ with Logging {
       }
   }
 
-  def subscribe: Action[AnyContent] = Action.async { implicit request =>
-    withSimpleAgentAuth { implicit subRequest =>
+  def subscribe: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withSimpleAgentAuth { subRequest =>
       if (subRequest.enrolments.isEmpty || appConfig.allowExistingCredentialsForApprovedOverseasApplications)
         continueSubscription()
       else {
@@ -96,8 +97,9 @@ with Logging {
     }
   }
 
-  def subscriptionComplete: Action[AnyContent] = Action.async { implicit request =>
-    withHmrcAsAgentAction { implicit arn =>
+  def subscriptionComplete: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withHmrcAsAgentAction { arn =>
       sessionStoreService.fetchAgencyDetails.map {
         case Some(agencyDetails) =>
           Ok(
@@ -116,19 +118,22 @@ with Logging {
     }
   }
 
-  def alreadySubscribed: Action[AnyContent] = Action.async { implicit request =>
+  def alreadySubscribed: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSimpleAgentAuth { _ =>
       Future.successful(Ok(alreadySubscribedView()))
     }
   }
 
-  def showEmailLocked: Action[AnyContent] = Action.async { implicit request =>
+  def showEmailLocked: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authAction.withBasicAuthAndAgentAffinity {
       _ => Future.successful(Ok(emailLockedView(routes.BusinessIdentificationController.showUpdateBusinessEmailForm)))
     }
   }
 
-  def showEmailTechnicalError: Action[AnyContent] = Action.async { implicit request =>
+  def showEmailTechnicalError: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     authAction.withBasicAuthAndAgentAffinity {
       _ => Future.successful(Ok(emailTechnicalErrorView()))
     }

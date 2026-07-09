@@ -63,8 +63,8 @@
         actions = answerRow.changeLink.map(link => Actions(items = List(
             ActionItem(
                 href = link.url,
-                content = HtmlContent(s"""${msgs("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}</span>"""),
-                attributes = Map("data-include-hidden" -> s"${msgs("checkAnswers.change.button")} ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toString.toLowerCase)}")
+                content = HtmlContent(s"""${msgs("checkAnswers.change.button")} <span class="govuk-visually-hidden"> ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toLowerCase)}</span>"""),
+                attributes = Map("data-include-hidden" -> s"${msgs("checkAnswers.change.button")} ${answerRow.visuallyHiddenText.getOrElse(answerRow.question.toLowerCase)}")
             )
         )))
     )
@@ -81,7 +81,7 @@
     }
 }
 
-@mainTemplate(title = errorPrefix(cyaForm) + msgs("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
+@mainTemplate(title = errorPrefix(cyaForm).toString + msgs("checkAnswers.title"), backLinkHref = Some(checkYourAnswers.backLink)) {
 
     @h1("checkAnswers.title")
 
@@ -97,7 +97,7 @@
     @p("checkAnswers.confirm.p1")
 
     @formWithCsrf(
-        action = routes.ApplicationController.submitCheckYourAnswers, 'id -> "checkAnswers") {
+        action = routes.ApplicationController.submitCheckYourAnswers, Symbol("id") -> "checkAnswers") {
         @govukCheckboxes(Checkboxes(
             items = Seq(CheckboxItem(id = Some("confirmed"), name = Some("confirmed"), content = Text(msgs("checkAnswers.confirm.label")), value = "true"))
         ).withFormField(cyaForm("confirmed")))

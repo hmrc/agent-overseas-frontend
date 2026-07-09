@@ -45,7 +45,7 @@
 @(amlsRequiredForm: Form[RadioConfirm], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 
-@mainTemplate(title = errorPrefix(amlsRequiredForm) + msgs("amls.required.title"), backLinkHref = backLink) {
+@mainTemplate(title = errorPrefix(amlsRequiredForm).toString + msgs("amls.required.title"), backLinkHref = backLink) {
 
     @if(amlsRequiredForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(amlsRequiredForm))

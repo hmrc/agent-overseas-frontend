@@ -28,8 +28,8 @@ extends OverseasAgentIdentifier
 
 object SaAgentCode {
 
-  implicit val reads: SimpleObjectReads[SaAgentCode] = new SimpleObjectReads[SaAgentCode]("value", SaAgentCode.apply)
-  implicit val writes: SimpleObjectWrites[SaAgentCode] = new SimpleObjectWrites[SaAgentCode](_.value)
+  given SimpleObjectReads[SaAgentCode] = new SimpleObjectReads[SaAgentCode]("value", SaAgentCode.apply)
+  given SimpleObjectWrites[SaAgentCode] = new SimpleObjectWrites[SaAgentCode](_.value)
 
 }
 
@@ -38,8 +38,8 @@ extends OverseasAgentIdentifier
 
 object CtAgentCode {
 
-  implicit val reads: SimpleObjectReads[CtAgentCode] = new SimpleObjectReads[CtAgentCode]("value", CtAgentCode.apply)
-  implicit val writes: SimpleObjectWrites[CtAgentCode] = new SimpleObjectWrites[CtAgentCode](_.value)
+  given SimpleObjectReads[CtAgentCode] = new SimpleObjectReads[CtAgentCode]("value", CtAgentCode.apply)
+  given SimpleObjectWrites[CtAgentCode] = new SimpleObjectWrites[CtAgentCode](_.value)
 
 }
 
@@ -48,8 +48,8 @@ extends OverseasAgentIdentifier
 
 object ApplicationReference {
 
-  implicit val reads: SimpleObjectReads[ApplicationReference] = new SimpleObjectReads[ApplicationReference]("value", ApplicationReference.apply)
-  implicit val writes: SimpleObjectWrites[ApplicationReference] = new SimpleObjectWrites[ApplicationReference](_.value)
+  given SimpleObjectReads[ApplicationReference] = new SimpleObjectReads[ApplicationReference]("value", ApplicationReference.apply)
+  given SimpleObjectWrites[ApplicationReference] = new SimpleObjectWrites[ApplicationReference](_.value)
 
   def create(uuid: UUID = UUID.randomUUID()): ApplicationReference = {
     val formatId = uuid.toString.replace("-", "").take(8)
@@ -63,8 +63,8 @@ extends OverseasAgentIdentifier
 
 object SafeId {
 
-  implicit val reads: SimpleObjectReads[SafeId] = new SimpleObjectReads[SafeId]("value", SafeId.apply)
-  implicit val writes: SimpleObjectWrites[SafeId] = new SimpleObjectWrites[SafeId](_.value)
+  given SimpleObjectReads[SafeId] = new SimpleObjectReads[SafeId]("value", SafeId.apply)
+  given SimpleObjectWrites[SafeId] = new SimpleObjectWrites[SafeId](_.value)
 
 }
 
@@ -73,8 +73,8 @@ extends OverseasAgentIdentifier
 
 object Crn {
 
-  implicit val reads: SimpleObjectReads[Crn] = new SimpleObjectReads[Crn]("value", Crn.apply)
-  implicit val writes: SimpleObjectWrites[Crn] = new SimpleObjectWrites[Crn](_.value)
+  given SimpleObjectReads[Crn] = new SimpleObjectReads[Crn]("value", Crn.apply)
+  given SimpleObjectWrites[Crn] = new SimpleObjectWrites[Crn](_.value)
 
 }
 
@@ -83,8 +83,8 @@ extends OverseasAgentIdentifier
 
 object Trn {
 
-  implicit val ordering: Ordering[Trn] = Ordering.by(unapply)
-  implicit val reads: SimpleObjectReads[Trn] = new SimpleObjectReads[Trn]("value", Trn.apply)
-  implicit val writes: SimpleObjectWrites[Trn] = new SimpleObjectWrites[Trn](_.value)
+  given Ordering[Trn] = Ordering.by(_.value)
+  given SimpleObjectReads[Trn] = new SimpleObjectReads[Trn]("value", Trn.apply)
+  given SimpleObjectWrites[Trn] = new SimpleObjectWrites[Trn](_.value)
 
 }

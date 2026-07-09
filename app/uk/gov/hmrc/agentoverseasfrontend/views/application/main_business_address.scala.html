@@ -62,13 +62,13 @@
     errorSummaryRaw.copy(errorList = newErrorList)
 }
     
-@mainTemplate(title = errorPrefix(mainBusinessAddressForm) + msgs("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
+@mainTemplate(title = errorPrefix(mainBusinessAddressForm).toString + msgs("mainBusinessAddress.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showTradingNameForm.url))) {
 
     @if(mainBusinessAddressForm.hasErrors) {
         @govukErrorSummary(errorSummary)
     }
 
-    @formWithCSRF(action = routes.TradingAddressController.submitMainBusinessAddress, 'class -> "form js-form") {
+    @formWithCSRF(action = routes.TradingAddressController.submitMainBusinessAddress, Symbol("class") -> "form js-form") {
 
         <fieldset class="govuk-fieldset">
 

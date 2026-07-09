@@ -25,6 +25,6 @@ object ProviderId {
 
   val sessionKey: DataKey[ProviderId] = DataKey[ProviderId]("providerId")
 
-  implicit val format: OFormat[ProviderId] = Json.format
+  given OFormat[ProviderId] = Json.format
 
 }

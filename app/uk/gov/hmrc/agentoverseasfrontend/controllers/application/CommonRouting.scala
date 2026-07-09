@@ -40,7 +40,6 @@ trait CommonRouting {
   val sessionStoreService: SessionCacheService
 
   val applicationService: ApplicationService
-
   def lookupNextPage(agentSession: Option[AgentSession]): Call =
     agentSession match {
       case MissingAmlsRequired() => routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
@@ -60,7 +59,7 @@ trait CommonRouting {
 
   def routesIfExistingApplication(
     subscriptionRootPath: String
-  )(implicit
+  )(using
     rh: RequestHeader,
     ec: ExecutionContext
   ): Future[Call] = {
@@ -82,6 +81,7 @@ trait CommonRouting {
           )
             .contains(application.status) =>
         StatusRouting(Call(GET, subscriptionRootPath), initialiseAgentSession = false)
+      case Some(_) => StatusRouting(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired, initialiseAgentSession = true)
       case None => StatusRouting(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired, initialiseAgentSession = true)
     }
 
@@ -99,6 +99,7 @@ trait CommonRouting {
     agentSession match {
       case MissingAgentCodes() => routes.ApplicationController.showAgentCodesForm
       case HasAnsweredAgentCodes() => routesFromUkTaxRegistrationOnwards(agentSession)
+      case _ => routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
     }
 
   private def routesFromUkTaxRegistrationOnwards(agentSession: Option[AgentSession]): Call =
@@ -106,6 +107,7 @@ trait CommonRouting {
       case MissingRegisteredForUkTax() => routes.ApplicationController.showUkTaxRegistrationForm
       case IsRegisteredForUkTax(Yes) => showPersonalDetailsOrContinue(agentSession)
       case IsRegisteredForUkTax(No) => collectCompanyRegNoOrContinue(agentSession)
+      case _ => routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
     }
 
   private def showPersonalDetailsOrContinue(agentSession: Option[AgentSession]): Call =
@@ -126,6 +128,7 @@ trait CommonRouting {
       case MissingHasTaxRegistrationNumber() => routes.TaxRegController.showTaxRegistrationNumberForm
       case HasTaxRegistrationNumber() => collectTaxRegFileUploadOrContinue(agentSession)
       case NoTaxRegistrationNumber() => routes.ApplicationController.showCheckYourAnswers
+      case _ => routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired
     }
 
   private def collectTaxRegFileUploadOrContinue(agentSession: Option[AgentSession]): Call =

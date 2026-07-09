@@ -31,35 +31,35 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class SessionCacheService @Inject() (sessionCacheRepository: SessionCacheRepository)(implicit executionContext: ExecutionContext) {
+class SessionCacheService @Inject() (sessionCacheRepository: SessionCacheRepository)(using executionContext: ExecutionContext) {
 
-  def fetchAgentSession(implicit rh: RequestHeader): Future[Option[AgentSession]] = sessionCacheRepository.getFromSession(AgentSession.sessionKey)
+  def fetchAgentSession(using rh: RequestHeader): Future[Option[AgentSession]] = sessionCacheRepository.getFromSession(AgentSession.sessionKey)
 
-  def cacheAgentSession(agentSession: AgentSession)(implicit rh: RequestHeader): Future[Unit] = sessionCacheRepository.putSession(
+  def cacheAgentSession(agentSession: AgentSession)(using rh: RequestHeader): Future[Unit] = sessionCacheRepository.putSession(
     AgentSession.sessionKey,
     agentSession.sanitize
   ).map(_ => ())
 
-  def removeAgentSession(implicit rh: RequestHeader): Future[Unit] = sessionCacheRepository.deleteFromSession(AgentSession.sessionKey)
+  def removeAgentSession(using rh: RequestHeader): Future[Unit] = sessionCacheRepository.deleteFromSession(AgentSession.sessionKey)
 
-  def fetchAgencyDetails(implicit rh: RequestHeader): Future[Option[AgencyDetails]] = sessionCacheRepository.getFromSession(AgencyDetails.sessionKey)
+  def fetchAgencyDetails(using rh: RequestHeader): Future[Option[AgencyDetails]] = sessionCacheRepository.getFromSession(AgencyDetails.sessionKey)
 
-  def cacheAgencyDetails(agencyDetails: AgencyDetails)(implicit rh: RequestHeader): Future[Unit] = sessionCacheRepository.putSession(
+  def cacheAgencyDetails(agencyDetails: AgencyDetails)(using rh: RequestHeader): Future[Unit] = sessionCacheRepository.putSession(
     AgencyDetails.sessionKey,
     agencyDetails
   ).map(_ => ())
 
-  def removeAgencyDetails(implicit rh: RequestHeader): Future[Unit] = sessionCacheRepository.deleteFromSession(AgencyDetails.sessionKey)
+  def removeAgencyDetails(using rh: RequestHeader): Future[Unit] = sessionCacheRepository.deleteFromSession(AgencyDetails.sessionKey)
 
   def fetchOldProviderId(
     oldSessionId: String,
     rh: RequestHeader
   ): Future[Option[ProviderId]] = {
-    implicit val oldRequestHeader: RequestHeader = changeHeaderSessionId(oldSessionId, rh)
+    given RequestHeader = changeHeaderSessionId(oldSessionId, rh)
     sessionCacheRepository.getFromSession(ProviderId.sessionKey)
   }
 
-  def cacheProviderId(providerId: ProviderId)(implicit rh: RequestHeader): Future[Unit] = sessionCacheRepository.putSession(
+  def cacheProviderId(providerId: ProviderId)(using rh: RequestHeader): Future[Unit] = sessionCacheRepository.putSession(
     ProviderId.sessionKey,
     providerId
   ).map(_ => ())
@@ -68,7 +68,7 @@ class SessionCacheService @Inject() (sessionCacheRepository: SessionCacheReposit
     oldSessionId: String,
     rh: RequestHeader
   ): Future[Unit] = {
-    implicit val oldRequestHeader: RequestHeader = changeHeaderSessionId(oldSessionId, rh)
+    given RequestHeader = changeHeaderSessionId(oldSessionId, rh)
     sessionCacheRepository.deleteFromSession(ProviderId.sessionKey)
   }
 

@@ -28,6 +28,7 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
@@ -52,7 +53,7 @@ class ApplicationRootController @Inject() (
   notAgentView: not_agent,
   applicationNotReadyView: application_not_ready,
   statusRejectedView: status_rejected
-)(implicit
+)(using
   appConfig: AppConfig,
   ec: ExecutionContext
 )
@@ -65,19 +66,22 @@ with I18nSupport {
 
   import authAction.withBasicAuth
 
-  def root: Action[AnyContent] = Action.async { implicit request =>
+  def root: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withBasicAuth { _ =>
       Future.successful(Redirect(routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired))
     }
   }
 
-  def showNotAgent: Action[AnyContent] = Action.async { implicit request =>
+  def showNotAgent: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withBasicAuth { _ =>
       Future.successful(Ok(notAgentView()))
     }
   }
 
-  def applicationStatus: Action[AnyContent] = Action.async { implicit request =>
+  def applicationStatus: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withBasicAuth { _ =>
       applicationService.getCurrentApplication.map {
         case Some(application) if application.status == Pending =>

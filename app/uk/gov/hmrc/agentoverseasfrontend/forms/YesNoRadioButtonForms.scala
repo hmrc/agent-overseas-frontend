@@ -33,7 +33,7 @@ object YesNoRadioButtonForms {
       field -> optional(boolean)
         .verifying(radioInputSelected(errorMsg))
         .transform(_.getOrElse(false), (Some(_)): Boolean => Option[Boolean])
-    )(RadioConfirm.apply)(RadioConfirm.unapply)
+    )(RadioConfirm.apply)(o => Some(o.value))
   )
 
   val amlsRequiredForm: Form[RadioConfirm] = form("amlsRequired", "error.amls.required.empty")

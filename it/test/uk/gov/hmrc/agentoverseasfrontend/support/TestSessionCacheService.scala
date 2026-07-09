@@ -21,13 +21,12 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
 
 import scala.concurrent.Future
 
 //This should probably be removed, we can simply rely on the actual mongo repository in integration tests
 class TestSessionCacheService
-extends SessionCacheService(null)(null) {
+extends SessionCacheService(null)(using null) {
 
   class Session(
     var agentSession: Option[AgentSession] = None,
@@ -37,35 +36,35 @@ extends SessionCacheService(null)(null) {
 
   private val sessions = collection.mutable.Map[String, Session]()
 
-  private def sessionKey(implicit rc: RequestHeader): String =
-    hc.sessionId match {
+  private def sessionKey(using rc: RequestHeader): String =
+    rc.session.get("sessionId") match {
       case None => "default"
-      case Some(sessionId) => sessionId.toString
+      case Some(sessionId) => sessionId
     }
 
-  def currentSession(implicit rc: RequestHeader): Session = sessions.getOrElseUpdate(sessionKey, new Session())
+  def currentSession(using rc: RequestHeader): Session = sessions.getOrElseUpdate(sessionKey, new Session())
 
   def clear(): Unit = sessions.clear()
 
   def allSessionsRemoved: Boolean = sessions.isEmpty
 
-  override def fetchAgentSession(implicit
+  override def fetchAgentSession(using
     rc: RequestHeader
   ): Future[Option[AgentSession]] = Future.successful(currentSession.agentSession)
 
   override def cacheAgentSession(
     agentSession: AgentSession
-  )(implicit rc: RequestHeader): Future[Unit] = Future.successful(currentSession.agentSession = Some(agentSession))
+  )(using rc: RequestHeader): Future[Unit] = Future.successful(currentSession.agentSession = Some(agentSession))
 
-  override def removeAgentSession(implicit rc: RequestHeader): Future[Unit] = Future.successful(sessions.clear())
+  override def removeAgentSession(using rc: RequestHeader): Future[Unit] = Future.successful(sessions.clear())
 
-  override def fetchAgencyDetails(implicit rc: RequestHeader): Future[Option[AgencyDetails]] = Future successful currentSession.agencyDetails
+  override def fetchAgencyDetails(using rc: RequestHeader): Future[Option[AgencyDetails]] = Future successful currentSession.agencyDetails
 
   override def cacheAgencyDetails(
     agencyDetails: AgencyDetails
-  )(implicit rc: RequestHeader): Future[Unit] = Future.successful(currentSession.agencyDetails = Some(agencyDetails))
+  )(using rc: RequestHeader): Future[Unit] = Future.successful(currentSession.agencyDetails = Some(agencyDetails))
 
-  override def removeAgencyDetails(implicit rc: RequestHeader): Future[Unit] = Future.successful {
+  override def removeAgencyDetails(using rc: RequestHeader): Future[Unit] = Future.successful {
     sessions.clear()
     ()
   }
@@ -73,9 +72,9 @@ extends SessionCacheService(null)(null) {
   override def fetchOldProviderId(
     oldSessionId: String,
     rh: RequestHeader
-  ): Future[Option[ProviderId]] = Future.successful(currentSession(changeHeaderSessionId(oldSessionId, rh)).providerId)
+  ): Future[Option[ProviderId]] = Future.successful(currentSession(using changeHeaderSessionId(oldSessionId, rh)).providerId)
 
-  override def cacheProviderId(providerId: ProviderId)(implicit rh: RequestHeader): Future[Unit] = Future.successful(
+  override def cacheProviderId(providerId: ProviderId)(using rh: RequestHeader): Future[Unit] = Future.successful(
     currentSession.providerId = Some(providerId)
   )
 

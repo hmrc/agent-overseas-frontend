@@ -62,7 +62,8 @@ with AgentOverseasApplicationStubs {
 
   "GET /main-business-address" should {
     "display the trading address form" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
@@ -91,12 +92,13 @@ with AgentOverseasApplicationStubs {
 
   "POST /main-business-address" should {
     "submit form and then redirect to trading-address-upload page" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "addressLine1" -> "line1",
-          "addressLine2" -> "line2",
-          "countryCode" -> "IE"
+          ("addressLine1", "line1"),
+          ("addressLine2", "line2"),
+          ("countryCode", "IE")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None))
 
@@ -117,12 +119,13 @@ with AgentOverseasApplicationStubs {
     }
 
     "submit form and then redirect to check-your-answers page if user is changing answers" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
-          "addressLine1" -> "line1",
-          "addressLine2" -> "line2",
-          "countryCode" -> "IE"
+          ("addressLine1", "line1"),
+          ("addressLine2", "line2"),
+          ("countryCode", "IE")
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
@@ -147,12 +150,13 @@ with AgentOverseasApplicationStubs {
 
     "show validation errors when form data is incorrect" when {
       "address line 1 is blank" in {
-        implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        val request = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody(
-            "addressLine1" -> "",
-            "addressLine2" -> "line2",
-            "countryCode" -> "IE"
+            ("addressLine1", ""),
+            ("addressLine2", "line2"),
+            ("countryCode", "IE")
           )
+        given FakeRequest[?] = request
 
         sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 
@@ -163,12 +167,13 @@ with AgentOverseasApplicationStubs {
         result.futureValue should containMessages("error.addressline.1.empty")
       }
       "country code is GB" in {
-        implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        val request = cleanCredsAgent(FakeRequest(POST, "/"))
           .withFormUrlEncodedBody(
-            "addressLine1" -> "Some address",
-            "addressLine2" -> "line2",
-            "countryCode" -> "GB"
+            ("addressLine1", "Some address"),
+            ("addressLine2", "line2"),
+            ("countryCode", "GB")
           )
+        given FakeRequest[?] = request
 
         sessionCacheService.currentSession.agentSession = Some(agentSession.copy(overseasAddress = None, changingAnswers = true))
 

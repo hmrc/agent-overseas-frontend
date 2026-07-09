@@ -26,7 +26,7 @@ case class FailureDetails(
 )
 
 object FailureDetails {
-  implicit val format: Format[FailureDetails] = Json.format[FailureDetails]
+  given Format[FailureDetails] = Json.format[FailureDetails]
 }
 
 case class FileUploadStatus(
@@ -37,6 +37,6 @@ case class FileUploadStatus(
 )
 
 object FileUploadStatus {
-  implicit val format: OFormat[FileUploadStatus] = Json.format[FileUploadStatus]
+  given OFormat[FileUploadStatus] = Json.format[FileUploadStatus]
 
 }

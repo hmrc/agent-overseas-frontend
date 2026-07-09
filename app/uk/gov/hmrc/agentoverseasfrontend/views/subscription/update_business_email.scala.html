@@ -44,7 +44,7 @@
 
 @(businessEmailForm: Form[BusinessEmailForm])(implicit msgs: Messages, request: RequestHeader, configuration: Configuration, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(businessEmailForm) + msgs("updateBusinessEmail.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
+@mainTemplate(title = errorPrefix(businessEmailForm).toString + msgs("updateBusinessEmail.title"), backLinkHref = Some(routes.BusinessIdentificationController.showCheckAnswers.url)) {
 
     @if(businessEmailForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(businessEmailForm))

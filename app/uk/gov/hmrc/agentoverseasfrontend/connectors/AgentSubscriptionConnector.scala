@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -35,19 +35,19 @@ import scala.concurrent.Future
 case class OverseasSubscriptionResponse(arn: Arn)
 
 object OverseasSubscriptionResponse {
-  implicit val formats: Format[OverseasSubscriptionResponse] = Json.format[OverseasSubscriptionResponse]
+  given Format[OverseasSubscriptionResponse] = Json.format[OverseasSubscriptionResponse]
 }
 
 @Singleton
 class AgentSubscriptionConnector @Inject() (
   http: HttpClientV2,
   val metrics: Metrics
-)(implicit
+)(using
   val appConfig: AppConfig,
   val ec: ExecutionContext
 ) {
 
-  def overseasSubscription(implicit rh: RequestHeader): Future[Arn] = {
+  def overseasSubscription(using rh: RequestHeader): Future[Arn] = {
     val url = url"${appConfig.agentSubscriptionBaseUrl}/agent-subscription/overseas-subscription"
     http.put(url)
       .execute[OverseasSubscriptionResponse]

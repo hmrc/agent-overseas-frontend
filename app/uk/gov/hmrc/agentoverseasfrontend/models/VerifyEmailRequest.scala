@@ -39,16 +39,16 @@ case class Email(
 )
 
 object Email {
-  implicit val format: Format[Email] = Json.format[Email]
+  given Format[Email] = Json.format[Email]
 }
 object VerifyEmailRequest {
-  implicit val writes: Writes[VerifyEmailRequest] = Json.writes[VerifyEmailRequest]
+  given Writes[VerifyEmailRequest] = Json.writes[VerifyEmailRequest]
 }
 
 case class VerifyEmailResponse(redirectUri: String)
 
 object VerifyEmailResponse {
-  implicit val formats: Format[VerifyEmailResponse] = Json.format[VerifyEmailResponse]
+  given Format[VerifyEmailResponse] = Json.format[VerifyEmailResponse]
 }
 
 case class CompletedEmail(
@@ -58,13 +58,13 @@ case class CompletedEmail(
 )
 
 object CompletedEmail {
-  implicit val reads: Reads[CompletedEmail] = Json.reads[CompletedEmail]
+  given Reads[CompletedEmail] = Json.reads[CompletedEmail]
 }
 
 case class VerificationStatusResponse(emails: List[CompletedEmail])
 
 object VerificationStatusResponse {
-  implicit val reads: Reads[VerificationStatusResponse] = Json.reads[VerificationStatusResponse]
+  given Reads[VerificationStatusResponse] = Json.reads[VerificationStatusResponse]
 }
 
 sealed trait EmailVerificationStatus

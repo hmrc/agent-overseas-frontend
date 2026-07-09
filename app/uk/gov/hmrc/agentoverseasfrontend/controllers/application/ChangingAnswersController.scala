@@ -22,8 +22,8 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
@@ -35,9 +35,8 @@ class ChangingAnswersController @Inject() (
   authAction: ApplicationAuth,
   override val sessionStoreService: SessionCacheService,
   override val applicationService: ApplicationService,
-  countryNamesLoader: CountryNamesLoader,
   cc: MessagesControllerComponents
-)(implicit
+)(using
   val env: Environment,
   override val ec: ExecutionContext
 )
@@ -51,7 +50,8 @@ with I18nSupport {
 
   import authAction.withEnrollingAgent
 
-  def changeAmlsRequired: Action[AnyContent] = Action.async { implicit request =>
+  def changeAmlsRequired: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url
@@ -59,7 +59,8 @@ with I18nSupport {
     }
   }
 
-  def changeAmlsDetails: Action[AnyContent] = Action.async { implicit request =>
+  def changeAmlsDetails: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.AntiMoneyLaunderingController.showAntiMoneyLaunderingForm.url
@@ -67,7 +68,8 @@ with I18nSupport {
     }
   }
 
-  def changeAmlsFile: Action[AnyContent] = Action.async { implicit request =>
+  def changeAmlsFile: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.FileUploadController.showAmlsUploadForm.url
@@ -75,7 +77,8 @@ with I18nSupport {
     }
   }
 
-  def changeContactDetails: Action[AnyContent] = Action.async { implicit request =>
+  def changeContactDetails: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showContactDetailsForm.url
@@ -83,7 +86,8 @@ with I18nSupport {
     }
   }
 
-  def changeTradingName: Action[AnyContent] = Action.async { implicit request =>
+  def changeTradingName: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showTradingNameForm.url
@@ -91,7 +95,8 @@ with I18nSupport {
     }
   }
 
-  def changeTradingAddress: Action[AnyContent] = Action.async { implicit request =>
+  def changeTradingAddress: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.TradingAddressController.showMainBusinessAddressForm.url
@@ -99,7 +104,8 @@ with I18nSupport {
     }
   }
 
-  def changeTradingAddressFile: Action[AnyContent] = Action.async { implicit request =>
+  def changeTradingAddressFile: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.FileUploadController.showTradingAddressUploadForm.url
@@ -107,7 +113,8 @@ with I18nSupport {
     }
   }
 
-  def changeRegisteredWithHmrc: Action[AnyContent] = Action.async { implicit request =>
+  def changeRegisteredWithHmrc: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showRegisteredWithHmrcForm.url
@@ -115,7 +122,8 @@ with I18nSupport {
     }
   }
 
-  def changeAgentCodes: Action[AnyContent] = Action.async { implicit request =>
+  def changeAgentCodes: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showAgentCodesForm.url
@@ -123,7 +131,8 @@ with I18nSupport {
     }
   }
 
-  def changeRegisteredForUKTax: Action[AnyContent] = Action.async { implicit request =>
+  def changeRegisteredForUKTax: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showUkTaxRegistrationForm.url
@@ -131,7 +140,8 @@ with I18nSupport {
     }
   }
 
-  def changePersonalDetails: Action[AnyContent] = Action.async { implicit request =>
+  def changePersonalDetails: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showPersonalDetailsForm.url
@@ -139,7 +149,8 @@ with I18nSupport {
     }
   }
 
-  def changeCompanyRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
+  def changeCompanyRegistrationNumber: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.ApplicationController.showCompanyRegistrationNumberForm.url
@@ -147,7 +158,8 @@ with I18nSupport {
     }
   }
 
-  def changeYourTaxRegistrationNumbers: Action[AnyContent] = Action.async { implicit request =>
+  def changeYourTaxRegistrationNumbers: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.TaxRegController.showYourTaxRegNumbersForm.url
@@ -155,7 +167,8 @@ with I18nSupport {
     }
   }
 
-  def changeYourTaxRegistrationNumbersFile: Action[AnyContent] = Action.async { implicit request =>
+  def changeYourTaxRegistrationNumbersFile: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       updateSessionAndRedirect(agentSession.copy(changingAnswers = true))(
         routes.FileUploadController.showTrnUploadForm.url

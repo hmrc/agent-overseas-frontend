@@ -26,6 +26,6 @@ object DoYouWantToAddAnotherTrnForm {
   val form: Form[DoYouWantToAddAnotherTrn] = Form(
     mapping(
       "value" -> optional(boolean).verifying(radioInputSelected("doYouWantToAddAnotherTrn.error.no-radio.selected"))
-    )(DoYouWantToAddAnotherTrn.apply)(DoYouWantToAddAnotherTrn.unapply)
+    )(DoYouWantToAddAnotherTrn.apply)(o => Some(o.value))
   )
 }

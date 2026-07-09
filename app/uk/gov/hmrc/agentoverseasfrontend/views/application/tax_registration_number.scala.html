@@ -44,7 +44,7 @@
 
 @(taxRegistrationNumberForm: Form[TaxRegistrationNumber], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(taxRegistrationNumberForm) + msgs("taxRegNo.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showCompanyRegistrationNumberForm.url))) {
+@mainTemplate(title = errorPrefix(taxRegistrationNumberForm).toString + msgs("taxRegNo.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showCompanyRegistrationNumberForm.url))) {
 
     @if(taxRegistrationNumberForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(taxRegistrationNumberForm))

@@ -42,7 +42,7 @@
 
 @(tradingNameForm: Form[String], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(tradingNameForm) + msgs("tradingName.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showContactDetailsForm.url))) {
+@mainTemplate(title = errorPrefix(tradingNameForm).toString + msgs("tradingName.title"), backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showContactDetailsForm.url))) {
 
     @if(tradingNameForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(tradingNameForm))

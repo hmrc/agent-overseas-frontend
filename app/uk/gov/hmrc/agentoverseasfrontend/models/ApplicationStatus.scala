@@ -71,7 +71,7 @@ object ApplicationStatus {
 
   def unapply(arg: ApplicationStatus): Option[String] = Some(arg.key)
 
-  implicit val reads: Reads[ApplicationStatus] = {
+  given Reads[ApplicationStatus] = {
     case JsString(ApplicationStatus.Pending.key) => JsSuccess(Pending)
     case JsString(ApplicationStatus.Accepted.key) => JsSuccess(Accepted)
     case JsString(ApplicationStatus.Rejected.key) => JsSuccess(Rejected)
@@ -82,7 +82,7 @@ object ApplicationStatus {
     case invalid => JsError(s"Invalid ApplicationStatus found: $invalid")
   }
 
-  implicit val writes: Writes[ApplicationStatus] = (o: ApplicationStatus) => JsString(o.key)
+  given Writes[ApplicationStatus] = (o: ApplicationStatus) => JsString(o.key)
 
   val allStatuses = Seq(
     Pending,

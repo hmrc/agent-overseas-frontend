@@ -43,14 +43,17 @@
         formWithCSRF: FormWithCSRF,
         submitButton: submitButton
 )
+
 @(
         doYouWantToAddAnotherTrnForm: Form[DoYouWantToAddAnotherTrn],
         trns: SortedSet[String],
         backLink: Option[String] = None
 )(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+
 @pageTitle = @{msgs("yourTaxRegistrationNumbers.title")}
+
 @mainTemplate(
-    title = errorPrefix(doYouWantToAddAnotherTrnForm) + pageTitle,
+    title = errorPrefix(doYouWantToAddAnotherTrnForm).toString + pageTitle,
     backLinkHref = Some(backLink.getOrElse(routes.TaxRegController.showTaxRegistrationNumberForm.url))
 ) {
 
@@ -87,7 +90,7 @@
         }
     ))
   
-    @formWithCSRF(action = routes.TaxRegController.submitYourTaxRegNumbers, 'class -> "form js-form") {
+    @formWithCSRF(action = routes.TaxRegController.submitYourTaxRegNumbers, Symbol("class") -> "form js-form") {
 
         @govukRadios(Radios(
             classes = "govuk-radios--inline",

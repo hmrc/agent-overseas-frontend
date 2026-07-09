@@ -21,9 +21,8 @@ import play.api.mvc.Call
 
 object CallOps {
 
-  implicit class CallOps(call: Call) {
-    def toURLWithParams(params: (String, Option[String])*): String = addParamsToUrl(call.url, params: _*)
-  }
+  extension (call: Call)
+    def toURLWithParams(params: (String, Option[String])*): String = addParamsToUrl(call.url, params*)
 
   def addParamsToUrl(
     url: String,

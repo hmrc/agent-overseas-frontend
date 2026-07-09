@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.BadRequestException
 case class RadioConfirm(value: Boolean)
 
 object RadioConfirm {
-  implicit val format: OFormat[RadioConfirm] = Json.format[RadioConfirm]
+  given OFormat[RadioConfirm] = Json.format[RadioConfirm]
 }
 
 sealed trait YesNo {
@@ -50,7 +50,7 @@ object YesNo {
       case No => Some(No.value)
     }
 
-  implicit val reads: Reads[YesNo] =
+  given Reads[YesNo] =
     new Reads[YesNo] {
       override def reads(json: JsValue): JsResult[YesNo] =
         json match {
@@ -60,7 +60,7 @@ object YesNo {
         }
     }
 
-  implicit val writes: Writes[YesNo] =
+  given Writes[YesNo] =
     new Writes[YesNo] {
       override def writes(o: YesNo): JsValue = JsString(o.value)
     }

@@ -26,7 +26,7 @@ import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application
-import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport._
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestSupport.given
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 
@@ -41,26 +41,26 @@ with Logging {
   val env: Environment
   val config: Configuration
   val appConfig: AppConfig
-  implicit val ec: ExecutionContext
+  given ec: ExecutionContext
 
   def withBasicAuth(
-    block: Request[_] => Future[Result]
-  )(implicit
-    request: Request[_]
+    block: Request[?] => Future[Result]
+  )(using
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway)) {
     block(request)
-  }.recover(handleFailure(request))
+  }.recover(handleFailure(using request))
 
   def withBasicAuthAndAgentAffinity(
-    block: Request[_] => Future[Result]
-  )(implicit
-    request: Request[_]
+    block: Request[?] => Future[Result]
+  )(using
+    request: Request[?]
   ): Future[Result] = authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent) {
     block(request)
-  }.recover(handleFailure(request))
+  }.recover(handleFailure(using request))
 
   protected def hasAgentEnrolment(enrolments: Enrolments): Boolean = enrolments.enrolments
-    .find(_.key equals "HMRC-AS-AGENT")
+    .find(_.key.equals("HMRC-AS-AGENT"))
     .exists(_.isActivated)
 
   protected def getArn(enrolments: Enrolments): Option[Arn] =
@@ -69,7 +69,7 @@ with Logging {
       identifier <- enrolment.getIdentifier("AgentReferenceNumber")
     } yield Arn(identifier.value)
 
-  protected def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Result] = {
+  protected def handleFailure(using request: Request[?]): PartialFunction[Throwable, Result] = {
     case _: NoActiveSession => Redirect(s"$signInUrl?continue_url=$continueUrl${request.uri}&origin=$appName")
 
     case _: InsufficientEnrolments =>

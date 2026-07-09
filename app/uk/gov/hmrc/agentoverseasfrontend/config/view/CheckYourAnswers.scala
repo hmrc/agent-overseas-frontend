@@ -51,7 +51,7 @@ object AnswerRow {
     answerLines: Seq[String],
     changeLink: Option[Call] = None,
     visuallyHiddenText: Option[String] = None
-  )(implicit messages: Messages): AnswerRow = AnswerRow(
+  )(using messages: Messages): AnswerRow = AnswerRow(
     id,
     question,
     answerLines,
@@ -75,17 +75,17 @@ case class CheckYourAnswersConfirmation(confirmed: Boolean)
   */
 object CheckYourAnswers {
 
-  def form(implicit messages: Messages): Form[CheckYourAnswersConfirmation] = Form[CheckYourAnswersConfirmation](
+  def form(using messages: Messages): Form[CheckYourAnswersConfirmation] = Form[CheckYourAnswersConfirmation](
     mapping(
       "confirmed" -> default(boolean, false)
         .verifying(Messages("checkAnswers.confirm.error"), _ == true)
-    )(CheckYourAnswersConfirmation.apply)(CheckYourAnswersConfirmation.unapply)
+    )(CheckYourAnswersConfirmation.apply)(o => Some(o.confirmed))
   )
 
   def apply(
     agentSession: AgentSession,
     countryName: String
-  )(implicit messages: Messages): CheckYourAnswers = CheckYourAnswers(
+  )(using messages: Messages): CheckYourAnswers = CheckYourAnswers(
     amlsDetails = AnswerBlock(
       heading = Messages("checkAnswers.amlsDetails.title"),
       answerGroups =
@@ -128,7 +128,7 @@ object CheckYourAnswers {
       }
   )
 
-  private def makeAmlsRequiredGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = {
+  private def makeAmlsRequiredGroup(session: AgentSession)(using messages: Messages): Option[AnswerGroup] = {
 
     val amlsRequired = session.amlsRequired.fold(false)(identity)
     Some(
@@ -145,7 +145,7 @@ object CheckYourAnswers {
     )
   }
 
-  private def makeAmlsDetailsGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.amlsDetails.map { details =>
+  private def makeAmlsDetailsGroup(session: AgentSession)(using messages: Messages): Option[AnswerGroup] = session.amlsDetails.map { details =>
     AnswerGroup(
       List(
         AnswerRow(
@@ -171,7 +171,7 @@ object CheckYourAnswers {
 
   private def makeAmlsFileUploadGroup(
     session: AgentSession
-  )(implicit messages: Messages): Option[AnswerGroup] = session.amlsUploadStatus.flatMap(_.fileName).map { fileName =>
+  )(using messages: Messages): Option[AnswerGroup] = session.amlsUploadStatus.flatMap(_.fileName).map { fileName =>
     AnswerGroup(
       List(
         AnswerRow(
@@ -184,7 +184,7 @@ object CheckYourAnswers {
     )
   }
 
-  private def makeContactDetailsGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.contactDetails.map { details =>
+  private def makeContactDetailsGroup(session: AgentSession)(using messages: Messages): Option[AnswerGroup] = session.contactDetails.map { details =>
     AnswerGroup(
       List(
         AnswerRow(
@@ -216,7 +216,7 @@ object CheckYourAnswers {
   private def makeOverseasAddressGroup(
     session: AgentSession,
     countryName: String
-  )(implicit
+  )(using
     messages: Messages
   ): Option[AnswerGroup] = session.overseasAddress.map { address =>
     AnswerGroup(
@@ -240,7 +240,7 @@ object CheckYourAnswers {
 
   private def makeTradingAddressFileUploadGroup(
     session: AgentSession
-  )(implicit messages: Messages): Option[AnswerGroup] = session.tradingAddressUploadStatus.flatMap(_.fileName).map { fileName =>
+  )(using messages: Messages): Option[AnswerGroup] = session.tradingAddressUploadStatus.flatMap(_.fileName).map { fileName =>
     AnswerGroup(
       List(
         AnswerRow(
@@ -253,7 +253,7 @@ object CheckYourAnswers {
     )
   }
 
-  private def makeTradingNameGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.tradingName.map { name =>
+  private def makeTradingNameGroup(session: AgentSession)(using messages: Messages): Option[AnswerGroup] = session.tradingName.map { name =>
     AnswerGroup(
       List(
         AnswerRow(
@@ -269,7 +269,7 @@ object CheckYourAnswers {
   def getAgentCodeRows(
     isRegistered: YesNo,
     session: AgentSession
-  )(implicit messages: Messages): Seq[AnswerRow] =
+  )(using messages: Messages): Seq[AnswerRow] =
     isRegistered match {
       case Yes =>
         if (session.agentCodes.exists(_.hasOneOrMoreCodes)) {
@@ -304,7 +304,7 @@ object CheckYourAnswers {
       case No => List.empty
     }
 
-  def getUkRegistrationRows(session: AgentSession)(implicit messages: Messages): Seq[AnswerRow] =
+  def getUkRegistrationRows(session: AgentSession)(using messages: Messages): Seq[AnswerRow] =
     session.registeredForUkTax.fold(Seq.empty: Seq[AnswerRow]) { isRegisteredForUKTax =>
       val rows = List(
         AnswerRow(
@@ -339,8 +339,8 @@ object CheckYourAnswers {
       rows ++ personalDetails
     }
 
-  private def makeRegistrationDataGroup(session: AgentSession)(implicit messages: Messages): Option[AnswerGroup] = session.registeredWithHmrc.map {
-    isRegistered: YesNo =>
+  private def makeRegistrationDataGroup(session: AgentSession)(using messages: Messages): Option[AnswerGroup] = session.registeredWithHmrc.map {
+    (isRegistered: YesNo) =>
       val agentCodeRows = getAgentCodeRows(isRegistered, session)
 
       val ukRegistrationRows = getUkRegistrationRows(session)
@@ -384,7 +384,7 @@ object CheckYourAnswers {
 
   private def makeTaxRegistrationNumbersFileUploadGroup(
     session: AgentSession
-  )(implicit messages: Messages): Option[AnswerGroup] =
+  )(using messages: Messages): Option[AnswerGroup] =
     if (session.taxRegistrationNumbers.fold(false)(_.nonEmpty)) {
 
       session.trnUploadStatus.flatMap(_.fileName).map { fileName =>

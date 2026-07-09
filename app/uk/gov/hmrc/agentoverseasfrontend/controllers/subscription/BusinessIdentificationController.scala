@@ -22,6 +22,7 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.config.CountryNamesLoader
@@ -57,7 +58,7 @@ class BusinessIdentificationController @Inject() (
   updateBusinessNameView: update_business_name,
   checkBusinessEmailView: check_business_email,
   updateBusinessEmailView: update_business_email
-)(implicit
+)(using
   override val ec: ExecutionContext,
   appConfig: AppConfig
 )
@@ -74,7 +75,8 @@ extends AgentOverseasBaseController(
   import authAction.withSimpleAgentAuth
   import authAction.withSubscribingAgent
 
-  def showCheckAnswers: Action[AnyContent] = Action.async { implicit request =>
+  def showCheckAnswers: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true, generateNewDetailsIfNoSession = true) { agencyDetails =>
       val countryCode = agencyDetails.agencyAddress.countryCode
       val countryName = countries.getOrElse(
@@ -86,7 +88,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def showCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
+  def showCheckBusinessAddress: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       val countryCode = agencyDetails.agencyAddress.countryCode
       val countryName = countries.getOrElse(
@@ -103,7 +106,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def submitCheckBusinessAddress: Action[AnyContent] = Action.async { implicit request =>
+  def submitCheckBusinessAddress: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       businessAddressCheckForm
         .bindFromRequest()
@@ -131,7 +135,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def showUpdateBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
+  def showUpdateBusinessAddressForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       Future.successful(
         Ok(
@@ -144,7 +149,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def submitUpdateBusinessAddressForm: Action[AnyContent] = Action.async { implicit request =>
+  def submitUpdateBusinessAddressForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       updateBusinessAddressForm(validCountryCodes)
         .bindFromRequest()
@@ -168,13 +174,15 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def showCheckBusinessEmail: Action[AnyContent] = Action.async { implicit request =>
+  def showCheckBusinessEmail: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
       Future.successful(Ok(checkBusinessEmailView(businessEmailCheckForm, agencyDetails.agencyEmail)))
     }
   }
 
-  def submitCheckBusinessEmail: Action[AnyContent] = Action.async { implicit request =>
+  def submitCheckBusinessEmail: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
       businessEmailCheckForm
         .bindFromRequest()
@@ -191,7 +199,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def showUpdateBusinessEmailForm: Action[AnyContent] = Action.async { implicit request =>
+  def showUpdateBusinessEmailForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
       Future.successful(
         Ok(updateBusinessEmailView(updateBusinessEmailForm.fill(BusinessEmailForm(agencyDetails.agencyEmail))))
@@ -199,7 +208,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def submitUpdateBusinessEmailForm: Action[AnyContent] = Action.async { implicit request =>
+  def submitUpdateBusinessEmailForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = false) { agencyDetails =>
       updateBusinessEmailForm
         .bindFromRequest()
@@ -216,13 +226,15 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def showCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
+  def showCheckBusinessName: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       Future.successful(Ok(checkBusinessNameView(businessNameCheckForm, agencyDetails.agencyName)))
     }
   }
 
-  def submitCheckBusinessName: Action[AnyContent] = Action.async { implicit request =>
+  def submitCheckBusinessName: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       businessNameCheckForm
         .bindFromRequest()
@@ -239,7 +251,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def showUpdateBusinessNameForm: Action[AnyContent] = Action.async { implicit request =>
+  def showUpdateBusinessNameForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       Future.successful(
         Ok(updateBusinessNameView(updateBusinessNameForm.fill(BusinessNameForm(agencyDetails.agencyName))))
@@ -247,7 +260,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def submitUpdateBusinessNameForm: Action[AnyContent] = Action.async { implicit request =>
+  def submitUpdateBusinessNameForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSubscribingAgent(checkForEmailVerification = true) { agencyDetails =>
       updateBusinessNameForm
         .bindFromRequest()
@@ -264,7 +278,8 @@ extends AgentOverseasBaseController(
     }
   }
 
-  def returnFromGGRegistration(sessionId: String): Action[AnyContent] = Action.async { implicit request =>
+  def returnFromGGRegistration(sessionId: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withSimpleAgentAuth { _ =>
       subscriptionService
         .updateAuthProviderId(sessionId)
@@ -283,19 +298,19 @@ object BusinessIdentificationController {
       "addressLine3" -> addressLine34(lineNumber = 3),
       "addressLine4" -> addressLine34(lineNumber = 4),
       "countryCode" -> countryCode(validCountryCodes)
-    )(BusinessAddressForm.apply)(BusinessAddressForm.unapply)
+    )(BusinessAddressForm.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 
   val updateBusinessEmailForm: Form[BusinessEmailForm] = Form[BusinessEmailForm](
     mapping(
       "email" -> emailAddress
-    )(BusinessEmailForm.apply)(BusinessEmailForm.unapply)
+    )(BusinessEmailForm.apply)(o => Some(o.email))
   )
 
   val updateBusinessNameForm: Form[BusinessNameForm] = Form[BusinessNameForm](
     mapping(
       "name" -> businessName
-    )(BusinessNameForm.apply)(BusinessNameForm.unapply)
+    )(BusinessNameForm.apply)(o => Some(o.name))
   )
 
 }

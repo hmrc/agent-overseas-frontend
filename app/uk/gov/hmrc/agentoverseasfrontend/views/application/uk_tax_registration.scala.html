@@ -40,7 +40,7 @@
 
 @(registeredForUkTaxForm: Form[RadioConfirm], backLinkRoute: String)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(registeredForUkTaxForm) + msgs("ukTaxRegistration.title"), backLinkHref = Some(backLinkRoute)) {
+@mainTemplate(title = errorPrefix(registeredForUkTaxForm).toString + msgs("ukTaxRegistration.title"), backLinkHref = Some(backLinkRoute)) {
 
     @if(registeredForUkTaxForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(registeredForUkTaxForm))

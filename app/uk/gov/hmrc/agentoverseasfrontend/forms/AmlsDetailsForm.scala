@@ -27,6 +27,6 @@ object AmlsDetailsForm {
     mapping(
       "amlsBody" -> amlsBody,
       "membershipNumber" -> membershipNumber
-    )(AmlsDetails.apply)(AmlsDetails.unapply)
+    )(AmlsDetails.apply)(o => Some(Tuple.fromProductTyped(o)))
   )
 }

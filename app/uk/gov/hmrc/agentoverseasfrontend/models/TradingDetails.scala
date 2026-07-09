@@ -32,5 +32,5 @@ case class TradingDetails(
 )
 
 object TradingDetails {
-  implicit val format: OFormat[TradingDetails] = Json.format
+  given OFormat[TradingDetails] = Json.format
 }

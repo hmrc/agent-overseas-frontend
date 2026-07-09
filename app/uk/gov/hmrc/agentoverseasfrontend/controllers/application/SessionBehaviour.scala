@@ -29,17 +29,17 @@ trait SessionBehaviour
 extends CommonRouting {
 
   val sessionStoreService: SessionCacheService
-  implicit val ec: ExecutionContext
+  given ec: ExecutionContext
 
   val showCheckYourAnswersUrl: String = routes.ApplicationController.showCheckYourAnswers.url
 
   def updateSessionAndRedirect(
     agentSession: AgentSession
-  )(redirectTo: String)(implicit rh: RequestHeader): Future[Result] = sessionStoreService
+  )(redirectTo: String)(using rh: RequestHeader): Future[Result] = sessionStoreService
     .cacheAgentSession(agentSession)
     .map(_ => Redirect(redirectTo))
 
-  def updateSession(agentSession: AgentSession)(redirectTo: String)(implicit rh: RequestHeader): Future[Result] =
+  def updateSession(agentSession: AgentSession)(redirectTo: String)(using rh: RequestHeader): Future[Result] =
     if (agentSession.changingAnswers) {
       updateSessionAndRedirect(agentSession.copy(changingAnswers = false))(showCheckYourAnswersUrl)
     }

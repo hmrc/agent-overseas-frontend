@@ -25,5 +25,5 @@ case class UpdateTrn(
 )
 
 object UpdateTrn {
-  implicit val format: Format[UpdateTrn] = Json.format[UpdateTrn]
+  given Format[UpdateTrn] = Json.format[UpdateTrn]
 }

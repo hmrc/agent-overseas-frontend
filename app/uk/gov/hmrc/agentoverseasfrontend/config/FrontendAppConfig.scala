@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentoverseasfrontend.config
 import com.google.inject.ImplementedBy
 import com.google.inject.Singleton
 import javax.inject.Inject
-import play.api.Environment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @ImplementedBy(classOf[FrontendAppConfig])
@@ -54,8 +53,7 @@ trait AppConfig {
 
 @Singleton
 class FrontendAppConfig @Inject() (
-  servicesConfig: ServicesConfig,
-  environment: Environment
+  servicesConfig: ServicesConfig
 )
 extends AppConfig {
 
@@ -89,7 +87,7 @@ extends AppConfig {
   private val basGatewayFrontendExternalUrl: String = servicesConfig.getString("bas-gateway-frontend.external-url")
   private val signOutPath: String = servicesConfig.getString("bas-gateway-frontend.sign-out.path")
   private val signInPath: String = servicesConfig.getString("bas-gateway-frontend.sign-in.path")
-  override lazy val signOutUrl: String = s"$basGatewayFrontendExternalUrl$signOutPath"
-  override lazy val signInUrl: String = s"$basGatewayFrontendExternalUrl$signInPath"
+  override val signOutUrl: String = s"$basGatewayFrontendExternalUrl$signOutPath"
+  override val signInUrl: String = s"$basGatewayFrontendExternalUrl$signInPath"
 
 }

@@ -53,7 +53,7 @@ with MetricsTestSupport {
   private lazy val http = app.injector.instanceOf[HttpClientV2]
   private lazy val appConfig = app.injector.instanceOf[AppConfig]
 
-  private implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  private given request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val connector: AgentOverseasApplicationConnector =
     new AgentOverseasApplicationConnector(
@@ -67,7 +67,7 @@ with MetricsTestSupport {
     "create an application successfully" in {
       givenPostOverseasApplication(201)
 
-      connector.createOverseasApplication(defaultCreateApplicationRequest).futureValue shouldBe (())
+      connector.createOverseasApplication(defaultCreateApplicationRequest).futureValue shouldBe ()
     }
 
     "return exception" when {
@@ -186,7 +186,7 @@ with MetricsTestSupport {
     "add the new authId to the application" in {
       givenUpdateAuthIdSuccessResponse(oldAuthId)
 
-      connector.updateAuthId(ProviderId(oldAuthId)).futureValue shouldBe (())
+      connector.updateAuthId(ProviderId(oldAuthId)).futureValue shouldBe ()
     }
 
     "return exception if the upstream returns 404" in {

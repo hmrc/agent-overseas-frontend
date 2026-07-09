@@ -36,6 +36,6 @@ case class AgentCodes(
 
 object AgentCodes {
 
-  implicit val format: OFormat[AgentCodes] = Json.format[AgentCodes]
+  given OFormat[AgentCodes] = Json.format[AgentCodes]
 
 }

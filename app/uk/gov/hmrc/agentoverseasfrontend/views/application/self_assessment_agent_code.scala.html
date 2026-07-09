@@ -40,7 +40,7 @@
 @ctValue = @{ agentCodesForm("corporation-tax").value.getOrElse("") }
 
 @mainTemplate(
-    title = errorPrefix(agentCodesForm) + msgs("agentCodes.title"),
+    title = errorPrefix(agentCodesForm).toString + msgs("agentCodes.title"),
     backLinkHref = Some(backLink.getOrElse(routes.ApplicationController.showRegisteredWithHmrcForm.url))
 ) {
 

@@ -4,18 +4,14 @@ import uk.gov.hmrc.DefaultBuildSettings
 val appName = "agent-overseas-frontend"
 
 ThisBuild / majorVersion := 1
-ThisBuild / scalaVersion := "2.13.18"
+ThisBuild / scalaVersion := "3.7.4"
 
 
 val scalaCOptions = Seq(
-//  "-Xfatal-warnings",
-  "-Wconf:msg=match may not be exhaustive:is",
-  "-Xlint:-missing-interpolator,_",
-  "-deprecation",
+  "-Werror",
+  "-Wconf:msg=Flag.*repeatedly:s",
   "-feature",
-  "-unchecked",
   "-Wconf:src=target/.*:s", // silence warnings from compiled files
-  "-Wconf:src=*html:w",     // silence html warnings as they are wrong
   "-Wconf:src=routes/.*:s", // silence warnings from routes
   "-language:implicitConversions"
 )

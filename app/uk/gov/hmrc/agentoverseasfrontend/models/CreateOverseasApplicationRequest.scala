@@ -32,7 +32,7 @@ case class CreateOverseasApplicationRequest(
 
 object CreateOverseasApplicationRequest {
 
-  implicit val formats: OFormat[CreateOverseasApplicationRequest] = Json.format
+  given OFormat[CreateOverseasApplicationRequest] = Json.format
 
   def apply(agentSession: AgentSession): CreateOverseasApplicationRequest =
     (for {

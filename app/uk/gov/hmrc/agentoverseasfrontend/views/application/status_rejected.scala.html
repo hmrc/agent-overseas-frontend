@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.HtmlFormat
 @import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 @import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 @import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationEntityDetails
@@ -42,9 +43,8 @@
     @h2("statusRejected.heading")
     @p("statusRejected.para3")
 
-    @p(html = Some(Html(
-        span("statusRejected.link") + "" +
-                a("statusRejected.link.text",
-                    href = routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
-    )))
+    @p(html=Some(HtmlFormat.fill(Seq(
+        span("statusRejected.link"),
+        a("statusRejected.link.text", href = routes.AntiMoneyLaunderingController.showMoneyLaunderingRequired.url)
+    ))))
 }

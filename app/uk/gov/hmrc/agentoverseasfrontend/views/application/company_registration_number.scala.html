@@ -42,13 +42,13 @@
 
 @(companyRegistrationNumberForm: Form[CompanyRegistrationNumber], backButtonLink: String)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
-@mainTemplate(title = errorPrefix(companyRegistrationNumberForm) + msgs("companyRegistrationNumber.title"), backLinkHref = Some(backButtonLink)) {
+@mainTemplate(title = errorPrefix(companyRegistrationNumberForm).toString + msgs("companyRegistrationNumber.title"), backLinkHref = Some(backButtonLink)) {
 
     @if(companyRegistrationNumberForm.hasErrors) {
         @govukErrorSummary(ErrorSummary().withFormErrorsAsText(companyRegistrationNumberForm))
     }
 
-    @formWithCsrf(action = routes.ApplicationController.submitCompanyRegistrationNumber, 'class -> "form js-form") {
+    @formWithCsrf(action = routes.ApplicationController.submitCompanyRegistrationNumber, Symbol("class") -> "form js-form") {
 
         @govukRadios(Radios(
             fieldset = Some(Fieldset(

@@ -17,16 +17,15 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
 import play.api.mvc.AnyContent
-import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.agentoverseasfrontend.controllers.routes as signOutRoutes
 import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.AmlsDetails
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
-import uk.gov.hmrc.agentoverseasfrontend.controllers.{routes => signOutRoutes}
 
 import scala.concurrent.Future
 
@@ -39,7 +38,8 @@ with AgentOverseasApplicationStubs {
   "GET /money-laundering-registration" should {
 
     "redirect to it self when agentSession not initialised, should only be done once as auth action should initialise agentSession" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       given404OverseasApplications()
       val result = controller.showMoneyLaunderingRequired(request)
@@ -49,7 +49,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the is money laundering required page" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -63,7 +64,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "back link should be check your answers when changing" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession(changingAnswers = true))
 
@@ -80,8 +82,9 @@ with AgentOverseasApplicationStubs {
   "POST /money-laundering-registration" should {
 
     "redirect to /money-laundering when YES is selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "true")
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(("amlsRequired", "true"))
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -94,8 +97,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /contact-details when NO is selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "false")
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(("amlsRequired", "false"))
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -108,8 +112,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /check-answers and remove AMLS details from session when changing is true and the user selects NO (changing from YES to NO)" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "false")
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(("amlsRequired", "false"))
+      given FakeRequest[?] = request
 
       sessionCacheService
         .cacheAgentSession(
@@ -131,8 +136,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "redirect to /money-landering when changing is true and the user selects YES (changing from NO to YES)" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
-        .withFormUrlEncodedBody("amlsRequired" -> "true")
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+        .withFormUrlEncodedBody(("amlsRequired", "true"))
+      given FakeRequest[?] = request
 
       sessionCacheService
         .cacheAgentSession(AgentSession(amlsRequired = Some(false), changingAnswers = true))
@@ -147,7 +153,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "redisplay the page with errors when no radio button is selected" in {
-      implicit val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -166,7 +173,8 @@ with AgentOverseasApplicationStubs {
   "GET /money-laundering" should {
 
     "display the is amls required page if user has not already selected an option" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = None)).futureValue
       val result = controller.showAntiMoneyLaunderingForm(request)
@@ -176,7 +184,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the contact form page if user has already selected false to amls required" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(false))).futureValue
       val result = controller.showAntiMoneyLaunderingForm(request)
@@ -186,7 +195,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the money-laundering form if user has selected amls required" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       given404OverseasApplications()
       sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(true))).futureValue
@@ -207,7 +217,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the money-laundering form with correct back button link when user is CHANGING ANSWERS" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       given404OverseasApplications()
       sessionCacheService
@@ -230,7 +241,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the money-laundering form with correct back button link when user is CHANGING ANSWERS via the /anti-money-laundering-registration page" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       given404OverseasApplications()
       sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(true), changingAnswers = true)).futureValue
@@ -246,7 +258,8 @@ with AgentOverseasApplicationStubs {
     }
 
     "display the money-laundering form with correct back button link when user is not changing answers and Has seen previously rejected application page" in {
-      implicit val request = cleanCredsAgent(FakeRequest())
+      val request = cleanCredsAgent(FakeRequest())
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession(amlsRequired = Some(true))).futureValue
       given200GetOverseasApplications(allRejected = true)
@@ -263,11 +276,12 @@ with AgentOverseasApplicationStubs {
   "POST /money-laundering" should {
 
     "redirect to upload/amls" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "amlsBody" -> "Association of AccountingTechnicians (AAT)",
           "membershipNumber" -> "123445"
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -283,11 +297,12 @@ with AgentOverseasApplicationStubs {
 
     "redirect to upload-proof-anti-money-laundering-registration if user is changing the details" in {
       // pre-state
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody(
           "amlsBody" -> "Association of AccountingTechnicians (AAT)",
           "membershipNumber" -> "123445"
         )
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
 
@@ -302,8 +317,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error when form params are incorrect with correct back link for changing answers" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession(changingAnswers = true)).futureValue
 
@@ -316,8 +332,9 @@ with AgentOverseasApplicationStubs {
     }
 
     "show validation error when form params are incorrect with correct back link for not changing answers" in {
-      implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] = cleanCredsAgent(FakeRequest(POST, "/"))
+      val request = cleanCredsAgent(FakeRequest(POST, "/"))
         .withFormUrlEncodedBody("amlsBody" -> "", "membershipNumber" -> "123445")
+      given FakeRequest[?] = request
 
       sessionCacheService.cacheAgentSession(AgentSession()).futureValue
 
@@ -337,7 +354,8 @@ with AgentOverseasApplicationStubs {
   "email verification" should {
     "not be triggered even with an unverified mail" when {
       def checkVerifyEmailIsNotTriggered(f: Request[AnyContent] => Future[Result]) = {
-        implicit val request = cleanCredsAgent(FakeRequest())
+        val request = cleanCredsAgent(FakeRequest())
+        given FakeRequest[?] = request
 
         sessionCacheService
           .cacheAgentSession(AgentSession().copy(changingAnswers = true, verifiedEmails = Set.empty))

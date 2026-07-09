@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.AgentOverseasBa
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.SubscriptionAuth
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 
 import scala.concurrent.ExecutionContext
@@ -35,14 +34,13 @@ import scala.concurrent.Future
 @Singleton
 class SubscriptionRootController @Inject() (
   override val messagesApi: MessagesApi,
-  service: SubscriptionService,
   authAction: SubscriptionAuth,
   sessionStoreService: SessionCacheService,
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   createNewAccountView: create_new_account,
   cannotCheckStatusView: cannot_check_status
-)(implicit
+)(using
   appConfig: AppConfig,
   ec: ExecutionContext,
   configuration: Configuration
@@ -59,14 +57,16 @@ extends AgentOverseasBaseController(
     Redirect(routes.BusinessIdentificationController.showCheckAnswers)
   }
 
-  def nextStep: Action[AnyContent] = Action.async { implicit request =>
-    withSimpleAgentAuth { subRequest =>
+  def nextStep: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withSimpleAgentAuth { _ =>
       Future.successful(Ok(createNewAccountView()))
     }
   }
 
-  def showApplicationIssue: Action[AnyContent] = Action.async { implicit request =>
-    withSimpleAgentAuth { subRequest =>
+  def showApplicationIssue: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withSimpleAgentAuth { _ =>
       Future.successful(Ok(cannotCheckStatusView()))
     }
   }

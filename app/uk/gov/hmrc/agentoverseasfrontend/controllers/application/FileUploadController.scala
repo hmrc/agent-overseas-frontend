@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.Yes
 import uk.gov.hmrc.agentoverseasfrontend.models.YesNo
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
+import uk.gov.hmrc.agentoverseasfrontend.utils.given
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
 import javax.inject.Inject
@@ -47,7 +47,7 @@ class FileUploadController @Inject() (
   tradingAddressNoJsView: trading_address_no_js_check_file,
   successfulFileUploadView: successful_file_upload,
   fileUploadFailedView: file_upload_failed
-)(implicit
+)(using
   ex: ExecutionContext,
   appConfig: AppConfig
 )
@@ -61,27 +61,33 @@ with Logging {
 
   import authAction.withEnrollingEmailVerifiedAgent
 
-  def showAmlsUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { implicit agentSession =>
+  def showAmlsUploadForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { agentSession =>
+      given AgentSession = agentSession
       showUploadForm("amls")
     }
   }
 
-  def showTradingAddressUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { implicit agentSession =>
+  def showTradingAddressUploadForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { agentSession =>
+      given AgentSession = agentSession
       showUploadForm("trading-address")
     }
   }
 
-  def showTrnUploadForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { implicit agentSession =>
+  def showTrnUploadForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { agentSession =>
+      given AgentSession = agentSession
       showUploadForm("trn")
     }
   }
 
   private def showUploadForm(
     fileType: String
-  )(implicit
+  )(using
     agentSession: AgentSession,
     rh: RequestHeader
   ) = upscanConnector
@@ -98,8 +104,9 @@ with Logging {
         )
     )
 
-  def showTradingAddressNoJsCheckPage: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+  def showTradingAddressNoJsCheckPage: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { _ =>
       Ok(tradingAddressNoJsView())
     }
   }
@@ -108,8 +115,9 @@ with Logging {
   def pollStatus(
     fileType: String,
     reference: String
-  ): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+  ): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { _ =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           applicationService
@@ -139,8 +147,9 @@ with Logging {
     }
   }
 
-  def showSuccessfulUploadedForm(): Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+  def showSuccessfulUploadedForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { _ =>
       sessionStoreService.fetchAgentSession.flatMap {
         case Some(agentSession) =>
           agentSession.fileType match {
@@ -173,8 +182,10 @@ with Logging {
       case _ => None
     }
 
-  def submitSuccessfulFileUploadedForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { implicit agentSession =>
+  def submitSuccessfulFileUploadedForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { agentSession =>
+      given AgentSession = agentSession
       SuccessfulFileUploadConfirmationForm.form
         .bindFromRequest()
         .fold(
@@ -205,8 +216,9 @@ with Logging {
     }
   }
 
-  def showUploadFailedPage: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingEmailVerifiedAgent { agentSession =>
+  def showUploadFailedPage: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingEmailVerifiedAgent { _ =>
       sessionStoreService.fetchAgentSession.map {
         case Some(agentSession) =>
           agentSession.fileType match {
@@ -220,7 +232,7 @@ with Logging {
     }
   }
 
-  private def getFileNameFromSession(fileType: String)(implicit rh: RequestHeader): Future[Option[String]] = sessionStoreService.fetchAgentSession.flatMap {
+  private def getFileNameFromSession(fileType: String)(using rh: RequestHeader): Future[Option[String]] = sessionStoreService.fetchAgentSession.flatMap {
     case Some(agentSession) =>
       {
         fileType match {
@@ -235,7 +247,7 @@ with Logging {
     case None => throw new RuntimeException("no agent session")
   }
 
-  private def getBackLink(fileType: String)(implicit agentSession: AgentSession): Option[String] =
+  private def getBackLink(fileType: String)(using agentSession: AgentSession): Option[String] =
     if (
       agentSession.changingAnswers && (fileType match {
         case "trading-address" => agentSession.tradingAddressUploadStatus.nonEmpty
@@ -260,7 +272,7 @@ with Logging {
       }
     }
 
-  private def nextPage(fileType: String)(implicit
+  private def nextPage(fileType: String)(using
     agentSession: AgentSession,
     rh: RequestHeader
   ): Future[String] =

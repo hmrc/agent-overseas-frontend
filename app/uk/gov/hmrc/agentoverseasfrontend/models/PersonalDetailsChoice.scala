@@ -55,7 +55,7 @@ object PersonalDetailsChoice {
 
     def unapply(answer: RadioOption): Option[String] = Some(answer.value)
 
-    implicit val format: Format[RadioOption] =
+    given Format[RadioOption] =
       new Format[RadioOption] {
 
         override def reads(json: JsValue): JsResult[RadioOption] =
@@ -89,6 +89,6 @@ object PersonalDetailsChoice {
     )
   }
 
-  implicit val personalDetailsFormat: OFormat[PersonalDetailsChoice] = Json.format[PersonalDetailsChoice]
+  given OFormat[PersonalDetailsChoice] = Json.format[PersonalDetailsChoice]
 
 }

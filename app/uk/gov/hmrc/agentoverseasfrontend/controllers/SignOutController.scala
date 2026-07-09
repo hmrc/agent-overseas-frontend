@@ -20,6 +20,7 @@ import play.api.Configuration
 import play.api.i18n.MessagesApi
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
@@ -30,7 +31,6 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.subscription.{routes => sub
 import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentoverseasfrontend.views.html.subscription._
 import uk.gov.hmrc.http.SessionKeys.sessionId
 
@@ -41,13 +41,12 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class SignOutController @Inject() (
   override val messagesApi: MessagesApi,
-  service: SubscriptionService,
   applicationService: ApplicationService,
   mcc: MessagesControllerComponents,
   authAction: SubscriptionAuth,
   sessionStoreService: SessionCacheService,
   timedOutView: timed_out
-)(implicit
+)(using
   val appConfig: AppConfig,
   override val ec: ExecutionContext,
   config: Configuration
@@ -65,8 +64,9 @@ extends AgentOverseasBaseController(
     Redirect(signOutAndRedirectUrl)
   }
 
-  def signOutToGGRegistrationWhenSubscribing: Action[AnyContent] = Action.async { implicit request =>
-    withSimpleAgentAuth { implicit subRequest =>
+  def signOutToGGRegistrationWhenSubscribing: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withSimpleAgentAuth { subRequest =>
       sessionStoreService.cacheProviderId(ProviderId(subRequest.authProviderId)).map { _ =>
         val postRegistrationContinue =
           uri"${appConfig.selfExternalUrl + subscriptionRoutes.BusinessIdentificationController.returnFromGGRegistration(request.session.apply(sessionId)).url}"
@@ -107,7 +107,8 @@ extends AgentOverseasBaseController(
     signOutWithContinue(continueUrl.toString)
   }
 
-  def timedOut: Action[AnyContent] = Action { implicit request =>
+  def timedOut: Action[AnyContent] = Action { request =>
+    given Request[AnyContent] = request
     Ok(timedOutView())
   }
 

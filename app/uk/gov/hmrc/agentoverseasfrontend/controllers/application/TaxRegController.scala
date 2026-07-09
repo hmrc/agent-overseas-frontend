@@ -21,6 +21,7 @@ import javax.inject.Singleton
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import play.api.Environment
 import play.api.Logging
@@ -37,7 +38,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.Trn
 import uk.gov.hmrc.agentoverseasfrontend.models.UpdateTrn
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
+import uk.gov.hmrc.agentoverseasfrontend.utils.given
 import uk.gov.hmrc.agentoverseasfrontend.views.html._
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
@@ -58,7 +59,7 @@ class TaxRegController @Inject() (
   updateTrnView: update_tax_registration_number,
   removeTrnView: remove_tax_reg_number,
   errorTemplateView: error_template
-)(implicit
+)(using
   appConfig: AppConfig,
   override val ec: ExecutionContext
 )
@@ -73,7 +74,8 @@ with Logging {
 
   import authAction.withEnrollingAgent
 
-  def showTaxRegistrationNumberForm: Action[AnyContent] = Action.async { implicit request =>
+  def showTaxRegistrationNumberForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       val storedTrns = agentSession.taxRegistrationNumbers
         .getOrElse(SortedSet.empty[Trn])
@@ -91,7 +93,8 @@ with Logging {
     }
   }
 
-  def submitTaxRegistrationNumber: Action[AnyContent] = Action.async { implicit request =>
+  def submitTaxRegistrationNumber: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       TaxRegistrationNumberForm.form
         .bindFromRequest()
@@ -128,19 +131,22 @@ with Logging {
     }
   }
 
-  def showMoreInformationNeeded: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+  def showMoreInformationNeeded: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingAgent { _ =>
       Ok(taxMoreInfoNeededView())
     }
   }
 
-  def showAddTaxRegNoForm: Action[AnyContent] = Action.async { implicit request =>
-    withEnrollingAgent { agentSession =>
+  def showAddTaxRegNoForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
+    withEnrollingAgent { _ =>
       Ok(addTrnView(AddTrnForm.form))
     }
   }
 
-  def submitAddTaxRegNo: Action[AnyContent] = Action.async { implicit request =>
+  def submitAddTaxRegNo: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       AddTrnForm.form
         .bindFromRequest()
@@ -166,7 +172,8 @@ with Logging {
     }
   }
 
-  def showYourTaxRegNumbersForm: Action[AnyContent] = Action.async { implicit request =>
+  def showYourTaxRegNumbersForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       val trns = agentSession.taxRegistrationNumbers
         .getOrElse(SortedSet.empty[Trn])
@@ -191,7 +198,8 @@ with Logging {
     }
   }
 
-  def submitYourTaxRegNumbers: Action[AnyContent] = Action.async { implicit request =>
+  def submitYourTaxRegNumbers: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       DoYouWantToAddAnotherTrnForm.form
         .bindFromRequest()
@@ -229,13 +237,15 @@ with Logging {
     }
   }
 
-  def showUpdateTaxRegNumber(trn: String): Action[AnyContent] = Action.async { implicit request =>
+  def showUpdateTaxRegNumber(trn: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { _ =>
       Ok(updateTrnView(UpdateTrnForm.form.fill(UpdateTrn(original = trn, Some(trn)))))
     }
   }
 
-  def submitUpdateTaxRegNumber: Action[AnyContent] = Action.async { implicit request =>
+  def submitUpdateTaxRegNumber: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       UpdateTrnForm.form
         .bindFromRequest()
@@ -268,7 +278,8 @@ with Logging {
     }
   }
 
-  def showRemoveTaxRegNumber(trn: String): Action[AnyContent] = Action.async { implicit request =>
+  def showRemoveTaxRegNumber(trn: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       if (agentSession.taxRegistrationNumbers.exists(_.contains(Trn(trn))))
         Ok(removeTrnView(removeTrnForm, trn))
@@ -281,7 +292,8 @@ with Logging {
     }
   }
 
-  def submitRemoveTaxRegNumber(trn: String): Action[AnyContent] = Action.async { implicit request =>
+  def submitRemoveTaxRegNumber(trn: String): Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       removeTrnForm
         .bindFromRequest()

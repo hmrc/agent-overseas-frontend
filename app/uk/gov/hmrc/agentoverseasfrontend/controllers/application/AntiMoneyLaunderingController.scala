@@ -22,6 +22,7 @@ import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.connectors.UpscanConnector
@@ -33,7 +34,7 @@ import uk.gov.hmrc.agentoverseasfrontend.models.AgentSession
 import uk.gov.hmrc.agentoverseasfrontend.models.RadioConfirm
 import uk.gov.hmrc.agentoverseasfrontend.services.ApplicationService
 import uk.gov.hmrc.agentoverseasfrontend.services.SessionCacheService
-import uk.gov.hmrc.agentoverseasfrontend.utils.toFuture
+import uk.gov.hmrc.agentoverseasfrontend.utils.given
 import uk.gov.hmrc.agentoverseasfrontend.views.html.application._
 
 import scala.concurrent.ExecutionContext
@@ -49,7 +50,7 @@ class AntiMoneyLaunderingController @Inject() (
   cc: MessagesControllerComponents,
   amlsView: anti_money_laundering,
   amlsRequiredView: anti_money_laundering_required
-)(implicit
+)(using
   appConfig: AppConfig,
   override val ec: ExecutionContext
 )
@@ -63,7 +64,8 @@ with I18nSupport {
 
   import authAction.withEnrollingAgent
 
-  def showMoneyLaunderingRequired: Action[AnyContent] = Action.async { implicit request =>
+  def showMoneyLaunderingRequired: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       val backUrl =
         if (agentSession.changingAnswers)
@@ -81,7 +83,8 @@ with I18nSupport {
     }
   }
 
-  def submitMoneyLaunderingRequired: Action[AnyContent] = Action.async { implicit request =>
+  def submitMoneyLaunderingRequired: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       amlsRequiredForm
         .bindFromRequest()
@@ -129,7 +132,8 @@ with I18nSupport {
       case _ => routes.ApplicationController.showContactDetailsForm.url
     }
 
-  def showAntiMoneyLaunderingForm: Action[AnyContent] = Action.async { implicit request =>
+  def showAntiMoneyLaunderingForm: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       val form = AmlsDetailsForm.form
 
@@ -156,7 +160,8 @@ with I18nSupport {
     }
   }
 
-  def submitAntiMoneyLaundering: Action[AnyContent] = Action.async { implicit request =>
+  def submitAntiMoneyLaundering: Action[AnyContent] = Action.async { request =>
+    given Request[AnyContent] = request
     withEnrollingAgent { agentSession =>
       AmlsDetailsForm.form
         .bindFromRequest()

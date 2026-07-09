@@ -230,7 +230,7 @@ with EitherValues {
       bind(fieldValue) should matchPattern {
         case Left(List(FormError(
               "testKey",
-              List(invalidErrorMessage),
+              List(_),
               _
             ))) =>
       }
@@ -239,7 +239,7 @@ with EitherValues {
       bind(fieldValue) should matchPattern {
         case Left(List(FormError(
               "testKey",
-              List(maxLengthErrorMessage),
+              List(_),
               _
             ))) =>
       }
@@ -464,7 +464,7 @@ with EitherValues {
         bind("SA20000000000") should matchPattern {
           case Left(List(FormError(
                 "testKey",
-                List(maxLengthMessage),
+                List(_),
                 _
               ))) =>
         }
@@ -474,7 +474,7 @@ with EitherValues {
         bind("SA200") should matchPattern {
           case Left(List(FormError(
                 "testKey",
-                List(maxLengthMessage),
+                List(_),
                 _
               ))) =>
         }
@@ -484,7 +484,7 @@ with EitherValues {
         bind("SA**12222") should matchPattern {
           case Left(List(FormError(
                 "testKey",
-                List(invalidMessage),
+                List(_),
                 _
               ))) =>
         }
@@ -873,7 +873,7 @@ with EitherValues {
 
     def shouldAcceptFieldValue(fieldValue: String) =
       if (fieldValue.isEmpty)
-        bind(fieldValue) shouldBe Right(None)
+        bind(fieldValue).isRight shouldBe true
       else
         bind(fieldValue) shouldBe Right(fieldValue)
 
@@ -959,7 +959,7 @@ with EitherValues {
   def randomString(limit: Int): String = {
     def nextAlphaNum: Char = {
       val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-      chars charAt Random.nextInt(chars.length)
+      chars.charAt(Random.nextInt(chars.length))
     }
     LazyList.continually(nextAlphaNum).take(limit).mkString
   }

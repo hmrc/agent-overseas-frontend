@@ -34,30 +34,30 @@ case class UploadRequest(
 
 object UploadRequest {
 
-  implicit val writes: Writes[UploadRequest] =
+  given Writes[UploadRequest] =
     new Writes[UploadRequest] {
       def writes(uploadRequest: UploadRequest): JsObject = Json.obj(
         "href" -> uploadRequest.href,
         "fields" -> uploadRequest.fields
       )
     }
-  implicit val reads: Reads[UploadRequest] =
+  given Reads[UploadRequest] =
     ((__ \ "href").read[String] and
-      (__ \ "fields").read[Map[String, String]])(UploadRequest.apply _)
+      (__ \ "fields").read[Map[String, String]])(UploadRequest.apply)
 
 }
 
 object UpscanInitiate {
 
-  implicit val writes: Writes[UpscanInitiate] =
+  given Writes[UpscanInitiate] =
     new Writes[UpscanInitiate] {
       def writes(upscan: UpscanInitiate): JsObject = Json.obj(
         "reference" -> upscan.reference,
         "uploadRequest" -> upscan.uploadRequest
       )
     }
-  implicit val reads: Reads[UpscanInitiate] =
+  given Reads[UpscanInitiate] =
     ((__ \ "reference").read[String] and
-      (__ \ "uploadRequest").read[UploadRequest])(UpscanInitiate.apply _)
+      (__ \ "uploadRequest").read[UploadRequest])(UpscanInitiate.apply)
 
 }

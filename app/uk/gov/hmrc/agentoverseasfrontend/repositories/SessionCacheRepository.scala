@@ -44,10 +44,9 @@ class SessionCacheRepository @Inject() (
   val mongo: MongoComponent,
   timestampSupport: TimestampSupport,
   appConfig: AppConfig
-)(implicit
+)(using
   ec: ExecutionContext,
-  @Named("aes") val crypto: Encrypter
-    with Decrypter
+  @Named("aes") val crypto: Encrypter & Decrypter
 )
 extends CacheRepository(
   mongoComponent = mongo,
@@ -61,19 +60,19 @@ extends CacheRepository(
   override def putSession[T: Writes](
     dataKey: DataKey[T],
     data: T
-  )(implicit request: RequestHeader): Future[(String, String)] = Mdc.preservingMdc {
+  )(using request: RequestHeader): Future[(String, String)] = Mdc.preservingMdc {
     super.putSession(DataKey[SensitiveWrapper[T]](dataKey.unwrap), SensitiveWrapper(data))
   }
 
   override def getFromSession[T: Reads](
     dataKey: DataKey[T]
-  )(implicit request: RequestHeader): Future[Option[T]] = Mdc.preservingMdc {
+  )(using request: RequestHeader): Future[Option[T]] = Mdc.preservingMdc {
     super.getFromSession(DataKey[SensitiveWrapper[T]](dataKey.unwrap)).map(_.map(_.decryptedValue))
   }
 
   override def deleteFromSession[T](
     dataKey: DataKey[T]
-  )(implicit request: RequestHeader): Future[Unit] = Mdc.preservingMdc {
+  )(using request: RequestHeader): Future[Unit] = Mdc.preservingMdc {
     super.deleteFromSession(DataKey[SensitiveWrapper[T]](dataKey.unwrap))
   }
 
@@ -84,16 +83,14 @@ extends Sensitive[T]
 
 object SensitiveWrapper {
 
-  implicit def reads[T](implicit
+  given reads[T](using
     reads: Reads[T],
-    crypto: Encrypter
-      with Decrypter
+    crypto: Encrypter & Decrypter
   ): Reads[SensitiveWrapper[T]] = sensitiveDecrypter(SensitiveWrapper[T])
 
-  implicit def writes[T](implicit
+  given writes[T](using
     writes: Writes[T],
-    crypto: Encrypter
-      with Decrypter
+    crypto: Encrypter & Decrypter
   ): Writes[SensitiveWrapper[T]] = sensitiveEncrypter
 
 }

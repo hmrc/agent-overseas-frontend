@@ -42,7 +42,7 @@ class SubscriptionEmailVerificationController @Inject() (
   emailVerificationService: EmailVerificationService,
   val controllerComponents: MessagesControllerComponents,
   accessibilityStatementConfig: AccessibilityStatementConfig
-)(implicit
+)(using
   appConfig: AppConfig,
   ec: ExecutionContext
 )
@@ -53,9 +53,9 @@ with I18nSupport {
 
   override def emailVerificationFrontendBaseUrl: String = appConfig.emailVerificationFrontendBaseUrl
 
-  override def accessibilityStatementUrl(implicit request: RequestHeader): String = accessibilityStatementConfig.url.getOrElse("")
+  override def accessibilityStatementUrl(using request: RequestHeader): String = accessibilityStatementConfig.url.getOrElse("")
 
-  override def getState(implicit rh: RequestHeader): Future[(AgencyDetails, String)] =
+  override def getState(using rh: RequestHeader): Future[(AgencyDetails, String)] =
     for {
       mAgencyDetails <- sessionStoreService.fetchAgencyDetails
       agencyDetails = mAgencyDetails.getOrElse(
@@ -74,7 +74,7 @@ with I18nSupport {
   override def markEmailAsVerified(
     session: AgencyDetails,
     email: String
-  )(implicit
+  )(using
     rh: RequestHeader
   ): Future[AgencyDetails] = {
     val newAgencyDetails = session.copy(verifiedEmails = session.verifiedEmails + email)
