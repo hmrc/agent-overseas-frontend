@@ -16,7 +16,7 @@
 
 @this()
 
-@(form: Form[_])(using msgs: Messages)
+@(form: Form[_])(implicit msgs: Messages)
 @if(form.hasErrors){
     @msgs("error.prefix")
 }

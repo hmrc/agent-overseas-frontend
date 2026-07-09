@@ -47,7 +47,7 @@
     inset_text: inset_text, h1: h1
 )
 
-@(contactDetailsForm: Form[ContactDetails], backLink: Option[String] = None)(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@(contactDetailsForm: Form[ContactDetails], backLink: Option[String] = None)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(title = errorPrefix(contactDetailsForm).toString + msgs("contactDetails.title"), backLinkHref = Some(backLink.getOrElse(routes.FileUploadController.showSuccessfulUploadedForm.url))) {
 

@@ -30,7 +30,7 @@
     p: p, h1: h1, h2: h2, span: span, a: a
 )
 
-@(agentDetails: ApplicationEntityDetails)(using msgs: Messages, request: RequestHeader, appConfig: AppConfig)
+@(agentDetails: ApplicationEntityDetails)(implicit msgs: Messages, request: RequestHeader, appConfig: AppConfig)
 
 @mainTemplate(msgs("statusRejected.title")) {
 
