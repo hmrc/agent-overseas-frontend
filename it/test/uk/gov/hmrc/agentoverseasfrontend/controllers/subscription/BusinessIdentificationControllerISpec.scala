@@ -17,17 +17,16 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import org.jsoup.Jsoup
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.*
-import play.api.test.Helpers.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers
+import play.api.test.Helpers.*
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.models.ProviderId
-import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser.*
-import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.*
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentOverseasApplicationStubs
 import uk.gov.hmrc.agentoverseasfrontend.stubs.AgentSubscriptionStubs
+import uk.gov.hmrc.agentoverseasfrontend.stubs.SampleUser.*
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.*
 import uk.gov.hmrc.agentoverseasfrontend.support.BaseISpec
 import uk.gov.hmrc.http.SessionKeys
 
@@ -131,14 +130,17 @@ with AgentSubscriptionStubs {
 
     }
 
-    "redirect to next-steps if Registered with unclean credential" in {
+    "redirect to create-account/complete if Registered with unclean credential" in {
+      val arn: Arn = Arn("TARN0000001")
+      givenOverseasApplicationIsRegistered()
+      givenOverseasApplicationReceivesSuccessfulSubscriptionResponse(arn)
+
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      givenRegisteredApplicationResponse()
 
       val result: Future[Result] = controller.showCheckAnswers(request)
       status(result) shouldBe 303
 
-      header(LOCATION, result).get shouldBe "/agent-services/apply-from-outside-uk/create-account/next-step"
+      header(LOCATION, result).get shouldBe routes.SubscriptionController.subscriptionComplete.url
     }
 
     "attempt subscribeAndEnrol if Complete then redirect to /agent-services-account" in {
@@ -850,56 +852,6 @@ with AgentSubscriptionStubs {
       "submit update business email" in checkVerifyEmailIsNotTriggered { request =>
         controller.submitUpdateBusinessEmailForm(request)
       }
-    }
-  }
-
-}
-
-class BusinessIdentificationControllerExistingCredsEnabledISpec
-extends BaseISpec
-with AgentOverseasApplicationStubs
-with AgentSubscriptionStubs {
-
-  override protected def appBuilder: GuiceApplicationBuilder = super.appBuilder.configure(
-    "features.allow-existing-credentials-for-approved-overseas-applications" -> true
-  )
-
-  lazy val controller: BusinessIdentificationController = app.injector.instanceOf[BusinessIdentificationController]
-
-  "GET /check-answers" should {
-    "display the check-answers page for an accepted application with existing enrolments when the feature switch is enabled" in {
-      val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
-      givenAcceptedApplicationResponse()
-      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
-
-      val result = controller.showCheckAnswers(request)
-      status(result) shouldBe 200
-
-      result.futureValue should containMessages("subscription.checkAnswers.title")
-    }
-
-    "allow a registered application with existing enrolments to continue when the feature switch is enabled" in {
-      val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      givenRegisteredApplicationResponse()
-      givenApplicationUpdateSuccessResponse()
-      givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
-
-      val result = controller.showCheckAnswers(request)
-      status(result) shouldBe 303
-
-      header(LOCATION, result).get shouldBe "/agent-services/apply-from-outside-uk/create-account/complete"
-    }
-
-    "allow a complete application with existing enrolments to continue when the feature switch is enabled" in {
-      val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      givenCompleteApplicationResponse()
-      givenSubscriptionSuccessfulResponse(Arn("TARN0000001"))
-
-      val result = controller.showCheckAnswers(request)
-      status(result) shouldBe 303
-
-      header(LOCATION, result).get shouldBe "/agent-services/apply-from-outside-uk/create-account/complete"
     }
   }
 

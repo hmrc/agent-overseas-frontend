@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.stubs
 
-import java.time.LocalDateTime
+import uk.gov.hmrc.agentoverseasfrontend.connectors.OverseasSubscriptionResponse
 
+import java.time.LocalDateTime
 import uk.gov.hmrc.agentoverseasfrontend.models
-import uk.gov.hmrc.agentoverseasfrontend.models._
+import uk.gov.hmrc.agentoverseasfrontend.models.*
 
 object StubsTestData {
 
@@ -36,14 +37,41 @@ object StubsTestData {
       "CC"
     )
   )
+  val newTradingDetails = SubscriptionTradingDetails(
+    "Testing Agency",
+    OverseasAddress(
+      "addressLine1",
+      "addressLine2",
+      Some("addressLine3"),
+      Some("addressLine4"),
+      "TN"
+    )
+  )
 
-  val applicationcreationDate = LocalDateTime.parse("2019-02-20T15:11:51.729")
+  val applicationCreationDate: LocalDateTime = LocalDateTime.parse("2019-02-20T15:11:51.729")
+  val newApplicationCreationDate: LocalDateTime = LocalDateTime.parse("2019-02-18T15:11:51.729")
 
   val application = models.OverseasApplication(
-    applicationcreationDate,
+    applicationCreationDate,
     ApplicationStatus.Accepted,
     contactDetails,
     tradingDetails,
+    None
+  )
+
+  val acceptedOverseasApplication = models.OverseasApplication(
+    newApplicationCreationDate,
+    ApplicationStatus.Accepted,
+    contactDetails,
+    newTradingDetails,
+    None
+  )
+
+  val registeredOverseasApplication = models.OverseasApplication(
+    newApplicationCreationDate,
+    ApplicationStatus.Registered,
+    contactDetails,
+    newTradingDetails,
     None
   )
 
@@ -59,6 +87,21 @@ object StubsTestData {
     ),
     verifiedEmails = Set("test-agency-email@domain.com")
   )
+
+  val newAgencyDetailsForOverseasApplication = AgencyDetails(
+    agencyName = "Testing Agency",
+    agencyEmail = "test@test.com",
+    agencyAddress = OverseasAddress(
+      "addressLine1",
+      "addressLine2",
+      Some("addressLine3"),
+      Some("addressLine4"),
+      "TN"
+    ),
+    verifiedEmails = Set("test@test.com")
+  )
+
+  def overseasApplicationSubscriptionResponse(arn: Arn) = OverseasSubscriptionResponse(arn)
 
   def pendingApplication(appCreateDate: String): String =
     s"""|[

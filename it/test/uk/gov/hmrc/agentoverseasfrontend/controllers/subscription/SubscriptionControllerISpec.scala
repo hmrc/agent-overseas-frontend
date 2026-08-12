@@ -71,12 +71,19 @@ with AgentSubscriptionStubs {
       header(LOCATION, result).get shouldBe routes.BusinessIdentificationController.showCheckAnswers.url
     }
 
-    "redirect to /next-steps if user has unclean credentials (they have 1 or more enrolments)" in {
+    "redirect to create-account/complete if user has unclean credentials (they have 1 or more enrolments)" in {
+      givenOverseasApplicationIsAccepted()
+      givenOverseasApplicationAgencyDetailsAreUpdated()
+      givenOverseasApplicationReceivesSuccessfulSubscriptionResponse(arn)
+
       val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
+
+      sessionCacheService.currentSession(using request).agencyDetails = Some(agencyDetails)
+
       val result = controller.subscribe(request)
 
       status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.SubscriptionRootController.nextStep.url
+      header(LOCATION, result).get shouldBe routes.SubscriptionController.subscriptionComplete.url
     }
 
     "redirect to /already-subscribed if the HMRC-AS-AGENT enrolment with their ARN is already allocated to a group" in {
@@ -294,35 +301,6 @@ with AgentSubscriptionStubs {
       header(LOCATION, result).value shouldBe "http://localhost:9099/bas-gateway/sign-in?continue_url=http://localhost:9414/&origin=agent-overseas-frontend"
     }
 
-  }
-
-}
-
-class SubscriptionControllerWithExistingCredentialsEnabledISpec
-extends BaseISpec
-with AgentOverseasApplicationStubs
-with AgentSubscriptionStubs {
-
-  override protected def appBuilder = super.appBuilder.configure("features.allow-existing-credentials-for-approved-overseas-applications" -> true)
-
-  val arn: Arn = Arn("TARN0000001")
-
-  lazy val controller: SubscriptionController = app.injector.instanceOf[SubscriptionController]
-
-  "subscribe" should {
-    "allow an accepted application to continue with existing enrolments when the feature switch is enabled" in {
-      val request = authenticatedAs(subscribingAgentEnrolledForNonMTD)
-      given FakeRequest[?] = request
-      sessionCacheService.currentSession.agencyDetails = Some(agencyDetails)
-      givenAcceptedApplicationResponse()
-      givenApplicationUpdateSuccessResponse()
-      givenSubscriptionSuccessfulResponse(arn)
-
-      val result = controller.subscribe(request)
-
-      status(result) shouldBe 303
-      header(LOCATION, result).get shouldBe routes.SubscriptionController.subscriptionComplete.url
-    }
   }
 
 }

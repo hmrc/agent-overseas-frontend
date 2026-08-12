@@ -70,14 +70,18 @@ with Logging {
     case Some(agencyDetails) if !agencyDetails.isEmailVerified => Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
     case _ =>
       subscriptionService.subscribe.map {
-        case Right(_) => Redirect(routes.SubscriptionController.subscriptionComplete)
+        case Right(_) =>
+          logger.info("Subscription application is valid, redirecting to /complete")
+          Redirect(routes.SubscriptionController.subscriptionComplete)
         case Left(NoApplications) =>
           logger.info("User has no known applications, redirecting to application frontend")
           Redirect(s"${appConfig.selfExternalUrl + routes.SubscriptionRootController.root.url}")
         case Left(NoAgencyInSession) =>
           logger.info("No agency details in session, redirecting to /check-answers")
           Redirect(routes.BusinessIdentificationController.showCheckAnswers)
-        case Left(AlreadySubscribed) => Redirect(routes.SubscriptionController.alreadySubscribed)
+        case Left(AlreadySubscribed) =>
+          logger.info("Agent is already subscribed, redirecting to /already-subscribed")
+          Redirect(routes.SubscriptionController.alreadySubscribed)
         case Left(WrongApplicationStatus) =>
           throw new IllegalStateException(
             "Can not proceed with application - can not subscribe with an application in this status"
@@ -87,13 +91,8 @@ with Logging {
 
   def subscribe: Action[AnyContent] = Action.async { request =>
     given Request[AnyContent] = request
-    withSimpleAgentAuth { subRequest =>
-      if (subRequest.enrolments.isEmpty || appConfig.allowExistingCredentialsForApprovedOverseasApplications)
-        continueSubscription()
-      else {
-        logger.info("User has other enrolments, redirecting to /next-step")
-        Future.successful(Redirect(routes.SubscriptionRootController.nextStep))
-      }
+    withSimpleAgentAuth { _ =>
+      continueSubscription()
     }
   }
 

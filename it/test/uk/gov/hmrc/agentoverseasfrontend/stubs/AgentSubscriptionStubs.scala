@@ -16,12 +16,16 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.Logging
+import play.api.libs.json.Json
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.overseasApplicationSubscriptionResponse
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 
-trait AgentSubscriptionStubs { me: WireMockSupport =>
+trait AgentSubscriptionStubs
+extends Logging { me: WireMockSupport =>
 
   private val pathOverseasSubscription = "/agent-subscription/overseas-subscription"
 
@@ -31,6 +35,17 @@ trait AgentSubscriptionStubs { me: WireMockSupport =>
         .withStatus(201)
     )
   )
+
+  def givenOverseasApplicationReceivesSuccessfulSubscriptionResponse(responseArn: Arn): StubMapping = {
+    val subscriptionResponseJson = Json.toJson(overseasApplicationSubscriptionResponse(responseArn))
+
+    stubFor(
+      put(urlEqualTo(pathOverseasSubscription)).willReturn(
+        jsonResponse(Json.prettyPrint(subscriptionResponseJson), 201)
+      )
+    )
+
+  }
 
   def givenSubscriptionFailed(withStatus: Int): StubMapping = stubFor(
     put(urlEqualTo(pathOverseasSubscription))
