@@ -121,63 +121,54 @@ with Logging {
         Future.successful(Redirect(appConfig.asaFrontendUrl))
       }
       else {
-        val hasCleanCreds = enrolments.enrolments.isEmpty
-        val treatAsCleanCreds = hasCleanCreds || appConfig.allowExistingCredentialsForApprovedOverseasApplications
-
         subscriptionService.mostRecentApplication.flatMap {
           case Some(application) if application.status == Pending || application.status == Rejected =>
             Future.successful(SeeOther(s"${appConfig.selfExternalUrl + applicationRoutes.ApplicationRootController.root.url}/application-status"))
           case Some(application) if application.status == ApplicationStatus.Accepted =>
-            if (treatAsCleanCreds) {
-              // happy path
-              sessionStoreService.fetchAgencyDetails
-                .flatMap { maybeAgencyDetails =>
-                  // If there are no AgentDetails in session, create a new one derived from the agent's application data and store it in the session
-                  if (maybeAgencyDetails.isEmpty && generateNewDetailsIfNoSession) {
-                    val agencyDetails = AgencyDetails.fromOverseasApplication(application)
-                    sessionStoreService.cacheAgencyDetails(agencyDetails).map(_ => Some(agencyDetails))
-                  }
-                  else
-                    Future.successful(maybeAgencyDetails)
+            // happy path
+            sessionStoreService.fetchAgencyDetails
+              .flatMap { maybeAgencyDetails =>
+                // If there are no AgentDetails in session, create a new one derived from the agent's application data and store it in the session
+                if (maybeAgencyDetails.isEmpty && generateNewDetailsIfNoSession) {
+                  val agencyDetails = AgencyDetails.fromOverseasApplication(application)
+                  sessionStoreService.cacheAgencyDetails(agencyDetails).map(_ => Some(agencyDetails))
                 }
-                .flatMap {
-                  case Some(agencyDetails) =>
-                    // Consider the auth email as verified for email verification purposes (APB-7317)
-                    val agencyDetailsFixed = agencyDetails.copy(verifiedEmails = agencyDetails.verifiedEmails ++ maybeAuthEmail.toSet)
-
-                    def maybeUpdateSession(): Future[Unit] = {
-                      val sessionNeedsUpdating = agencyDetailsFixed != agencyDetails
-                      if (sessionNeedsUpdating)
-                        sessionStoreService.cacheAgencyDetails(agencyDetailsFixed)
-                      else
-                        Future.successful(())
-                    }
-
-                    maybeUpdateSession().flatMap { _ =>
-                      if (checkForEmailVerification && !agencyDetailsFixed.isEmailVerified) {
-                        // email needs verifying
-                        Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
-                      }
-                      else {
-                        // happy path
-                        block(agencyDetailsFixed)
-                      }
-                    }
-                  case None =>
-                    logger.warn(s"Missing agency details in session, redirecting back to /check-answers")
-                    Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
-                }
-            }
-            else
-              Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
-          case Some(application) if application.status == Registered || application.status == Complete =>
-            if (treatAsCleanCreds)
-              subscriptionService.subscribe.flatMap {
-                case Right(_) => Future.successful(Redirect(subscription.routes.SubscriptionController.subscriptionComplete))
-                case Left(_) => Future.successful(Redirect(subscription.routes.SubscriptionController.alreadySubscribed))
+                else
+                  Future.successful(maybeAgencyDetails)
               }
-            else
-              Future.successful(Redirect(subscription.routes.SubscriptionRootController.nextStep))
+              .flatMap {
+                case Some(agencyDetails) =>
+                  // Consider the auth email as verified for email verification purposes (APB-7317)
+                  val agencyDetailsFixed = agencyDetails.copy(verifiedEmails = agencyDetails.verifiedEmails ++ maybeAuthEmail.toSet)
+
+                  def maybeUpdateSession(): Future[Unit] = {
+                    val sessionNeedsUpdating = agencyDetailsFixed != agencyDetails
+                    if (sessionNeedsUpdating)
+                      sessionStoreService.cacheAgencyDetails(agencyDetailsFixed)
+                    else
+                      Future.successful(())
+                  }
+
+                  maybeUpdateSession().flatMap { _ =>
+                    if (checkForEmailVerification && !agencyDetailsFixed.isEmailVerified) {
+                      // email needs verifying
+                      Future.successful(Redirect(routes.SubscriptionEmailVerificationController.verifyEmail))
+                    }
+                    else {
+                      // happy path
+                      block(agencyDetailsFixed)
+                    }
+                  }
+                case None =>
+                  logger.warn(s"Missing agency details in session, redirecting back to /check-answers")
+                  Future.successful(Redirect(routes.BusinessIdentificationController.showCheckAnswers))
+              }
+
+          case Some(application) if application.status == Registered || application.status == Complete =>
+            subscriptionService.subscribe.flatMap {
+              case Right(_) => Future.successful(Redirect(subscription.routes.SubscriptionController.subscriptionComplete))
+              case Left(_) => Future.successful(Redirect(subscription.routes.SubscriptionController.alreadySubscribed))
+            }
           case Some(application) if application.status == AttemptingRegistration =>
             Future.successful(Redirect(subscription.routes.SubscriptionRootController.showApplicationIssue))
           case None => Future.successful(SeeOther(s"${appConfig.selfExternalUrl + applicationRoutes.ApplicationRootController.root.url}"))

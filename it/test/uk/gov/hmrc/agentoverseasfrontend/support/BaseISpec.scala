@@ -82,7 +82,6 @@ with MongoSupport {
       "cachable.session-cache.domain" -> "keystore",
       "maintainer-application-review-days" -> 28,
       "feedback-survey-url" -> "http://localhost:9514/feedback/OVERSEAS_AGENTS",
-      "features.allow-existing-credentials-for-approved-overseas-applications" -> false,
       "metrics.enabled" -> false,
       "auditing.enabled" -> true,
       "auditing.consumer.baseUri.host" -> wireMockHost,

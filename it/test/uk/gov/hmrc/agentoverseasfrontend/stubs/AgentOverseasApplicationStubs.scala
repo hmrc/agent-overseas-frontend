@@ -16,14 +16,19 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.CreateOverseasApplicationRequest
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.acceptedOverseasApplication
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.newAgencyDetailsForOverseasApplication
+import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.registeredOverseasApplication
 
-trait AgentOverseasApplicationStubs {
+trait AgentOverseasApplicationStubs
+extends Logging {
 
   private val allStatuses = ApplicationStatus.allStatuses.map(status => s"statusIdentifier=${status.key}").mkString("&")
 
@@ -187,6 +192,28 @@ trait AgentOverseasApplicationStubs {
     )
   )
 
+  def givenOverseasApplicationIsAccepted(): StubMapping = {
+    val listOfOverseasApplicationsJson = Json.toJson(List(acceptedOverseasApplication))
+
+    stubFor(
+      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+        okJson(Json.prettyPrint(listOfOverseasApplicationsJson))
+      )
+    )
+
+  }
+
+  def givenOverseasApplicationIsRegistered(): StubMapping = {
+    val listOfOverseasApplicationsJson = Json.toJson(List(registeredOverseasApplication))
+
+    stubFor(
+      get(urlEqualTo("/agent-overseas-application/application")).willReturn(
+        okJson(Json.prettyPrint(listOfOverseasApplicationsJson))
+      )
+    )
+
+  }
+
   def givenAcceptedApplicationResponseWithUnverifiedEmail(): StubMapping = stubFor(
     get(urlEqualTo("/agent-overseas-application/application")).willReturn(
       okJson(StubsTestData.applicationWithStatus())
@@ -265,6 +292,17 @@ trait AgentOverseasApplicationStubs {
         .withStatus(204)
     )
   )
+
+  def givenOverseasApplicationAgencyDetailsAreUpdated(): StubMapping = {
+    val newAgencyDetailsJson = Json.toJson(newAgencyDetailsForOverseasApplication)
+
+    stubFor(
+      put(urlEqualTo("/agent-overseas-application/application")).willReturn(
+        jsonResponse(Json.prettyPrint(newAgencyDetailsJson), 204)
+      )
+    )
+
+  }
 
   def givenApplicationUpdateNotFoundResponse(): StubMapping = stubFor(
     put(urlEqualTo("/agent-overseas-application/application")).willReturn(
