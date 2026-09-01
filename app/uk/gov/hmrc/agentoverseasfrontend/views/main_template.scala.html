@@ -94,7 +94,6 @@
         serviceUrl = None,
         signOutUrl = if(isSignedIn) Some(routes.SignOutController.signOut.url) else None,
     ),
-    banners = Banners(displayHmrcBanner = true),
     templateOverrides = TemplateOverrides(
         additionalHeadBlock = Some(head),
         additionalScriptsBlock = Some(additionalScripts),
