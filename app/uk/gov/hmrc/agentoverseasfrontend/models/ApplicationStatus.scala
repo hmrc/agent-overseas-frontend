@@ -27,9 +27,8 @@ with Serializable {
       case ApplicationStatus.Pending => "pending" // 1
       case ApplicationStatus.Rejected => "rejected" // 2
       case ApplicationStatus.Accepted => "accepted" // 2
-      case ApplicationStatus.AttemptingRegistration => "attempting_registration" // 3
-      case ApplicationStatus.Registered => "registered" // 4
-      case ApplicationStatus.Complete => "complete" // 5
+      case ApplicationStatus.Registered => "registered" // 3
+      case ApplicationStatus.Complete => "complete" // 4
       case ApplicationStatus.NotReceivedInDms => "not_received_in_dms"
     }
 }
@@ -48,9 +47,6 @@ object ApplicationStatus {
   case object Accepted
   extends ApplicationStatus
 
-  case object AttemptingRegistration
-  extends ApplicationStatus
-
   case object Registered
   extends ApplicationStatus
 
@@ -64,7 +60,6 @@ object ApplicationStatus {
       case ApplicationStatus.Rejected.key => ApplicationStatus.Rejected
       case ApplicationStatus.NotReceivedInDms.key => ApplicationStatus.NotReceivedInDms
       case ApplicationStatus.Accepted.key => ApplicationStatus.Accepted
-      case ApplicationStatus.AttemptingRegistration.key => ApplicationStatus.AttemptingRegistration
       case ApplicationStatus.Registered.key => ApplicationStatus.Registered
       case ApplicationStatus.Complete.key => ApplicationStatus.Complete
     }
@@ -76,7 +71,6 @@ object ApplicationStatus {
     case JsString(ApplicationStatus.Accepted.key) => JsSuccess(Accepted)
     case JsString(ApplicationStatus.Rejected.key) => JsSuccess(Rejected)
     case JsString(ApplicationStatus.NotReceivedInDms.key) => JsSuccess(NotReceivedInDms)
-    case JsString(ApplicationStatus.AttemptingRegistration.key) => JsSuccess(AttemptingRegistration)
     case JsString(ApplicationStatus.Registered.key) => JsSuccess(Registered)
     case JsString(ApplicationStatus.Complete.key) => JsSuccess(Complete)
     case invalid => JsError(s"Invalid ApplicationStatus found: $invalid")
@@ -89,7 +83,6 @@ object ApplicationStatus {
     Rejected,
     NotReceivedInDms,
     Accepted,
-    AttemptingRegistration,
     Registered,
     Complete
   )

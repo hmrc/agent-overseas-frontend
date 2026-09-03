@@ -32,7 +32,6 @@ import uk.gov.hmrc.agentoverseasfrontend.controllers.application.CommonRouting
 import uk.gov.hmrc.agentoverseasfrontend.controllers.application.routes
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Accepted
-import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.AttemptingRegistration
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Complete
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.Registered
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus.NotReceivedInDms
@@ -369,7 +368,6 @@ with ScalaFutures {
     "return overseas-subscription-frontend root page" when {
       Set(
         Accepted,
-        AttemptingRegistration,
         Registered,
         Complete
       ).foreach { status =>

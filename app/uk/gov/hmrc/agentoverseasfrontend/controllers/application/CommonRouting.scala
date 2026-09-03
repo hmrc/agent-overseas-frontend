@@ -75,7 +75,6 @@ trait CommonRouting {
       case Some(application)
           if Set(
             Accepted,
-            AttemptingRegistration,
             Registered,
             Complete
           )
