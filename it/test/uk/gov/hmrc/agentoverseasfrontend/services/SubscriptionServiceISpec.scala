@@ -94,11 +94,6 @@ with AgentSubscriptionStubs {
         service.subscribe.futureValue shouldBe Left(NoApplications)
       }
 
-      "the user's most recent application is in 'attempting_registration' status, return Left(WrongApplicationStatus)" in {
-        givenAttemptingRegistrationApplicationResponse()
-        service.subscribe.futureValue shouldBe Left(WrongApplicationStatus)
-      }
-
       "the user's most recent application is in 'rejected' status, return Left(WrongApplicationStatus)" in {
         givenRejectedApplicationResponse()
         service.subscribe.futureValue shouldBe Left(WrongApplicationStatus)

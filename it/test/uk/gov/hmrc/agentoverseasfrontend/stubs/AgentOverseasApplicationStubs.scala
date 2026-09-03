@@ -235,13 +235,6 @@ extends Logging {
     )
   )
 
-  def givenAttemptingRegistrationApplicationResponse(): StubMapping = stubFor(
-    get(urlEqualTo("/agent-overseas-application/application")).willReturn(
-      okJson(StubsTestData.applicationWithStatus("attempting_registration"))
-        .withStatus(200)
-    )
-  )
-
   def givenRejectedApplicationResponse(): StubMapping = stubFor(
     get(urlEqualTo("/agent-overseas-application/application")).willReturn(
       okJson(StubsTestData.rejectedApplication)
