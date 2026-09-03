@@ -6,6 +6,7 @@ val appName = "agent-overseas-frontend"
 ThisBuild / majorVersion := 1
 ThisBuild / scalaVersion := "3.7.4"
 
+
 val scalaCOptions = Seq(
   "-Werror",
   "-Wconf:msg=Flag.*repeatedly:s",
@@ -14,6 +15,7 @@ val scalaCOptions = Seq(
   "-Wconf:src=routes/.*:s", // silence warnings from routes
   "-language:implicitConversions"
 )
+
 
 lazy val root = (project in file("."))
   .settings(
