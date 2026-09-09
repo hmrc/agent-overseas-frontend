@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentoverseasfrontend.controllers.subscription
 
 import javax.inject.Inject
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.i18n.MessagesApi
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -60,7 +60,7 @@ extends AgentOverseasBaseController(
   applicationService,
   mcc
 )
-with Logging {
+with RequestAwareLogging {
 
   import authAction.config
   import authAction.withSimpleAgentAuth

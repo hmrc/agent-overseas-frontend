@@ -18,14 +18,14 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.overseasApplicationSubscriptionResponse
 import uk.gov.hmrc.agentoverseasfrontend.support.WireMockSupport
 
 trait AgentSubscriptionStubs
-extends Logging { me: WireMockSupport =>
+extends RequestAwareLogging { me: WireMockSupport =>
 
   private val pathOverseasSubscription = "/agent-subscription/overseas-subscription"
 
