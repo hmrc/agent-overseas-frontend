@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentoverseasfrontend.models.AgencyDetails
 import uk.gov.hmrc.agentoverseasfrontend.models.ApplicationStatus
@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.newAgencyDetailsFor
 import uk.gov.hmrc.agentoverseasfrontend.stubs.StubsTestData.registeredOverseasApplication
 
 trait AgentOverseasApplicationStubs
-extends Logging {
+extends RequestAwareLogging {
 
   private val allStatuses = ApplicationStatus.allStatuses.map(status => s"statusIdentifier=${status.key}").mkString("&")
 

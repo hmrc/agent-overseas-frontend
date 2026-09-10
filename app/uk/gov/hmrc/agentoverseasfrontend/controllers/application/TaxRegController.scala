@@ -24,7 +24,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.mvc.MessagesControllerComponents
 import play.api.Environment
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
 import uk.gov.hmrc.agentoverseasfrontend.controllers.auth.ApplicationAuth
 import uk.gov.hmrc.agentoverseasfrontend.forms.YesNoRadioButtonForms.removeTrnForm
@@ -70,7 +70,7 @@ extends AgentOverseasBaseController(
 )
 with SessionBehaviour
 with I18nSupport
-with Logging {
+with RequestAwareLogging {
 
   import authAction.withEnrollingAgent
 

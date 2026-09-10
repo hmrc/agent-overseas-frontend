@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
 import play.api.Configuration
 import play.api.Environment
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Forbidden
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 trait AuthBase
 extends AuthorisedFunctions
-with Logging {
+with RequestAwareLogging {
 
   val authConnector: AuthConnector
   val env: Environment

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.services
 
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.connectors.EmailVerificationConnector
 import uk.gov.hmrc.agentoverseasfrontend.models.Email
@@ -31,7 +31,7 @@ import scala.concurrent.Future
 
 @Singleton
 class EmailVerificationService @Inject() (emailVerificationConnector: EmailVerificationConnector)(using executionContext: ExecutionContext)
-extends Logging {
+extends RequestAwareLogging {
 
   def verifyEmail(
     credId: String,

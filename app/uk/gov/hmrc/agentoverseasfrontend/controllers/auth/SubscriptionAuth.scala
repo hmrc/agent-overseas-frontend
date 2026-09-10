@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.controllers.auth
 
 import play.api.Configuration
 import play.api.Environment
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.mvc.Results.Forbidden
 import play.api.mvc.Results.Redirect
 import play.api.mvc.Results.SeeOther
@@ -70,7 +70,7 @@ class SubscriptionAuth @Inject() (
 )
 extends AuthBase
 with CommonRouting
-with Logging {
+with RequestAwareLogging {
 
   def getCreds(using rh: RequestHeader): Future[Credentials] =
     authorised(AuthProviders(GovernmentGateway) and AffinityGroup.Agent).retrieve(credentials) {

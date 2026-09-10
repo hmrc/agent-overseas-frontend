@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.controllers.application
 
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.agentoverseasfrontend.config.AppConfig
@@ -57,7 +57,7 @@ extends AgentOverseasBaseController(
   cc
 )
 with SessionBehaviour
-with Logging {
+with RequestAwareLogging {
 
   import authAction.withEnrollingEmailVerifiedAgent
 
@@ -247,7 +247,10 @@ with Logging {
     case None => throw new RuntimeException("no agent session")
   }
 
-  private def getBackLink(fileType: String)(using agentSession: AgentSession): Option[String] =
+  private def getBackLink(fileType: String)(using
+    agentSession: AgentSession,
+    requestHeader: RequestHeader
+  ): Option[String] =
     if (
       agentSession.changingAnswers && (fileType match {
         case "trading-address" => agentSession.tradingAddressUploadStatus.nonEmpty

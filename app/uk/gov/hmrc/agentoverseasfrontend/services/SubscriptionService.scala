@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentoverseasfrontend.services
 
 import cats.data.OptionT
 import cats.implicits._
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentoverseasfrontend.models.Arn
 import uk.gov.hmrc.agentoverseasfrontend.connectors.AgentOverseasApplicationConnector
@@ -45,7 +45,7 @@ class SubscriptionService @Inject() (
   subscriptionConnector: AgentSubscriptionConnector,
   sessionStoreService: SessionCacheService
 )(using executionContext: ExecutionContext)
-extends Logging {
+extends RequestAwareLogging {
 
   given Ordering[LocalDateTime] = Ordering.by(_.toEpochSecond(ZoneOffset.UTC))
 

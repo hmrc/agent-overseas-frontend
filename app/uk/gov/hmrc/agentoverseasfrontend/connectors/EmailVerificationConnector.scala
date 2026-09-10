@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentoverseasfrontend.connectors
 
-import play.api.Logging
+import uk.gov.hmrc.agentoverseasfrontend.utils.RequestAwareLogging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.RequestHeader
@@ -44,7 +44,7 @@ class EmailVerificationConnector @Inject() (
   val appConfig: AppConfig,
   val ec: ExecutionContext
 )
-extends Logging {
+extends RequestAwareLogging {
 
   def verifyEmail(
     request: VerifyEmailRequest
